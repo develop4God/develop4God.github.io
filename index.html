@@ -3,142 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones de Uso - Devocionales Cristianos</title>
-    <!-- Enlace al CDN de Tailwind CSS para estilos básicos -->
+    <title>Inicio - Devocionales Cristianos</title>
+    <!-- Enlace al CDN de Tailwind CSS para estilos rápidos y responsivos -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Enlace a Google Fonts para la fuente "Inter" -->
+    <!-- Enlace a Google Fonts para la fuente "Inter" (moderna y legible) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Enlace a Font Awesome para los iconos -->
+    <script src="https://kit.fontawesome.com/b286598102.js" crossorigin="anonymous"></script>
     <style>
+        /* Estilos personalizados para la fuente Inter */
         body {
             font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
         }
-        .container-legal {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        /* Ajuste para que el pie de página se quede abajo */
+        html, body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
         }
-        h1 {
-            font-size: 2.5em;
-            color: #4a0e4e; /* Morado oscuro para títulos principales */
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        h2 {
-            font-size: 1.8em;
-            color: #6c236f; /* Un tono de morado un poco más claro */
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        h3 {
-            font-size: 1.4em;
-            color: #8c3b90; /* Otro tono de morado */
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        p, ul, ol {
-            margin-bottom: 1em;
-        }
-        ul {
-            list-style-type: disc;
-            margin-left: 20px;
-        }
-        ol {
-            list-style-type: decimal;
-            margin-left: 20px;
-        }
-        a {
-            color: #6d28d9; /* Morado de Tailwind para enlaces */
-            text-decoration: underline;
-        }
-        a:hover {
-            color: #5b21b6;
-        }
-        .back-link {
-            display: block;
-            margin-top: 40px;
-            text-align: center;
-        }
-        .back-link a {
-            background-color: #a78bfa; /* Botón morado claro */
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-        }
-        .back-link a:hover {
-            background-color: #8b5cf6; /* Morado un poco más oscuro al pasar el ratón */
+        main {
+            flex: 1; /* Esto hace que el contenido principal ocupe el espacio restante */
         }
     </style>
 </head>
-<body>
-    <div class="container-legal">
-        <h1>Términos y Condiciones de Uso de la Aplicación "Devocionales Cristianos"</h1>
-        <p class="text-center text-gray-600 mb-8"><strong>Fecha de Última Actualización:</strong> 16 de julio de 2025</p>
+<body class="bg-gray-100 text-gray-900">
+    <div id="app-container" class="flex flex-col min-h-screen">
+        <!-- Encabezado de la página -->
+        <header class="bg-purple-600 text-white p-6 shadow-md">
+            <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+                <a href="index.html" class="text-2xl sm:text-3xl font-bold rounded-md hover:bg-purple-700 px-3 py-2 transition-colors duration-200 mb-4 sm:mb-0">Devocionales Cristianos</a>
+                <nav>
+                    <!-- Menú de navegación responsive: de columna a fila en pantallas pequeñas y mayores -->
+                    <ul class="flex flex-col sm:flex-row sm:space-x-6 space-y-2 sm:space-y-0 text-center">
+                        <li><a href="#" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Inicio</a></li>
+                        <li><a href="#our-vision" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Nuestra Visión</a></li>
+                        <li><a href="#features" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Características</a></li>
+                        <li><a href="#contact" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Contacto</a></li>
+                        <!-- Enlace de Donación en la barra de navegación -->
+                        <li><a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Donación</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
 
-        <p>Bienvenido/a a la aplicación móvil "Devocionales Cristianos" (en adelante, "la Aplicación"), propiedad y operada por **Develop4God**. Al acceder o utilizar la Aplicación, usted ("el Usuario") acepta estar legalmente vinculado/a por los presentes Términos y Condiciones de Uso (en adelante, "los Términos"). Si no está de acuerdo con alguno de estos Términos, no debe utilizar la Aplicación.</p>
+        <!-- Sección Principal (Hero Section) -->
+        <main class="flex-grow flex items-center justify-center py-16 px-4">
+            <div class="text-center w-full">
+                <!-- Ajuste de tamaño de texto para móviles -->
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-purple-800 mb-6 leading-tight px-2">
+                    Tu Compañero Diario para el Crecimiento Espiritual
+                </h1>
+                <!-- Ajuste de tamaño de texto para móviles -->
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-700 mb-8 max-w-2xl mx-auto px-2">
+                    Accede a devocionales bíblicos cada día, marca tus favoritos y comparte la palabra de Dios fácilmente, todo desde tu dispositivo móvil.
+                </p>
+                <!-- Botones responsive: de columna a fila en pantallas pequeñas y mayores, con ancho completo en móviles -->
+                <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center px-2">
+                    <a href="#" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fab fa-google-play mr-2"></i> Descarga la App
+                    </a>
+                    <a href="#features" class="w-full sm:w-auto bg-transparent border-2 border-purple-600 text-purple-600 hover:bg-purple-100 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                        Conoce las Características
+                    </a>
+                </div>
+            </div>
+        </main>
 
-        <h2>1. Descripción de la Aplicación</h2>
-        <p>La Aplicación "Devocionales Cristianos" es una plataforma digital diseñada para proporcionar acceso a textos devocionales diarios, semanales o periódicos, con el propósito de fomentar la reflexión espiritual y el crecimiento personal. Las funcionalidades principales incluyen la lectura de devocionales, la capacidad de guardar devocionales como favoritos, la opción de compartir devocionales con contactos a través de las funciones de su dispositivo móvil, la captura de pantalla del contenido del devocional, y la posibilidad de realizar donaciones voluntarias para apoyar la Aplicación. Para el funcionamiento y mejora de estas funcionalidades, la aplicación recopila y procesa ciertos datos de usuario, tal como se detalla en nuestra Política de Privacidad.</p>
+        <!-- Sección Nuestra Visión -->
+        <section id="our-vision" class="bg-white py-16 px-4 shadow-inner">
+            <div class="container mx-auto text-center">
+                <!-- Ajuste de tamaño de texto para móviles -->
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">Nuestra Visión en Devocionales Cristianos</h2>
+                <p class="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+                    Devocionales Cristianos es tu compañero móvil diseñado para enriquecer y fortalecer tu vida espiritual. Nuestro objetivo es ser tu puente diario hacia la palabra de Dios, ofreciéndote contenido bíblico inspirador y relevante. Creemos en la tecnología al servicio de tu fe, brindándote una experiencia fluida, rápida y confiable de manera totalmente gratuita.
+                </p>
+            </div>
+        </section>
 
-        <h2>2. Propiedad Intelectual y Contenido de la Aplicación</h2>
-        <h3>2.1. Contenido de los Devocionales:</h3>
-        <p>Todo el contenido de los devocionales (textos, reflexiones, comentarios, etc.) presentado en la Aplicación es propiedad de **Develop4God**. Si bien parte de este contenido ha sido generado inicialmente con la asistencia de Inteligencia Artificial (IA), **es posible que contenga errores o imprecisiones**. **Develop4God** se esfuerza por ofrecer contenido de calidad, pero no garantiza la exactitud o la integridad absoluta de todo el material. Le animamos a verificar la información y, si detecta algún error o tiene alguna sugerencia, por favor, contáctenos a través de develop4God@gmail.com o utilizando la opción de contacto disponible en la Aplicación para su revisión.</p>
+        <!-- Sección Características Principales -->
+        <section id="features" class="bg-gray-100 py-16 px-4">
+            <div class="container mx-auto text-center">
+                <!-- Ajuste de tamaño de texto para móviles -->
+                <h2 class="text-3xl sm:text-4xl font-bold text-purple-800 mb-12">Características Principales</h2>
+                <!-- El grid se mantendrá en una columna en móviles y se expandirá en pantallas mayores -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-lg mx-auto md:max-w-none">
+                    <!-- Característica: Devocionales Diarios -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-book-open"></i> <!-- Icono para devocionales -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Devocionales Diarios</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Accede a una nueva reflexión bíblica cada día, diseñada para inspirar y nutrir tu espíritu.</p>
+                    </div>
 
-        <h3>2.2. Uso del Contenido:</h3>
-        <p>Los usuarios pueden utilizar el contenido de los devocionales para su uso personal y no comercial (incluyendo la lectura, la opción de compartir con contactos, la captura de pantalla del contenido del devocional y la adición a favoritos). Este uso está permitido siempre que no se generen ingresos directos o indirectos con dicho uso. Para cualquier uso que exceda lo personal y no comercial, incluyendo, sin limitación, la reproducción, distribución o modificación del contenido con fines comerciales, o si desea obtener una licencia para cualquier otro tipo de uso, debe obtener un permiso previo por escrito de **Develop4God**. Toda solicitud debe dirigirse a la siguiente dirección de correo electrónico: develop4God@gmail.com.</p>
+                    <!-- Característica: Soporte Multi-Versión -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-bible"></i> <!-- Icono para versiones bíblicas -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Versiones Bíblicas</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Disfruta de los devocionales en diferentes versiones de la Biblia, como RVR1960, para un estudio más profundo.</p>
+                    </div>
 
-        <h3>2.3. Texto Bíblico Reina-Valera 1960 (RVR1960):</h3>
-        <p>El texto bíblico Reina-Valera 1960® utilizado en la Aplicación es © Sociedades Bíblicas en América Latina, 1960. Derechos renovados 1988, Sociedades Bíblicas Unidas. Su uso está permitido según los términos y condiciones de Sociedades Bíblicas Unidas, y la Aplicación "Devocionales Cristianos" cumple con dichas licencias o autorizaciones.</p>
+                    <!-- Característica: Favoritos -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-heart"></i> <!-- Icono para favoritos -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Marca tus Favoritos</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Guarda aquellos devocionales que más te toquen para revisitarlos fácilmente cuando quieras.</p>
+                    </div>
 
-        <h3>2.4. Diseño y Software de la Aplicación:</h3>
-        <p>El diseño, logotipos, gráficos, interfaz de usuario y el software subyacente de la Aplicación son propiedad de **Develop4God** y están protegidos por las leyes de propiedad intelectual. Sin embargo, con fines educativos y de contribución no comercial, se permite a los usuarios técnicos revisar el código y el diseño, siempre y cuando se informe a Develop4God de dicho uso y no se derive beneficio económico alguno. Para cualquier uso que exceda esto, se debe contactar a Develop4God para obtener una licencia formal.</p>
+                    <!-- Característica: Compartir Contenido -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-share-alt"></i> <!-- Icono para compartir -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Comparte la Palabra</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Difunde la inspiración compartiendo devocionales como texto o bellas imágenes a través de tus redes.</p>
+                    </div>
 
-        <h2>3. Donaciones</h2>
-        <p>La Aplicación ofrece un botón de PayPal que permite a los Usuarios realizar donaciones voluntarias para apoyar el desarrollo y mantenimiento de la Aplicación. Estas donaciones son completamente opcionales y no otorgan al Usuario ningún beneficio o servicio adicional dentro de la Aplicación más allá del acceso a las funcionalidades existentes. La realización de una donación no constituye una compra de bienes o servicios.</p>
+                    <!-- Característica: Oración de Fe -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-pray"></i> <!-- Ícono cambiado a fas fa-pray -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Oración de Fe</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Un mensaje especial para entregar tu vida a Jesucristo y vivir eternamente.</p>
+                    </div>
 
-        <h2>4. Privacidad de Datos</h2>
-        <p>La Aplicación recopila y procesa ciertos datos de usuario para su funcionamiento y mejora. Para obtener información detallada sobre los tipos de datos que recopilamos, cómo los usamos, con quién los compartimos, cómo los protegemos y sus derechos de usuario (incluyendo cómo solicitar la eliminación de sus datos), por favor, consulte nuestra <a href="[URL_DE_TU_POLITICA_DE_PRIVACIDAD]" class="text-purple-700 hover:text-purple-900">Política de Privacidad</a>. Los usuarios tienen el derecho de solicitar la eliminación de sus datos, y el procedimiento para hacerlo se describe en detalle en nuestra Política de Privacidad.</p>
+                    <!-- Característica: Personalización de Idioma -->
+                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                        <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
+                            <i class="fas fa-language"></i> <!-- Icono para idioma -->
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Múltiples Idiomas</h3>
+                        <p class="text-base sm:text-lg text-gray-600">Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-        <h2>5. Conducta del Usuario</h2>
-        <p>El Usuario se compromete a utilizar la Aplicación de manera lícita y de buena fe. Se prohíbe cualquier uso de la Aplicación que:</p>
-        <ul>
-            <li>Viole cualquier ley o regulación aplicable.</li>
-            <li>Sea fraudulento o engañoso.</li>
-            <li>Dañe, desactive, sobrecargue o menoscabe la Aplicación o los servidores y redes conectados a la Aplicación.</li>
-            <li>Interfiera con el uso y disfrute de la Aplicación por parte de otros Usuarios.</li>
-            <li>Intente obtener acceso no autorizado a cualquier parte de la Aplicación, otras cuentas o sistemas informáticos o redes conectadas a la Aplicación.</li>
-        </ul>
+        <!-- Sección de Contacto -->
+        <section id="contact" class="bg-purple-700 text-white py-16 px-4">
+            <div class="container mx-auto text-center">
+                <!-- Ajuste de tamaño de texto para móviles -->
+                <h2 class="text-3xl sm:text-4xl font-bold mb-8">¿Preguntas? ¡Contáctanos!</h2>
+                <p class="text-base sm:text-xl mb-8 max-w-2xl mx-auto">
+                    Si tienes alguna duda, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.
+                </p>
+                <a href="mailto:develop4God@gmail.com" class="w-full sm:w-auto bg-white hover:bg-gray-200 text-purple-700 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
+                    Envíanos un Email
+                </a>
+                <p class="text-sm sm:text-lg mt-8 max-w-2xl mx-auto">
+                    Tu apoyo nos ayuda a seguir compartiendo la palabra.
+                    <a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-purple-200 underline hover:text-white transition-colors duration-200">Considera hacer una donación.</a>
+                </p>
+            </div>
+        </section>
 
-        <h2>6. Exclusión de Garantías</h2>
-        <p>La Aplicación se proporciona "tal cual" y "según disponibilidad", sin garantías de ningún tipo, ya sean expresas o implícitas. **Develop4God** no garantiza que la Aplicación será ininterrumpida, libre de errores, segura o que cualquier defecto será corregido. El uso de la Aplicación es bajo el propio riesgo del Usuario.</p>
 
-        <h2>7. Limitación de Responsabilidad</h2>
-        <p>En la máxima medida permitida por la ley aplicable, **Develop4God** no será responsable por ningún daño directo, indirecto, incidental, especial, consecuencial o ejemplar, incluyendo, entre otros, daños por pérdida de ganancias, buena voluntad, uso, datos u otras pérdidas intangibles, resultantes del uso o la imposibilidad de usar la Aplicación.</p>
-
-        <h2>8. Modificaciones de los Términos</h2>
-        <p>**Develop4God** se reserva el derecho de modificar estos Términos en cualquier momento. Se notificará a los Usuarios sobre cualquier cambio significativo mediante la publicación de los Términos actualizados en la Aplicación o a través de otros medios razonables. El uso continuado de la Aplicación después de la publicación de los cambios constituirá la aceptación de los Términos modificados.</p>
-
-        <h2>9. Terminación</h2>
-        <p>**Develop4God** se reserva el derecho de suspender o terminar el acceso del Usuario a la Aplicación, a su sola discreción y sin previo aviso, si considera que el Usuario ha violado estos Términos.</p>
-
-        <h2>10. Ley Aplicable y Jurisdicción</h2>
-        <p>Estos Términos se regirán e interpretarán de acuerdo con las leyes de **la República de Panamá**, sin tener en cuenta sus disposiciones sobre conflictos de leyes. Cualquier disputa que surja en relación con estos Términos estará sujeta a la jurisdicción exclusiva de los tribunales de **la Ciudad de Panamá, República de Panamá**.</p>
-
-        <h2>11. Contacto</h2>
-        <p>Si tiene alguna pregunta sobre estos Términos, puede contactarnos en: <a href="mailto:develop4God@gmail.com" class="text-purple-700 hover:text-purple-900">develop4God@gmail.com</a>.</p>
-
-        <div class="back-link">
-            <a href="index.html">Volver a la página principal</a>
-        </div>
+        <!-- Pie de página con enlaces legales -->
+        <footer class="bg-gray-800 text-white p-6 mt-auto">
+            <div class="container mx-auto text-center text-sm">
+                <p class="mb-4">© 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
+                <!-- Enlaces de pie de página responsive: envuelven en varias líneas si no hay espacio -->
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="terminos-y-condiciones.html" class="hover:text-gray-300 transition-colors duration-200">Términos y Condiciones</a>
+                    <a href="politica-de-privacidad.html" class="hover:text-gray-300 transition-colors duration-200">Política de Privacidad</a>
+                    <a href="#contact" class="hover:text-gray-300 transition-colors duration-200">Contacto</a>
+                </div>
+            </div>
+        </footer>
     </div>
 </body>
-</html>
+                        </html>
