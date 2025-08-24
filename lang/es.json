@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Inicio - Devocionales Cristianos",
+    "description": "Devocionales Cristianos es tu compañero móvil para enriquecer tu vida espiritual con reflexiones bíblicas diarias. Descarga gratis la app y fortalece tu fe cada día."
+  },
+  "navigation": {
+    "home": "Inicio",
+    "vision": "Nuestra Visión",
+    "features": "Características",
+    "contact": "Contacto",
+    "donation": "Donación",
+    "deleteData": "Eliminar Datos"
+  },
+  "header": {
+    "title": "Devocionales Cristianos",
+    "subtitle": "Tu Compañero Espiritual Diario",
+    "description": "Fortalece tu fe con reflexiones bíblicas inspiradoras y contenido espiritual diseñado para nutrir tu alma cada día.",
+    "downloadApp": "Descarga App",
+    "learnMore": "Conoce las Características"
+  },
+  "vision": {
+    "title": "Nuestra Visión en Devocionales Cristianos",
+    "description": "Devocionales Cristianos es tu compañero móvil diseñado para enriquecer y fortalecer tu vida espiritual. Nuestro objetivo es ser tu puente diario hacia la palabra de Dios, ofreciéndote contenido bíblico inspirador y relevante. Creemos en la tecnología al servicio de tu fe, brindándote una experiencia fluida, rápida y confiable de manera totalmente gratuita."
+  },
+  "features": {
+    "title": "Características Principales",
+    "daily": {
+      "title": "Devocionales Diarios",
+      "description": "Accede a una nueva reflexión bíblica cada día, diseñada para inspirar y nutrir tu espíritu."
+    },
+    "versions": {
+      "title": "Versiones Bíblicas",
+      "description": "Disfruta de los devocionales en diferentes versiones de la Biblia, como RVR1960, para un estudio más profundo."
+    },
+    "favorites": {
+      "title": "Marca tus Favoritos",
+      "description": "Guarda aquellos devocionales que más te toquen para revisitarlos fácilmente cuando quieras."
+    },
+    "sharing": {
+      "title": "Comparte la Palabra",
+      "description": "Difunde la inspiración compartiendo devocionales como texto o bellas imágenes a través de tus redes."
+    },
+    "prayer": {
+      "title": "Oración de Fe",
+      "description": "Un mensaje especial para entregar tu vida a Jesucristo y vivir eternamente."
+    },
+    "language": {
+      "title": "Múltiples Idiomas",
+      "description": "Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana."
+    }
+  },
+  "contact": {
+    "title": "¿Preguntas? ¡Contáctanos!",
+    "description": "Si tienes alguna duda, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.",
+    "email": "develop4God@gmail.com",
+    "emailButton": "Enviar Correo"
+  },
+  "footer": {
+    "copyright": "© 2025 Devocionales Cristianos. Todos los derechos reservados.",
+    "madeWith": "Desarrollado con ♥️ por develop4God",
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "deleteData": "Solicitar Eliminación de Datos",
+    "contact": "Contacto"
+  },
+  "legal": {
+    "terms": {
+      "title": "Términos y Condiciones de Uso de la Aplicación \"Devocionales Cristianos\"",
+      "lastUpdated": "Fecha de Última Actualización: 28 de julio de 2025",
+      "welcome": "Bienvenido/a a la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**. Al acceder o utilizar la Aplicación, usted (\"el Usuario\") acepta estar legalmente vinculado/a por los presentes Términos y Condiciones de Uso (en adelante, \"los Términos\"). Si no está de acuerdo con alguno de estos Términos, no debe utilizar la Aplicación.",
+      "backToHome": "Volver a la página principal"
+    },
+    "privacy": {
+      "title": "Política de Privacidad de la Aplicación \"Devocionales Cristianos\"",
+      "lastUpdated": "Fecha de Última Actualización: 28 de julio de 2025",
+      "description": "Esta Política de Privacidad describe cómo la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**, maneja la información del usuario. La privacidad de nuestros usuarios es de suma importancia para nosotros.",
+      "backToHome": "Volver a la página principal"
+    }
+  }
+}
