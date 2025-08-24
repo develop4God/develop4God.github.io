@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Início - Devocionais Cristãos",
+    "description": "Devocionais Cristãos é seu companheiro móvel para enriquecer sua vida espiritual com reflexões bíblicas diárias. Baixe o aplicativo gratuito and fortaleça sua fé todos os dias."
+  },
+  "navigation": {
+    "home": "Início",
+    "vision": "Nossa Visão",
+    "features": "Recursos",
+    "contact": "Contato",
+    "donation": "Doação",
+    "deleteData": "Excluir Dados"
+  },
+  "header": {
+    "title": "Devocionais Cristãos",
+    "subtitle": "Seu Companheiro Espiritual Diário",
+    "description": "Fortaleça sua fé com reflexões bíblicas inspiradoras e conteúdo espiritual projetado para nutrir sua alma todos os dias.",
+    "downloadApp": "Baixar App",
+    "learnMore": "Conhecer os Recursos"
+  },
+  "vision": {
+    "title": "Nossa Visão para Devocionais Cristãos",
+    "description": "Devocionais Cristãos é seu companheiro móvel projetado para enriquecer e fortalecer sua vida espiritual. Nosso objetivo é ser sua ponte diária para a palavra de Deus, oferecendo conteúdo bíblico inspirador e relevante. Acreditamos na tecnologia a serviço de sua fé, proporcionando uma experiência fluida, rápida e confiável completamente gratuita."
+  },
+  "features": {
+    "title": "Recursos Principais",
+    "daily": {
+      "title": "Devocionais Diários",
+      "description": "Acesse uma nova reflexão bíblica todos os dias, projetada para inspirar e nutrir seu espírito."
+    },
+    "versions": {
+      "title": "Versões Bíblicas",
+      "description": "Desfrute de devocionais em diferentes versões da Bíblia, como RVR1960, para um estudo mais profundo."
+    },
+    "favorites": {
+      "title": "Marque seus Favoritos",
+      "description": "Salve aqueles devocionais que mais te tocam para revisitá-los facilmente quando quiser."
+    },
+    "sharing": {
+      "title": "Compartilhe a Palavra",
+      "description": "Espalhe inspiração compartilhando devocionais como texto ou belas imagens através de suas redes."
+    },
+    "prayer": {
+      "title": "Oração de Fé",
+      "description": "Uma mensagem especial para entregar sua vida a Jesus Cristo e viver eternamente."
+    },
+    "language": {
+      "title": "Múltiplos Idiomas",
+      "description": "Projetado para expansão, atualmente otimizado para usuários de língua espanhola."
+    }
+  },
+  "contact": {
+    "title": "Perguntas? Fale Conosco!",
+    "description": "Se você tem alguma dúvida, sugestão ou simplesmente quer dizer olá, não hesite em entrar em contato conosco.",
+    "email": "develop4God@gmail.com",
+    "emailButton": "Enviar Email"
+  },
+  "footer": {
+    "copyright": "© 2025 Devocionais Cristãos. Todos os direitos reservados.",
+    "madeWith": "Feito com ♥️ por develop4God",
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "deleteData": "Solicitar Exclusão de Dados",
+    "contact": "Contato"
+  },
+  "legal": {
+    "terms": {
+      "title": "Termos e Condições de Uso da Aplicação \"Devocionais Cristãos\"",
+      "lastUpdated": "Última Atualização: 28 de julho de 2025",
+      "welcome": "Bem-vindo ao aplicativo móvel \"Devocionais Cristãos\" (doravante, \"o Aplicativo\"), de propriedade e operado pela **Develop4God**. Ao acessar ou usar o Aplicativo, você (\"o Usuário\") concorda em estar legalmente vinculado a estes Termos e Condições de Uso (doravante, \"os Termos\"). Se você não concorda com algum destes Termos, não deve usar o Aplicativo.",
+      "backToHome": "Voltar à página inicial"
+    },
+    "privacy": {
+      "title": "Política de Privacidade da Aplicação \"Devocionais Cristãos\"",
+      "lastUpdated": "Última Atualização: 28 de julho de 2025",
+      "description": "Esta Política de Privacidade descreve como o aplicativo móvel \"Devocionais Cristãos\" (doravante, \"o Aplicativo\"), de propriedade e operado pela **Develop4God**, lida com as informações do usuário. A privacidade de nossos usuários é de suma importância para nós.",
+      "backToHome": "Voltar à página inicial"
+    }
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "title": "Accueil - Dévotions Chrétiennes",
+    "description": "Dévotions Chrétiennes est votre compagnon mobile pour enrichir votre vie spirituelle avec des réflexions bibliques quotidiennes. Téléchargez l'application gratuite et renforcez votre foi chaque jour."
+  },
+  "navigation": {
+    "home": "Accueil",
+    "vision": "Notre Vision",
+    "features": "Fonctionnalités",
+    "contact": "Contact",
+    "donation": "Donation",
+    "deleteData": "Supprimer Données"
+  },
+  "header": {
+    "title": "Dévotions Chrétiennes",
+    "subtitle": "Votre Compagnon Spirituel Quotidien",
+    "description": "Renforcez votre foi avec des réflexions bibliques inspirantes et un contenu spirituel conçu pour nourrir votre âme chaque jour.",
+    "downloadApp": "Télécharger App",
+    "learnMore": "Découvrir les Fonctionnalités"
+  },
+  "vision": {
+    "title": "Notre Vision pour les Dévotions Chrétiennes",
+    "description": "Dévotions Chrétiennes est votre compagnon mobile conçu pour enrichir et renforcer votre vie spirituelle. Notre objectif est d'être votre pont quotidien vers la parole de Dieu, vous offrant un contenu biblique inspirant et pertinent. Nous croyons en la technologie au service de votre foi, vous fournissant une expérience fluide, rapide et fiable entièrement gratuite."
+  },
+  "features": {
+    "title": "Fonctionnalités Principales",
+    "daily": {
+      "title": "Dévotions Quotidiennes",
+      "description": "Accédez à une nouvelle réflexion biblique chaque jour, conçue pour inspirer et nourrir votre esprit."
+    },
+    "versions": {
+      "title": "Versions Bibliques",
+      "description": "Profitez des dévotions dans différentes versions de la Bible, comme RVR1960, pour une étude plus approfondie."
+    },
+    "favorites": {
+      "title": "Marquez vos Favoris",
+      "description": "Sauvegardez les dévotions qui vous touchent le plus pour les revisiter facilement quand vous le souhaitez."
+    },
+    "sharing": {
+      "title": "Partagez la Parole",
+      "description": "Répandez l'inspiration en partageant des dévotions sous forme de texte ou de belles images à travers vos réseaux."
+    },
+    "prayer": {
+      "title": "Prière de Foi",
+      "description": "Un message spécial pour donner votre vie à Jésus-Christ et vivre éternellement."
+    },
+    "language": {
+      "title": "Langues Multiples",
+      "description": "Conçue pour l'expansion, actuellement optimisée pour les utilisateurs hispanophones."
+    }
+  },
+  "contact": {
+    "title": "Des Questions ? Contactez-nous !",
+    "description": "Si vous avez des questions, des suggestions, ou si vous voulez simplement dire bonjour, n'hésitez pas à nous contacter.",
+    "email": "develop4God@gmail.com",
+    "emailButton": "Envoyer Email"
+  },
+  "footer": {
+    "copyright": "© 2025 Dévotions Chrétiennes. Tous droits réservés.",
+    "madeWith": "Fait avec ♥️ par develop4God",
+    "terms": "Termes et Conditions",
+    "privacy": "Politique de Confidentialité",
+    "deleteData": "Demander Suppression des Données",
+    "contact": "Contact"
+  },
+  "legal": {
+    "terms": {
+      "title": "Termes et Conditions d'Utilisation de l'Application \"Dévotions Chrétiennes\"",
+      "lastUpdated": "Dernière Mise à Jour : 28 juillet 2025",
+      "welcome": "Bienvenue dans l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), possédée et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par ces Termes et Conditions d'Utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
+      "backToHome": "Retour à la page d'accueil"
+    },
+    "privacy": {
+      "title": "Politique de Confidentialité de l'Application \"Dévotions Chrétiennes\"",
+      "lastUpdated": "Dernière Mise à Jour : 28 juillet 2025",
+      "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), possédée et exploitée par **Develop4God**, traite les informations des utilisateurs. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
+      "backToHome": "Retour à la page d'accueil"
+    }
+  }
+}
