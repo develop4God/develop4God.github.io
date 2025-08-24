@@ -4,12 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Devocionales Cristianos</title>
+    <meta name="description" content="Devocionales Cristianos es tu compañero móvil para enriquecer tu vida espiritual con reflexiones bíblicas diarias. Descarga gratis la app y fortalece tu fe cada día.">
+    <meta name="title-key" content="meta.title">
+    <meta name="description-key" content="meta.description">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://develop4god.github.io/">
+    <meta property="og:title" content="Devocionales Cristianos - Tu Compañero Espiritual Diario">
+    <meta property="og:description" content="Fortalece tu fe con reflexiones bíblicas inspiradoras y contenido espiritual diseñado para nutrir tu alma cada día.">
+    <meta property="og:image" content="https://develop4god.github.io/images/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://develop4god.github.io/">
+    <meta property="twitter:title" content="Devocionales Cristianos - Tu Compañero Espiritual Diario">
+    <meta property="twitter:description" content="Fortalece tu fe con reflexiones bíblicas inspiradoras y contenido espiritual diseñado para nutrir tu alma cada día.">
+    <meta property="twitter:image" content="https://develop4god.github.io/images/og-image.jpg">
+    
     <!-- Enlace al CDN de Tailwind CSS para estilos rápidos y responsivos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Enlace a Google Fonts para la fuente "Inter" (moderna y legible) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Enlace a Font Awesome para los iconos -->
     <script src="https://kit.fontawesome.com/b286598102.js" crossorigin="anonymous"></script>
+    <!-- Modern CSS enhancements -->
+    <link rel="stylesheet" href="/css/modern.css">
+    <!-- Internationalization system -->
+    <script src="/js/i18n.js"></script>
+    <!-- Modern enhancements -->
+    <script src="/js/modern.js"></script>
     <style>
         /* Estilos personalizados para la fuente Inter */
         body {
@@ -29,54 +53,68 @@
 <body class="bg-gray-100 text-gray-900">
     <div id="app-container" class="flex flex-col min-h-screen">
         <!-- Encabezado de la página -->
-        <header class="bg-purple-600 text-white p-6 shadow-md">
+        <header class="gradient-purple text-white p-6 shadow-md">
             <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
-                <a href="index.html" class="text-2xl sm:text-3xl font-bold rounded-md hover:bg-purple-700 px-3 py-2 transition-colors duration-200 mb-4 sm:mb-0">Devocionales Cristianos</a>
+                <a href="index.html" class="text-2xl sm:text-3xl font-bold rounded-md hover:bg-purple-700 px-3 py-2 transition-colors duration-200 mb-4 sm:mb-0 interactive" data-i18n="header.title">Devocionales Cristianos</a>
                 <nav>
                     <!-- Menú de navegación responsive: de columna a fila en pantallas pequeñas y mayores -->
                     <ul class="flex flex-col sm:flex-row sm:space-x-6 space-y-2 sm:space-y-0 text-center">
-                        <li><a href="#" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Inicio</a></li>
-                        <li><a href="#our-vision" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Nuestra Visión</a></li>
-                        <li><a href="#features" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Características</a></li>
-                        <li><a href="#contact" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Contacto</a></li>
+                        <li><a href="#" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.home">Inicio</a></li>
+                        <li><a href="#our-vision" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.vision">Nuestra Visión</a></li>
+                        <li><a href="#features" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.features">Características</a></li>
+                        <li><a href="#contact" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.contact">Contacto</a></li>
                         <!-- Enlace de Donación en la barra de navegación -->
-                        <li><a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Donación</a></li>
+                        <li><a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.donation">Donación</a></li>
                         <!-- NUEVO: Enlace de Eliminación de Datos en la barra de navegación -->
-                        <li><a href="politica-de-privacidad.html#eliminacion-datos" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2">Eliminar Datos</a></li>
+                        <li><a href="politica-de-privacidad.html#eliminacion-datos" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.deleteData">Eliminar Datos</a></li>
+                        <!-- Language Selector -->
+                        <li>
+                            <div id="language-selector" class="language-selector">
+                                <select class="bg-transparent text-white border border-purple-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-white transition-colors">
+                                </select>
+                            </div>
+                        </li>
                     </ul>
                 </nav>
             </div>
         </header>
 
         <!-- Sección Principal (Hero Section) -->
-        <main class="flex-grow flex items-center justify-center py-16 px-4">
-            <div class="text-center w-full">
+        <main id="main" class="flex-grow flex items-center justify-center gradient-bg text-white py-16 px-4 relative overflow-hidden">
+            <!-- Background decorative elements -->
+            <div class="absolute inset-0 opacity-10">
+                <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full float-animation"></div>
+                <div class="absolute bottom-10 right-10 w-24 h-24 bg-white rounded-full float-animation" style="animation-delay: 1s;"></div>
+                <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full float-animation" style="animation-delay: 2s;"></div>
+            </div>
+            
+            <div class="text-center w-full relative z-10">
                 <!-- Ajuste de tamaño de texto para móviles -->
-                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-purple-800 mb-6 leading-tight px-2">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight px-2" data-i18n="header.subtitle">
                     Tu Compañero Diario para el Crecimiento Espiritual
                 </h1>
                 <!-- Ajuste de tamaño de texto para móviles -->
-                <p class="text-lg sm:text-xl md:text-2xl text-gray-700 mb-8 max-w-2xl mx-auto px-2">
+                <p class="text-lg sm:text-xl md:text-2xl mb-8 max-w-2xl mx-auto px-2" data-i18n="header.description">
                     Accede a devocionales bíblicos cada día, marca tus favoritos y comparte la palabra de Dios fácilmente, todo desde tu dispositivo móvil.
                 </p>
                 <!-- Botones responsive: de columna a fila en pantallas pequeñas y mayores, con ancho completo en móviles -->
                 <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center px-2">
-                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo" target="_blank" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                        <i class="fab fa-google-play mr-2"></i> Descarga App
+                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo" target="_blank" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 pulse-animation interactive">
+                        <i class="fab fa-google-play mr-2"></i> <span data-i18n="header.downloadApp">Descarga App</span>
                     </a>
-                    <a href="#features" class="w-full sm:w-auto bg-transparent border-2 border-purple-600 text-purple-600 hover:bg-purple-100 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                        Conoce las Características
+                    <a href="#features" class="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 interactive">
+                        <span data-i18n="header.learnMore">Conoce las Características</span>
                     </a>
                 </div>
             </div>
         </main>
 
         <!-- Sección Nuestra Visión -->
-        <section id="our-vision" class="bg-white py-16 px-4 shadow-inner">
+        <section id="our-vision" class="bg-white py-16 px-4 shadow-inner scroll-reveal">
             <div class="container mx-auto text-center">
                 <!-- Ajuste de tamaño de texto para móviles -->
-                <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8">Nuestra Visión en Devocionales Cristianos</h2>
-                <p class="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-8" data-i18n="vision.title">Nuestra Visión en Devocionales Cristianos</h2>
+                <p class="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" data-i18n="vision.description">
                     Devocionales Cristianos es tu compañero móvil diseñado para enriquecer y fortalecer tu vida espiritual. Nuestro objetivo es ser tu puente diario hacia la palabra de Dios, ofreciéndote contenido bíblico inspirador y relevante. Creemos en la tecnología al servicio de tu fe, brindándote una experiencia fluida, rápida y confiable de manera totalmente gratuita.
                 </p>
             </div>
@@ -86,43 +124,43 @@
         <section id="features" class="bg-gray-100 py-16 px-4">
             <div class="container mx-auto text-center">
                 <!-- Ajuste de tamaño de texto para móviles -->
-                <h2 class="text-3xl sm:text-4xl font-bold text-purple-800 mb-12">Características Principales</h2>
+                <h2 class="text-3xl sm:text-4xl font-bold text-purple-800 mb-12" data-i18n="features.title">Características Principales</h2>
                 <!-- El grid se mantendrá en una columna en móviles y se expandirá en pantallas mayores -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-lg mx-auto md:max-w-none">
                     <!-- Característica: Devocionales Diarios -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-book-open"></i> <!-- Icono para devocionales -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Devocionales Diarios</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Accede a una nueva reflexión bíblica cada día, diseñada para inspirar y nutrir tu espíritu.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.daily.title">Devocionales Diarios</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.daily.description">Accede a una nueva reflexión bíblica cada día, diseñada para inspirar y nutrir tu espíritu.</p>
                     </div>
 
                     <!-- Característica: Soporte Multi-Versión -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-bible"></i> <!-- Icono para versiones bíblicas -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Versiones Bíblicas</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Disfruta de los devocionales en diferentes versiones de la Biblia, como RVR1960, para un estudio más profundo.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.versions.title">Versiones Bíblicas</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.versions.description">Disfruta de los devocionales en diferentes versiones de la Biblia, como RVR1960, para un estudio más profundo.</p>
                     </div>
 
                     <!-- Característica: Favoritos -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-heart"></i> <!-- Icono para favoritos -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Marca tus Favoritos</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Guarda aquellos devocionales que más te toquen para revisitarlos fácilmente cuando quieras.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.favorites.title">Marca tus Favoritos</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.favorites.description">Guarda aquellos devocionales que más te toquen para revisitarlos fácilmente cuando quieras.</p>
                     </div>
 
                     <!-- Característica: Compartir Contenido -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-share-alt"></i> <!-- Icono para compartir -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Comparte la Palabra</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Difunde la inspiración compartiendo devocionales como texto o bellas imágenes a través de tus redes.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.sharing.title">Comparte la Palabra</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.sharing.description">Difunde la inspiración compartiendo devocionales como texto o bellas imágenes a través de tus redes.</p>
                     </div>
 
                     <!-- Característica: Notificaciones Personalizadas -->
@@ -153,36 +191,36 @@
                     </div>
 
                     <!-- Característica: Oración de Fe -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-pray"></i> <!-- Ícono cambiado a fas fa-pray -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Oración de Fe</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Un mensaje especial para entregar tu vida a Jesucristo y vivir eternamente.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.prayer.title">Oración de Fe</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.prayer.description">Un mensaje especial para entregar tu vida a Jesucristo y vivir eternamente.</p>
                     </div>
 
                     <!-- Característica: Personalización de Idioma -->
-                    <div class="p-6 bg-white rounded-lg shadow-xl hover:shadow-2xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
                         <div class="text-purple-600 mb-4 text-4xl sm:text-5xl">
                             <i class="fas fa-language"></i> <!-- Icono para idioma -->
                         </div>
-                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3">Múltiples Idiomas</h3>
-                        <p class="text-base sm:text-lg text-gray-600">Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana.</p>
+                        <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3" data-i18n="features.language.title">Múltiples Idiomas</h3>
+                        <p class="text-base sm:text-lg text-gray-600" data-i18n="features.language.description">Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana.</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Sección de Contacto -->
-        <section id="contact" class="bg-purple-700 text-white py-16 px-4">
+        <section id="contact" class="gradient-purple text-white py-16 px-4 scroll-reveal">
             <div class="container mx-auto text-center">
                 <!-- Ajuste de tamaño de texto para móviles -->
-                <h2 class="text-3xl sm:text-4xl font-bold mb-8">¿Preguntas? ¡Contáctanos!</h2>
-                <p class="text-base sm:text-xl mb-8 max-w-2xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-8" data-i18n="contact.title">¿Preguntas? ¡Contáctanos!</h2>
+                <p class="text-base sm:text-xl mb-8 max-w-2xl mx-auto" data-i18n="contact.description">
                     Si tienes alguna duda, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.
                 </p>
-                <a href="mailto:develop4God@gmail.com?subject=Consulta%20desde%20la%20Web%20-%20Devocionales%20Cristianos" class="w-full sm:w-auto bg-white hover:bg-gray-200 text-purple-700 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105">
-                    Envíanos un Email
+                <a href="mailto:develop4God@gmail.com?subject=Consulta%20desde%20la%20Web%20-%20Devocionales%20Cristianos" class="w-full sm:w-auto bg-white hover:bg-gray-200 text-purple-700 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 interactive pulse-animation">
+                    <span data-i18n="contact.emailButton">Envíanos un Email</span>
                 </a>
                 <p class="text-sm sm:text-lg mt-8 max-w-2xl mx-auto">
                     Tu apoyo nos ayuda a seguir compartiendo la palabra.
@@ -195,18 +233,18 @@
         <!-- Pie de página con enlaces legales -->
         <footer class="bg-gray-800 text-white p-6 mt-auto">
             <div class="container mx-auto text-center text-sm">
-                <p class="mb-4">© 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
+                <p class="mb-4" data-i18n="footer.copyright">© 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
                 <!-- Texto "Desarrollado con amor" -->
-                <p class="mb-4">Desarrollado con ♥️ por develop4God</p>
+                <p class="mb-4" data-i18n="footer.madeWith">Desarrollado con ♥️ por develop4God</p>
                 <!-- Enlaces de pie de página responsive: envuelven en varias líneas si no hay espacio -->
                 <div class="flex flex-wrap justify-center gap-4">
-                    <a href="terminos-y-condiciones.html" class="hover:text-gray-300 transition-colors duration-200">Términos y Condiciones</a>
-                    <a href="politica-de-privacidad.html" class="hover:text-gray-300 transition-colors duration-200">Política de Privacidad</a>
-                    <a href="politica-de-privacidad.html#eliminacion-datos" class="hover:text-gray-300 transition-colors duration-200">Solicitar Eliminación de Datos</a>
-                    <a href="#contact" class="hover:text-gray-300 transition-colors duration-200">Contacto</a>
+                    <a href="terminos-y-condiciones.html" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.terms">Términos y Condiciones</a>
+                    <a href="politica-de-privacidad.html" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.privacy">Política de Privacidad</a>
+                    <a href="politica-de-privacidad.html#eliminacion-datos" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.deleteData">Solicitar Eliminación de Datos</a>
+                    <a href="#contact" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.contact">Contacto</a>
                 </div>
             </div>
         </footer>
     </div>
 </body>
-    </html>
+</html>
