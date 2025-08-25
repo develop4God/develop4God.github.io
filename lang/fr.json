@@ -47,13 +47,27 @@
     "language": {
       "title": "Langues Multiples",
       "description": "Conçue pour l'expansion, actuellement optimisée pour les utilisateurs hispanophones."
+    },
+    "notifications": {
+      "title": "Notifications Personnalisées",
+      "description": "Recevez des rappels quotidiens de votre dévotion à l'heure que vous choisissez, pour ne pas manquer votre moment avec Dieu."
+    },
+    "themes": {
+      "title": "Personnalisez votre Thème",
+      "description": "Choisissez parmi différentes combinaisons de couleurs pour adapter l'interface à votre goût."
+    },
+    "darkMode": {
+      "title": "Mode Sombre (Faible Luminosité)",
+      "description": "Profitez d'une lecture confortable dans des environnements peu éclairés, réduisant la fatigue oculaire."
     }
   },
   "contact": {
     "title": "Des Questions ? Contactez-nous !",
     "description": "Si vous avez des questions, des suggestions, ou si vous voulez simplement dire bonjour, n'hésitez pas à nous contacter.",
     "email": "develop4God@gmail.com",
-    "emailButton": "Envoyer Email"
+    "emailButton": "Envoyer Email",
+    "supportText": "Votre soutien nous aide à continuer de partager la parole.",
+    "donationText": "Considérez faire un don."
   },
   "footer": {
     "copyright": "© 2025 Dévotions Chrétiennes. Tous droits réservés.",
