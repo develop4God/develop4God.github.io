@@ -47,13 +47,27 @@
     "language": {
       "title": "Múltiples Idiomas",
       "description": "Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana."
+    },
+    "notifications": {
+      "title": "Notificaciones Personalizadas",
+      "description": "Recibe recordatorios diarios de tu devocional a la hora que elijas, para no perderte tu momento con Dios."
+    },
+    "themes": {
+      "title": "Personaliza tu Tema",
+      "description": "Elige entre diferentes combinaciones de colores para adaptar la interfaz a tu gusto."
+    },
+    "darkMode": {
+      "title": "Modo Oscuro (Luz Baja)",
+      "description": "Disfruta de una lectura cómoda en entornos con poca luz, reduciendo la fatiga visual."
     }
   },
   "contact": {
     "title": "¿Preguntas? ¡Contáctanos!",
     "description": "Si tienes alguna duda, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.",
     "email": "develop4God@gmail.com",
-    "emailButton": "Enviar Correo"
+    "emailButton": "Enviar Correo",
+    "supportText": "Tu apoyo nos ayuda a seguir compartiendo la palabra.",
+    "donationText": "Considera hacer una donación."
   },
   "footer": {
     "copyright": "© 2025 Devocionales Cristianos. Todos los derechos reservados.",

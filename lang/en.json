@@ -47,13 +47,27 @@
     "language": {
       "title": "Multiple Languages",
       "description": "Designed for expansion, currently optimized for Spanish-speaking users."
+    },
+    "notifications": {
+      "title": "Personalized Notifications",
+      "description": "Receive daily reminders of your devotional at the time you choose, so you don't miss your moment with God."
+    },
+    "themes": {
+      "title": "Customize Your Theme",
+      "description": "Choose from different color combinations to adapt the interface to your taste."
+    },
+    "darkMode": {
+      "title": "Dark Mode (Low Light)",
+      "description": "Enjoy comfortable reading in low-light environments, reducing eye strain."
     }
   },
   "contact": {
     "title": "Questions? Contact Us!",
     "description": "If you have any questions, suggestions, or just want to say hello, don't hesitate to get in touch with us.",
     "email": "develop4God@gmail.com",
-    "emailButton": "Send Email"
+    "emailButton": "Send Email",
+    "supportText": "Your support helps us continue sharing the word.",
+    "donationText": "Consider making a donation."
   },
   "footer": {
     "copyright": "© 2025 Christian Devotionals. All rights reserved.",
