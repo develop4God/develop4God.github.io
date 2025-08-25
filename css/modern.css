@@ -1,278 +1,234 @@
-/* Modern enhancements for Devocionales Cristianos website */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Manager - Devocionales Cristianos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/b286598102.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .draggable {
+            transition: all 0.3s ease;
+        }
+        
+        .dragging {
+            opacity: 0.5;
+            transform: scale(1.05);
+        }
+        
+        .drop-zone {
+            border: 2px dashed #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.active {
+            border-color: #8b5cf6;
+            background-color: #f3f4f6;
+        }
+        
+        .section-editor {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .section-editor:hover {
+            border-color: #8b5cf6;
+        }
+        
+        .editor-tools {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-purple-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">
+                <i class="fas fa-edit mr-2"></i>Content Manager - Devocionales Cristianos
+            </h1>
+            <div class="flex space-x-4">
+                <button id="save-changes" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-save mr-2"></i>Save Changes
+                </button>
+                <button id="preview" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-eye mr-2"></i>Preview
+                </button>
+                <a href="index.html" class="bg-gray-500 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-home mr-2"></i>Back to Site
+                </a>
+            </div>
+        </div>
+    </header>
 
-/* Fuente global legible y fondo claro solo para el body principal */
-body, html {
-    font-family: Arial, Verdana, 'Inter', sans-serif !important;
-    background-color: #f8f8f8;
-    color: #222;
-}
+    <!-- Main Content -->
+    <div class="container mx-auto py-8 px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Sidebar - Content Elements -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-purple-800">
+                        <i class="fas fa-puzzle-piece mr-2"></i>Content Elements
+                    </h2>
+                    
+                    <!-- Available Elements -->
+                    <div class="space-y-3">
+                        <div class="draggable bg-purple-100 p-3 rounded-lg cursor-move border" data-element="hero">
+                            <i class="fas fa-star mr-2"></i>Hero Section
+                        </div>
+                        <div class="draggable bg-blue-100 p-3 rounded-lg cursor-move border" data-element="feature">
+                            <i class="fas fa-cog mr-2"></i>Feature Card
+                        </div>
+                        <div class="draggable bg-green-100 p-3 rounded-lg cursor-move border" data-element="text">
+                            <i class="fas fa-paragraph mr-2"></i>Text Block
+                        </div>
+                        <div class="draggable bg-yellow-100 p-3 rounded-lg cursor-move border" data-element="image">
+                            <i class="fas fa-image mr-2"></i>Image Block
+                        </div>
+                        <div class="draggable bg-red-100 p-3 rounded-lg cursor-move border" data-element="contact">
+                            <i class="fas fa-envelope mr-2"></i>Contact Form
+                        </div>
+                        <div class="draggable bg-indigo-100 p-3 rounded-lg cursor-move border" data-element="testimonial">
+                            <i class="fas fa-quote-left mr-2"></i>Testimonial
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-700">
+                            <i class="fas fa-language mr-2"></i>Languages
+                        </h3>
+                        <select id="edit-language" class="w-full p-2 border rounded-lg">
+                            <option value="es">🇪🇸 Español</option>
+                            <option value="en">🇺🇸 English</option>
+                            <option value="fr">🇫🇷 Français</option>
+                            <option value="pt">🇧🇷 Português</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Editor Area -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-purple-800">
+                        <i class="fas fa-layout mr-2"></i>Page Layout
+                    </h2>
+                    
+                    <!-- Drop Zones for Content -->
+                    <div id="page-content" class="space-y-4">
+                        <!-- Hero Section -->
+                        <div class="section-editor relative p-4 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg" data-section="hero">
+                            <div class="editor-tools hidden">
+                                <button class="edit-btn bg-blue-500 text-white p-2 rounded mr-2 hover:bg-blue-600">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <h3 class="text-lg font-bold text-purple-800 mb-2">Hero Section</h3>
+                            <div class="editable" data-key="header.title">
+                                <h1 class="text-2xl font-bold">Devocionales Cristianos</h1>
+                            </div>
+                            <div class="editable" data-key="header.subtitle">
+                                <p class="text-lg">Tu Compañero Espiritual Diario</p>
+                            </div>
+                            <div class="editable" data-key="header.description">
+                                <p>Fortalece tu fe con reflexiones bíblicas inspiradoras...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Drop Zone -->
+                        <div class="drop-zone p-8 rounded-lg text-center text-gray-500">
+                            <i class="fas fa-plus-circle text-3xl mb-2"></i>
+                            <p>Drag content elements here</p>
+                        </div>
+                        
+                        <!-- Features Section -->
+                        <div class="section-editor relative p-4 bg-green-50 rounded-lg" data-section="features">
+                            <div class="editor-tools hidden">
+                                <button class="edit-btn bg-blue-500 text-white p-2 rounded mr-2 hover:bg-blue-600">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn bg-red-500 text-white p-2 rounded hover:bg-red-600">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <h3 class="text-lg font-bold text-green-800 mb-2">Features Section</h3>
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="editable p-2 border rounded" data-key="features.daily.title">Daily Devotionals</div>
+                                <div class="editable p-2 border rounded" data-key="features.versions.title">Bible Versions</div>
+                                <div class="editable p-2 border rounded" data-key="features.favorites.title">Favorites</div>
+                                <div class="editable p-2 border rounded" data-key="features.sharing.title">Share Word</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Another Drop Zone -->
+                        <div class="drop-zone p-8 rounded-lg text-center text-gray-500">
+                            <i class="fas fa-plus-circle text-3xl mb-2"></i>
+                            <p>Drag content elements here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Properties Panel -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-xl font-bold mb-4 text-purple-800">
+                        <i class="fas fa-sliders-h mr-2"></i>Properties
+                    </h2>
+                    
+                    <div id="property-editor" class="space-y-4">
+                        <div class="text-gray-500 text-center py-8">
+                            <i class="fas fa-mouse-pointer text-3xl mb-2"></i>
+                            <p>Click on an element to edit its properties</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Translation Helper -->
+                <div class="bg-white rounded-lg shadow-lg p-6 mt-4">
+                    <h3 class="text-lg font-semibold mb-3 text-purple-800">
+                        <i class="fas fa-globe mr-2"></i>Quick Translate
+                    </h3>
+                    <textarea id="translate-text" placeholder="Enter text to translate..." class="w-full p-2 border rounded-lg mb-2" rows="3"></textarea>
+                    <select id="translate-to" class="w-full p-2 border rounded-lg mb-2">
+                        <option value="en">To English</option>
+                        <option value="fr">To French</option>
+                        <option value="pt">To Portuguese</option>
+                        <option value="es">To Spanish</option>
+                    </select>
+                    <button id="translate-btn" class="w-full bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-lg">
+                        <i class="fas fa-language mr-2"></i>Translate
+                    </button>
+                    <div id="translation-result" class="mt-2 p-2 bg-gray-100 rounded-lg hidden"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-/* Encabezados y secciones con fondo oscuro: mantener texto blanco */
-header, .gradient-bg, .gradient-purple, .bg-gray-800 {
-    color: #fff !important;
-}
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 class="text-lg font-bold mb-4">Edit Content</h3>
+            <textarea id="edit-content" class="w-full p-3 border rounded-lg" rows="4"></textarea>
+            <div class="flex justify-end space-x-2 mt-4">
+                <button id="cancel-edit" class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400">Cancel</button>
+                <button id="save-edit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Save</button>
+            </div>
+        </div>
+    </div>
 
-header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
-    color: #fff !important;
-    text-decoration: underline;
-}
-
-/* Sección Nuestra Visión: fondo blanco, texto oscuro */
-#our-vision, #our-vision h2, #our-vision p {
-    background: #fff;
-    color: #222 !important;
-    font-family: Arial, Verdana, 'Inter', sans-serif !important;
-}
-
-/* Enlaces por defecto: texto oscuro, subrayados (excepto en headers oscuros) */
-a {
-    color: #2d2d2d;
-    text-decoration: underline;
-}
-
-header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
-    color: #fff !important;
-    text-decoration: underline;
-}
-
-/* Smooth animations and transitions */
-* {
-    transition: all 0.3s ease;
-}
-
-/* Modern gradient backgrounds */
-.gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.gradient-purple {
-    background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
-}
-
-/* Glass morphism effect */
-.glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Enhanced card hover effects */
-.card-hover {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.card-hover:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-}
-
-/* Pulsing animation for CTA buttons */
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
-}
-
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
-
-/* Floating animation */
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-.float-animation {
-    animation: float 3s ease-in-out infinite;
-}
-
-/* Modern gradient text */
-.gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Enhanced language selector */
-.language-selector {
-    position: relative;
-    z-index: 1000;
-}
-
-.language-selector select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-}
-
-/* Loading animations */
-.loading-dots {
-    display: inline-block;
-}
-
-.loading-dots::after {
-    content: '';
-    animation: dots 1.5s steps(5, end) infinite;
-}
-
-@keyframes dots {
-    0%, 20% { content: ''; }
-    40% { content: '.'; }
-    60% { content: '..'; }
-    80%, 100% { content: '...'; }
-}
-
-/* Parallax scroll effect for hero section */
-.parallax {
-    transform: translateZ(0);
-    will-change: transform;
-}
-
-/* Interactive elements */
-.interactive {
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.interactive::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.interactive:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* Scroll reveal animations */
-.scroll-reveal {
-    opacity: 0;
-    transform: translateY(50px);
-    transition: all 0.6s ease;
-}
-
-.scroll-reveal.revealed {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Modern scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Mobile-first responsive design enhancements */
-@media (max-width: 768px) {
-    .card-hover:hover {
-        transform: translateY(-5px) scale(1.01);
-    }
-    
-    .language-selector select {
-        font-size: 0.875rem;
-        padding: 0.25rem 2rem 0.25rem 0.5rem;
-    }
-}
-
-/* Dark mode support: solo cambiar colores si el sistema está en modo oscuro */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #1a1a1a;
-        --text-color: #ffffff;
-        --card-bg: #2d2d2d;
-    }
-    body, html {
-        background-color: var(--bg-color) !important;
-        color: var(--text-color) !important;
-    }
-    #our-vision, #our-vision h2, #our-vision p {
-        background: #222;
-        color: var(--text-color) !important;
-    }
-    a {
-        color: #c3aaff !important;
-    }
-    header, .gradient-bg, .gradient-purple, .bg-gray-800 {
-        color: #fff !important;
-    }
-    header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
-        color: #fff !important;
-    }
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-    .gradient-bg,
-    .gradient-purple {
-        background: #000000;
-        color: #ffffff;
-    }
-}
-
-/* Reduced motion for accessibility */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    ::before,
-    ::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-    
-    .scroll-reveal {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-/* Focus states for accessibility */
-button:focus,
-a:focus,
-select:focus,
-input:focus {
-    outline: 2px solid #667eea;
-    outline-offset: 2px;
-}
-
-.skip-to-main {
-    position: absolute;
-    top: -100px;
-    left: 0;
-    background: #667eea;
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 1001;
-}
-
-.skip-to-main:focus {
-    top: 0;
-}
+    <script src="/js/content-manager.js"></script>
+</body>
+</html>
