@@ -1,25 +1,36 @@
 /* Modern enhancements for Devocionales Cristianos website */
 
-/* Fuente global legible y fallback seguro */
+/* Fuente global legible y fondo claro solo para el body principal */
 body, html {
     font-family: Arial, Verdana, 'Inter', sans-serif !important;
-    color: #222 !important;
     background-color: #f8f8f8;
+    color: #222;
 }
 
-/* Ajuste específico para la sección Nuestra Visión */
-#our-vision, #our-vision h2, #our-vision p {
-    color: #222 !important;
-    font-family: Arial, Verdana, 'Inter', sans-serif !important;
+/* Encabezados y secciones con fondo oscuro: mantener texto blanco */
+header, .gradient-bg, .gradient-purple, .bg-gray-800 {
+    color: #fff !important;
 }
 
-/* Forzar color oscuro en todos los enlaces del sitio, excepto los que están en headers oscuros */
-a {
-    color: #2d2d2d !important;
+header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
+    color: #fff !important;
     text-decoration: underline;
 }
 
-header a, .gradient-purple a, .bg-gray-800 a {
+/* Sección Nuestra Visión: fondo blanco, texto oscuro */
+#our-vision, #our-vision h2, #our-vision p {
+    background: #fff;
+    color: #222 !important;
+    font-family: Arial, Verdana, 'Inter', sans-serif !important;
+}
+
+/* Enlaces por defecto: texto oscuro, subrayados (excepto en headers oscuros) */
+a {
+    color: #2d2d2d;
+    text-decoration: underline;
+}
+
+header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
     color: #fff !important;
     text-decoration: underline;
 }
@@ -191,7 +202,7 @@ header a, .gradient-purple a, .bg-gray-800 a {
     }
 }
 
-/* Dark mode support */
+/* Dark mode support: solo cambiar colores si el sistema está en modo oscuro */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-color: #1a1a1a;
@@ -203,10 +214,17 @@ header a, .gradient-purple a, .bg-gray-800 a {
         color: var(--text-color) !important;
     }
     #our-vision, #our-vision h2, #our-vision p {
+        background: #222;
         color: var(--text-color) !important;
     }
     a {
         color: #c3aaff !important;
+    }
+    header, .gradient-bg, .gradient-purple, .bg-gray-800 {
+        color: #fff !important;
+    }
+    header a, .gradient-bg a, .gradient-purple a, .bg-gray-800 a {
+        color: #fff !important;
     }
 }
 
@@ -244,7 +262,6 @@ input:focus {
     outline-offset: 2px;
 }
 
-/* Skip to main content link */
 .skip-to-main {
     position: absolute;
     top: -100px;
