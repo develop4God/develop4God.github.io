@@ -1,5 +1,29 @@
 /* Modern enhancements for Devocionales Cristianos website */
 
+/* Fuente global legible y fallback seguro */
+body, html {
+    font-family: Arial, Verdana, 'Inter', sans-serif !important;
+    color: #222 !important;
+    background-color: #f8f8f8;
+}
+
+/* Ajuste específico para la sección Nuestra Visión */
+#our-vision, #our-vision h2, #our-vision p {
+    color: #222 !important;
+    font-family: Arial, Verdana, 'Inter', sans-serif !important;
+}
+
+/* Forzar color oscuro en todos los enlaces del sitio, excepto los que están en headers oscuros */
+a {
+    color: #2d2d2d !important;
+    text-decoration: underline;
+}
+
+header a, .gradient-purple a, .bg-gray-800 a {
+    color: #fff !important;
+    text-decoration: underline;
+}
+
 /* Smooth animations and transitions */
 * {
     transition: all 0.3s ease;
@@ -173,6 +197,16 @@
         --bg-color: #1a1a1a;
         --text-color: #ffffff;
         --card-bg: #2d2d2d;
+    }
+    body, html {
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
+    }
+    #our-vision, #our-vision h2, #our-vision p {
+        color: var(--text-color) !important;
+    }
+    a {
+        color: #c3aaff !important;
     }
 }
 
