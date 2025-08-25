@@ -9,7 +9,7 @@ on:
         default: 'main'
 
 jobs:
-  build-and-deploy:
+  deploy-static:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout selected branch
@@ -17,41 +17,20 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branch }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build site
-        run: npm run build
-
       - name: Deploy to GitHub Pages (Preview)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./
           destination_branch: gh-pages-preview-${{ github.event.inputs.branch }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
 
-      - name: Show Preview URL
+      - name: Mostrar URL de preview
         run: |
-          URL="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          echo "========================================="
+          echo "============================================="
           echo "🌐 Preview generada:"
-          echo "$URL"
-          echo "Abre, copia o comparte este enlace para validar la web."
-          echo "========================================="
-          echo "::notice title=Preview URL::$URL"
-
-      # OPCIONAL: Comentar la URL en el PR si existe (requiere permiso de escritura en PR)
-      - name: Comment Preview URL on PR
-        if: github.event.pull_request != null
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: |
-            🚀 Preview disponible para esta rama:
-            https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+          echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "Copia o abre este enlace para validar la web."
+          echo "============================================="
+          echo "::notice title=Preview URL::https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
