@@ -243,8 +243,6 @@ input:focus {
     top: 0;
 }
 
-/* CORRECCIONES ADICIONALES PARA VISIBILIDAD */
-
 /* Asegurar contraste en footer */
 footer, footer * {
     color: white !important;
@@ -263,33 +261,19 @@ footer a:hover {
     color: white !important;
 }
 
-/* Asegurar visibilidad de la sección "Nuestra Visión" */
-#our-vision h2 {
-    color: #374151 !important; /* gray-800 */
-}
-
-#our-vision p {
-    color: #4b5563 !important; /* gray-600 */
-}
-
-/* Debugging: Prevenir elementos completamente ocultos */
-[style*="display: none"]:not(.intentionally-hidden),
-[style*="visibility: hidden"]:not(.intentionally-hidden),
-[style*="opacity: 0"]:not(.loading):not(.intentionally-hidden) {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
 /* Corrección específica para elementos con animación float que puedan tener opacity 0 */
 .float-animation {
     opacity: 1 !important;
+}
 
-
+/* Corrección para casos específicos de texto blanco sobre fondo blanco - MEJORADA */
+.bg-white p,
+.bg-white span:not(.text-purple-600):not(#features *) {
+    color: #374151;
 }
 
 .bg-white h1, .bg-white h2, .bg-white h3 {
-    color: #111827 !important;
+    color: #111827;
 }
 
 /* Asegurar que los elementos de Tailwind tengan el color correcto */
@@ -303,4 +287,50 @@ footer a:hover {
 
 .text-white {
     color: white !important;
-    }
+}
+
+/* CORRECCIONES ESPECÍFICAS PARA COLORES MORADOS */
+
+/* 1. CORRECCIÓN: Título "Our Vision" debe ser morado */
+#our-vision h2 {
+    color: #7c3aed !important; /* purple-600 equivalent */
+}
+
+/* 2. CORRECCIÓN: TODOS los íconos de funciones deben ser morados */
+#features .text-purple-600 {
+    color: #7c3aed !important; /* Forzar morado para íconos */
+}
+
+/* 3. CORRECCIÓN: TODOS los títulos de funciones deben ser morados */
+#features h3 {
+    color: #7c3aed !important; /* Forzar morado para títulos de funciones */
+}
+
+/* 4. CORRECCIÓN: Asegurar que las descripciones mantengan su color gris */
+#features p {
+    color: #6b7280 !important; /* gray-500 - mantener descripción en gris */
+}
+
+/* 5. CORRECCIÓN: Botón de email igual que "Learn about Features" */
+#contact a[href^="mailto"] {
+    background: transparent !important;
+    border: 2px solid white !important;
+    color: white !important;
+}
+
+#contact a[href^="mailto"]:hover {
+    background: white !important;
+    color: #7c3aed !important; /* purple-600 */
+}
+
+/* CORRECCIÓN: Asegurar que los elementos morados mantengan su color */
+.text-purple-600,
+.text-purple-800 {
+    color: #7c3aed !important;
+}
+
+/* CORRECCIÓN: Elementos de contacto mantienen color blanco */
+#contact h2,
+#contact p {
+    color: white !important;
+}
