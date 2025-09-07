@@ -1,0 +1,173 @@
+/* ====================================== */
+/* NUEVO: Custom Language Selector Styles */
+/* ====================================== */
+
+.custom-language-selector {
+    position: relative;
+    display: inline-block;
+}
+
+.language-selector-button {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.language-selector-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.language-selector-button:active {
+    transform: translateY(0);
+}
+
+.language-dropdown {
+    min-width: 160px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+}
+
+.language-option {
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.language-option:hover {
+    background-color: #f3f4f6 !important;
+    transform: translateX(2px);
+}
+
+.language-option:active {
+    transform: translateX(0);
+}
+
+.language-option[aria-selected="true"] {
+    background-color: #ede9fe !important;
+    color: #7c3aed !important;
+    font-weight: 600;
+}
+
+.language-option[aria-selected="true"]:hover {
+    background-color: #ddd6fe !important;
+}
+
+/* Animation keyframes */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Focus styles for accessibility */
+.language-selector-button:focus-visible,
+.language-option:focus-visible {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .language-dropdown {
+        border-width: 2px;
+        border-color: #000;
+    }
+    
+    .language-option {
+        border-bottom: 1px solid #ccc;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .language-selector-button,
+    .language-dropdown,
+    .language-arrow,
+    .language-option {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+    .language-dropdown {
+        position: fixed;
+        left: 1rem;
+        right: 1rem;
+        top: auto;
+        min-width: unset;
+        max-width: calc(100vw - 2rem);
+        z-index: 9999;
+    }
+    
+    .language-selector-button {
+        min-width: unset;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .language-option {
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Loading state animation */
+.loading-dots::after {
+    content: '';
+    animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+    0%, 20% {
+        content: '';
+    }
+    40% {
+        content: '.';
+    }
+    60% {
+        content: '..';
+    }
+    80%, 100% {
+        content: '...';
+    }
+}
+
+/* Integration with existing modern.css classes */
+.language-selector-button.interactive {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ripple effect compatibility */
+.language-selector-button .ripple {
+    border-radius: 0.5rem;
+}
+
+/* Dark theme compatibility (if implemented later) */
+@media (prefers-color-scheme: dark) {
+    .language-dropdown {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+    
+    .language-option {
+        color: #f9fafb;
+    }
+    
+    .language-option:hover {
+        background-color: #374151 !important;
+    }
+    
+    .language-option[aria-selected="true"] {
+        background-color: #4c1d95 !important;
+        color: #a78bfa !important;
+    }
+}

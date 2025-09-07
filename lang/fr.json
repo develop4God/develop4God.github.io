@@ -29,7 +29,7 @@
       "description": "Accédez à une nouvelle réflexion biblique chaque jour, conçue pour inspirer et nourrir votre esprit."
     },
     "versions": {
-      "title": "Versions Bibliques",
+      "title": "Versions de la Bible",
       "description": "Profitez des dévotions dans différentes versions de la Bible, comme RVR1960, pour une étude plus approfondie."
     },
     "favorites": {
@@ -38,36 +38,40 @@
     },
     "sharing": {
       "title": "Partagez la Parole",
-      "description": "Répandez l'inspiration en partageant des dévotions sous forme de texte ou de belles images à travers vos réseaux."
+      "description": "Répandez l'inspiration en partageant les dévotions sous forme de texte ou de belles images via vos réseaux."
     },
     "prayer": {
       "title": "Prière de Foi",
       "description": "Un message spécial pour donner votre vie à Jésus-Christ et vivre éternellement."
     },
     "language": {
-      "title": "Langues Multiples",
-      "description": "Conçue pour l'expansion, actuellement optimisée pour les utilisateurs hispanophones."
+      "title": "Plusieurs Langues",
+      "description": "Conçu pour l'expansion, actuellement optimisé pour les utilisateurs hispanophones."
     },
     "notifications": {
       "title": "Notifications Personnalisées",
       "description": "Recevez des rappels quotidiens de votre dévotion à l'heure que vous choisissez, pour ne pas manquer votre moment avec Dieu."
     },
     "themes": {
-      "title": "Personnalisez votre Thème",
+      "title": "Personnalisez Votre Thème",
       "description": "Choisissez parmi différentes combinaisons de couleurs pour adapter l'interface à votre goût."
     },
     "darkMode": {
       "title": "Mode Sombre (Faible Luminosité)",
-      "description": "Profitez d'une lecture confortable dans des environnements peu éclairés, réduisant la fatigue oculaire."
+      "description": "Profitez d'une lecture confortable dans des environnements à faible luminosité, réduisant la fatigue oculaire."
     }
   },
   "contact": {
     "title": "Des Questions ? Contactez-nous !",
     "description": "Si vous avez des questions, des suggestions, ou si vous voulez simplement dire bonjour, n'hésitez pas à nous contacter.",
     "email": "develop4God@gmail.com",
-    "emailButton": "Envoyer Email",
-    "supportText": "Votre soutien nous aide à continuer de partager la parole.",
-    "donationText": "Considérez faire un don."
+    "sendEmail": "Envoyez-nous un e-mail"
+  },
+  "donation": {
+    "title": "Soutenez notre Mission",
+    "subtitle": "Votre générosité nous permet de continuer à construire",
+    "supportText": "Votre soutien nous aide à continuer à partager la parole.",
+    "donationText": "Pensez à faire un don."
   },
   "footer": {
     "copyright": "© 2025 Dévotions Chrétiennes. Tous droits réservés.",
@@ -80,14 +84,96 @@
   "legal": {
     "terms": {
       "title": "Termes et Conditions d'Utilisation de l'Application \"Dévotions Chrétiennes\"",
-      "lastUpdated": "Dernière Mise à Jour : 28 juillet 2025",
-      "welcome": "Bienvenue dans l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), possédée et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par ces Termes et Conditions d'Utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
+      "lastUpdated": "Dernière mise à jour :",
+      "date": "28 juillet 2025",
+      "welcome": "Bienvenue dans l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par les présentes Conditions d'utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
+      "section1_title": "1. Description de l'Application",
+      "section1_text": "L'Application \"Dévotions Chrétiennes\" est une plateforme numérique conçue pour fournir un accès à des textes de dévotion quotidiens, hebdomadaires ou périodiques, dans le but de favoriser la réflexion spirituelle et la croissance personnelle. Les principales fonctionnalités incluent la lecture de dévotions, la possibilité de sauvegarder des dévotions comme favorites, l'option de partager des dévotions avec des contacts via les fonctions de votre appareil mobile, la capture d'écran du contenu de la dévotion et la possibilité de faire des dons volontaires pour soutenir l'Application.",
+      "section2_title": "2. Propriété Intellectuelle et Contenu de l'Application",
+      "section2_1_title": "2.1. Contenu Dévotionnel :",
+      "section2_1_text": "Tout le contenu dévotionnel (textes, réflexions, commentaires, etc.) présenté dans l'Application est la propriété de **Develop4God**. Bien qu'une partie de ce contenu ait été initialement générée avec l'aide de l'Intelligence Artificielle (IA), elle a été revue, éditée et approuvée par **Develop4God**, qui en assume l'entière responsabilité et la propriété. Ce contenu est protégé par les lois sur le droit d'auteur et d'autres lois sur la propriété intellectuelle.",
+      "section2_2_title": "2.2. Utilisation du Contenu :",
+      "section2_2_text": "Les Utilisateurs peuvent utiliser le contenu dévotionnel à des fins personnelles et non commerciales (y compris la lecture, l'option de partager avec des contacts, la capture d'écran du contenu de la dévotion et l'ajout aux favoris). Cette utilisation est permise tant qu'aucun revenu direct ou indirect n'est généré par cette utilisation. Pour toute utilisation dépassant le cadre personnel et...",
+      "section3_title": "3. Responsabilités de l'Utilisateur",
+      "section3_text": "En utilisant l'Application, vous vous engagez à :",
+      "section3_list1": "Utiliser l'Application de manière légale et éthique.",
+      "section3_list2": "Ne pas interférer avec ou perturber le fonctionnement de l'Application ou des serveurs et réseaux qui y sont connectés.",
+      "section3_list3": "Ne pas utiliser l'Application à des fins illégales ou pour envoyer du spam, des virus ou d'autres codes malveillants.",
+      "section3_list4": "Respecter les droits de propriété intellectuelle de **Develop4God** et des tiers.",
+      "section3_list5": "Être seul responsable de tout contenu ou information que vous partagez.",
+      "section4_title": "4. Dons",
+      "section4_text": "L'Application offre la possibilité de faire des dons volontaires pour soutenir sa maintenance et sa croissance. Ces dons sont traités via des plateformes tierces (par exemple, PayPal) et ne constituent pas un paiement pour un quelconque service. En faisant un don, vous acceptez les termes et conditions de cette plateforme tierce. Les dons ne sont pas remboursables.",
+      "section5_title": "5. Clauses de Non-Responsabilité et Limitation de Responsabilité",
+      "section5_1_title": "5.1. Aucune Garantie :",
+      "section5_1_text": "L'Application est fournie \"telle quelle\" et \"selon sa disponibilité\" sans garanties d'aucune sorte, expresses ou implicites. **Develop4God** ne garantit pas que l'Application sera ininterrompue, exempte d'erreurs ou exempte de virus ou d'autres composants nuisibles.",
+      "section5_2_title": "5.2. Limitation de Responsabilité :",
+      "section5_2_text": "Dans toute la mesure permise par la loi, **Develop4God** ne sera pas responsable des dommages directs, indirects, accessoires, spéciaux, consécutifs ou punitifs résultant de votre utilisation ou de votre incapacité à utiliser l'Application.",
+      "section6_title": "6. Modifications des Termes",
+      "section6_text": "Nous nous réservons le droit de modifier ces Termes à tout moment. Nous vous informerons de toute modification en publiant les nouveaux Termes sur cette page et en mettant à jour la date de \"Dernière mise à jour\". Nous vous recommandons de revoir ces Termes périodiquement.",
+      "section7_title": "7. Liens de Tiers",
+      "section7_text": "L'Application peut contenir des liens vers des sites web ou des services tiers. Nous ne sommes pas responsables du contenu ou des pratiques de confidentialité de ces sites. Votre accès et votre utilisation de ces sites se font à vos propres risques.",
+      "section8_title": "8. Résiliation de l'Utilisation",
+      "section8_text": "**Develop4God** peut résilier ou suspendre votre accès à l'Application à tout moment, sans préavis, pour quelque raison que ce soit, y compris si nous pensons que vous avez violé ces Termes.",
+      "section9_title": "9. Droit Applicable et Juridiction",
+      "section9_text": "Ces Termes seront régis et interprétés conformément aux lois de la **République du Panama**, sans tenir compte de ses dispositions en matière de conflits de lois. Tout litige découlant de ces Termes sera soumis à la juridiction exclusive des tribunaux de la **Ville de Panama, République du Panama**.",
+      "section10_title": "10. Contact",
+      "section10_text": "Si vous avez des questions sur ces Termes, vous pouvez nous contacter à : develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     },
     "privacy": {
       "title": "Politique de Confidentialité de l'Application \"Dévotions Chrétiennes\"",
-      "lastUpdated": "Dernière Mise à Jour : 28 juillet 2025",
-      "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), possédée et exploitée par **Develop4God**, traite les informations des utilisateurs. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
+      "lastUpdated": "Dernière mise à jour :",
+      "date": "28 juillet 2025",
+      "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**, gère les informations de l'utilisateur. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
+      "section1_title": "1. Informations que Nous Collectons et Comment Nous les Utilisons",
+      "section1_text": "L'Application \"Dévotions Chrétiennes\" collecte et traite certains types de données pour offrir ses fonctionnalités et améliorer l'expérience utilisateur. Nous voulons être transparents sur les données collectées et dans quel but :",
+      "section1_list1_title": "Identifiants :",
+      "section1_list1_text": "Nous collectons les identifiants de l'appareil (tels que les jetons Firebase Cloud Messaging - FCM) et, lorsque cela est disponible et autorisé par l'utilisateur, l'ID publicitaire Android.",
+      "section1_list1_purpose": "But :",
+      "section1_list1_purpose_text": "Utilisés pour envoyer des notifications push (FCM), pour l'analyse de l'utilisation de l'application (Firebase Analytics) et pour l'attribution des campagnes publicitaires.",
+      "section1_list2_title": "Informations Personnelles (limitées) :",
+      "section1_list2_text": "Nous collectons la date et l'heure de la dernière connexion (`lastLogin`).",
+      "section1_list2_purpose": "But :",
+      "section1_list2_purpose_text": "Pour l'administration du compte utilisateur (via Firebase Authentication) et pour des statistiques d'activité de base.",
+      "section1_list3_title": "Activité dans l'application :",
+      "section1_list3_text": "Nous collectons des données sur les interactions de l'utilisateur avec l'application (par exemple, clics sur les boutons, visites d'écrans) et les dévotions sauvegardées en tant que favorites.",
+      "section1_list3_purpose": "But :",
+      "section1_list3_purpose_text": "Pour les statistiques d'utilisation (Firebase Analytics), pour améliorer les fonctionnalités de l'application et pour personnaliser l'expérience utilisateur (par exemple, en affichant les dévotions favorites).",
+      "section1_list4_title": "Performances de l'application :",
+      "section1_list4_text": "Nous collectons des données de plantage et de diagnostic.",
+      "section1_list4_purpose": "But :",
+      "section1_list4_purpose_text": "Pour surveiller la stabilité et les performances de l'application, détecter et corriger les erreurs et garantir une expérience fluide.",
+      "section1_list5_title": "Utilisation de l'application :",
+      "section1_list5_text": "Nous collectons des journaux d'interaction pour comprendre comment les utilisateurs naviguent et utilisent l'interface de l'application.",
+      "section1_list5_purpose": "But :",
+      "section1_list5_purpose_text": "Pour les statistiques d'utilisation et l'analyse (Firebase Analytics).",
+      "section1_list6_title": "Paramètres de l'application :",
+      "section1_list6_text": "Nous stockons les préférences de l'utilisateur relatives aux notifications (par exemple, si les notifications sont activées, l'heure de notification préférée, le fuseau horaire de l'utilisateur).",
+      "section1_list6_purpose": "But :",
+      "section1_list6_purpose_text": "Pour permettre aux fonctions de notification de fonctionner selon les préférences de l'utilisateur et pour envoyer des communications opportunes du développeur.",
+      "important_note_title": "Important :",
+      "important_note_text": "L'Application ne collecte pas directement votre nom, votre adresse e-mail, votre numéro de téléphone, votre emplacement précis ou d'autres informations d'identification personnelle (PII) en dehors de ce qui est mentionné ci-dessus, sauf si vous les fournissez explicitement via des fonctionnalités tierces (telles que PayPal) ou des services d'authentification externes.",
+      "section2_title": "2. Comment l'Application Fonctionne et Gestion des Données Locales",
+      "section2_text": "Certaines fonctionnalités de l'Application fonctionnent principalement localement sur votre appareil :",
+      "section2_list1_title": "Lecture des Dévotions :",
+      "section2_list1_text": "Le contenu dévotionnel est chargé pour l'affichage. L'activité de lecture n'est pas enregistrée au niveau personnel.",
+      "section2_list2_title": "Sauvegarde des Favoris :",
+      "section2_list2_text": "La fonctionnalité de \"sauvegarde des favoris\" est effectuée localement sur votre appareil et est synchronisée avec votre compte utilisateur dans Firebase Firestore pour la persistance et l'accès depuis d'autres appareils (si vous vous connectez avec le même compte). Ces données sont accessibles et gérées par nous pour vous fournir cette fonctionnalité.",
+      "section2_list3_title": "Partage avec les Contacts :",
+      "section2_list3_text": "Lorsque vous partagez une dévotion, nous ne stockons pas les informations du destinataire ni le contenu du message que vous envoyez. Ce processus est géré par les fonctions de partage natives de votre appareil.",
+      "section3_title": "3. Sécurité des Données",
+      "section3_text": "Nous nous engageons à protéger la sécurité de vos données. Nous utilisons des mesures administratives, techniques et physiques pour protéger contre l'accès non autorisé, la divulgation, la modification ou la destruction des informations que nous collectons et stockons. Cependant, aucune mesure de sécurité n'est parfaite à 100 %. Nous vous recommandons d'utiliser des mots de passe forts et de protéger les informations de votre compte.",
+      "section4_title": "4. Services Tiers",
+      "section4_text": "L'Application utilise des services tiers qui peuvent collecter des informations. Ces services ont leurs propres politiques de confidentialité :",
+      "section4_list1": "**Firebase (Google) :** Pour l'authentification, les bases de données (Firestore), les notifications (FCM) et l'analyse. La politique de confidentialité de Firebase est disponible à l'adresse [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
+      "section4_list2": "**PayPal :** Pour les dons. La politique de confidentialité de PayPal est disponible à l'adresse [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
+      "section4_list3": "Autres services : L'Application peut également utiliser d'autres services tiers pour des fonctions spécifiques, telles que l'envoi d'e-mails. Ces services n'auront accès qu'aux informations nécessaires pour fournir leur service.",
+      "section5_title": "5. Confidentialité des Enfants",
+      "section5_text": "L'Application n'est pas destinée à être utilisée par des enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants de moins de 13 ans. Si nous apprenons que nous avons collecté des informations auprès d'un enfant de moins de 13 ans sans le consentement parental vérifiable, nous prendrons des mesures pour supprimer ces informations de nos serveurs.",
+      "section6_title": "6. Modifications de cette Politique de Confidentialité",
+      "section6_text": "Nous pouvons mettre à jour notre Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle Politique de Confidentialité sur cette page et en mettant à jour la date de \"Dernière mise à jour\" en haut de la page. Nous vous encourageons à revoir cette Politique de Confidentialité périodiquement pour tout changement.",
+      "section7_title": "7. Contact",
+      "section7_text": "Si vous avez des questions sur cette Politique de Confidentialité ou si vous souhaitez demander la suppression de vos données, n'hésitez pas à nous contacter à : develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     }
   }

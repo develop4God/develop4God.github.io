@@ -29,16 +29,16 @@
       "description": "Accede a una nueva reflexión bíblica cada día, diseñada para inspirar y nutrir tu espíritu."
     },
     "versions": {
-      "title": "Versiones Bíblicas",
+      "title": "Versiones de la Biblia",
       "description": "Disfruta de los devocionales en diferentes versiones de la Biblia, como RVR1960, para un estudio más profundo."
     },
     "favorites": {
       "title": "Marca tus Favoritos",
-      "description": "Guarda aquellos devocionales que más te toquen para revisitarlos fácilmente cuando quieras."
+      "description": "Guarda aquellos devocionales que más te tocan para volver a ellos fácilmente cuando quieras."
     },
     "sharing": {
       "title": "Comparte la Palabra",
-      "description": "Difunde la inspiración compartiendo devocionales como texto o bellas imágenes a través de tus redes."
+      "description": "Difunde la inspiración compartiendo los devocionales como texto o en bellas imágenes a través de tus redes."
     },
     "prayer": {
       "title": "Oración de Fe",
@@ -46,26 +46,30 @@
     },
     "language": {
       "title": "Múltiples Idiomas",
-      "description": "Diseñada para expandirse, actualmente optimizada para usuarios de habla hispana."
+      "description": "Diseñado para la expansión, actualmente optimizado para los usuarios de habla hispana."
     },
     "notifications": {
       "title": "Notificaciones Personalizadas",
-      "description": "Recibe recordatorios diarios de tu devocional a la hora que elijas, para no perderte tu momento con Dios."
+      "description": "Recibe recordatorios diarios de tu devocional a la hora que elijas, para que no te pierdas tu momento con Dios."
     },
     "themes": {
       "title": "Personaliza tu Tema",
       "description": "Elige entre diferentes combinaciones de colores para adaptar la interfaz a tu gusto."
     },
     "darkMode": {
-      "title": "Modo Oscuro (Luz Baja)",
+      "title": "Modo Oscuro (Poca Luz)",
       "description": "Disfruta de una lectura cómoda en entornos con poca luz, reduciendo la fatiga visual."
     }
   },
   "contact": {
     "title": "¿Preguntas? ¡Contáctanos!",
-    "description": "Si tienes alguna duda, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.",
+    "description": "Si tienes alguna pregunta, sugerencia o simplemente quieres saludar, no dudes en ponerte en contacto con nosotros.",
     "email": "develop4God@gmail.com",
-    "emailButton": "Enviar Correo",
+    "sendEmail": "Envíanos un correo"
+  },
+  "donation": {
+    "title": "Apoya nuestra Misión",
+    "subtitle": "Tu generosidad nos permite seguir construyendo",
     "supportText": "Tu apoyo nos ayuda a seguir compartiendo la palabra.",
     "donationText": "Considera hacer una donación."
   },
@@ -80,14 +84,97 @@
   "legal": {
     "terms": {
       "title": "Términos y Condiciones de Uso de la Aplicación \"Devocionales Cristianos\"",
-      "lastUpdated": "Fecha de Última Actualización: 28 de julio de 2025",
+      "lastUpdated": "Fecha de Última Actualización:",
+      "date": "28 de julio de 2025",
       "welcome": "Bienvenido/a a la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**. Al acceder o utilizar la Aplicación, usted (\"el Usuario\") acepta estar legalmente vinculado/a por los presentes Términos y Condiciones de Uso (en adelante, \"los Términos\"). Si no está de acuerdo con alguno de estos Términos, no debe utilizar la Aplicación.",
+      "section1_title": "1. Descripción de la Aplicación",
+      "section1_text": "La Aplicación “Devocionales Cristianos” es una plataforma digital diseñada para proporcionar acceso a textos devocionales diarios, semanales o periódicos, con el propósito de fomentar la reflexión espiritual y el crecimiento personal. Las funcionalidades principales incluyen la lectura de devocionales, la posibilidad de guardar devocionales como favoritos, la opción de compartir devocionales con contactos a través de las funciones de su dispositivo móvil, la captura de pantalla del contenido del devocional y la posibilidad de realizar donaciones voluntarias para apoyar la Aplicación.",
+      "section2_title": "2. Propiedad Intelectual y Contenido de la Aplicación",
+      "section2_1_title": "2.1. Contenido Devocional:",
+      "section2_1_text": "Todo el contenido devocional (textos, reflexiones, comentarios, etc.) presentado en la Aplicación es propiedad de **Develop4God**. Si bien parte de este contenido fue inicialmente generado con la asistencia de Inteligencia Artificial (IA), ha sido revisado, editado y aprobado por **Develop4God**, quien asume la total responsabilidad y titularidad del mismo. Este contenido está protegido por las leyes de derechos de autor y otras leyes de propiedad intelectual.",
+      "section2_2_title": "2.2. Uso del Contenido:",
+      "section2_2_text": "Los Usuarios pueden usar el contenido devocional para uso personal y no comercial (incluyendo la lectura, la opción de compartir con contactos, la captura de pantalla del contenido del devocional y la adición a favoritos). Este uso está permitido siempre y cuando no se genere ningún ingreso directo o indirecto a partir de dicho uso. Para cualquier uso que exceda lo personal y...",
+      "section3_title": "3. Responsabilidades del Usuario",
+      "section3_text": "Al usar la Aplicación, usted se compromete a:",
+      "section3_list1": "Utilizar la Aplicación de manera legal y ética.",
+      "section3_list2": "No interferir ni interrumpir el funcionamiento de la Aplicación o de los servidores y redes conectados a ella.",
+      "section3_list3": "No utilizar la Aplicación para fines ilegales o para enviar spam, virus u otro código dañino.",
+      "section3_list4": "Respetar los derechos de propiedad intelectual de **Develop4God** y de terceros.",
+      "section3_list5": "Ser el único responsable de cualquier contenido o información que comparta.",
+      "section4_title": "4. Donaciones",
+      "section4_text": "La Aplicación ofrece la opción de realizar donaciones voluntarias para apoyar su mantenimiento y crecimiento. Estas donaciones se procesan a través de plataformas de terceros (p. ej., PayPal) y no son un pago por ningún servicio. Al realizar una donación, usted acepta los términos y condiciones de dicha plataforma de terceros. Las donaciones no son reembolsables.",
+      "section5_title": "5. Exención de Garantías y Limitación de Responsabilidad",
+      "section5_1_title": "5.1. Sin Garantías:",
+      "section5_1_text": "La Aplicación se proporciona \"tal como está\" y \"según disponibilidad\" sin garantías de ningún tipo, ya sean expresas o implícitas. **Develop4God** no garantiza que la Aplicación será ininterrumpida, libre de errores o libre de virus u otros componentes dañinos.",
+      "section5_2_title": "5.2. Limitación de Responsabilidad:",
+      "section5_2_text": "En la máxima medida permitida por la ley, **Develop4God** no será responsable de ningún daño directo, indirecto, incidental, especial, consecuente o punitivo que resulte de su uso o incapacidad para usar la Aplicación.",
+      "section6_title": "6. Modificaciones de los Términos",
+      "section6_text": "Nos reservamos el derecho de modificar estos Términos en cualquier momento. Le notificaremos cualquier cambio publicando los nuevos Términos en esta página y actualizando la fecha de \"Última Actualización\". Le recomendamos revisar estos Términos periódicamente.",
+      "section7_title": "7. Enlaces a Terceros",
+      "section7_text": "La Aplicación puede contener enlaces a sitios web o servicios de terceros. No somos responsables del contenido o las prácticas de privacidad de estos sitios. Su acceso y uso de estos sitios es bajo su propio riesgo.",
+      "section8_title": "8. Terminación de Uso",
+      "section8_text": "**Develop4God** puede terminar o suspender su acceso a la Aplicación en cualquier momento, sin previo aviso, por cualquier motivo, incluyendo si creemos que usted ha violado estos Términos.",
+      "section9_title": "9. Ley Aplicable y Jurisdicción",
+      "section9_text": "Estos Términos se regirán e interpretarán de acuerdo con las leyes de **la República de Panamá**, sin tener en cuenta sus disposiciones sobre conflictos de leyes. Cualquier disputa que surja en relación con estos Términos estará sujeta a la jurisdicción exclusiva de los tribunales de **la Ciudad de Panamá, República de Panamá**.",
+      "section10_title": "10. Contacto",
+      "section10_text": "Si tiene alguna pregunta sobre estos Términos, puede contactarnos en: develop4God@gmail.com.",
       "backToHome": "Volver a la página principal"
     },
     "privacy": {
       "title": "Política de Privacidad de la Aplicación \"Devocionales Cristianos\"",
-      "lastUpdated": "Fecha de Última Actualización: 28 de julio de 2025",
+      "lastUpdated": "Fecha de Última Actualización:",
+      "date": "28 de julio de 2025",
       "description": "Esta Política de Privacidad describe cómo la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**, maneja la información del usuario. La privacidad de nuestros usuarios es de suma importancia para nosotros.",
+      "section1_title": "1. Información que Recopilamos y Cómo la Usamos",
+      "section1_text": "La Aplicación \"Devocionales Cristianos\" recopila y procesa ciertos tipos de datos para ofrecer sus funcionalidades y mejorar la experiencia del usuario. Queremos ser transparentes sobre qué datos se recopilan y con qué propósito:",
+      "section1_list1_title": "Identificadores:",
+      "section1_list1_text": "Recopilamos identificadores de dispositivos (como los tokens de Firebase Cloud Messaging - FCM) y, cuando esté disponible y sea permitido por el usuario, el ID de publicidad de Android.",
+      "section1_list1_purpose": "Propósito:",
+      "section1_list1_purpose_text": "Utilizados para enviar notificaciones push (FCM), para el análisis de uso de la aplicación (Firebase Analytics) y para la atribución de campañas publicitarias.",
+      "section1_list2_title": "Información Personal (limitada):",
+      "section1_list2_text": "Recopilamos la fecha y hora del último inicio de sesión (`lastLogin`).",
+      "section1_list2_purpose": "Propósito:",
+      "section1_list2_purpose_text": "Para la administración de la cuenta de usuario (a través de Firebase Authentication) y para estadísticas básicas de actividad.",
+      "section1_list3_title": "Actividad en la aplicación:",
+      "section1_list3_text": "Recopilamos datos sobre las interacciones del usuario con la aplicación (p. ej., clics en botones, visitas a pantallas) y los devocionales guardados como favoritos.",
+      "section1_list3_purpose": "Propósito:",
+      "section1_list3_purpose_text": "Para estadísticas de uso (Firebase Analytics), para mejorar las funcionalidades de la aplicación y para personalizar la experiencia del usuario (p. ej., mostrando los devocionales favoritos).",
+      "section1_list4_title": "Rendimiento de la aplicación:",
+      "section1_list4_text": "Recopilamos datos de fallos y diagnósticos.",
+      "section1_list4_purpose": "Propósito:",
+      "section1_list4_purpose_text": "Para monitorear la estabilidad y el rendimiento de la aplicación, detectar y corregir errores y garantizar una experiencia fluida.",
+      "section1_list5_title": "Uso de la aplicación:",
+      "section1_list5_text": "Recopilamos registros de interacción para comprender cómo los usuarios navegan y utilizan la interfaz de la aplicación.",
+      "section1_list5_purpose": "Propósito:",
+      "section1_list5_purpose_text": "Para estadísticas de uso y análisis (Firebase Analytics)."
+      ,
+      "section1_list6_title": "Configuración de la aplicación:",
+      "section1_list6_text": "Almacenamos las preferencias del usuario relacionadas con las notificaciones (p. ej., si las notificaciones están habilitadas, la hora de notificación preferida, la zona horaria del usuario).",
+      "section1_list6_purpose": "Propósito:",
+      "section1_list6_purpose_text": "Para permitir que las funciones de notificación operen de acuerdo con las preferencias del usuario y para enviar comunicaciones oportunas del desarrollador.",
+      "important_note_title": "Importante:",
+      "important_note_text": "La Aplicación no recopila directamente su nombre, dirección de correo electrónico, número de teléfono, ubicación precisa u otra información de identificación personal (PII) aparte de lo mencionado anteriormente, a menos que usted la proporcione explícitamente a través de funcionalidades de terceros (como PayPal) o servicios de autenticación externos.",
+      "section2_title": "2. Cómo Funciona la Aplicación y Manejo de Datos Locales",
+      "section2_text": "Algunas funcionalidades de la Aplicación operan principalmente de forma local en su dispositivo:",
+      "section2_list1_title": "Lectura de Devocionales:",
+      "section2_list1_text": "El contenido devocional se carga para su visualización. La actividad de lectura no se registra a nivel personal.",
+      "section2_list2_title": "Guardado de Favoritos:",
+      "section2_list2_text": "La funcionalidad de \"guardar favoritos\" se realiza localmente en su dispositivo y se sincroniza con su cuenta de usuario en Firebase Firestore para la persistencia y el acceso desde otros dispositivos (si inicia sesión con la misma cuenta). Estos datos son accesibles y gestionados por nosotros para proporcionarle esta funcionalidad.",
+      "section2_list3_title": "Compartir con Contactos:",
+      "section2_list3_text": "Cuando comparte un devocional, no almacenamos la información del destinatario ni el contenido del mensaje que envía. Este proceso es gestionado por las funciones de uso compartido nativas de su dispositivo.",
+      "section3_title": "3. Seguridad de los Datos",
+      "section3_text": "Nos comprometemos a proteger la seguridad de sus datos. Utilizamos medidas administrativas, técnicas y físicas para proteger contra el acceso no autorizado, la divulgación, la alteración o la destrucción de la información que recopilamos y almacenamos. Sin embargo, ninguna medida de seguridad es 100% perfecta. Le recomendamos que utilice contraseñas seguras y proteja la información de su cuenta.",
+      "section4_title": "4. Servicios de Terceros",
+      "section4_text": "La Aplicación utiliza servicios de terceros que pueden recopilar información. Estos servicios tienen sus propias políticas de privacidad:",
+      "section4_list1": "**Firebase (Google):** Para la autenticación, bases de datos (Firestore), notificaciones (FCM) y análisis. La política de privacidad de Firebase está disponible en [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
+      "section4_list2": "**PayPal:** Para las donaciones. La política de privacidad de PayPal está disponible en [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
+      "section4_list3": "Otros servicios: La Aplicación también puede usar otros servicios de terceros para funciones específicas, como el envío de correos electrónicos. Estos servicios solo tendrán acceso a la información necesaria para proporcionar su servicio.",
+      "section5_title": "5. Privacidad de los Niños",
+      "section5_text": "La Aplicación no está destinada para su uso por niños menores de 13 años. No recopilamos a sabiendas información personal de niños menores de 13 años. Si nos damos cuenta de que hemos recopilado información de un niño menor de 13 años sin el consentimiento verificable de sus padres, tomaremos medidas para eliminar esa información de nuestros servidores.",
+      "section6_title": "6. Cambios a Esta Política de Privacidad",
+      "section6_text": "Podemos actualizar nuestra Política de Privacidad de vez en cuando. Le notificaremos cualquier cambio publicando la nueva Política de Privacidad en esta página y actualizando la \"Fecha de Última Actualización\" en la parte superior. Le recomendamos revisar esta Política de Privacidad periódicamente para cualquier cambio.",
+      "section7_title": "7. Contacto",
+      "section7_text": "Si tiene alguna pregunta sobre esta Política de Privacidad o desea solicitar la eliminación de sus datos, no dude en contactarnos en: develop4God@gmail.com.",
       "backToHome": "Volver a la página principal"
     }
   }
