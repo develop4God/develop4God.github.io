@@ -1,29 +1,5 @@
 /* Modern enhancements for Devocionales Cristianos website */
 
-/* Fuente global legible y fallback seguro */
-body, html {
-    font-family: Arial, Verdana, 'Inter', sans-serif !important;
-    color: #222 !important;
-    background-color: #f8f8f8;
-}
-
-/* Ajuste específico para la sección Nuestra Visión */
-#our-vision, #our-vision h2, #our-vision p {
-    color: #222 !important;
-    font-family: Arial, Verdana, 'Inter', sans-serif !important;
-}
-
-/* Forzar color oscuro en todos los enlaces del sitio, excepto los que están en headers oscuros */
-a {
-    color: #2d2d2d !important;
-    text-decoration: underline;
-}
-
-header a, .gradient-purple a, .bg-gray-800 a {
-    color: #fff !important;
-    text-decoration: underline;
-}
-
 /* Smooth animations and transitions */
 * {
     transition: all 0.3s ease;
@@ -215,16 +191,6 @@ header a, .gradient-purple a, .bg-gray-800 a {
         --text-color: #ffffff;
         --card-bg: #2d2d2d;
     }
-    body, html {
-        background-color: var(--bg-color) !important;
-        color: var(--text-color) !important;
-    }
-    #our-vision, #our-vision h2, #our-vision p {
-        color: var(--text-color) !important;
-    }
-    a {
-        color: #c3aaff !important;
-    }
 }
 
 /* High contrast mode */
@@ -277,3 +243,154 @@ input:focus {
     top: 0;
 }
 
+/* Asegurar contraste en footer */
+footer, footer * {
+    color: white !important;
+}
+
+footer a {
+    color: #d1d5db !important; /* gray-300 */
+}
+
+footer a:hover {
+    color: white !important;
+}
+
+/* Mejorar contraste en secciones de contacto */
+#contact, #contact * {
+    color: white !important;
+}
+
+/* Corrección específica para elementos con animación float que puedan tener opacity 0 */
+.float-animation {
+    opacity: 1 !important;
+}
+
+/* Corrección para casos específicos de texto blanco sobre fondo blanco - MEJORADA */
+.bg-white p,
+.bg-white span:not(.text-purple-600):not(#features *) {
+    color: #374151;
+}
+
+.bg-white h1, .bg-white h2, .bg-white h3 {
+    color: #111827;
+}
+
+/* Asegurar que los elementos de Tailwind tengan el color correcto */
+.text-gray-800 {
+    color: #1f2937 !important;
+}
+
+.text-gray-600 {
+    color: #4b5563 !important;
+}
+
+.text-white {
+    color: white !important;
+}
+
+/* CORRECCIONES ESPECÍFICAS PARA COLORES MORADOS */
+
+/* 1. CORRECCIÓN: Título "Our Vision" debe ser morado */
+#our-vision h2 {
+    color: #7c3aed !important; /* purple-600 equivalent */
+}
+
+/* 2. CORRECCIÓN: TODOS los íconos de funciones deben ser morados */
+#features .text-purple-600 {
+    color: #7c3aed !important; /* Forzar morado para íconos */
+}
+
+/* 3. CORRECCIÓN: TODOS los títulos de funciones deben ser morados */
+#features h3 {
+    color: #7c3aed !important; /* Forzar morado para títulos de funciones */
+}
+
+/* 4. CORRECCIÓN: Asegurar que las descripciones mantengan su color gris */
+#features p {
+    color: #6b7280 !important; /* gray-500 - mantener descripción en gris */
+}
+
+/* 5. CORRECCIÓN: Botón de email igual que "Learn about Features" */
+#contact a[href^="mailto"] {
+    background: transparent !important;
+    border: 2px solid white !important;
+    color: white !important;
+}
+
+#contact a[href^="mailto"]:hover {
+    background: white !important;
+    color: #7c3aed !important; /* purple-600 */
+}
+
+/* CORRECCIÓN: Asegurar que los elementos morados mantengan su color */
+.text-purple-600,
+.text-purple-800 {
+    color: #7c3aed !important;
+}
+
+/* CORRECCIÓN: Elementos de contacto mantienen color blanco */
+#contact h2,
+#contact p {
+    color: white !important;
+}
+
+/* =============================================
+   CORRECCIÓN DEFINITIVA PARA EL BOTÓN "VOLVER A LA PÁGINA PRINCIPAL"
+   ============================================= */
+
+/* Corrección específica para botones con bg-purple-600 */
+.bg-purple-600,
+a.bg-purple-600,
+.inline-block.bg-purple-600 {
+    background-color: #7c3aed !important; /* purple-600 */
+    color: white !important;
+    border: none !important;
+}
+
+.bg-purple-600:hover,
+a.bg-purple-600:hover,
+.inline-block.bg-purple-600:hover {
+    background-color: #6d28d9 !important; /* purple-700 */
+    color: white !important;
+}
+
+/* Forzar color blanco para todos los elementos internos del botón */
+.bg-purple-600 *,
+.bg-purple-600 span,
+.bg-purple-600 i {
+    color: white !important;
+}
+
+/* Selector específico para el botón en el contenedor de la página de privacidad */
+.bg-purple-50 a.bg-purple-600,
+.bg-purple-50 .bg-purple-600 {
+    background-color: #7c3aed !important;
+    color: white !important;
+}
+
+.bg-purple-50 a.bg-purple-600:hover,
+.bg-purple-50 .bg-purple-600:hover {
+    background-color: #6d28d9 !important;
+    color: white !important;
+}
+
+/* Selector ultra-específico para garantizar que funcione */
+.text-center a[href="index.html"].bg-purple-600 {
+    background-color: #7c3aed !important;
+    color: white !important;
+}
+
+.text-center a[href="index.html"].bg-purple-600:hover {
+    background-color: #6d28d9 !important;
+    color: white !important;
+}
+
+/* Override final para cualquier conflicto */
+[class*="bg-purple-6"] {
+    color: white !important;
+}
+
+[class*="bg-purple-6"]:hover {
+    color: white !important;
+}
