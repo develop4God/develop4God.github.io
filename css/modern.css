@@ -77,12 +77,22 @@ header a, .gradient-purple a, .bg-gray-800 a {
     animation: float 3s ease-in-out infinite;
 }
 
-/* Modern gradient text */
+/* Modern gradient text - CORREGIDO */
 .gradient-text {
+    /* Color sólido como respaldo */
+    color: #374151 !important; 
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+}
+
+/* Si el gradiente falla, mostrar color sólido */
+@supports not (background-clip: text) {
+    .gradient-text {
+        color: #374151 !important;
+        background: none;
+    }
 }
 
 /* Enhanced language selector */
@@ -148,11 +158,18 @@ header a, .gradient-purple a, .bg-gray-800 a {
     height: 300px;
 }
 
-/* Scroll reveal animations */
+/* Scroll reveal animations - CORREGIDO */
 .scroll-reveal {
+    /* SOLUCIÓN: Hacer elementos visibles por defecto */
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.6s ease;
+}
+
+/* Opcional: Mantener animación si JavaScript está disponible */
+.scroll-reveal.hidden {
     opacity: 0;
     transform: translateY(50px);
-    transition: all 0.6s ease;
 }
 
 .scroll-reveal.revealed {
@@ -259,3 +276,4 @@ input:focus {
 .skip-to-main:focus {
     top: 0;
 }
+
