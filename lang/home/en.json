@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "title": "develop4God - Spiritual Resources for Your Faith Growth",
+    "description": "Christian platform with daily devotionals and tools to build faith habits. Completely free spiritual resources."
+  },
+  "navigation": {
+    "home": "Home"
+  },
+  "header": {
+    "title": "develop4God",
+    "subtitle": "Resources for Your Spiritual Growth"
+  },
+  "hero": {
+    "mainTitle": "develop4God",
+    "subtitle": "Tools to Strengthen Your Faith and Walk with God",
+    "description": "Free spiritual resources for your daily growth in Christ"
+  },
+  "projects": {
+    "title": "Our Projects",
+    "devocionales": {
+      "title": "Christian Devotionals",
+      "description": "Your daily refuge in God's Word with audio devotionals",
+      "features": [
+        "Daily devotionals with audio",
+        "8 Bible versions",
+        "Completely offline",
+        "Ad-free"
+      ],
+      "button": "Explore Devotionals"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Build godly habits through faith and spiritual discipline",
+      "features": [
+        "Habit tracking",
+        "Spiritual goals",
+        "Biblical motivation",
+        "Personal progress"
+      ],
+      "button": "Discover Habitus"
+    }
+  },
+  "mission": {
+    "title": "Our Mission",
+    "description": "We develop digital tools that help believers grow in their faith, maintain spiritual disciplines, and walk closer to God every day.",
+    "vision": "We believe technology can serve God's kingdom by providing accessible, quality resources to strengthen your spiritual life."
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. All rights reserved.",
+    "madeWith": "Made with love for God's glory",
+    "contact": "Contact"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Construire des Habitudes Pieuses",
+    "description": "Outil pour construire des habitudes spirituelles et grandir en discipline avec motivation biblique."
+  },
+  "navigation": {
+    "home": "Accueil",
+    "habits": "Habitudes",
+    "progress": "Progrès",
+    "about": "À propos"
+  },
+  "header": {
+    "title": "Habitus+Faith",
+    "subtitle": "Construire des Habitudes Pieuses"
+  },
+  "hero": {
+    "mainTitle": "Habitus+Faith",
+    "subtitle": "Construire la Discipline Spirituelle par des Habitudes Quotidiennes",
+    "description": "Renforcez votre marche avec Dieu par des habitudes intentionnelles et cohérentes",
+    "cta": "Commencer"
+  },
+  "features": {
+    "title": "Fonctionnalités",
+    "tracking": {
+      "title": "Suivi des Habitudes",
+      "description": "Suivez vos progrès quotidiens dans les habitudes spirituelles comme la prière, la lecture biblique et le service."
+    },
+    "goals": {
+      "title": "Objectifs Spirituels",
+      "description": "Définissez des objectifs clairs alignés avec votre croissance en Christ et atteignez-les étape par étape."
+    },
+    "motivation": {
+      "title": "Motivation Biblique",
+      "description": "Recevez des versets et des rappels qui vous inspirent à maintenir vos engagements envers Dieu."
+    },
+    "progress": {
+      "title": "Visualisez vos Progrès",
+      "description": "Voyez votre croissance à travers des statistiques et célébrez chaque victoire dans votre parcours de foi."
+    }
+  },
+  "about": {
+    "title": "À propos d'Habitus+Faith",
+    "description": "Habitus+Faith est un outil conçu pour vous aider à développer des habitudes spirituelles cohérentes. Basé sur les principes bibliques de discipline et de persévérance, il vous accompagne dans votre marche quotidienne avec Christ.",
+    "mission": "Notre mission est de vous aider à former le caractère de Christ en vous par la pratique quotidienne de disciplines spirituelles."
+  },
+  "comingSoon": {
+    "title": "Bientôt Disponible",
+    "message": "Nous travaillons pour vous offrir une expérience incroyable pour construire des habitudes de foi.",
+    "backHome": "Retour à l'Accueil"
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. Tous droits réservés.",
+    "madeWith": "Développé avec amour pour la gloire de Dieu",
+    "backToHub": "Retour au Hub Principal"
+  }
+}

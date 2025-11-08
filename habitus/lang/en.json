@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Build Godly Habits",
+    "description": "Tool to build spiritual habits and grow in discipline with biblical motivation."
+  },
+  "navigation": {
+    "home": "Home",
+    "habits": "Habits",
+    "progress": "Progress",
+    "about": "About"
+  },
+  "header": {
+    "title": "Habitus+Faith",
+    "subtitle": "Build Godly Habits"
+  },
+  "hero": {
+    "mainTitle": "Habitus+Faith",
+    "subtitle": "Build Spiritual Discipline through Daily Habits",
+    "description": "Strengthen your walk with God through intentional and consistent habits",
+    "cta": "Get Started"
+  },
+  "features": {
+    "title": "Features",
+    "tracking": {
+      "title": "Habit Tracking",
+      "description": "Monitor your daily progress in spiritual habits like prayer, Bible reading, and service."
+    },
+    "goals": {
+      "title": "Spiritual Goals",
+      "description": "Set clear goals aligned with your growth in Christ and achieve them step by step."
+    },
+    "motivation": {
+      "title": "Biblical Motivation",
+      "description": "Receive verses and reminders that inspire you to keep your commitments to God."
+    },
+    "progress": {
+      "title": "Visualize Your Progress",
+      "description": "See your growth through statistics and celebrate every victory in your faith journey."
+    }
+  },
+  "about": {
+    "title": "About Habitus+Faith",
+    "description": "Habitus+Faith is a tool designed to help you develop consistent spiritual habits. Based on biblical principles of discipline and perseverance, it accompanies you in your daily walk with Christ.",
+    "mission": "Our mission is to help you form the character of Christ in you through daily practice of spiritual disciplines."
+  },
+  "comingSoon": {
+    "title": "Coming Soon",
+    "message": "We're working on bringing you an amazing experience to build faith habits.",
+    "backHome": "Back to Home"
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. All rights reserved.",
+    "madeWith": "Made with love for God's glory",
+    "backToHub": "Back to Main Hub"
+  }
+}
