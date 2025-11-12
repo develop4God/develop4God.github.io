@@ -1,311 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Devocionales Cristianos</title>
-    <meta name="description" content="Ven y descansa. Encuentra tu refugio diario en la Palabra de Dios con devocionales, audio y contenido espiritual que nutre tu alma en medio del afán del mundo.">
-    <meta name="title-key" content="meta.title">
-    <meta name="description-key" content="meta.description">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://develop4god.github.io/">
-    <meta property="og:title" content="Devocionales Cristianos - Ven y Descansa">
-    <meta property="og:description" content="Encuentra tu refugio diario en la Palabra de Dios. Devocionales con audio, rachas diarias y contenido espiritual para nutrir tu alma.">
-    <meta property="og:image" content="https://develop4god.github.io/images/og-image.jpg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>develop4God - Recursos Espirituales</title>
+  <meta name="description" content="Plataforma cristiana con devocionales diarios y herramientas para construir hábitos de fe.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/home.css">
+  <style>
+    .language-select {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgb(255 255 255 / 30%);
+      background: rgb(255 255 255 / 10%);
+      color: #fff;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://develop4god.github.io/">
-    <meta property="twitter:title" content="Devocionales Cristianos - Ven y Descansa">
-    <meta property="twitter:description" content="Encuentra tu refugio diario en la Palabra de Dios. Devocionales con audio, rachas diarias y contenido espiritual para nutrir tu alma.">
-    <meta property="twitter:image" content="https://develop4god.github.io/images/og-image.jpg">
-    
-    <!-- Enlace al CDN de Tailwind CSS para estilos rápidos y responsivos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Enlace a Google Fonts para la fuente "Inter" (moderna y legible) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons for modern iconography -->
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-    <!-- Modern CSS enhancements -->
-    <link rel="stylesheet" href="/css/modern.css">
-    <link rel="stylesheet" href="/css/language-selector.css">
-    <!-- Internationalization system -->
-    <script src="/js/i18n.js"></script>
-    <!-- Modern enhancements -->
-    <script src="/js/modern.js"></script>
-    <style>
-        /* Estilos personalizados para la fuente Inter */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Ajuste para que el pie de página se quede abajo */
-        html, body {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-        main {
-            flex: 1; /* Esto hace que el contenido principal ocupe el espacio restante */
-        }
-    </style>
+    .language-select:hover {
+      background: rgb(255 255 255 / 20%);
+    }
+
+    .language-select option {
+      background: #1f2937;
+      color: #fff;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-    <div id="app-container" class="flex flex-col min-h-screen">
-        <!-- Encabezado de la página -->
-        <header class="gradient-purple text-white p-6 shadow-md">
-            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
-                <a href="index.html" class="text-2xl sm:text-3xl font-bold rounded-md hover:bg-purple-700 px-3 py-2 transition-colors duration-200 mb-4 sm:mb-0 interactive" data-i18n="header.title">Devocionales Cristianos</a>
-                <nav>
-                    <!-- Menú de navegación responsive: de columna a fila en pantallas pequeñas y mayores -->
-                    <ul class="flex flex-col md:flex-row sm:space-x-6 space-y-2 sm:space-y-0 text-center">
-                        <li><a href="#" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.home">Inicio</a></li>
-                        <li><a href="#our-vision" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.vision">Nuestra Visión</a></li>
-                        <li><a href="#features" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.features">Características</a></li>
-                        <li><a href="#daily-provision" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.dailyProvision">Provisión Diaria</a></li>
-                        <li><a href="#contact" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.contact">Contacto</a></li>
-                        <!-- Enlace de Donación en la barra de navegación -->
-                        <li><a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.donation">Donación</a></li>
-                        <!-- NUEVO: Enlace de Eliminación de Datos en la barra de navegación -->
-                        <li><a href="politica-de-privacidad.html#eliminacion-datos" class="text-white hover:text-purple-200 transition-colors duration-200 block sm:inline-block py-1 px-2" data-i18n="navigation.deleteData">Eliminar Datos</a></li>
-                        <!-- Language Selector -->
-                        <li>
-                            <div id="language-selector" class="language-selector">
-                            </div>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
-
-        <!-- Sección Principal (Hero Section) -->
-        <main id="main" class="flex-grow flex items-center justify-center gradient-bg text-white py-16 px-4 relative overflow-hidden">
-            <!-- Background decorative elements -->
-            <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full float-animation"></div>
-                <div class="absolute bottom-10 right-10 w-24 h-24 bg-white rounded-full float-animation" style="animation-delay: 1s;"></div>
-                <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full float-animation" style="animation-delay: 2s;"></div>
-            </div>
-            
-            <div class="text-center w-full relative z-10">
-                <!-- Título principal renovado con mensaje bíblico -->
-                <h1 class="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-6 leading-tight px-2" data-i18n="header.mainTitle">
-                    Ven y Descansa
-                </h1>
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-semibold mb-6 text-purple-100 px-2" data-i18n="header.subtitle">
-                    Encuentra tu Refugio Diario en la Palabra de Dios
-                </h2>
-                <!-- Descripción actualizada con enfoque bíblico -->
-                <p class="text-lg sm:text-xl md:text-2xl mb-8 max-w-3xl mx-auto px-2 leading-relaxed" data-i18n="header.description">
-                    En medio del afán del mundo, busca primero Su reino. Dedica unos minutos cada día a nutrir tu espíritu con devocionales, audio y la paz que solo Él puede dar.
-                </p>
-                <!-- Botones responsive: de columna a fila en pantallas pequeñas y mayores, con ancho completo en móviles -->
-                <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-center justify-center px-2">
-                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="bg-purple-600 hover:bg-purple-700 border-2 border-white px-8 py-3 rounded-full font-semibold transition-all duration-300 text-white flex items-center gap-2">
-                        <i data-lucide="download" class="w-5 h-5"></i> 
-                        <span data-i18n="header.downloadApp">Descarga App</span>
-                    </a>
-                    <a href="#features" class="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 interactive flex items-center justify-center gap-2">
-                        <i data-lucide="compass" class="w-5 h-5"></i>
-                        <span data-i18n="header.learnMore">Descubre las Características</span>
-                    </a>
-                </div>
-            </div>
-        </main>
-
-        <!-- Sección Nuestra Visión -->
-        <section id="our-vision" class="bg-white py-16 px-4 shadow-inner scroll-reveal">
-            <div class="container mx-auto text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-8" data-i18n="vision.title">Nuestra Visión en Devocionales Cristianos</h2>
-                <p class="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed" data-i18n="vision.description">
-                    Devocionales Cristianos es tu santuario digital, diseñado para ser ese "lugar apartado" donde puedes encontrarte con Dios cada día. Como Jesús se retiraba a orar, creemos que necesitas un espacio libre de distracciones donde Su paz pueda restaurar tu alma. Nuestra misión es ser tu compañero fiel en este tiempo sagrado, completamente gratuito y sin interrupciones.
-                </p>
-            </div>
-        </section>
-
-        <!-- Nueva Sección: Provisión Diaria -->
-        <section id="daily-provision" class="bg-gradient-to-r from-purple-50 to-blue-50 py-16 px-4 scroll-reveal">
-            <div class="container mx-auto text-center">
-                <div class="flex justify-center mb-6">
-                    <i data-lucide="flame" class="w-16 h-16 text-purple-600"></i>
-                </div>
-                <h2 class="text-3xl sm:text-4xl font-bold text-purple-800 mb-8" data-i18n="dailyProvision.title">Como el Maná de Cada Día</h2>
-                <p class="text-base sm:text-lg text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed" data-i18n="dailyProvision.description">
-                    Así como Dios proveyó maná fresco cada mañana en el desierto, tu app te ofrece alimento espiritual diario. Las rachas no son una presión, son una celebración de la fidelidad de Dios proveyendo para ti día tras día. Cada devocional leído, cada momento de quietud, es un paso más en tu caminar con Él.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    <div class="bg-white p-6 rounded-lg shadow-lg card-hover">
-                        <div class="flex justify-center mb-4">
-                            <i data-lucide="calendar-days" class="w-12 h-12 text-purple-600"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3" data-i18n="dailyProvision.streaks.title">Rachas de Gracia</h3>
-                        <p class="text-gray-600" data-i18n="dailyProvision.streaks.description">Mantén una conexión diaria con Dios. Cada día consecutivo es una celebración de Su fidelidad y tu búsqueda de Él.</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-lg card-hover">
-                        <div class="flex justify-center mb-4">
-                            <i data-lucide="award" class="w-12 h-12 text-purple-600"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-800 mb-3" data-i18n="dailyProvision.achievements.title">Logros Espirituales</h3>
-                        <p class="text-gray-600" data-i18n="dailyProvision.achievements.description">Celebra tu crecimiento en la fe. Cada devocional leído es un tesoro eterno guardado en tu corazón.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección Características Principales -->
-        <section id="features" class="bg-gray-100 py-16 px-4">
-            <div class="container mx-auto text-center">
-                <h2 class="text-3xl sm:text-4xl font-bold text-purple-800 mb-12" data-i18n="features.title">Tu Refugio Espiritual Completo</h2>
-                
-                <!-- Subsección: Contenido Espiritual -->
-                <div class="mb-16">
-                    <h3 class="text-2xl font-semibold text-purple-700 mb-8" data-i18n="features.content.title">Contenido Espiritual</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-lg mx-auto md:max-w-none">
-                        <!-- Devocionales Diarios con Audio -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="headphones" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.audioDevotionals.title">Devocionales con Audio</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.audioDevotionals.description">Escucha la Palabra mientras descansas. Audio profesional para devocionales completos y versículos, completamente offline.</p>
-                        </div>
-
-                        <!-- 8 Versiones Bíblicas -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="layers" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.versions.title">8 Versiones Bíblicas</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.versions.description">Español: RVR1960, NVI • English: KJV, NIV • Português: ARC, NVI • Français: LSG1910, TOB</p>
-                        </div>
-
-                        <!-- Sección de Oraciones -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="hands" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.prayers.title">Centro de Oración</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.prayers.description">Un espacio dedicado para elevar tus peticiones y encontrar oraciones que fortalezcan tu comunión con Dios.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Subsección: Experiencia Personal -->
-                <div class="mb-16">
-                    <h3 class="text-2xl font-semibold text-purple-700 mb-8" data-i18n="features.personal.title">Experiencia Personal</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-lg mx-auto md:max-w-none">
-                        <!-- Favoritos -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="bookmark" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.favorites.title">Marca tus Favoritos</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.favorites.description">Guarda aquellos devocionales que más tocaron tu corazón para revisitarlos cuando necesites esa palabra específica.</p>
-                        </div>
-
-                        <!-- Compartir Contenido -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="share-2" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.sharing.title">Comparte la Bendición</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.sharing.description">Difunde la esperanza compartiendo devocionales como texto elegante o bellas imágenes inspiradoras.</p>
-                        </div>
-
-                        <!-- Personalización de Temas -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="palette" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.themes.title">Personaliza tu Espacio</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.themes.description">Elige entre temas claros y oscuros, creando el ambiente perfecto para tu tiempo de quietud con Dios.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Subsección: Libertad Total -->
-                <div>
-                    <h3 class="text-2xl font-semibold text-purple-700 mb-8" data-i18n="features.freedom.title">Libertad Total</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left max-w-lg mx-auto md:max-w-none">
-                        <!-- Completamente Offline -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="wifi-off" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.offline.title">Completamente Offline</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.offline.description">No dependas de conexión a internet. Tu tiempo con Dios está siempre disponible, sin interrupciones ni dependencias.</p>
-                        </div>
-
-                        <!-- Sin Anuncios -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="shield-check" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.noAds.title">Santuario Sin Distracciones</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.noAds.description">Cero anuncios. Cero interrupciones. Tu espacio sagrado protegido para que nada perturbe tu comunión con Él.</p>
-                        </div>
-
-                        <!-- 4 Idiomas -->
-                        <div class="p-6 bg-white rounded-lg shadow-xl card-hover interactive">
-                            <div class="text-purple-600 mb-4 flex justify-center">
-                                <i data-lucide="globe" class="w-12 h-12"></i>
-                            </div>
-                            <h4 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 text-center" data-i18n="features.languages.title">4 Idiomas Disponibles</h4>
-                            <p class="text-base sm:text-lg text-gray-600 text-center" data-i18n="features.languages.description">Español, English, Português, Français. La Palabra de Dios en tu idioma del corazón, con contenido adaptado culturalmente.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Contacto -->
-        <section id="contact" class="gradient-purple text-white py-16 px-4 scroll-reveal">
-            <div class="container mx-auto text-center">
-                <div class="flex justify-center mb-6">
-                    <i data-lucide="heart" class="w-16 h-16 text-white"></i>
-                </div>
-                <h2 class="text-3xl sm:text-4xl font-bold mb-8" data-i18n="contact.title">¿Preguntas? ¡Estamos Aquí!</h2>
-                <p class="text-base sm:text-xl mb-8 max-w-2xl mx-auto leading-relaxed" data-i18n="contact.description">
-                    Si tienes alguna duda, sugerencia, testimonio o simplemente quieres compartir cómo Dios te ha hablado través de la app, nos encantaría escucharte.
-                </p>
-                <a href="mailto:develop4God@gmail.com?subject=Consulta%20desde%20la%20Web%20-%20Devocionales%20Cristianos" class="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-600 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 interactive pulse-animation flex items-center justify-center gap-2">
-                    <i data-lucide="mail" class="w-5 h-5"></i>
-                    <span data-i18n="contact.emailButton">Envíanos un Email</span>
-                </a>
-                <p class="text-sm sm:text-lg mt-8 max-w-2xl mx-auto">
-                    <span data-i18n="contact.supportText">Tu apoyo nos permite seguir siendo completamente gratuitos.</span>
-                    <a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="text-purple-200 underline hover:text-white transition-colors duration-200 ml-2" data-i18n="contact.donationText">Considera hacer una ofrenda de amor.</a>
-                </p>
-            </div>
-        </section>
-
-        <!-- Pie de página con enlaces legales -->
-        <footer class="bg-gray-800 text-white p-6 mt-auto">
-            <div class="container mx-auto text-center text-sm">
-                <p class="mb-4" data-i18n="footer.copyright">© 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
-                <!-- Texto "Desarrollado con amor" -->
-                <p class="mb-4 flex items-center justify-center gap-2" data-i18n="footer.madeWith">
-                    Desarrollado con 
-                    <i data-lucide="heart" class="w-4 h-4 text-red-500"></i> 
-                    por develop4God
-                </p>
-                <!-- Enlaces de pie de página responsive: envuelven en varias líneas si no hay espacio -->
-                <div class="flex flex-wrap justify-center gap-4">
-                    <a href="terminos-y-condiciones.html" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.terms">Términos y Condiciones</a>
-                    <a href="politica-de-privacidad.html" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.privacy">Política de Privacidad</a>
-                    <a href="politica-de-privacidad.html#eliminacion-datos" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.deleteData">Solicitar Eliminación de Datos</a>
-                    <a href="#contact" class="hover:text-gray-300 transition-colors duration-200" data-i18n="footer.contact">Contacto</a>
-                </div>
-            </div>
-        </footer>
+<body>
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <a href="/" class="logo" data-i18n="header.title">develop4God</a>
+        <div class="language-selector-wrapper">
+          <div id="language-selector"></div>
+        </div>
+      </div>
     </div>
+  </header>
 
-    <!-- Initialize Lucide Icons -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            lucide.createIcons();
-        });
-    </script>
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <div class="container">
+          <h1 data-i18n="hero.mainTitle">develop4God</h1>
+          <h2 data-i18n="hero.subtitle">Herramientas para Fortalecer tu Fe y Caminar con Dios</h2>
+          <p data-i18n="hero.description">Recursos espirituales gratuitos para tu crecimiento diario en Cristo</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="projects-section">
+      <div class="container">
+        <h2 class="section-title" data-i18n="projects.title">Nuestros Proyectos</h2>
+        <div class="projects-grid">
+          <a href="/devocionales/" class="project-card">
+            <div class="project-icon">📖</div>
+            <h3 data-i18n="projects.devocionales.title">Devocionales Cristianos</h3>
+            <p data-i18n="projects.devocionales.description">Tu refugio diario en la Palabra de Dios con devocionales en audio</p>
+            <ul class="project-features" id="devocionales-features">
+              <li>Devocionales diarios con audio</li>
+              <li>8 versiones bíblicas</li>
+              <li>Completamente offline</li>
+              <li>Sin anuncios</li>
+            </ul>
+            <span class="project-button" data-i18n="projects.devocionales.button">Explorar Devocionales</span>
+          </a>
+
+          <a href="/habitus/" class="project-card">
+            <div class="project-icon">✨</div>
+            <h3 data-i18n="projects.habitus.title">Habitus+Faith</h3>
+            <p data-i18n="projects.habitus.description">Construye hábitos piadosos a través de la fe y la disciplina espiritual</p>
+            <ul class="project-features" id="habitus-features">
+              <li>Seguimiento de hábitos</li>
+              <li>Metas espirituales</li>
+              <li>Motivación bíblica</li>
+              <li>Progreso personal</li>
+            </ul>
+            <span class="project-button" data-i18n="projects.habitus.button">Descubrir Habitus</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mission-section">
+      <div class="container">
+        <div class="mission-content">
+          <h2 data-i18n="mission.title">Nuestra Misión</h2>
+          <p data-i18n="mission.description">Desarrollamos herramientas digitales que ayudan a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día.</p>
+          <p data-i18n="mission.vision">Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <p data-i18n="footer.copyright">© 2025 develop4God. Todos los derechos reservados.</p>
+        <p data-i18n="footer.madeWith">Desarrollado con amor para la gloria de Dios</p>
+        <p><a href="mailto:develop4God@gmail.com" class="footer-link" data-i18n="footer.contact">Contacto</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/home.js"></script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "title": "develop4God - Ressources Spirituelles pour la Croissance de Votre Foi",
+    "description": "Plateforme chrétienne avec des dévotions quotidiennes et des outils pour construire des habitudes de foi. Ressources spirituelles entièrement gratuites."
+  },
+  "navigation": {
+    "home": "Accueil"
+  },
+  "header": {
+    "title": "develop4God",
+    "subtitle": "Ressources pour Votre Croissance Spirituelle"
+  },
+  "hero": {
+    "mainTitle": "develop4God",
+    "subtitle": "Outils pour Renforcer Votre Foi et Marcher avec Dieu",
+    "description": "Ressources spirituelles gratuites pour votre croissance quotidienne en Christ"
+  },
+  "projects": {
+    "title": "Nos Projets",
+    "devocionales": {
+      "title": "Dévotions Chrétiennes",
+      "description": "Votre refuge quotidien dans la Parole de Dieu avec des dévotions audio",
+      "features": [
+        "Dévotions quotidiennes avec audio",
+        "8 versions bibliques",
+        "Complètement hors ligne",
+        "Sans publicité"
+      ],
+      "button": "Explorer les Dévotions"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Construisez des habitudes pieuses par la foi et la discipline spirituelle",
+      "features": [
+        "Suivi des habitudes",
+        "Objectifs spirituels",
+        "Motivation biblique",
+        "Progrès personnel"
+      ],
+      "button": "Découvrir Habitus"
+    }
+  },
+  "mission": {
+    "title": "Notre Mission",
+    "description": "Nous développons des outils numériques qui aident les croyants à grandir dans leur foi, à maintenir des disciplines spirituelles et à marcher plus près de Dieu chaque jour.",
+    "vision": "Nous croyons que la technologie peut servir le royaume de Dieu en fournissant des ressources accessibles et de qualité pour renforcer votre vie spirituelle."
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. Tous droits réservés.",
+    "madeWith": "Développé avec amour pour la gloire de Dieu",
+    "contact": "Contact"
+  }
+}

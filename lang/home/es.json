@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "title": "develop4God - Recursos Espirituales para tu Crecimiento en la Fe",
+    "description": "Plataforma cristiana con devocionales diarios y herramientas para construir hábitos de fe. Recursos espirituales completamente gratuitos."
+  },
+  "navigation": {
+    "home": "Inicio"
+  },
+  "header": {
+    "title": "develop4God",
+    "subtitle": "Recursos para tu Crecimiento Espiritual"
+  },
+  "hero": {
+    "mainTitle": "develop4God",
+    "subtitle": "Herramientas para Fortalecer tu Fe y Caminar con Dios",
+    "description": "Recursos espirituales gratuitos para tu crecimiento diario en Cristo"
+  },
+  "projects": {
+    "title": "Nuestros Proyectos",
+    "devocionales": {
+      "title": "Devocionales Cristianos",
+      "description": "Tu refugio diario en la Palabra de Dios con devocionales en audio",
+      "features": [
+        "Devocionales diarios con audio",
+        "8 versiones bíblicas",
+        "Completamente offline",
+        "Sin anuncios"
+      ],
+      "button": "Explorar Devocionales"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Construye hábitos piadosos a través de la fe y la disciplina espiritual",
+      "features": [
+        "Seguimiento de hábitos",
+        "Metas espirituales",
+        "Motivación bíblica",
+        "Progreso personal"
+      ],
+      "button": "Descubrir Habitus"
+    }
+  },
+  "mission": {
+    "title": "Nuestra Misión",
+    "description": "Desarrollamos herramientas digitales que ayudan a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día.",
+    "vision": "Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual."
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. Todos los derechos reservados.",
+    "madeWith": "Desarrollado con amor para la gloria de Dios",
+    "contact": "Contacto"
+  }
+}

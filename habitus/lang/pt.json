@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Construir Hábitos Piedosos",
+    "description": "Ferramenta para construir hábitos espirituais e crescer em disciplina com motivação bíblica."
+  },
+  "navigation": {
+    "home": "Início",
+    "habits": "Hábitos",
+    "progress": "Progresso",
+    "about": "Sobre"
+  },
+  "header": {
+    "title": "Habitus+Faith",
+    "subtitle": "Construir Hábitos Piedosos"
+  },
+  "hero": {
+    "mainTitle": "Habitus+Faith",
+    "subtitle": "Construa Disciplina Espiritual através de Hábitos Diários",
+    "description": "Fortaleça sua caminhada com Deus através de hábitos intencionais e consistentes",
+    "cta": "Começar Agora"
+  },
+  "features": {
+    "title": "Recursos",
+    "tracking": {
+      "title": "Acompanhamento de Hábitos",
+      "description": "Monitore seu progresso diário em hábitos espirituais como oração, leitura bíblica e serviço."
+    },
+    "goals": {
+      "title": "Metas Espirituais",
+      "description": "Defina metas claras alinhadas com seu crescimento em Cristo e alcance-as passo a passo."
+    },
+    "motivation": {
+      "title": "Motivação Bíblica",
+      "description": "Receba versículos e lembretes que te inspiram a manter seus compromissos com Deus."
+    },
+    "progress": {
+      "title": "Visualize seu Progresso",
+      "description": "Veja seu crescimento através de estatísticas e celebre cada vitória em sua jornada de fé."
+    }
+  },
+  "about": {
+    "title": "Sobre Habitus+Faith",
+    "description": "Habitus+Faith é uma ferramenta projetada para ajudá-lo a desenvolver hábitos espirituais consistentes. Baseado em princípios bíblicos de disciplina e perseverança, acompanha você em sua caminhada diária com Cristo.",
+    "mission": "Nossa missão é ajudá-lo a formar o caráter de Cristo em você através da prática diária de disciplinas espirituais."
+  },
+  "comingSoon": {
+    "title": "Em Breve",
+    "message": "Estamos trabalhando para trazer uma experiência incrível para construir hábitos de fé.",
+    "backHome": "Voltar ao Início"
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. Todos os direitos reservados.",
+    "madeWith": "Desenvolvido com amor para a glória de Deus",
+    "backToHub": "Voltar ao Hub Principal"
+  }
+}

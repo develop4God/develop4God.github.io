@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Construye Hábitos Piadosos",
+    "description": "Herramienta para construir hábitos espirituales y crecer en disciplina con motivación bíblica."
+  },
+  "navigation": {
+    "home": "Inicio",
+    "habits": "Hábitos",
+    "progress": "Progreso",
+    "about": "Acerca de"
+  },
+  "header": {
+    "title": "Habitus+Faith",
+    "subtitle": "Construye Hábitos Piadosos"
+  },
+  "hero": {
+    "mainTitle": "Habitus+Faith",
+    "subtitle": "Construye Disciplina Espiritual a través de Hábitos Diarios",
+    "description": "Fortalece tu caminar con Dios mediante hábitos intencionales y consistentes",
+    "cta": "Comenzar Ahora"
+  },
+  "features": {
+    "title": "Características",
+    "tracking": {
+      "title": "Seguimiento de Hábitos",
+      "description": "Monitorea tu progreso diario en hábitos espirituales como oración, lectura bíblica y servicio."
+    },
+    "goals": {
+      "title": "Metas Espirituales",
+      "description": "Define metas claras alineadas con tu crecimiento en Cristo y alcánzalas paso a paso."
+    },
+    "motivation": {
+      "title": "Motivación Bíblica",
+      "description": "Recibe versículos y recordatorios que te inspiran a mantener tus compromisos con Dios."
+    },
+    "progress": {
+      "title": "Visualiza tu Progreso",
+      "description": "Ve tu crecimiento a través de estadísticas y celebra cada victoria en tu jornada de fe."
+    }
+  },
+  "about": {
+    "title": "Acerca de Habitus+Faith",
+    "description": "Habitus+Faith es una herramienta diseñada para ayudarte a desarrollar hábitos espirituales consistentes. Basado en principios bíblicos de disciplina y perseverancia, te acompaña en tu caminar diario con Cristo.",
+    "mission": "Nuestra misión es ayudarte a formar el carácter de Cristo en ti a través de la práctica diaria de disciplinas espirituales."
+  },
+  "comingSoon": {
+    "title": "Próximamente",
+    "message": "Estamos trabajando en traerte una experiencia increíble para construir hábitos de fe.",
+    "backHome": "Volver al Inicio"
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. Todos los derechos reservados.",
+    "madeWith": "Desarrollado con amor para la gloria de Dios",
+    "backToHub": "Volver al Hub Principal"
+  }
+}

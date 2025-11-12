@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - 建立敬虔习惯",
+    "description": "通过圣经激励建立属灵习惯并增长纪律的工具。"
+  },
+  "navigation": {
+    "home": "首页",
+    "habits": "习惯",
+    "progress": "进度",
+    "about": "关于"
+  },
+  "header": {
+    "title": "Habitus+Faith",
+    "subtitle": "建立敬虔习惯"
+  },
+  "hero": {
+    "mainTitle": "Habitus+Faith",
+    "subtitle": "通过每日习惯建立属灵纪律",
+    "description": "通过有意识和持续的习惯加强与神的同行",
+    "cta": "开始"
+  },
+  "features": {
+    "title": "功能",
+    "tracking": {
+      "title": "习惯追踪",
+      "description": "监控您在祷告、读经和服务等属灵习惯中的每日进度。"
+    },
+    "goals": {
+      "title": "属灵目标",
+      "description": "设定与在基督里成长相一致的明确目标，并一步步实现它们。"
+    },
+    "motivation": {
+      "title": "圣经激励",
+      "description": "接收经文和提醒，激励您保持对神的承诺。"
+    },
+    "progress": {
+      "title": "可视化进度",
+      "description": "通过统计数据查看您的成长，并庆祝信仰旅程中的每一次胜利。"
+    }
+  },
+  "about": {
+    "title": "关于 Habitus+Faith",
+    "description": "Habitus+Faith 是一个旨在帮助您培养一致的属灵习惯的工具。基于纪律和毅力的圣经原则，陪伴您每日与基督同行。",
+    "mission": "我们的使命是通过每日实践属灵纪律，帮助您在自己身上形成基督的品格。"
+  },
+  "comingSoon": {
+    "title": "即将推出",
+    "message": "我们正在努力为您带来一个令人惊叹的建立信仰习惯的体验。",
+    "backHome": "返回首页"
+  },
+  "footer": {
+    "copyright": "© 2025 develop4God. 版权所有。",
+    "madeWith": "为神的荣耀用爱开发",
+    "backToHub": "返回主中心"
+  }
+}
