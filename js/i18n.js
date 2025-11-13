@@ -464,6 +464,8 @@ class I18n {
         
         // Load translations
         this.loadTranslations(this.currentLang);
+        // Load page-specific translations (e.g., devocionales/legal) and fallback to ES
+        await this.loadExternalPageTranslationsIfAvailable();
         
         // Apply translations to the page
         this.translatePage();
@@ -473,6 +475,64 @@ class I18n {
         
         // Update HTML lang attribute
         document.documentElement.lang = this.currentLang;
+    }
+
+    // Deep merge helper (source overwrites target values)
+    deepMerge(target, source) {
+        if (!source || typeof source !== 'object') return target;
+        for (const key of Object.keys(source)) {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+                this.deepMerge(target[key], source[key]);
+            } else {
+                target[key] = source[key];
+            }
+        }
+        return target;
+    }
+
+    // Merge only missing keys from source into target
+    deepMergeMissing(target, source) {
+        if (!source || typeof source !== 'object') return target;
+        for (const key of Object.keys(source)) {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                if (!target[key] || typeof target[key] !== 'object') target[key] = {};
+                this.deepMergeMissing(target[key], source[key]);
+            } else if (typeof target[key] === 'undefined') {
+                target[key] = source[key];
+            }
+        }
+        return target;
+    }
+
+    async loadExternalPageTranslationsIfAvailable() {
+        try {
+            // Only attempt for the Devocionales section where legal JSON lives
+            const isDevocionalesPage = window.location.pathname.includes('/devocionales/');
+            if (!isDevocionalesPage) return;
+
+            const lang = this.currentLang;
+            const basePath = '/devocionales/lang';
+
+            // Load current language file if present
+            let current = null;
+            try {
+                const res = await fetch(`${basePath}/${lang}.json`, { cache: 'no-store' });
+                if (res.ok) current = await res.json();
+            } catch (e) { /* ignore */ }
+
+            // Load Spanish fallback
+            let es = null;
+            try {
+                const resEs = await fetch(`${basePath}/es.json`, { cache: 'no-store' });
+                if (resEs.ok) es = await resEs.json();
+            } catch (e) { /* ignore */ }
+
+            if (current) this.deepMerge(this.translations, current);
+            if (lang !== 'es' && es) this.deepMergeMissing(this.translations, es);
+        } catch (e) {
+            console.warn('External page translations not available:', e);
+        }
     }
 
     detectLanguage() {
@@ -550,6 +610,9 @@ class I18n {
 
         // Translate meta tags
         this.translateMetaTags();
+
+        // Render dynamic legal content if placeholders exist
+        this.renderLegalPages();
     }
 
     translateMetaTags() {
@@ -567,6 +630,111 @@ class I18n {
                 metaDesc.content = this.t(descKey);
             }
         }
+    }
+
+    // Dynamic rendering for legal pages from translations JSON
+    renderLegalPages() {
+        this.renderLegalTerms();
+        this.renderLegalPrivacy();
+    }
+
+    renderLegalTerms() {
+        const container = document.getElementById('legal-terms-content');
+        const terms = this.translations?.legal?.terms;
+        if (!container || !terms) return;
+
+        const parts = [];
+
+        // Section 1
+        if (terms.section1_title) parts.push(`<h2>${terms.section1_title}</h2>`);
+        if (terms.section1_text) parts.push(`<p>${terms.section1_text}</p>`);
+
+        // Section 2
+        if (terms.section2_title) parts.push(`<h2>${terms.section2_title}</h2>`);
+        if (terms.section2_1_title) parts.push(`<h3>${terms.section2_1_title}</h3>`);
+        if (terms.section2_1_text) parts.push(`<p>${terms.section2_1_text}</p>`);
+        if (terms.section2_2_title) parts.push(`<h3>${terms.section2_2_title}</h3>`);
+        if (terms.section2_2_text) parts.push(`<p>${terms.section2_2_text}</p>`);
+
+        // Section 3 with list
+        if (terms.section3_title) parts.push(`<h2>${terms.section3_title}</h2>`);
+        if (terms.section3_text) parts.push(`<p>${terms.section3_text}</p>`);
+        const list3 = [];
+        for (let i = 1; i <= 10; i++) {
+            const item = terms[`section3_list${i}`];
+            if (item) list3.push(`<li>${item}</li>`);
+        }
+        if (list3.length) parts.push(`<ul>${list3.join('')}</ul>`);
+
+        // Section 4..10 simple title + text pairs
+        for (let s = 4; s <= 10; s++) {
+            const title = terms[`section${s}_title`];
+            const text = terms[`section${s}_text`];
+            const sub1Title = terms[`section${s}_1_title`];
+            const sub1Text = terms[`section${s}_1_text`];
+            const sub2Title = terms[`section${s}_2_title`];
+            const sub2Text = terms[`section${s}_2_text`];
+            if (title) parts.push(`<h2>${title}</h2>`);
+            if (text) parts.push(`<p>${text}</p>`);
+            if (sub1Title) parts.push(`<h3>${sub1Title}</h3>`);
+            if (sub1Text) parts.push(`<p>${sub1Text}</p>`);
+            if (sub2Title) parts.push(`<h3>${sub2Title}</h3>`);
+            if (sub2Text) parts.push(`<p>${sub2Text}</p>`);
+        }
+
+        container.innerHTML = parts.join('\n');
+    }
+
+    renderLegalPrivacy() {
+        const container = document.getElementById('legal-privacy-content');
+        const privacy = this.translations?.legal?.privacy;
+        if (!container || !privacy) return;
+
+        const parts = [];
+
+        // Section 1 with nested list items
+        if (privacy.section1_title) parts.push(`<h2>${privacy.section1_title}</h2>`);
+        if (privacy.section1_text) parts.push(`<p>${privacy.section1_text}</p>`);
+        const s1Groups = [1,2,3,4,5,6];
+        const s1List = [];
+        s1Groups.forEach(n => {
+            const title = privacy[`section1_list${n}_title`];
+            const text = privacy[`section1_list${n}_text`];
+            const purpose = privacy[`section1_list${n}_purpose`];
+            const purposeText = privacy[`section1_list${n}_purpose_text`];
+            if (title || text) {
+                let li = '<li>';
+                if (title) li += `<strong>${title}</strong> `;
+                if (text) li += `${text}`;
+                const sub = [];
+                if (purpose) sub.push(`<strong>${purpose}</strong> ${purposeText || ''}`);
+                if (sub.length) li += `<ul><li>${sub.join('')}</li></ul>`;
+                li += '</li>';
+                s1List.push(li);
+            }
+        });
+        if (s1List.length) parts.push(`<ul>${s1List.join('')}</ul>`);
+
+        if (privacy.important_note_title || privacy.important_note_text) {
+            parts.push(`<p><strong>${privacy.important_note_title || ''}</strong> ${privacy.important_note_text || ''}</p>`);
+        }
+
+        // Sections 2..7 simple title + text and optional lists
+        for (let s = 2; s <= 7; s++) {
+            const title = privacy[`section${s}_title`];
+            const text = privacy[`section${s}_text`];
+            if (title) parts.push(`<h2>${title}</h2>`);
+            if (text) parts.push(`<p>${text}</p>`);
+            // Generic list items like section4_list1..n
+            const listItems = [];
+            for (let i = 1; i <= 20; i++) {
+                const item = privacy[`section${s}_list${i}`];
+                if (item) listItems.push(`<li>${item}</li>`);
+            }
+            if (listItems.length) parts.push(`<ul>${listItems.join('')}</ul>`);
+        }
+
+        container.innerHTML = parts.join('\n');
     }
 
     setupLanguageSelector() {

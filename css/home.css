@@ -65,12 +65,12 @@ header {
 
 /* App Download Banner */
 .app-download-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: var(--white);
+  background: linear-gradient(135deg, #3b1c5c 0%, #5f259f 100%);
+  color: #fff;
   padding: 3rem 0;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.15);
+  box-shadow: 0 6px 32px 0 rgba(44, 18, 80, 0.25);
 }
 
 .app-download-banner::before {
@@ -126,13 +126,16 @@ header {
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
+  color: #fff;
+  text-shadow: 0 3px 8px rgba(44,18,80,0.25), 0 1px 0 #0002;
 }
 
 .download-banner-subtitle {
   font-size: 1.125rem;
   margin-bottom: 1rem;
-  opacity: 0.95;
+  color: #e0d7f7;
+  text-shadow: 0 2px 6px rgba(44,18,80,0.18);
+  opacity: 1;
 }
 
 .download-banner-features {
@@ -146,19 +149,22 @@ header {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgb(255, 255, 255, 0.2);
+  background: rgba(255,255,255,0.13);
+  color: #f3e8ff;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
   font-size: 0.9rem;
   font-weight: 600;
   backdrop-filter: blur(10px);
-  border: 1px solid rgb(255, 255, 255, 0.3);
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: 0 1px 4px 0 rgba(44,18,80,0.10);
   transition: all 0.3s ease;
 }
 
 .download-feature:hover {
-  background: rgb(255, 255, 255, 0.3);
-  transform: translateY(-2px);
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  transform: translateY(-2px) scale(1.04);
 }
 
 .feature-icon {
@@ -177,16 +183,16 @@ header {
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 2.5rem;
-  background: var(--white);
-  color: var(--primary-purple);
+  background: #fff;
+  color: #5f259f;
   font-size: 1.125rem;
   font-weight: 700;
   border-radius: 3rem;
   text-decoration: none;
-  box-shadow: 0 8px 20px rgb(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(44,18,80,0.18);
   transition: all 0.3s ease;
   animation: pulse-button 2s ease-in-out infinite;
-  border: 3px solid var(--white);
+  border: 3px solid #fff;
 }
 
 @keyframes pulse-button {
@@ -200,8 +206,10 @@ header {
 }
 
 .download-banner-button:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 30px rgb(0, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.07);
+  background: #f3e8ff;
+  color: #3b1c5c;
+  box-shadow: 0 12px 30px rgba(44,18,80,0.28);
 }
 
 .button-icon {

@@ -1,0 +1,180 @@
+{
+  "meta": {
+    "title": "首页 - 基督徒灵修",
+    "description": "基督徒灵修是您的移动伴侣，通过每日圣经反思丰富您的属灵生活。免费下载应用，每天坚固您的信仰。"
+  },
+  "navigation": {
+    "home": "首页",
+    "vision": "我们的愿景",
+    "features": "功能",
+    "contact": "联系",
+    "donation": "捐赠",
+    "deleteData": "删除数据"
+  },
+  "header": {
+    "title": "基督徒灵修",
+    "subtitle": "您的每日属灵伴侣",
+    "description": "通过鼓舞人心的圣经反思和属灵内容，每天滋养您的心灵，坚固您的信仰。",
+    "downloadApp": "下载应用",
+    "learnMore": "了解功能"
+  },
+  "vision": {
+    "title": "我们的基督徒灵修愿景",
+    "description": "基督徒灵修是您的移动伴侣，旨在丰富和坚固您的属灵生活。我们的目标是成为您每日通向神话语的桥梁，提供鼓舞人心且相关的圣经内容。我们相信技术可以服务于您的信仰，带来流畅、快速、可靠且完全免费的体验。"
+  },
+  "features": {
+    "title": "主要功能",
+    "daily": {
+      "title": "每日灵修",
+      "description": "每天获取新的圣经反思，激励并滋养您的灵魂。"
+    },
+    "versions": {
+      "title": "圣经版本",
+      "description": "享受不同圣经版本（如RVR1960）的灵修内容，助您更深入学习。"
+    },
+    "favorites": {
+      "title": "收藏夹",
+      "description": "保存最触动您的灵修，随时轻松回顾。"
+    },
+    "sharing": {
+      "title": "分享真道",
+      "description": "通过社交网络以文本或美图形式分享灵修，传播鼓励。"
+    },
+    "prayer": {
+      "title": "信心祷告",
+      "description": "一条特别信息，帮助您将生命交托给耶稣基督，得享永生。"
+    },
+    "language": {
+      "title": "多语言支持",
+      "description": "为扩展而设计，目前已针对西班牙语用户优化。"
+    },
+    "notifications": {
+      "title": "个性化通知",
+      "description": "每天在您选择的时间收到灵修提醒，不错过与神的时刻。"
+    },
+    "themes": {
+      "title": "自定义主题",
+      "description": "多种配色方案，界面风格随心切换。"
+    },
+    "darkMode": {
+      "title": "夜间模式（低光）",
+      "description": "在低光环境下舒适阅读，减轻眼睛疲劳。"
+    }
+  },
+  "contact": {
+    "title": "有问题？联系我们！",
+    "description": "如有疑问、建议或想打招呼，欢迎随时联系我们。",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "发送邮件"
+  },
+  "donation": {
+    "title": "支持我们的使命",
+    "subtitle": "您的慷慨让我们继续前行",
+    "supportText": "您的支持帮助我们继续分享神的话语。",
+    "donationText": "请考虑捐赠。"
+  },
+  "footer": {
+    "copyright": "© 2025 基督徒灵修。保留所有权利。",
+    "madeWith": "由 develop4God 爱心开发",
+    "terms": "条款与条件",
+    "privacy": "隐私政策",
+    "deleteData": "请求删除数据",
+    "contact": "联系"
+  },
+  "legal": {
+    "terms": {
+      "title": "“基督徒灵修”应用条款与条件",
+      "lastUpdated": "最后更新日期：",
+      "date": "2025年7月28日",
+      "welcome": "欢迎使用“基督徒灵修”移动应用（以下简称“本应用”），由 **Develop4God** 拥有和运营。访问或使用本应用即表示您（“用户”）同意受本条款与条件（以下简称“条款”）的法律约束。如果您不同意任何条款，请勿使用本应用。",
+      "section1_title": "1. 应用描述",
+      "section1_text": "“基督徒灵修”应用是一款数字平台，旨在提供每日、每周或定期的灵修文本，促进属灵反思和个人成长。主要功能包括阅读灵修、收藏灵修、通过移动设备功能与联系人分享灵修、截屏灵修内容，以及自愿捐赠以支持本应用。",
+      "section2_title": "2. 知识产权与应用内容",
+      "section2_1_title": "2.1. 灵修内容：",
+      "section2_1_text": "本应用中展示的所有灵修内容（文本、反思、评论等）均归 **Develop4God** 所有。部分内容最初由人工智能（AI）协助生成，已由 **Develop4God** 审核、编辑并最终确认，**Develop4God** 对其承担全部责任和所有权。该内容受版权法及其他知识产权法保护。",
+      "section2_2_title": "2.2. 内容使用：",
+      "section2_2_text": "用户可将灵修内容用于个人和非商业用途（包括阅读、与联系人分享、截屏灵修内容及添加至收藏夹）。只要不直接或间接产生任何收入，即可允许此类使用。超出个人用途的...",
+      "section3_title": "3. 用户责任",
+      "section3_text": "使用本应用即表示您同意：",
+      "section3_list1": "合法且合伦理地使用本应用。",
+      "section3_list2": "不干扰或破坏本应用或其服务器及网络的运行。",
+      "section3_list3": "不将本应用用于非法目的或发送垃圾邮件、病毒或其他有害代码。",
+      "section3_list4": "尊重 **Develop4God** 及第三方的知识产权。",
+      "section3_list5": "对您分享的任何内容或信息承担全部责任。",
+      "section4_title": "4. 捐赠",
+      "section4_text": "本应用提供自愿捐赠选项，以支持其维护和发展。捐赠通过第三方平台（如 PayPal）处理，并非任何服务的付款。捐赠即表示您同意该第三方平台的条款与条件。捐赠不可退款。",
+      "section5_title": "5. 免责声明与责任限制",
+      "section5_1_title": "5.1. 无担保：",
+      "section5_1_text": "本应用按“原样”和“可用”提供，不作任何明示或暗示的担保。**Develop4God** 不保证本应用不间断、无错误或无病毒或其他有害组件。",
+      "section5_2_title": "5.2. 责任限制：",
+      "section5_2_text": "在法律允许的最大范围内，**Develop4God** 对因您使用或无法使用本应用而导致的任何直接、间接、附带、特殊、后果性或惩罚性损害不承担责任。",
+      "section6_title": "6. 条款修改",
+      "section6_text": "我们保留随时修改本条款的权利。我们将通过在本页面发布新条款并更新“最后更新日期”来通知您任何更改。建议您定期查阅本条款。",
+      "section7_title": "7. 第三方链接",
+      "section7_text": "本应用可能包含指向第三方网站或服务的链接。我们不对这些网站的内容或隐私做法负责。您访问和使用这些网站需自行承担风险。",
+      "section8_title": "8. 使用终止",
+      "section8_text": "**Develop4God** 可在任何时候、无须事先通知地终止或暂停您对本应用的访问，包括但不限于我们认为您违反了本条款的情况。",
+      "section9_title": "9. 适用法律与管辖权",
+      "section9_text": "本条款受**巴拿马共和国**法律管辖并依其解释，不考虑其法律冲突规定。因本条款引起的任何争议均受**巴拿马共和国巴拿马市**法院专属管辖。",
+      "section10_title": "10. 联系方式",
+      "section10_text": "如对本条款有任何疑问，可通过 develop4God@gmail.com 联系我们。",
+      "backToHome": "返回首页"
+    },
+    "privacy": {
+      "title": "“基督徒灵修”应用隐私政策",
+      "lastUpdated": "最后更新日期：",
+      "date": "2025年7月28日",
+      "description": "本隐私政策描述了“基督徒灵修”移动应用（以下简称“本应用”）由 **Develop4God** 拥有和运营，如何处理用户信息。我们非常重视用户的隐私。",
+      "section1_title": "1. 我们收集的信息及用途",
+      "section1_text": "“基督徒灵修”应用会收集和处理某些类型的数据，以提供功能并提升用户体验。我们希望对收集哪些数据及其用途保持透明：",
+      "section1_list1_title": "标识符：",
+      "section1_list1_text": "我们收集设备标识符（如 Firebase Cloud Messaging - FCM 令牌），以及在用户允许的情况下，Android 广告 ID。",
+      "section1_list1_purpose": "用途：",
+      "section1_list1_purpose_text": "用于推送通知（FCM）、应用使用分析（Firebase Analytics）和广告活动归因。",
+      "section1_list2_title": "个人信息（有限）：",
+      "section1_list2_text": "我们收集最后一次登录的日期和时间（`lastLogin`）。",
+      "section1_list2_purpose": "用途：",
+      "section1_list2_purpose_text": "用于用户账户管理（通过 Firebase Authentication）及基本活动统计。",
+      "section1_list3_title": "应用内活动：",
+      "section1_list3_text": "我们收集用户与应用的交互数据（如按钮点击、页面访问）及收藏的灵修。",
+      "section1_list3_purpose": "用途：",
+      "section1_list3_purpose_text": "用于使用统计（Firebase Analytics）、改进应用功能及个性化用户体验（如显示收藏的灵修）。",
+      "section1_list4_title": "应用性能：",
+      "section1_list4_text": "我们收集崩溃和诊断数据。",
+      "section1_list4_purpose": "用途：",
+      "section1_list4_purpose_text": "用于监控应用稳定性和性能，发现并修复错误，确保流畅体验。",
+      "section1_list5_title": "应用使用：",
+      "section1_list5_text": "我们收集交互日志，以了解用户如何浏览和使用应用界面。",
+      "section1_list5_purpose": "用途：",
+      "section1_list5_purpose_text": "用于使用统计和分析（Firebase Analytics）。",
+      "section1_list6_title": "应用设置：",
+      "section1_list6_text": "我们存储与通知相关的用户偏好（如是否启用通知、首选通知时间、用户时区）。",
+      "section1_list6_purpose": "用途：",
+      "section1_list6_purpose_text": "使通知功能根据用户偏好运行，并发送及时的开发者通知。",
+      "important_note_title": "重要提示：",
+      "important_note_text": "本应用不会直接收集您的姓名、电子邮件、电话号码、精确位置或其他个人身份信息（PII），除非您通过第三方功能（如 PayPal）或外部认证服务明确提供。",
+      "section2_title": "2. 应用工作方式与本地数据处理",
+      "section2_text": "本应用的部分功能主要在您的设备本地运行：",
+      "section2_list1_title": "灵修阅读：",
+      "section2_list1_text": "灵修内容仅用于展示，阅读活动不会以个人身份记录。",
+      "section2_list2_title": "收藏夹保存：",
+      "section2_list2_text": "“收藏夹”功能在您的设备本地实现，并与您的 Firebase Firestore 用户账户同步，以便在其他设备访问（如用同一账户登录）。我们可访问和管理这些数据以提供该功能。",
+      "section2_list3_title": "与联系人分享：",
+      "section2_list3_text": "当您分享灵修时，我们不会存储收件人信息或您发送的消息内容。该过程由您设备的原生分享功能处理。",
+      "section3_title": "3. 数据安全",
+      "section3_text": "我们致力于保护您的数据安全。我们采用管理、技术和物理措施，防止未经授权的访问、披露、篡改或销毁我们收集和存储的信息。但任何安全措施都无法做到百分之百完美。建议您使用强密码并保护账户信息。",
+      "section4_title": "4. 第三方服务",
+      "section4_text": "本应用使用第三方服务，可能会收集信息。这些服务有各自的隐私政策：",
+      "section4_list1": "**Firebase（谷歌）：** 用于认证、数据库（Firestore）、通知（FCM）和分析。Firebase 隐私政策见 [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy)。",
+      "section4_list2": "**PayPal：** 用于捐赠。PayPal 隐私政策见 [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub)。",
+      "section4_list3": "其他服务：本应用还可能为特定功能（如发送邮件）使用其他第三方服务。这些服务仅能访问提供服务所需的信息。",
+      "section5_title": "5. 儿童隐私",
+      "section5_text": "本应用不面向13岁以下儿童。我们不会有意收集13岁以下儿童的个人信息。如发现无父母同意收集了13岁以下儿童信息，我们将采取措施从服务器中删除。",
+      "section6_title": "6. 隐私政策变更",
+      "section6_text": "我们可能会不时更新本隐私政策。我们将通过在本页面发布新政策并更新“最后更新日期”来通知您任何更改。建议您定期查阅本隐私政策。",
+      "section7_title": "7. 联系方式",
+      "section7_text": "如对本隐私政策有任何疑问或希望请求删除您的数据，欢迎通过 develop4God@gmail.com 联系我们。",
+      "backToHome": "返回首页"
+    }
+  }
+}
