@@ -178,6 +178,7 @@ header {
   gap: 0.75rem;
 }
 
+
 .download-banner-button {
   display: inline-flex;
   align-items: center;
@@ -193,6 +194,29 @@ header {
   transition: all 0.3s ease;
   animation: pulse-button 2s ease-in-out infinite;
   border: 3px solid #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.shiny-effect {
+  box-shadow: 0 0 24px 6px #fff7, 0 0 40px 10px #a78bfa88;
+}
+
+.shiny-glow {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  border-radius: 3rem;
+  background: linear-gradient(120deg, #fff6 0%, #a78bfa88 100%);
+  opacity: 0.5;
+  filter: blur(8px);
+  animation: shiny-move 2.5s linear infinite;
+}
+
+@keyframes shiny-move {
+  0% { opacity: 0.5; transform: translateX(-60%) scale(1); }
+  50% { opacity: 0.8; transform: translateX(60%) scale(1.1); }
+  100% { opacity: 0.5; transform: translateX(-60%) scale(1); }
 }
 
 @keyframes pulse-button {
