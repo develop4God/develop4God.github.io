@@ -8,7 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="/devocionales/css/modern.css">
+  <link rel="stylesheet" href="/devocionales/css/modern.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="/devocionales/js/modern.js"></script>
   <style>
     .language-select {
       padding: 0.5rem 1rem;
@@ -43,29 +48,35 @@
     </div>
   </header>
 
-  <main>
-    <section class="hero">
+  <main class="relative overflow-hidden">
+    <section class="hero scroll-reveal relative overflow-hidden py-2 px-4">
+      <!-- Luces animadas fondo hero (idéntico a devocionales) -->
+      <div class="absolute inset-0 opacity-10 pointer-events-none">
+        <div class="absolute top-10 left-10 w-32 h-32 bg-white rounded-full float-animation"></div>
+        <div class="absolute bottom-10 right-10 w-24 h-24 bg-white rounded-full float-animation" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full float-animation" style="animation-delay: 2s;"></div>
+      </div>
       <div class="hero-content">
-        <div class="container">
-          <h1 style="display:flex;align-items:center;gap:0.5em;justify-content:center;margin-bottom:0.2em;">
-            <img src="/img/logo_vector_512x512.png" alt="develop4God logo" style="height:10em;max-width:98vw;width:auto;vertical-align:middle;display:block;margin-bottom:0;">
+        <div class="container" style="position:relative; z-index:1;">
+          <h1 style="display:flex;align-items:center;gap:0.5em;justify-content:center;margin:0;" class="pulse-animation float-animation">
+            <img src="/img/logo_vector_512x512.png" alt="develop4God logo" style="height:10em;max-width:98vw;width:auto;display:block;margin:0;">
           </h1>
-          <h2 data-i18n="hero.subtitle">Herramientas para Fortalecer tu Fe y Caminar con Dios</h2>
-          <p data-i18n="hero.description">Recursos espirituales gratuitos para tu crecimiento diario en Cristo</p>
+          <h2 class="scroll-reveal" style="margin-top:0.2em;margin-bottom:0.4em;" data-i18n="hero.subtitle">Herramientas para Fortalecer tu Fe y Caminar con Dios</h2>
+          <p class="scroll-reveal" style="margin-top:0;margin-bottom:0.5em;" data-i18n="hero.description">Recursos espirituales gratuitos para tu crecimiento diario en Cristo</p>
         </div>
       </div>
     </section>
 
     <!-- App Download CTA Banner -->
-    <section class="app-download-banner">
+    <section class="app-download-banner scroll-reveal">
       <div class="container">
         <div class="download-banner-content">
-          <div class="download-banner-icon">📱</div>
+          <div class="download-banner-icon float-animation">📱</div>
           <div class="download-banner-text">
-            <h2 class="download-banner-title" data-i18n="downloadBanner.title">¡Descarga la App de Devocionales Cristianos!</h2>
-            <p class="download-banner-subtitle" data-i18n="downloadBanner.subtitle">Tu refugio espiritual diario, ahora en tu móvil</p>
+            <h2 class="download-banner-title scroll-reveal" data-i18n="downloadBanner.title">¡Descarga la App de Devocionales Cristianos!</h2>
+            <p class="download-banner-subtitle scroll-reveal" data-i18n="downloadBanner.subtitle">Tu refugio espiritual diario, ahora en tu móvil</p>
             <div class="download-banner-features">
-              <span class="download-feature">
+              <span class="download-feature pulse-animation">
                 <span class="feature-icon">✨</span>
                 <span data-i18n="downloadBanner.features.free">100% Gratis</span>
               </span>
@@ -85,7 +96,7 @@
           </div>
           <div class="download-banner-action">
             <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" 
-               class="download-banner-button" 
+               class="download-banner-button pulse-animation" 
                target="_blank" 
                rel="noopener noreferrer">
               <span class="button-icon">📥</span>
@@ -130,13 +141,30 @@
       </div>
     </section>
 
-    <section class="mission-section">
-      <div class="container">
-        <div class="mission-content">
-          <h2 data-i18n="mission.title">Nuestra Misión</h2>
-          <p data-i18n="mission.description">Desarrollamos herramientas digitales que ayudan a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día.</p>
-          <p data-i18n="mission.vision">Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual.</p>
+    <!-- Nuestra Visión -->
+    <section id="our-vision" class="bg-white py-16 px-4 shadow-inner scroll-reveal">
+      <div class="container mx-auto text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold text-purple-600 mb-8 scroll-reveal" data-i18n="vision.title">Nuestra Visión</h2>
+        <p class="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed scroll-reveal" data-i18n="vision.description">
+          develop4God es una iniciativa digital para crear herramientas que ayuden a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día. Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual.
+        </p>
+      </div>
+    </section>
+
+    <!-- Donación -->
+    <section id="donacion" class="gradient-purple text-white py-12 px-4 scroll-reveal">
+      <div class="container mx-auto text-center">
+        <div class="flex justify-center mb-6">
+          <span style="font-size:2.5em;" class="pulse-animation">💜</span>
         </div>
+        <h2 class="text-3xl sm:text-4xl font-bold mb-8 scroll-reveal" data-i18n="donation.title">Apóyanos con una Ofrenda</h2>
+        <p class="text-base sm:text-xl mb-8 max-w-2xl mx-auto leading-relaxed scroll-reveal" data-i18n="donation.description">
+          Tu apoyo nos permite seguir desarrollando recursos gratuitos y de calidad para la comunidad cristiana. ¡Gracias por ser parte de esta misión!
+        </p>
+        <a href="https://www.paypal.com/donate/?hosted_button_id=CGQNBA4YPUG7A" target="_blank" class="bg-white text-purple-700 font-bold py-3 px-8 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 interactive pulse-animation flex items-center justify-center gap-2">
+          <span style="font-size:1.5em;">💸</span>
+          <span data-i18n="donation.button">Donar Ahora</span>
+        </a>
       </div>
     </section>
   </main>
@@ -152,5 +180,10 @@
   </footer>
 
   <script src="/js/home.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide && lucide.createIcons) lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
