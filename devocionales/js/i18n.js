@@ -95,32 +95,18 @@ class I18n {
                         "description": "Español, English, Português, Français. La Palabra de Dios en tu idioma del corazón, con contenido adaptado culturalmente."
                     }
                 },
-                "contact": {
-                    "title": "¿Preguntas? ¡Estamos Aquí!",
-                    "description": "Si tienes alguna duda, sugerencia, testimonio o simplemente quieres compartir cómo Dios te ha hablado través de la app, nos encantaría escucharte.",
-                    "emailButton": "Envíanos un Email",
-                    "supportText": "Tu apoyo nos permite seguir siendo completamente gratuitos.",
-                    "donationText": "Considera hacer una ofrenda de amor."
-                },
-                "footer": {
-                    "copyright": "© 2025 Devocionales Cristianos. Todos los derechos reservados.",
-                    "madeWith": "Desarrollado con ♥️ por develop4God",
-                    "terms": "Términos y Condiciones",
-                    "privacy": "Política de Privacidad",
-                    "deleteData": "Solicitar Eliminación de Datos",
-                    "contact": "Contacto"
-                },
-                "legal": {
-                    "privacy": {
-                        "title": "Política de Privacidad - Devocionales Cristianos",
-                        "lastUpdated": "Fecha de Última Actualización:",
-                        "backToHome": "Volver a la página principal",
-                        "description": "Esta Política de Privacidad describe cómo la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**, maneja la información del usuario. La privacidad de nuestros usuarios es de suma importancia para nosotros."
-                    },
-                    "terms": {
-                        "title": "Términos y Condiciones - Devocionales Cristianos",
-                        "lastUpdated": "Fecha de Última Actualización:",
-                        "backToHome": "Volver a la página principal",
+                constructor() {
+                    this.currentLang = 'es'; // Default language
+                    this.translations = {};
+                    this.supportedLanguages = {
+                        'es': { name: 'Español', flag: '🇪🇸' },
+                        'en': { name: 'English', flag: '🇺🇸' },
+                        'fr': { name: 'Français', flag: '🇫🇷' },
+                        'pt': { name: 'Português', flag: '🇧🇷' },
+                        'zh': { name: '中文', flag: '🇨🇳' }
+                    };
+                    this.allTranslations = {};
+                }
                         "welcome": "Bienvenido/a a la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**. Al acceder o utilizar la Aplicación, usted (\"el Usuario\") acepta estar legalmente vinculado/a por los presentes Términos y Condiciones de Uso (en adelante, \"los Términos\"). Si no está de acuerdo con alguno de estos Términos, no debe utilizar la Aplicación."
                     }
                 }
@@ -461,18 +447,19 @@ class I18n {
     async init() {
         // Detect user's preferred language
         this.detectLanguage();
-        
-        // Load translations
-        this.loadTranslations(this.currentLang);
+
+        // Load translations from /lang/home/{lang}.json
+        await this.loadHomeTranslations(this.currentLang);
+
         // Load page-specific translations (e.g., devocionales/legal) and fallback to ES
         await this.loadExternalPageTranslationsIfAvailable();
-        
+
         // Apply translations to the page
         this.translatePage();
-        
+
         // Setup language selector
         this.setupLanguageSelector();
-        
+
         // Update HTML lang attribute
         document.documentElement.lang = this.currentLang;
     }
@@ -577,7 +564,26 @@ class I18n {
             this.translations = this.allTranslations[lang];
         } else {
             console.warn(`Translations not found for ${lang}, falling back to Spanish`);
-            this.translations = this.allTranslations.es;
+            this.translations = this.allTranslations.es || {};
+        }
+    }
+
+    async loadHomeTranslations(lang) {
+        try {
+            const res = await fetch(`/lang/home/${lang}.json`, { cache: 'no-store' });
+            if (res.ok) {
+                this.allTranslations[lang] = await res.json();
+            } else {
+                // fallback to Spanish
+                if (lang !== 'es') {
+                    const resEs = await fetch(`/lang/home/es.json`, { cache: 'no-store' });
+                    if (resEs.ok) {
+                        this.allTranslations[lang] = await resEs.json();
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('No se pudo cargar el archivo de traducción:', lang, e);
         }
     }
 
@@ -948,6 +954,7 @@ class I18n {
 
         // Limpiar traducciones antes de cargar
         this.translations = {};
+        await this.loadHomeTranslations(lang);
         this.loadTranslations(lang);
         // Cargar traducciones externas y luego traducir la página
         await this.loadExternalPageTranslationsIfAvailable();

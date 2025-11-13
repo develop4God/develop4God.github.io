@@ -117,6 +117,9 @@
     const wrapper = document.getElementById('language-selector');
     if (!wrapper) return;
 
+    // Limpiar el selector antes de agregar el nuevo <select>
+    wrapper.innerHTML = '';
+
     const select = document.createElement('select');
     select.id = 'language-select';
     select.className = 'language-select';
