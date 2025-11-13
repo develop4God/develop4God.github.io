@@ -40,6 +40,18 @@
       "button": "发现 Habitus"
     }
   },
+  "downloadBanner": {
+    "title": "下载基督教灵修应用！",
+    "subtitle": "您的日常属灵避难所，现在在您的手机上",
+    "features": {
+      "free": "100% 免费",
+      "noAds": "无广告",
+      "offline": "离线使用",
+      "downloads": "+1,000 次下载"
+    },
+    "button": "立即下载",
+    "note": "在 Google Play 上可用"
+  },
   "mission": {
     "title": "我们的使命",
     "description": "我们开发数字工具，帮助信徒在信仰中成长，保持属灵纪律，每天与神更亲近。",

@@ -40,6 +40,18 @@
       "button": "Découvrir Habitus"
     }
   },
+  "downloadBanner": {
+    "title": "Téléchargez l'App de Dévotions Chrétiennes!",
+    "subtitle": "Votre refuge spirituel quotidien, maintenant sur votre mobile",
+    "features": {
+      "free": "100% Gratuit",
+      "noAds": "Sans Publicité",
+      "offline": "Utilisation Hors Ligne",
+      "downloads": "+1 000 Téléchargements"
+    },
+    "button": "Télécharger Maintenant",
+    "note": "Disponible sur Google Play"
+  },
   "mission": {
     "title": "Notre Mission",
     "description": "Nous développons des outils numériques qui aident les croyants à grandir dans leur foi, à maintenir des disciplines spirituelles et à marcher plus près de Dieu chaque jour.",

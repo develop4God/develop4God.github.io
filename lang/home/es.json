@@ -40,6 +40,18 @@
       "button": "Descubrir Habitus"
     }
   },
+  "downloadBanner": {
+    "title": "¡Descarga la App de Devocionales Cristianos!",
+    "subtitle": "Tu refugio espiritual diario, ahora en tu móvil",
+    "features": {
+      "free": "100% Gratis",
+      "noAds": "Sin Anuncios",
+      "offline": "Uso Offline",
+      "downloads": "+1,000 Descargas"
+    },
+    "button": "Descargar Ahora",
+    "note": "Disponible en Google Play"
+  },
   "mission": {
     "title": "Nuestra Misión",
     "description": "Desarrollamos herramientas digitales que ayudan a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día.",
