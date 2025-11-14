@@ -319,14 +319,20 @@ header {
 /* Projects Section */
 .projects-section {
   padding: 4rem 0;
+  background: linear-gradient(135deg, #ffe0ec 0%, #f8bbd0 100%);
 }
 
 .section-title {
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 3rem;
+  font-weight: 800;
   text-align: center;
   margin-bottom: 3rem;
-  color: var(--text-dark);
+  color: #111;
+  display: block;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
 }
 
 .projects-grid {
