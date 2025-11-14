@@ -65,8 +65,8 @@ header {
 
 /* App Download Banner */
 .app-download-banner {
-  background: linear-gradient(135deg, #3b1c5c 0%, #5f259f 100%);
-  color: #fff;
+  background: linear-gradient(135deg, #1DE9B6 0%, #00B8D4 100%);
+  color: #111;
   padding: 3rem 0;
   position: relative;
   overflow: hidden;
@@ -77,7 +77,7 @@ header {
   content: '';
   position: absolute;
   inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%235f259f' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   opacity: 0.3;
   animation: slide 20s linear infinite;
 }
@@ -126,14 +126,14 @@ header {
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 0.5rem;
-  color: #fff;
+  color: #111;
   text-shadow: 0 3px 8px rgba(44,18,80,0.25), 0 1px 0 #0002;
 }
 
 .download-banner-subtitle {
   font-size: 1.125rem;
   margin-bottom: 1rem;
-  color: #e0d7f7;
+  color: #111;
   text-shadow: 0 2px 6px rgba(44,18,80,0.18);
   opacity: 1;
 }
@@ -150,7 +150,7 @@ header {
   align-items: center;
   gap: 0.5rem;
   background: rgba(255,255,255,0.13);
-  color: #f3e8ff;
+  color: #111;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
   font-size: 0.9rem;
