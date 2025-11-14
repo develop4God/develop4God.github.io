@@ -1,3 +1,14 @@
+/* Animación flotante para luces hero */
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+  opacity: 1 !important;
+}
+
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
 /* Home Hub Styles */
 :root {
   --primary-purple: #8b5cf6;
