@@ -9,8 +9,6 @@ The Google Analytics tag has been successfully installed on all pages with the r
 
 ### Pages with Google Analytics installed:
 
-### Pages with Google Analytics installed:
-
 - ✅ `/index.html`
 - ✅ `/devocionales/index.html`
 - ✅ `/devocionales/admin.html`
