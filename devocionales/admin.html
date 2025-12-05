@@ -15,6 +15,8 @@
     <title>Content Manager - Devocionales Cristianos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/devocionales/css/language-selector.css">
+        <script src="/devocionales/js/i18n.js"></script>
     <script src="https://kit.fontawesome.com/b286598102.js" crossorigin="anonymous"></script>
     <style>
         body {
@@ -61,9 +63,12 @@
     <!-- Header -->
     <header class="bg-purple-600 text-white p-4 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">
-                <i class="fas fa-edit mr-2"></i>Content Manager - Devocionales Cristianos
-            </h1>
+            <div class="flex items-center gap-6">
+                <h1 class="text-2xl font-bold">
+                    <i class="fas fa-edit mr-2"></i>Content Manager - Devocionales Cristianos
+                </h1>
+                <div id="language-selector" class="language-selector"></div>
+            </div>
             <div class="flex space-x-4">
                 <button id="save-changes" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
                     <i class="fas fa-save mr-2"></i>Save Changes
