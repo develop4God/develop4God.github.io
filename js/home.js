@@ -3,7 +3,7 @@
   'use strict';
 
   const DEFAULT_LANGUAGE = 'es';
-  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh'];
+  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh', 'ja'];
   const STORAGE_KEY = 'develop4God_language';
 
   let currentLanguage = DEFAULT_LANGUAGE;
@@ -130,7 +130,8 @@
       en: 'English',
       pt: 'Português',
       fr: 'Français',
-      zh: '中文'
+      zh: '中文',
+      ja: '日本語'
     };
 
     Object.entries(languages).forEach(([code, name]) => {
