@@ -1,12 +1,12 @@
 {
   "meta": {
     "title": "develop4God - Ressources Spirituelles pour la Croissance de Votre Foi",
-    "description": "Plateforme chrétienne avec des dévotions quotidiennes et des outils pour construire des habitudes de foi. Ressources spirituelles entièrement gratuites."
+    "description": "Plateforme chrétienne avec des méditations quotidiennes et des outils pour construire des habitudes de foi. Ressources spirituelles entièrement gratuites."
   },
   "tab": {
     "vision": "Notre Vision",
     "support": "Soutien",
-    "devotionals": "Dévotions",
+    "devotionals": "Méditations",
     "habitus": "Habitus+Faith"
   },
   "vision": {
@@ -25,15 +25,15 @@
   "projects": {
     "title": "Nos Projets",
     "devocionales": {
-      "title": "Dévotions Chrétiennes",
-      "description": "Votre refuge quotidien dans la Parole de Dieu avec des dévotions audio",
+      "title": "Méditations Chrétiennes",
+      "description": "Votre refuge quotidien dans la Parole de Dieu avec des méditations audio",
       "features": [
-        "Dévotions quotidiennes avec audio",
+        "Méditations quotidiennes avec audio",
         "8 versions bibliques",
         "Complètement hors ligne",
         "Sans publicité"
       ],
-      "button": "Explorer les Dévotions"
+      "button": "Explorer les Méditations"
     },
     "habitus": {
       "title": "Habitus+Faith",
@@ -48,7 +48,7 @@
     }
   },
   "downloadBanner": {
-    "title": "Téléchargez l'App de Dévotions Chrétiennes!",
+    "title": "Téléchargez l'App de Méditations Chrétiennes!",
     "subtitle": "Votre refuge spirituel quotidien, maintenant sur votre mobile",
     "features": {
       "free": "100% Gratuit",

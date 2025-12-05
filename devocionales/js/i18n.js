@@ -223,14 +223,14 @@ class I18n {
             },
             fr: {
                 "meta": {
-                    "title": "Accueil - Dévotions Chrétiennes",
-                    "description": "Venez et reposez-vous. Trouvez votre refuge quotidien dans la Parole de Dieu avec des dévotions, de l'audio et du contenu spirituel qui nourrit votre âme au milieu de l'agitation du monde."
+                    "title": "Accueil - Méditations Chrétiennes",
+                    "description": "Venez et reposez-vous. Trouvez votre refuge quotidien dans la Parole de Dieu avec des méditations, de l'audio et du contenu spirituel qui nourrit votre âme au milieu de l'agitation du monde."
                 },
                 "header": {
-                    "title": "Dévotions Chrétiennes",
+                    "title": "Méditations Chrétiennes",
                     "mainTitle": "Venez et Reposez-vous",
                     "subtitle": "Trouvez Votre Refuge Quotidien dans la Parole de Dieu",
-                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des dévotions, de l'audio et la paix que Lui seul peut donner.",
+                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des méditations, de l'audio et la paix que Lui seul peut donner."
                     "downloadApp": "Télécharger l'App",
                     "learnMore": "Découvrir les Fonctionnalités"
                 },
@@ -244,19 +244,19 @@ class I18n {
                     "deleteData": "Supprimer les Données"
                 },
                 "vision": {
-                    "title": "Notre Vision chez Dévotions Chrétiennes",
-                    "description": "Dévotions Chrétiennes est votre sanctuaire numérique, conçu pour être ce \"lieu à l'écart\" où vous pouvez rencontrer Dieu chaque jour. Comme Jésus se retirait pour prier, nous croyons que vous avez besoin d'un espace libre de distractions où Sa paix peut restaurer votre âme. Notre mission est d'être votre compagnon fidèle dans ce temps sacré, complètement gratuit et sans interruptions."
+                    "title": "Notre Vision chez Méditations Chrétiennes",
+                    "description": "Méditations Chrétiennes est votre sanctuaire numérique, conçu pour être ce \"lieu à l'écart\" où vous pouvez rencontrer Dieu chaque jour. Comme Jésus se retirait pour prier, nous croyons que vous avez besoin d'un espace libre de distractions où Sa paix peut restaurer votre âme. Notre mission est d'être votre compagnon fidèle dans ce temps sacré, complètement gratuit et sans interruptions."
                 },
                 "dailyProvision": {
                     "title": "Comme la Manne de Chaque Jour",
-                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque dévotion lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui.",
+                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque méditation lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui."
                     "streaks": {
                         "title": "Séries de Grâce",
                         "description": "Maintenez une connexion quotidienne avec Dieu. Chaque jour consécutif est une célébration de Sa fidélité et de votre recherche de Lui."
                     },
                     "achievements": {
                         "title": "Accomplissements Spirituels",
-                        "description": "Célébrez votre croissance dans la foi. Chaque dévotion lue est un trésor éternel gardé dans votre cœur."
+                        "description": "Célébrez votre croissance dans la foi. Chaque méditation lue est un trésor éternel gardé dans votre cœur."
                     }
                 },
                 "features": {
@@ -265,8 +265,8 @@ class I18n {
                     "personal": { "title": "Expérience Personnelle" },
                     "freedom": { "title": "Liberté Totale" },
                     "audioDevotionals": {
-                        "title": "Dévotions Audio",
-                        "description": "Écoutez la Parole pendant que vous vous reposez. Audio professionnel pour des dévotions complètes et des versets, complètement hors ligne."
+                        "title": "Méditations Audio",
+                        "description": "Écoutez la Parole pendant que vous vous reposez. Audio professionnel pour des méditations complètes et des versets, complètement hors ligne."
                     },
                     "versions": {
                         "title": "8 Versions Bibliques",
@@ -278,11 +278,11 @@ class I18n {
                     },
                     "favorites": {
                         "title": "Marquez vos Favoris",
-                        "description": "Sauvegardez ces dévotions qui ont le plus touché votre cœur pour les revisiter quand vous avez besoin de cette parole spécifique."
+                        "description": "Sauvegardez ces méditations qui ont le plus touché votre cœur pour les revisiter quand vous avez besoin de cette parole spécifique."
                     },
                     "sharing": {
                         "title": "Partagez la Bénédiction",
-                        "description": "Répandez l'espoir en partageant des dévotions sous forme de texte élégant ou de belles images inspirantes."
+                        "description": "Répandez l'espoir en partageant des méditations sous forme de texte élégant ou de belles images inspirantes."
                     },
                     "themes": {
                         "title": "Personnalisez votre Espace",
@@ -309,7 +309,7 @@ class I18n {
                     "donationText": "Considérez faire une offrande d'amour."
                 },
                 "footer": {
-                    "copyright": "© 2025 Dévotions Chrétiennes. Tous droits réservés.",
+                    "copyright": "© 2025 Méditations Chrétiennes. Tous droits réservés.",
                     "madeWith": "Développé avec ♥️ par develop4God",
                     "terms": "Termes et Conditions",
                     "privacy": "Politique de Confidentialité",
@@ -318,16 +318,16 @@ class I18n {
                 },
                 "legal": {
                     "privacy": {
-                        "title": "Politique de Confidentialité - Dévotions Chrétiennes",
+                        "title": "Politique de Confidentialité - Méditations Chrétiennes",
                         "lastUpdated": "Dernière Mise à Jour:",
                         "backToHome": "Retour à la page principale",
-                        "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et opérée par **Develop4God**, gère les informations des utilisateurs. La confidentialité de nos utilisateurs est de la plus haute importance pour nous."
+                        "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et opérée par **Develop4God**, gère les informations des utilisateurs. La confidentialité de nos utilisateurs est de la plus haute importance pour nous."
                     },
                     "terms": {
-                        "title": "Termes et Conditions - Dévotions Chrétiennes",
+                        "title": "Termes et Conditions - Méditations Chrétiennes",
                         "lastUpdated": "Dernière Mise à Jour:",
                         "backToHome": "Retour à la page principale",
-                        "welcome": "Bienvenue dans l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et opérée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par ces Termes et Conditions d'Utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devriez pas utiliser l'Application."
+                        "welcome": "Bienvenue dans l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et opérée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par ces Termes et Conditions d'Utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devriez pas utiliser l'Application."
                     }
                 }
             },

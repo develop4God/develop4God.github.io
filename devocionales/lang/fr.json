@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Accueil - Dévotions Chrétiennes",
-    "description": "Dévotions Chrétiennes est votre compagnon mobile pour enrichir votre vie spirituelle avec des réflexions bibliques quotidiennes. Téléchargez l'application gratuite et renforcez votre foi chaque jour."
+    "title": "Accueil - Méditations Chrétiennes",
+    "description": "Méditations Chrétiennes est votre compagnon mobile pour enrichir votre vie spirituelle avec des méditations bibliques quotidiennes. Téléchargez l'application gratuite et renforcez votre foi chaque jour."
   },
   "navigation": {
     "home": "Accueil",
@@ -12,33 +12,33 @@
     "deleteData": "Supprimer Données"
   },
   "header": {
-    "title": "Dévotions Chrétiennes",
+    "title": "Méditations Chrétiennes",
     "subtitle": "Votre Compagnon Spirituel Quotidien",
     "description": "Renforcez votre foi avec des réflexions bibliques inspirantes et un contenu spirituel conçu pour nourrir votre âme chaque jour.",
     "downloadApp": "Télécharger App",
     "learnMore": "Découvrir les Fonctionnalités"
   },
   "vision": {
-    "title": "Notre Vision pour les Dévotions Chrétiennes",
-    "description": "Dévotions Chrétiennes est votre compagnon mobile conçu pour enrichir et renforcer votre vie spirituelle. Notre objectif est d'être votre pont quotidien vers la parole de Dieu, vous offrant un contenu biblique inspirant et pertinent. Nous croyons en la technologie au service de votre foi, vous fournissant une expérience fluide, rapide et fiable entièrement gratuite."
+    "title": "Notre Vision pour les Méditations Chrétiennes",
+    "description": "Méditations Chrétiennes est votre compagnon mobile conçu pour enrichir et renforcer votre vie spirituelle. Notre objectif est d'être votre pont quotidien vers la parole de Dieu, vous offrant un contenu biblique inspirant et pertinent. Nous croyons en la technologie au service de votre foi, vous fournissant une expérience fluide, rapide et fiable entièrement gratuite."
   },
   "features": {
     "title": "Fonctionnalités Principales",
     "daily": {
-      "title": "Dévotions Quotidiennes",
+      "title": "Méditations Quotidiennes",
       "description": "Accédez à une nouvelle réflexion biblique chaque jour, conçue pour inspirer et nourrir votre esprit."
     },
     "versions": {
       "title": "Versions de la Bible",
-      "description": "Profitez des dévotions dans différentes versions de la Bible, comme RVR1960, pour une étude plus approfondie."
+      "description": "Profitez des méditations dans différentes versions de la Bible, comme RVR1960, pour une étude plus approfondie."
     },
     "favorites": {
       "title": "Marquez vos Favoris",
-      "description": "Sauvegardez les dévotions qui vous touchent le plus pour les revisiter facilement quand vous le souhaitez."
+      "description": "Sauvegardez les méditations qui vous touchent le plus pour les revisiter facilement quand vous le souhaitez."
     },
     "sharing": {
       "title": "Partagez la Parole",
-      "description": "Répandez l'inspiration en partageant les dévotions sous forme de texte ou de belles images via vos réseaux."
+      "description": "Répandez l'inspiration en partageant les méditations sous forme de texte ou de belles images via vos réseaux."
     },
     "prayer": {
       "title": "Prière de Foi",
@@ -74,7 +74,7 @@
     "donationText": "Pensez à faire un don."
   },
   "footer": {
-    "copyright": "© 2025 Dévotions Chrétiennes. Tous droits réservés.",
+    "copyright": "© 2025 Méditations Chrétiennes. Tous droits réservés.",
     "madeWith": "Fait avec ♥️ par develop4God",
     "terms": "Termes et Conditions",
     "privacy": "Politique de Confidentialité",
@@ -83,12 +83,12 @@
   },
   "legal": {
     "terms": {
-      "title": "Termes et Conditions d'Utilisation de l'Application \"Dévotions Chrétiennes\"",
+      "title": "Termes et Conditions d'Utilisation de l'Application \"Méditations Chrétiennes\"",
       "lastUpdated": "Dernière mise à jour :",
       "date": "28 juillet 2025",
-      "welcome": "Bienvenue dans l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par les présentes Conditions d'utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
+      "welcome": "Bienvenue dans l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par les présentes Conditions d'utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
       "section1_title": "1. Description de l'Application",
-      "section1_text": "L'Application \"Dévotions Chrétiennes\" est une plateforme numérique conçue pour fournir un accès à des textes de dévotion quotidiens, hebdomadaires ou périodiques, dans le but de favoriser la réflexion spirituelle et la croissance personnelle. Les principales fonctionnalités incluent la lecture de dévotions, la possibilité de sauvegarder des dévotions comme favorites, l'option de partager des dévotions avec des contacts via les fonctions de votre appareil mobile, la capture d'écran du contenu de la dévotion et la possibilité de faire des dons volontaires pour soutenir l'Application.",
+      "section1_text": "L'Application \"Méditations Chrétiennes\" est une plateforme numérique conçue pour fournir un accès à des textes de méditation quotidiens, hebdomadaires ou périodiques, dans le but de favoriser la réflexion spirituelle et la croissance personnelle. Les principales fonctionnalités incluent la lecture de méditations, la possibilité de sauvegarder des méditations comme favorites, l'option de partager des méditations avec des contacts via les fonctions de votre appareil mobile, la capture d'écran du contenu de la méditation et la possibilité de faire des dons volontaires pour soutenir l'Application.",
       "section2_title": "2. Propriété Intellectuelle et Contenu de l'Application",
       "section2_1_title": "2.1. Contenu Dévotionnel :",
       "section2_1_text": "Tout le contenu dévotionnel (textes, réflexions, commentaires, etc.) présenté dans l'Application est la propriété de **Develop4God**. Bien qu'une partie de ce contenu ait été initialement générée avec l'aide de l'Intelligence Artificielle (IA), elle a été revue, éditée et approuvée par **Develop4God**, qui en assume l'entière responsabilité et la propriété. Ce contenu est protégé par les lois sur le droit d'auteur et d'autres lois sur la propriété intellectuelle.",
@@ -121,12 +121,12 @@
       "backToHome": "Retour à la page d'accueil"
     },
     "privacy": {
-      "title": "Politique de Confidentialité de l'Application \"Dévotions Chrétiennes\"",
+      "title": "Politique de Confidentialité de l'Application \"Méditations Chrétiennes\"",
       "lastUpdated": "Dernière mise à jour :",
       "date": "28 juillet 2025",
-      "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Dévotions Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**, gère les informations de l'utilisateur. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
+      "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**, gère les informations de l'utilisateur. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
       "section1_title": "1. Informations que Nous Collectons et Comment Nous les Utilisons",
-      "section1_text": "L'Application \"Dévotions Chrétiennes\" collecte et traite certains types de données pour offrir ses fonctionnalités et améliorer l'expérience utilisateur. Nous voulons être transparents sur les données collectées et dans quel but :",
+      "section1_text": "L'Application \"Méditations Chrétiennes\" collecte et traite certains types de données pour offrir ses fonctionnalités et améliorer l'expérience utilisateur. Nous voulons être transparents sur les données collectées et dans quel but :",
       "section1_list1_title": "Identifiants :",
       "section1_list1_text": "Nous collectons les identifiants de l'appareil (tels que les jetons Firebase Cloud Messaging - FCM) et, lorsque cela est disponible et autorisé par l'utilisateur, l'ID publicitaire Android.",
       "section1_list1_purpose": "But :",
@@ -136,9 +136,9 @@
       "section1_list2_purpose": "But :",
       "section1_list2_purpose_text": "Pour l'administration du compte utilisateur (via Firebase Authentication) et pour des statistiques d'activité de base.",
       "section1_list3_title": "Activité dans l'application :",
-      "section1_list3_text": "Nous collectons des données sur les interactions de l'utilisateur avec l'application (par exemple, clics sur les boutons, visites d'écrans) et les dévotions sauvegardées en tant que favorites.",
+      "section1_list3_text": "Nous collectons des données sur les interactions de l'utilisateur avec l'application (par exemple, clics sur les boutons, visites d'écrans) et les méditations sauvegardées en tant que favorites.",
       "section1_list3_purpose": "But :",
-      "section1_list3_purpose_text": "Pour les statistiques d'utilisation (Firebase Analytics), pour améliorer les fonctionnalités de l'application et pour personnaliser l'expérience utilisateur (par exemple, en affichant les dévotions favorites).",
+      "section1_list3_purpose_text": "Pour les statistiques d'utilisation (Firebase Analytics), pour améliorer les fonctionnalités de l'application et pour personnaliser l'expérience utilisateur (par exemple, en affichant les méditations favorites).",
       "section1_list4_title": "Performances de l'application :",
       "section1_list4_text": "Nous collectons des données de plantage et de diagnostic.",
       "section1_list4_purpose": "But :",
@@ -155,7 +155,7 @@
       "important_note_text": "L'Application ne collecte pas directement votre nom, votre adresse e-mail, votre numéro de téléphone, votre emplacement précis ou d'autres informations d'identification personnelle (PII) en dehors de ce qui est mentionné ci-dessus, sauf si vous les fournissez explicitement via des fonctionnalités tierces (telles que PayPal) ou des services d'authentification externes.",
       "section2_title": "2. Comment l'Application Fonctionne et Gestion des Données Locales",
       "section2_text": "Certaines fonctionnalités de l'Application fonctionnent principalement localement sur votre appareil :",
-      "section2_list1_title": "Lecture des Dévotions :",
+      "section2_list1_title": "Lecture des Méditations :",
       "section2_list1_text": "Le contenu dévotionnel est chargé pour l'affichage. L'activité de lecture n'est pas enregistrée au niveau personnel.",
       "section2_list2_title": "Sauvegarde des Favoris :",
       "section2_list2_text": "La fonctionnalité de \"sauvegarde des favoris\" est effectuée localement sur votre appareil et est synchronisée avec votre compte utilisateur dans Firebase Firestore pour la persistance et l'accès depuis d'autres appareils (si vous vous connectez avec le même compte). Ces données sont accessibles et gérées par nous pour vous fournir cette fonctionnalité.",
