@@ -10,7 +10,8 @@ class I18n {
             'es': { name: 'Español', flag: '🇪🇸' },
             'en': { name: 'English', flag: '🇺🇸' },
             'fr': { name: 'Français', flag: '🇫🇷' },
-            'pt': { name: 'Português', flag: '🇧🇷' }
+            'pt': { name: 'Português', flag: '🇧🇷' },
+            'hi': { name: 'हिन्दी', flag: '🇮🇳' }
         };
         
         // All translations embedded directly
