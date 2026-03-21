@@ -11,7 +11,8 @@ class I18n {
             'en': { name: 'English', flag: '🇺🇸' },
             'fr': { name: 'Français', flag: '🇫🇷' },
             'pt': { name: 'Português', flag: '🇧🇷' },
-            'ja': { name: '日本語', flag: '🇯🇵' }
+            'ja': { name: '日本語', flag: '🇯🇵' },
+            'hi': { name: 'हिन्दी', flag: '🇮🇳' }
         };
         
         // All translations embedded directly

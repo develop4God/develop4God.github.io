@@ -3,7 +3,7 @@
   'use strict';
 
   const DEFAULT_LANGUAGE = 'es';
-  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh'];
+  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh', 'ja', 'hi'];
   const STORAGE_KEY = 'develop4God_language';
 
   let currentLanguage = DEFAULT_LANGUAGE;
@@ -49,6 +49,8 @@
 
   // Apply translations to the page
   function applyTranslations() {
+    const currentYear = new Date().getFullYear();
+
     // Update meta tags
     if (translations.meta) {
       document.title = translations.meta.title || document.title;
@@ -63,7 +65,11 @@
       const key = element.getAttribute('data-i18n');
       const value = getNestedTranslation(key);
       if (value) {
-        element.textContent = value;
+        if (key === 'footer.copyright') {
+          element.textContent = value.replace(/©\s*\d{4}/, `© ${currentYear}`);
+        } else {
+          element.textContent = value;
+        }
       }
     });
 
@@ -106,7 +112,9 @@
       en: 'English',
       pt: 'Português',
       fr: 'Français',
-      zh: '中文'
+      zh: '中文',
+      ja: '日本語',
+      hi: 'हिन्दी'
     };
 
     Object.entries(languages).forEach(([code, name]) => {
