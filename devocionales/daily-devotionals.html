@@ -212,6 +212,39 @@
             border-radius: .5rem;
         }
         @keyframes skeleton-loading { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+
+        /* ---- App promo banner: discreet, dismissible ---- */
+        .app-banner {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+        .app-banner-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        .app-banner-text { flex: 1; min-width: 0; }
+        .app-banner-cta {
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+        .app-banner-cta:hover { border-bottom-color: var(--accent); }
+        .app-banner-close {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 0;
+            flex-shrink: 0;
+        }
+        .app-banner-close:hover { color: var(--text); }
     </style>
 </head>
 <body>
@@ -239,6 +272,19 @@
             </div>
         </div>
     </header>
+
+    <div id="app-banner" class="app-banner hidden">
+        <div class="app-banner-inner max-w-5xl mx-auto">
+            <i data-lucide="smartphone" class="w-4 h-4 flex-shrink-0"></i>
+            <span class="app-banner-text">
+                <span id="app-banner-message"></span>
+                <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="app-banner-cta" id="app-banner-cta"></a>
+            </span>
+            <button type="button" id="app-banner-close" class="app-banner-close" aria-label="Cerrar">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
 
     <main class="max-w-5xl mx-auto px-4 py-8">
 
@@ -384,6 +430,15 @@
             });
 
             syncSwitch();
+        })();
+
+        (function () {
+            const banner = document.getElementById('app-banner');
+            const closeBtn = document.getElementById('app-banner-close');
+            closeBtn.addEventListener('click', () => {
+                banner.classList.add('hidden');
+                localStorage.setItem('appBannerDismissed', '1');
+            });
         })();
     </script>
 </body>
