@@ -133,10 +133,38 @@
         return Array.isArray(entry) ? entry[0] : entry;
     }
 
+    // index.json (published alongside the year-files) lists exactly which
+    // years exist per language/version — cheaper and more reliable than
+    // guessing by fetching year-files until one 404s.
+    let repoIndexPromise = null;
+
+    async function loadRepoIndex() {
+        if (!repoIndexPromise) {
+            repoIndexPromise = fetch(
+                `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/index.json`
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+        }
+        return repoIndexPromise;
+    }
+
+    async function availableFileYears() {
+        const index = await loadRepoIndex();
+        const version = LANGUAGE_VERSIONS[LANGUAGE];
+        const years = index?.files?.[LANGUAGE]?.[version]?.files;
+        if (years) return Object.keys(years).map(Number).sort((a, b) => a - b);
+        return null;
+    }
+
     // Walks backwards from the current year-file to find the oldest year-file
-    // that actually exists, then returns its first date. Nothing is hardcoded:
-    // this just keeps trying earlier years until a fetch 404s.
+    // that actually exists, then returns its first date. Falls back to
+    // brute-force fetching if index.json is unavailable.
     async function findEarliestDate() {
+        const knownYears = await availableFileYears();
+        if (knownYears?.length) {
+            const fileData = await loadYearFile(knownYears[0]);
+            return fileData.sortedKeys[0] || null;
+        }
+
         let fileYear = devotionalFileYear(new Date());
         let earliest = null;
         while (true) {
@@ -152,9 +180,16 @@
         return earliest;
     }
 
-    // Walks forward from the current file-year, trying successive years until
-    // one fails to load, to find the newest date content actually exists for.
+    // Walks forward from the current file-year to find the newest date
+    // content actually exists for. Falls back to brute-force fetching if
+    // index.json is unavailable.
     async function findLatestDate() {
+        const knownYears = await availableFileYears();
+        if (knownYears?.length) {
+            const fileData = await loadYearFile(knownYears[knownYears.length - 1]);
+            return fileData.sortedKeys[fileData.sortedKeys.length - 1] || null;
+        }
+
         let fileYear = devotionalFileYear(new Date());
         let latest = null;
         while (true) {
@@ -320,38 +355,26 @@
         });
     }
 
-    // TTS engines read "3:16" as a clock time (e.g. "three sixteen a.m.")
-    // because it matches an H:MM pattern. Bible references use the same
-    // "chapter:verse" shape, so we rewrite them to unambiguous spoken-out-loud
-    // text before handing anything to SpeechSynthesisUtterance. Only affects
-    // what's spoken — the on-screen text is untouched.
-    const SPEECH_VERSE_PHRASING = {
-        es: (chapter, verses) => {
-            const verseText = verses.includes('-')
-                ? `versículos ${verses.replace('-', ' al ')}`
-                : `versículo ${verses}`;
-            return `capítulo ${chapter}, ${verseText}`;
-        },
-        en: (chapter, verses) => {
-            const verseText = verses.includes('-')
-                ? `verses ${verses.replace('-', ' to ')}`
-                : `verse ${verses}`;
-            return `chapter ${chapter}, ${verseText}`;
-        },
-        pt: (chapter, verses) => {
-            const verseText = verses.includes('-')
-                ? `versículos ${verses.replace('-', ' a ')}`
-                : `versículo ${verses}`;
-            return `capítulo ${chapter}, ${verseText}`;
-        },
-    };
-
-    function normalizeForSpeech(text) {
-        const phrase = SPEECH_VERSE_PHRASING[LANGUAGE] || SPEECH_VERSE_PHRASING.es;
-        return text.replace(
-            /\b(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)\b/g,
-            (match, chapter, verses) => phrase(chapter, verses)
-        );
+    // Builds TTS-ready text from a devotional entry: expands book ordinals,
+    // Bible version codes, and "chapter:verse" into spoken-out-loud phrasing
+    // (also prevents e.g. "3:16" from being misread as a clock time). Ported
+    // from the Flutter app's DevocionalTtsTextBuilder/BibleTextFormatter —
+    // see bible-text-formatter.js.
+    function buildTtsText(entry) {
+        const t = UI_TEXT[LANGUAGE];
+        const norm = (s) => BibleTextFormatter.normalizeTtsText(s || '', LANGUAGE, entry.version);
+        const parts = [
+            `${t.eyebrow}: ${norm(entry.versiculo)}`,
+            `${t.reflexion}: ${norm(entry.reflexion)}`,
+        ];
+        if (entry.para_meditar && entry.para_meditar.length) {
+            const meditar = entry.para_meditar
+                .map((m) => `${norm(m.cita)}: ${m.texto}`)
+                .join('\n');
+            parts.push(`${t.paraMeditar}: ${meditar}`);
+        }
+        parts.push(`${t.oracion}: ${norm(entry.oracion)}`);
+        return parts.join('\n');
     }
 
     function setupTts(entry) {
@@ -374,7 +397,7 @@
                 return;
             }
 
-            const text = normalizeForSpeech([entry.versiculo, entry.reflexion, entry.oracion].join('. '));
+            const text = buildTtsText(entry);
             utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = t.ttsLang;
             utterance.onend = () => {
