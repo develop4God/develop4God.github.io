@@ -81,7 +81,11 @@ jobs:
         # can't check it and would otherwise report it as excluded with
         # no explanation in the job summary. Excluded here explicitly
         # instead of relying on lychee's undocumented defaults.
+        # fail: true marks this step failed (visible at a glance in the
+        # Actions UI) whenever lychee's own Errors/Timeouts/Unsupported
+        # counts are nonzero. The job stays non-blocking overall because
+        # of continue-on-error above.
         uses: lycheeverse/lychee-action@v2
         with:
           args: --verbose --no-progress --exclude-path node_modules --exclude 'mailto:' --root-dir "$GITHUB_WORKSPACE" './**/*.html'
-          fail: false
+          fail: true
