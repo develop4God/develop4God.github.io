@@ -239,6 +239,23 @@
         });
     }
 
+    // Spanish TTS engines read "3:16" as a clock time ("las tres y dieciséis
+    // de la mañana") because it matches an H:MM pattern. Bible references use
+    // the same "chapter:verse" shape, so we rewrite them to unambiguous
+    // spoken-out-loud text before handing anything to SpeechSynthesisUtterance.
+    // Only affects what's spoken — the on-screen text is untouched.
+    function normalizeForSpeech(text) {
+        return text.replace(
+            /\b(\d{1,3}):(\d{1,3}(?:-\d{1,3})?)\b/g,
+            (match, chapter, verses) => {
+                const verseText = verses.includes('-')
+                    ? `versículos ${verses.replace('-', ' al ')}`
+                    : `versículo ${verses}`;
+                return `capítulo ${chapter}, ${verseText}`;
+            }
+        );
+    }
+
     function setupTts(entry) {
         const btn = document.getElementById('tts-btn');
         const label = btn.querySelector('.tts-label');
@@ -258,7 +275,7 @@
                 return;
             }
 
-            const text = [entry.versiculo, entry.reflexion, entry.oracion].join('. ');
+            const text = normalizeForSpeech([entry.versiculo, entry.reflexion, entry.oracion].join('. '));
             utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
             utterance.onend = () => {
