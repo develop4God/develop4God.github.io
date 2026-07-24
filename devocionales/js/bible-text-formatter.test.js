@@ -70,20 +70,28 @@ test('normalizeTtsText: expands known Bible version codes per language', () => {
     assert.match(normalizeTtsText('MBB05', 'fil', 'MBB05'), /Magandang Balita Biblia/);
 });
 
-test('normalizeTtsText: known bug — fr has no Bible version expansion table entry', () => {
-    // BIBLE_VERSION_EXPANSIONS.fr does not exist, so the code falls back to
-    // the `es` table and the LSG1910 code passes through unexpanded. See
-    // "Known pre-existing bugs" in the SOLID i18n plan hand-off notes.
-    const result = normalizeTtsText('LSG1910', 'fr', 'LSG1910');
-    assert.equal(result, 'LSG1910');
+test('normalizeTtsText: fr expands Bible version codes (fixed — was previously missing entirely)', () => {
+    // BIBLE_VERSION_EXPANSIONS.fr was missing until this fix; also added to
+    // the Dart source's getBibleVersionExpansions('fr') to keep both in sync.
+    assert.match(normalizeTtsText('LSG1910', 'fr', 'LSG1910'), /Louis Segond mille neuf cent dix/);
+    assert.match(normalizeTtsText('TOB', 'fr', 'TOB'), /Traduction Oecuménique de la Bible/);
 });
 
-test('normalizeTtsText: known bug — hi substring-collision double-expands one version string', () => {
-    // 'पवित्र बाइबिल' is a substring of 'पवित्र बाइबिल (ओ.वी.)', and object key
-    // iteration order expands the short key first, so the long-form input
-    // gets nested/double-expanded. Ported faithfully from the Dart source
-    // (bible_text_formatter.dart) — same bug exists there too. See
-    // "Known pre-existing bugs" in the SOLID i18n plan hand-off notes.
+test('normalizeTtsText: known bug — hi long-form version string gets double-expanded', () => {
+    // Root cause (found while investigating the "substring collision" theory,
+    // which turned out to be wrong — BIBLE_VERSION_EXPANSIONS.hi's keys are
+    // already ordered longest-first, so that's not it): HindiTtsNormalizer
+    // .preProcess() runs BEFORE this expansion loop and expands the 'ओ.वी.'
+    // abbreviation on its own, turning 'पवित्र बाइबिल (ओ.वी.)' into
+    // 'पवित्र बाइबिल (पवित्र बाइबिल पुराना संस्करण)' — which now legitimately
+    // contains a second, separate 'पवित्र बाइबिल' substring that the main
+    // loop matches and expands again. A pipeline-ordering bug, not a key-
+    // ordering one. Also present in the Dart source (hindi_tts_normalizer.dart
+    // + bible_text_formatter.dart) — ported faithfully, not introduced.
+    // Not fixed here: changing when 'ओ.वी.' expands could affect other
+    // Hindi input shapes not verified in this session — needs a human call
+    // on intended behavior before touching the pipeline order in both
+    // JS and Dart. See GitHub issue and plan backlog.
     const result = normalizeTtsText('पवित्र बाइबिल (ओ.वी.)', 'hi', 'HIOV');
     assert.notEqual(result, 'पवित्र बाइबिल पुराना संस्करण');
 });

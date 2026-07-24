@@ -146,6 +146,10 @@
             ARC: 'Almeida Revista e Corrigida',
             NVI: 'Nova Versão Internacional',
         },
+        fr: {
+            LSG1910: 'Louis Segond mille neuf cent dix',
+            TOB: 'Traduction Oecuménique de la Bible',
+        },
         de: {
             LU17: 'Lutherbibel zweitausendsiebzehn',
             SCH2000: 'Schlachter zweitausend',
