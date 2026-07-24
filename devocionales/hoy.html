@@ -173,7 +173,6 @@
         }
 
         #tts-btn.speaking { background: var(--highlight); }
-        #tts-btn.speaking .tts-label::after { content: ' (detener)'; }
 
         #share-fb:hover, #share-x:hover, #share-mail:hover { color: var(--accent); }
 
@@ -226,7 +225,7 @@
         <article id="devotional-content" class="hidden">
 
             <div class="mb-4">
-                <a href="/devocionales/" class="text-sm" style="color: var(--text-muted);">&larr; Devocionales</a>
+                <a href="/devocionales/" id="back-link" class="text-sm" style="color: var(--text-muted);">&larr; Devocionales</a>
             </div>
 
             <div class="hero-devotional mb-2">
@@ -235,7 +234,7 @@
             <p id="hero-credit" class="text-right text-xs mb-6" style="color: var(--text-muted);"></p>
 
             <div class="text-center max-w-2xl mx-auto mb-6">
-                <div class="eyebrow mb-2">Devocional Diario</div>
+                <div id="eyebrow-label" class="eyebrow mb-2">Devocional Diario</div>
                 <h1 id="devotional-verse-ref" class="text-3xl sm:text-4xl font-extrabold mb-3" style="color: var(--text);"></h1>
 
                 <div class="flex items-center justify-center gap-3">
@@ -255,7 +254,7 @@
                     </button>
                     <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="btn-secondary px-5 py-2 flex items-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
-                        <span>Descarga la App</span>
+                        <span id="download-app-label">Descarga la App</span>
                     </a>
                 </div>
             </div>
@@ -267,7 +266,7 @@
                     <div class="sidebar-sticky space-y-6">
 
                         <div>
-                            <div class="eyebrow mb-3">Opciones de Lectura</div>
+                            <div id="reading-options-label" class="eyebrow mb-3">Opciones de Lectura</div>
                             <div class="text-size-toggle flex items-center gap-1 text-lg">
                                 <input type="radio" id="font_normal" name="fontsize" value="" checked>
                                 <label for="font_normal">A</label>
@@ -279,12 +278,12 @@
                         </div>
 
                         <div>
-                            <div class="eyebrow mb-2">Para Meditar</div>
+                            <div id="para-meditar-label" class="eyebrow mb-2">Para Meditar</div>
                             <div id="meditar-accordion"></div>
                         </div>
 
                         <div id="tags-wrap">
-                            <div class="eyebrow mb-2">Temas</div>
+                            <div id="temas-label" class="eyebrow mb-2">Temas</div>
                             <div id="tags-list"></div>
                         </div>
 
@@ -294,15 +293,15 @@
                 <!-- Main article body -->
                 <div class="md:col-span-8 lg:col-start-5">
                     <div class="prose max-w-none">
-                        <h2 class="text-lg font-bold mb-2" style="color: var(--text);">Reflexión</h2>
+                        <h2 id="reflexion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Reflexión</h2>
                         <p id="devotional-reflexion" class="whitespace-pre-line mb-8" style="color: var(--text-muted);"></p>
 
-                        <h2 class="text-lg font-bold mb-2" style="color: var(--text);">Oración</h2>
+                        <h2 id="oracion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Oración</h2>
                         <p id="devotional-oracion" class="whitespace-pre-line italic pl-4 mb-8" style="color: var(--text-muted); border-left: 2px solid var(--accent);"></p>
                     </div>
 
                     <div class="mt-10 pt-4 flex items-center gap-4" style="border-top: 1px solid var(--border);">
-                        <span class="text-sm font-semibold" style="color: var(--text-muted);">Comparte:</span>
+                        <span id="comparte-label" class="text-sm font-semibold" style="color: var(--text-muted);">Comparte:</span>
                         <a id="share-fb" href="#" target="_blank" aria-label="Compartir en Facebook" style="color: var(--text-muted);"><i data-lucide="share-2" class="w-5 h-5"></i></a>
                         <a id="share-x" href="#" target="_blank" aria-label="Compartir en X" style="color: var(--text-muted);"><i data-lucide="at-sign" class="w-5 h-5"></i></a>
                         <a id="share-mail" href="#" aria-label="Compartir por correo" style="color: var(--text-muted);"><i data-lucide="mail" class="w-5 h-5"></i></a>
