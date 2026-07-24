@@ -176,5 +176,23 @@
       "section7_text": "如对本隐私政策有任何疑问或希望请求删除您的数据，欢迎通过 develop4God@gmail.com 联系我们。",
       "backToHome": "返回首页"
     }
+  },
+  "devotionals": {
+    "docTitle": "今日灵修 - 基督徒灵修",
+    "errorLoad": "无法加载今日灵修内容，请稍后重试。",
+    "backLink": "← 灵修",
+    "eyebrow": "每日灵修",
+    "listen": "收听",
+    "stop": "收听（停止）",
+    "downloadApp": "下载应用",
+    "readingOptions": "阅读选项",
+    "paraMeditar": "默想",
+    "temas": "主题",
+    "versiculo": "经文",
+    "reflexion": "默想",
+    "oracion": "祷告",
+    "comparte": "分享：",
+    "heroCredit": "风景照片",
+    "ttsLang": "zh-CN"
   }
 }

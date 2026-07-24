@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "title": "Startseite - Christliche Andachten",
+    "description": "Christliche Andachten ist Ihr mobiler Begleiter, um Ihr geistliches Leben mit täglichen biblischen Reflexionen zu bereichern. Laden Sie die kostenlose App herunter und stärken Sie jeden Tag Ihren Glauben."
+  },
+  "navigation": {
+    "home": "Startseite",
+    "vision": "Unsere Vision",
+    "features": "Funktionen",
+    "contact": "Kontakt",
+    "donation": "Spende",
+    "deleteData": "Daten löschen"
+  },
+  "header": {
+    "title": "Christliche Andachten",
+    "subtitle": "Ihr täglicher geistlicher Begleiter",
+    "description": "Stärken Sie Ihren Glauben mit inspirierenden biblischen Reflexionen und geistlichen Inhalten, die entwickelt wurden, um Ihre Seele jeden Tag zu nähren.",
+    "downloadApp": "App herunterladen",
+    "learnMore": "Funktionen entdecken"
+  },
+  "vision": {
+    "title": "Unsere Vision für Christliche Andachten",
+    "description": "Christliche Andachten ist Ihr mobiler Begleiter, der entwickelt wurde, um Ihr geistliches Leben zu bereichern und zu stärken. Unser Ziel ist es, Ihre tägliche Brücke zum Wort Gottes zu sein und Ihnen inspirierende und relevante biblische Inhalte zu bieten. Wir glauben an Technologie im Dienst Ihres Glaubens und bieten Ihnen eine flüssige, schnelle und zuverlässige Erfahrung, völlig kostenlos."
+  },
+  "features": {
+    "title": "Hauptfunktionen",
+    "daily": {
+      "title": "Tägliche Andachten",
+      "description": "Greifen Sie jeden Tag auf eine neue biblische Reflexion zu, die entwickelt wurde, um Ihren Geist zu inspirieren und zu nähren."
+    },
+    "versions": {
+      "title": "Bibelversionen",
+      "description": "Genießen Sie Andachten in verschiedenen Bibelversionen, wie RVR1960, für ein tieferes Studium."
+    },
+    "favorites": {
+      "title": "Markieren Sie Ihre Favoriten",
+      "description": "Speichern Sie die Andachten, die Sie am meisten berühren, um sie jederzeit leicht wiederzufinden."
+    },
+    "sharing": {
+      "title": "Teilen Sie das Wort",
+      "description": "Verbreiten Sie Inspiration, indem Sie Andachten als Text oder in schönen Bildern über Ihre Netzwerke teilen."
+    },
+    "prayer": {
+      "title": "Gebet des Glaubens",
+      "description": "Eine besondere Botschaft, um Ihr Leben Jesus Christus zu übergeben und ewig zu leben."
+    },
+    "language": {
+      "title": "Mehrere Sprachen",
+      "description": "Für Erweiterung konzipiert, derzeit für spanischsprachige Nutzer optimiert."
+    },
+    "notifications": {
+      "title": "Personalisierte Benachrichtigungen",
+      "description": "Erhalten Sie tägliche Erinnerungen an Ihre Andacht zu der von Ihnen gewählten Zeit, damit Sie Ihren Moment mit Gott nicht verpassen."
+    },
+    "themes": {
+      "title": "Passen Sie Ihr Thema an",
+      "description": "Wählen Sie aus verschiedenen Farbkombinationen, um die Oberfläche an Ihren Geschmack anzupassen."
+    },
+    "darkMode": {
+      "title": "Dunkler Modus (wenig Licht)",
+      "description": "Genießen Sie angenehmes Lesen in Umgebungen mit wenig Licht und reduzieren Sie die Augenbelastung."
+    }
+  },
+  "contact": {
+    "title": "Fragen? Kontaktieren Sie uns!",
+    "description": "Wenn Sie Fragen oder Anregungen haben oder einfach nur Hallo sagen möchten, zögern Sie nicht, uns zu kontaktieren.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Senden Sie uns eine E-Mail"
+  },
+  "donation": {
+    "title": "Unterstützen Sie unsere Mission",
+    "subtitle": "Ihre Großzügigkeit ermöglicht es uns, weiter zu bauen",
+    "supportText": "Ihre Unterstützung hilft uns, weiterhin das Wort zu teilen.",
+    "donationText": "Erwägen Sie eine Spende."
+  },
+  "footer": {
+    "copyright": "© 2026 Christliche Andachten. Alle Rechte vorbehalten.",
+    "madeWith": "Entwickelt mit ♥️ von develop4God",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutzrichtlinie",
+    "deleteData": "Löschung der Daten anfordern",
+    "contact": "Kontakt"
+  },
+  "legal": {
+    "terms": {
+      "title": "Nutzungsbedingungen der Anwendung „Christliche Andachten“",
+      "lastUpdated": "Datum der letzten Aktualisierung:",
+      "date": "28. Juli 2025",
+      "welcome": "Willkommen bei der mobilen Anwendung „Christliche Andachten“ (im Folgenden „die Anwendung“), die Eigentum von **Develop4God** ist und von diesem betrieben wird. Durch den Zugriff auf oder die Nutzung der Anwendung erklären Sie („der Nutzer“) sich damit einverstanden, rechtlich an diese Nutzungsbedingungen (im Folgenden „die Bedingungen“) gebunden zu sein. Wenn Sie mit einer dieser Bedingungen nicht einverstanden sind, dürfen Sie die Anwendung nicht nutzen.",
+      "section1_title": "1. Beschreibung der Anwendung",
+      "section1_text": "Die Anwendung „Christliche Andachten“ ist eine digitale Plattform, die entwickelt wurde, um Zugang zu täglichen, wöchentlichen oder regelmäßigen Andachtstexten zu bieten, mit dem Zweck, geistliche Reflexion und persönliches Wachstum zu fördern. Zu den Hauptfunktionen gehören das Lesen von Andachten, die Möglichkeit, Andachten als Favoriten zu speichern, die Option, Andachten über die Funktionen Ihres mobilen Geräts mit Kontakten zu teilen, Screenshots von Andachtsinhalten zu machen und freiwillige Spenden zur Unterstützung der Anwendung zu tätigen.",
+      "section2_title": "2. Geistiges Eigentum und Inhalt der Anwendung",
+      "section2_1_title": "2.1. Andachtsinhalt:",
+      "section2_1_text": "Sämtlicher Andachtsinhalt (Texte, Reflexionen, Kommentare usw.), der in der Anwendung präsentiert wird, ist Eigentum von **Develop4God**. Obwohl ein Teil dieses Inhalts ursprünglich mit Unterstützung künstlicher Intelligenz (KI) erstellt wurde, wurde er von **Develop4God** überprüft, bearbeitet und genehmigt, das die volle Verantwortung und Eigentümerschaft übernimmt. Dieser Inhalt ist durch Urheberrechtsgesetze und andere Gesetze zum geistigen Eigentum geschützt.",
+      "section2_2_title": "2.2. Nutzung des Inhalts:",
+      "section2_2_text": "Nutzer dürfen den Andachtsinhalt für persönliche und nicht kommerzielle Zwecke verwenden (einschließlich Lesen, Teilen mit Kontakten, Screenshots von Andachtsinhalten und Hinzufügen zu Favoriten). Diese Nutzung ist erlaubt, solange keine direkten oder indirekten Einnahmen aus einer solchen Nutzung entstehen. Für jede Nutzung, die über die persönliche hinausgeht und...",
+      "section3_title": "3. Verantwortlichkeiten des Nutzers",
+      "section3_text": "Durch die Nutzung der Anwendung verpflichten Sie sich:",
+      "section3_list1": "Die Anwendung legal und ethisch zu nutzen.",
+      "section3_list2": "Den Betrieb der Anwendung oder der mit ihr verbundenen Server und Netzwerke nicht zu stören oder zu unterbrechen.",
+      "section3_list3": "Die Anwendung nicht für illegale Zwecke oder zum Versenden von Spam, Viren oder anderem schädlichem Code zu verwenden.",
+      "section3_list4": "Die Rechte des geistigen Eigentums von **Develop4God** und Dritten zu respektieren.",
+      "section3_list5": "Allein verantwortlich für jeglichen Inhalt oder Informationen zu sein, die Sie teilen.",
+      "section4_title": "4. Spenden",
+      "section4_text": "Die Anwendung bietet die Möglichkeit, freiwillige Spenden zu tätigen, um ihre Wartung und ihr Wachstum zu unterstützen. Diese Spenden werden über Plattformen Dritter (z. B. PayPal) verarbeitet und sind keine Zahlung für einen Dienst. Durch das Tätigen einer Spende akzeptieren Sie die Nutzungsbedingungen dieser Drittplattform. Spenden sind nicht erstattungsfähig.",
+      "section5_title": "5. Gewährleistungsausschluss und Haftungsbeschränkung",
+      "section5_1_title": "5.1. Keine Gewährleistung:",
+      "section5_1_text": "Die Anwendung wird „wie besehen“ und „wie verfügbar“ ohne jegliche ausdrückliche oder stillschweigende Gewährleistung bereitgestellt. **Develop4God** garantiert nicht, dass die Anwendung ununterbrochen, fehlerfrei oder frei von Viren oder anderen schädlichen Komponenten ist.",
+      "section5_2_title": "5.2. Haftungsbeschränkung:",
+      "section5_2_text": "Im gesetzlich zulässigen Höchstmaß haftet **Develop4God** nicht für direkte, indirekte, zufällige, besondere, Folge- oder Strafschäden, die sich aus Ihrer Nutzung oder Unfähigkeit zur Nutzung der Anwendung ergeben.",
+      "section6_title": "6. Änderungen der Bedingungen",
+      "section6_text": "Wir behalten uns das Recht vor, diese Bedingungen jederzeit zu ändern. Wir werden Sie über jegliche Änderungen informieren, indem wir die neuen Bedingungen auf dieser Seite veröffentlichen und das Datum der „Letzten Aktualisierung“ aktualisieren. Wir empfehlen Ihnen, diese Bedingungen regelmäßig zu überprüfen.",
+      "section7_title": "7. Links zu Dritten",
+      "section7_text": "Die Anwendung kann Links zu Websites oder Diensten Dritter enthalten. Wir sind nicht verantwortlich für den Inhalt oder die Datenschutzpraktiken dieser Websites. Ihr Zugriff auf und die Nutzung dieser Websites erfolgt auf eigenes Risiko.",
+      "section8_title": "8. Beendigung der Nutzung",
+      "section8_text": "**Develop4God** kann Ihren Zugang zur Anwendung jederzeit ohne vorherige Ankündigung aus jeglichem Grund beenden oder aussetzen, einschließlich wenn wir glauben, dass Sie gegen diese Bedingungen verstoßen haben.",
+      "section9_title": "9. Anwendbares Recht und Gerichtsstand",
+      "section9_text": "Diese Bedingungen unterliegen den Gesetzen der **Republik Panama** und werden entsprechend ausgelegt, ohne Rücksicht auf deren Kollisionsnormen. Jegliche Streitigkeit im Zusammenhang mit diesen Bedingungen unterliegt der ausschließlichen Zuständigkeit der Gerichte von **Panama-Stadt, Republik Panama**.",
+      "section10_title": "10. Kontakt",
+      "section10_text": "Wenn Sie Fragen zu diesen Bedingungen haben, können Sie uns unter develop4God@gmail.com kontaktieren.",
+      "backToHome": "Zurück zur Startseite"
+    },
+    "privacy": {
+      "title": "Datenschutzrichtlinie der Anwendung „Christliche Andachten“",
+      "lastUpdated": "Datum der letzten Aktualisierung:",
+      "date": "28. Juli 2025",
+      "description": "Diese Datenschutzrichtlinie beschreibt, wie die mobile Anwendung „Christliche Andachten“ (im Folgenden „die Anwendung“), die Eigentum von **Develop4God** ist und von diesem betrieben wird, Nutzerinformationen handhabt. Die Privatsphäre unserer Nutzer ist uns von größter Bedeutung.",
+      "section1_title": "1. Informationen, die wir sammeln, und wie wir sie verwenden",
+      "section1_text": "Die Anwendung „Christliche Andachten“ sammelt und verarbeitet bestimmte Arten von Daten, um ihre Funktionen anzubieten und die Nutzererfahrung zu verbessern. Wir möchten transparent sein, welche Daten zu welchem Zweck gesammelt werden:",
+      "section1_list1_title": "Identifikatoren:",
+      "section1_list1_text": "Wir sammeln Geräteidentifikatoren (wie Firebase Cloud Messaging - FCM-Token) und, wenn verfügbar und vom Nutzer erlaubt, die Android-Werbe-ID.",
+      "section1_list1_purpose": "Zweck:",
+      "section1_list1_purpose_text": "Verwendet zum Senden von Push-Benachrichtigungen (FCM), zur Analyse der Anwendungsnutzung (Firebase Analytics) und zur Zuordnung von Werbekampagnen.",
+      "section1_list2_title": "Persönliche Informationen (begrenzt):",
+      "section1_list2_text": "Wir sammeln Datum und Uhrzeit der letzten Anmeldung (`lastLogin`).",
+      "section1_list2_purpose": "Zweck:",
+      "section1_list2_purpose_text": "Für die Verwaltung des Benutzerkontos (über Firebase Authentication) und für grundlegende Aktivitätsstatistiken.",
+      "section1_list3_title": "Aktivität in der Anwendung:",
+      "section1_list3_text": "Wir sammeln Daten über die Interaktionen des Nutzers mit der Anwendung (z. B. Klicks auf Schaltflächen, Bildschirmbesuche) und als Favoriten gespeicherte Andachten.",
+      "section1_list3_purpose": "Zweck:",
+      "section1_list3_purpose_text": "Für Nutzungsstatistiken (Firebase Analytics), zur Verbesserung der Funktionen der Anwendung und zur Personalisierung der Nutzererfahrung (z. B. Anzeige von Lieblingsandachten).",
+      "section1_list4_title": "Leistung der Anwendung:",
+      "section1_list4_text": "Wir sammeln Absturz- und Diagnosedaten.",
+      "section1_list4_purpose": "Zweck:",
+      "section1_list4_purpose_text": "Zur Überwachung der Stabilität und Leistung der Anwendung, zur Erkennung und Behebung von Fehlern und zur Gewährleistung eines flüssigen Erlebnisses.",
+      "section1_list5_title": "Nutzung der Anwendung:",
+      "section1_list5_text": "Wir sammeln Interaktionsprotokolle, um zu verstehen, wie Nutzer die Anwendungsoberfläche navigieren und verwenden.",
+      "section1_list5_purpose": "Zweck:",
+      "section1_list5_purpose_text": "Für Nutzungsstatistiken und -analysen (Firebase Analytics).",
+      "section1_list6_title": "Anwendungseinstellungen:",
+      "section1_list6_text": "Wir speichern Nutzereinstellungen im Zusammenhang mit Benachrichtigungen (z. B. ob Benachrichtigungen aktiviert sind, bevorzugte Benachrichtigungszeit, Zeitzone des Nutzers).",
+      "section1_list6_purpose": "Zweck:",
+      "section1_list6_purpose_text": "Um Benachrichtigungsfunktionen gemäß den Präferenzen des Nutzers zu ermöglichen und rechtzeitige Mitteilungen des Entwicklers zu senden.",
+      "important_note_title": "Wichtig:",
+      "important_note_text": "Die Anwendung sammelt nicht direkt Ihren Namen, Ihre E-Mail-Adresse, Telefonnummer, genauen Standort oder andere persönlich identifizierbare Informationen (PII) über das oben Genannte hinaus, es sei denn, Sie stellen diese ausdrücklich über Funktionen Dritter (wie PayPal) oder externe Authentifizierungsdienste zur Verfügung.",
+      "section2_title": "2. Wie die Anwendung funktioniert und lokale Datenverarbeitung",
+      "section2_text": "Einige Funktionen der Anwendung arbeiten hauptsächlich lokal auf Ihrem Gerät:",
+      "section2_list1_title": "Lesen von Andachten:",
+      "section2_list1_text": "Der Andachtsinhalt wird zur Anzeige geladen. Die Leseaktivität wird nicht auf persönlicher Ebene aufgezeichnet.",
+      "section2_list2_title": "Speichern von Favoriten:",
+      "section2_list2_text": "Die Funktion „Favoriten speichern“ wird lokal auf Ihrem Gerät ausgeführt und mit Ihrem Benutzerkonto in Firebase Firestore synchronisiert, um Persistenz und Zugriff von anderen Geräten zu gewährleisten (wenn Sie sich mit demselben Konto anmelden). Diese Daten sind für uns zugänglich und werden von uns verwaltet, um Ihnen diese Funktion bereitzustellen.",
+      "section2_list3_title": "Teilen mit Kontakten:",
+      "section2_list3_text": "Wenn Sie eine Andacht teilen, speichern wir weder die Informationen des Empfängers noch den Inhalt der gesendeten Nachricht. Dieser Prozess wird von den nativen Freigabefunktionen Ihres Geräts verwaltet.",
+      "section3_title": "3. Datensicherheit",
+      "section3_text": "Wir verpflichten uns, die Sicherheit Ihrer Daten zu schützen. Wir verwenden administrative, technische und physische Maßnahmen, um vor unbefugtem Zugriff, Offenlegung, Änderung oder Zerstörung der von uns gesammelten und gespeicherten Informationen zu schützen. Keine Sicherheitsmaßnahme ist jedoch 100 % perfekt. Wir empfehlen Ihnen, sichere Passwörter zu verwenden und Ihre Kontoinformationen zu schützen.",
+      "section4_title": "4. Dienste Dritter",
+      "section4_text": "Die Anwendung nutzt Dienste Dritter, die Informationen sammeln können. Diese Dienste haben ihre eigenen Datenschutzrichtlinien:",
+      "section4_list1": "**Firebase (Google):** Für Authentifizierung, Datenbanken (Firestore), Benachrichtigungen (FCM) und Analysen. Die Datenschutzrichtlinie von Firebase ist verfügbar unter [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
+      "section4_list2": "**PayPal:** Für Spenden. Die Datenschutzrichtlinie von PayPal ist verfügbar unter [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
+      "section4_list3": "Andere Dienste: Die Anwendung kann auch andere Dienste Dritter für bestimmte Funktionen nutzen, wie z. B. das Versenden von E-Mails. Diese Dienste haben nur Zugriff auf die Informationen, die zur Erbringung ihres Dienstes erforderlich sind.",
+      "section5_title": "5. Datenschutz für Kinder",
+      "section5_text": "Die Anwendung ist nicht für die Nutzung durch Kinder unter 13 Jahren bestimmt. Wir sammeln nicht wissentlich persönliche Informationen von Kindern unter 13 Jahren. Wenn wir feststellen, dass wir Informationen von einem Kind unter 13 Jahren ohne nachweisbare elterliche Zustimmung gesammelt haben, werden wir Maßnahmen ergreifen, um diese Informationen von unseren Servern zu entfernen.",
+      "section6_title": "6. Änderungen dieser Datenschutzrichtlinie",
+      "section6_text": "Wir können unsere Datenschutzrichtlinie von Zeit zu Zeit aktualisieren. Wir werden Sie über jegliche Änderungen informieren, indem wir die neue Datenschutzrichtlinie auf dieser Seite veröffentlichen und das Datum der „Letzten Aktualisierung“ oben aktualisieren. Wir empfehlen Ihnen, diese Datenschutzrichtlinie regelmäßig auf Änderungen zu überprüfen.",
+      "section7_title": "7. Kontakt",
+      "section7_text": "Wenn Sie Fragen zu dieser Datenschutzrichtlinie haben oder die Löschung Ihrer Daten beantragen möchten, zögern Sie bitte nicht, uns unter develop4God@gmail.com zu kontaktieren.",
+      "backToHome": "Zurück zur Startseite"
+    }
+  },
+  "devotionals": {
+    "docTitle": "Heutige Andacht - Christliche Andachten",
+    "errorLoad": "Wir konnten die heutige Andacht nicht laden. Bitte versuchen Sie es später erneut.",
+    "backLink": "← Andachten",
+    "eyebrow": "Tägliche Andacht",
+    "listen": "Anhören",
+    "stop": "Anhören (stoppen)",
+    "downloadApp": "App herunterladen",
+    "readingOptions": "Leseoptionen",
+    "paraMeditar": "Zum Nachdenken",
+    "temas": "Themen",
+    "versiculo": "Vers",
+    "reflexion": "Reflexion",
+    "oracion": "Gebet",
+    "comparte": "Teilen:",
+    "heroCredit": "Landschaftsfoto",
+    "ttsLang": "de-DE"
+  }
+}
