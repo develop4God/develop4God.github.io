@@ -48,10 +48,21 @@ jobs:
           node-version: '20'
 
       - name: Install lint tools
-        run: npm install -g html-validate stylelint stylelint-config-standard eslint
+        # Pinned to match .claude/skills/web-coding-agent/SKILL.md's documented,
+        # tested versions. Unpinned installs previously resolved to stylelint 17
+        # (vs. the repo's tested v15), which renamed color-function-notation to
+        # color-function-alias-notation — silently breaking the "legacy"
+        # override in .stylelintrc.json and producing ~30 false-positive errors.
+        run: npm install -g html-validate@8 stylelint@15 stylelint-config-standard@34 eslint@8
 
       - name: Validate HTML
-        run: html-validate "**/*.html" --exclude "node_modules/**" || echo "⚠️ HTML validation completed with warnings"
+        # html-validate 8's CLI has no --exclude flag (that was silently
+        # failing every run with "unknown option --exclude", verified in
+        # CI logs — HTML was never actually being validated). List the
+        # real source directories explicitly instead of a recursive glob,
+        # so generated artifacts (e.g. e2e/playwright-report/) are never
+        # scanned in the first place.
+        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html" || echo "⚠️ HTML validation completed with warnings"
 
       - name: Validate CSS
         run: stylelint "**/*.css" --allow-empty-input || echo "⚠️ CSS validation completed with warnings"
