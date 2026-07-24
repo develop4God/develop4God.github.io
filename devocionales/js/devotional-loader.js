@@ -479,7 +479,6 @@
 
         document.getElementById('hero-image').src = heroImageForDate(dateKey);
         document.getElementById('hero-image').alt = ref;
-        document.getElementById('hero-credit').textContent = UI_TEXT[LANGUAGE].heroCredit;
 
         document.getElementById('devotional-verse-ref').textContent = ref;
         // The label always shows the visitor's real calendar date — it reads as
