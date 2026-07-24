@@ -12,6 +12,12 @@
         en: 'NIV',
         pt: 'ARC',
         fr: 'LSG1910',
+        ja: '新改訳2003',
+        zh: '和合本1919',
+        hi: 'HIOV',
+        de: 'LU17',
+        ar: 'NAV',
+        fil: 'MBB05',
     };
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
 
@@ -49,7 +55,9 @@
     function devotionalJsonUrl(fileYear) {
         const base = `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/Devocional_year_${fileYear}`;
         if (LANGUAGE === 'es') return `${base}.json`;
-        return `${base}_${LANGUAGE}_${LANGUAGE_VERSIONS[LANGUAGE]}.json`;
+        // encodeURIComponent covers version codes with non-ASCII characters
+        // (e.g. Japanese/Chinese) safely; it's a no-op for ASCII codes.
+        return `${base}_${LANGUAGE}_${encodeURIComponent(LANGUAGE_VERSIONS[LANGUAGE])}.json`;
     }
 
     // Cache of loaded year-files, keyed by "lang:fileYear" since the same
@@ -378,7 +386,10 @@
     // Only wire click handlers once; render() is called on every navigation.
     let navHandlersBound = false;
 
-    const LOCALE_TAGS = { es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR' };
+    const LOCALE_TAGS = {
+        es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR',
+        ja: 'ja-JP', zh: 'zh-CN', hi: 'hi-IN', de: 'de-DE', ar: 'ar-SA', fil: 'fil-PH',
+    };
 
     function applyStaticUiText() {
         document.getElementById('back-link').textContent = DevotionalI18n.t('devotionals.backLink', '');
