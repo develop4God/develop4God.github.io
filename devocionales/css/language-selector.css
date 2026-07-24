@@ -1,5 +1,7 @@
 /* ====================================== */
+
 /* NUEVO: Custom Language Selector Styles */
+
 /* ====================================== */
 
 .custom-language-selector {
@@ -53,11 +55,12 @@
 }
 
 /* Animation keyframes */
-@keyframes slideIn {
+@keyframes slide-in {
     from {
         opacity: 0;
         transform: translateY(-10px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -65,6 +68,7 @@
 }
 
 /* Focus styles for accessibility */
+
 .language-selector-button:focus-visible,
 .language-option:focus-visible {
     outline: 2px solid #667eea;
@@ -96,7 +100,7 @@
 }
 
 /* Mobile responsive adjustments */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .language-dropdown {
         position: fixed;
         left: 1rem;
@@ -106,12 +110,12 @@
         max-width: calc(100vw - 2rem);
         z-index: 9999;
     }
-    
+
     .language-selector-button {
         min-width: unset;
         padding: 0.5rem 0.75rem;
     }
-    
+
     .language-option {
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
@@ -128,12 +132,15 @@
     0%, 20% {
         content: '';
     }
+
     40% {
         content: '.';
     }
+
     60% {
         content: '..';
     }
+
     80%, 100% {
         content: '...';
     }
@@ -150,24 +157,26 @@
     border-radius: 0.5rem;
 }
 
-/* Dark theme compatibility (if implemented later) */
-@media (prefers-color-scheme: dark) {
-    .language-dropdown {
-        background-color: #1f2937;
-        border-color: #374151;
-        color: #f9fafb;
-    }
-    
-    .language-option {
-        color: #f9fafb;
-    }
-    
-    .language-option:hover {
-        background-color: #374151 !important;
-    }
-    
-    .language-option[aria-selected="true"] {
-        background-color: #4c1d95 !important;
-        color: #a78bfa !important;
-    }
+/* Dark theme compatibility: follows the page's own [data-theme="dark"]
+   toggle (via CSS custom properties) instead of the OS/browser
+   preference, so the dropdown always matches whatever theme is
+   actually showing. Pages without these custom properties defined
+   (e.g. admin.html) simply keep the default light styling above. */
+:root[data-theme="dark"] .language-dropdown {
+    background-color: var(--surface, #1f2937);
+    border-color: var(--border, #374151);
+    color: var(--text, #f9fafb);
+}
+
+:root[data-theme="dark"] .language-option {
+    color: var(--text, #f9fafb);
+}
+
+:root[data-theme="dark"] .language-option:hover {
+    background-color: var(--accent-soft, #374151) !important;
+}
+
+:root[data-theme="dark"] .language-option[aria-selected="true"] {
+    background-color: var(--accent-soft, #4c1d95) !important;
+    color: var(--accent, #a78bfa) !important;
 }

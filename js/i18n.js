@@ -4,7 +4,7 @@
 
 class I18n {
     constructor() {
-        this.currentLang = 'es'; // Default language
+        this.currentLang = 'en'; // Default language
         this.translations = {};
         this.supportedLanguages = {
             'es': { name: 'Español', flag: '🇪🇸' },
@@ -33,20 +33,6 @@ class I18n {
                 "navigation": {
                     "home": "Inicio",
                     "vision": "Nuestra Visión",
-                },
-                ja: {
-                    "meta": { "title": "develop4God - あなたの信仰を成長させるためのスピリチュアルリソース", "description": "毎日の黙想や信仰の習慣を築くための無料クリスチャンプラットフォーム。完全無料のスピリチュアルリソース。" },
-                    "tab": { "vision": "私たちのビジョン", "support": "サポート", "devotionals": "黙想", "habitus": "ハビトゥス+信仰" },
-                    "vision": { "title": "私たちのビジョン", "description": "develop4Godは、信者が信仰を成長させ、霊的な習慣を維持し、毎日神とより近く歩むためのツールを作成するデジタルイニシアチブです。テクノロジーは、あなたの霊的生活を強めるためのアクセスしやすく質の高いリソースを提供することで、神の御国に仕えることができると信じています。" },
-                    "header": { "title": "develop4God", "subtitle": "あなたの霊的成長のためのリソース" },
-                    "hero": { "mainTitle": "develop4God", "subtitle": "信仰を強め、神と歩むためのツール", "description": "キリストにおける毎日の成長のための無料スピリチュアルリソース" },
-                    "projects": { "title": "私たちのプロジェクト", "devocionales": { "title": "キリスト教黙想", "description": "神の言葉による毎日のオーディオ黙想のためのあなたの避難所", "features": ["オーディオ付き毎日の黙想", "8つの聖書バージョン", "完全オフライン", "広告なし"], "button": "黙想を探す" }, "habitus": { "title": "ハビトゥス+信仰", "description": "信仰と霊的な規律によって敬虔な習慣を築く", "features": ["習慣の追跡", "霊的目標", "聖書によるモチベーション", "個人の成長"], "button": "ハビトゥスを発見" } },
-                    "downloadBanner": { "title": "キリスト教黙想アプリをダウンロード!", "subtitle": "あなたの毎日の霊的避難所がモバイルで利用可能", "features": { "free": "100%無料", "noAds": "広告なし", "offline": "オフライン利用", "downloads": "+1,000ダウンロード" }, "button": "今すぐダウンロード", "note": "Google Playで利用可能" },
-                    "mission": { "title": "私たちの使命", "description": "私たちは、信者が信仰を成長させ、霊的な習慣を維持し、毎日神とより近く歩むのを助けるデジタルツールを開発しています。", "vision": "テクノロジーは、あなたの霊的生活を強めるためのアクセスしやすく質の高いリソースを提供することで、神の御国に仕えることができると信じています。" },
-                    "footer": { "copyright": "© 2025 develop4God. 無断転載を禁じます。", "madeWith": "神の栄光のために愛を込めて開発", "terms": "利用規約", "privacy": "プライバシーポリシー", "contact": "お問い合わせ" },
-                    "legal": { "privacy": { "title": "プライバシーポリシー - develop4God", "lastUpdated": "最終更新日:", "backToHome": "ホームに戻る", "description": "このプライバシーポリシーは、develop4Godアプリ（以下「本アプリ」）がユーザー情報をどのように取り扱うかを説明します。ユーザーのプライバシーは私たちにとって非常に重要です。" }, "terms": { "title": "利用規約 - develop4God", "lastUpdated": "最終更新日:", "backToHome": "ホームに戻る", "welcome": "develop4Godアプリ（以下「本アプリ」）へようこそ。本アプリにアクセスまたは利用することで、ユーザー（「利用者」）は本利用規約に法的に拘束されることに同意したものとみなされます。いずれかの規約に同意できない場合は、本アプリを利用しないでください。" } },
-                    "support": { "title": "ミニストリーをサポートする", "description": "あなたのサポートにより、クリスチャンコミュニティのための無料で質の高いリソースを開発し続けることができます。このミッションの一員でいてくれてありがとうございます！" }
-                }
                     "features": "Características",
                     "dailyProvision": "Provisión Diaria",
                     "contact": "Contacto",
@@ -260,7 +246,7 @@ class I18n {
                     "title": "Méditations Chrétiennes",
                     "mainTitle": "Venez et Reposez-vous",
                     "subtitle": "Trouvez Votre Refuge Quotidien dans la Parole de Dieu",
-                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des méditations, de l'audio et la paix que Lui seul peut donner."
+                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des méditations, de l'audio et la paix que Lui seul peut donner.",
                     "downloadApp": "Télécharger l'App",
                     "learnMore": "Découvrir les Fonctionnalités"
                 },
@@ -279,7 +265,7 @@ class I18n {
                 },
                 "dailyProvision": {
                     "title": "Comme la Manne de Chaque Jour",
-                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque méditation lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui."
+                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque méditation lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui.",
                     "streaks": {
                         "title": "Séries de Grâce",
                         "description": "Maintenez une connexion quotidienne avec Dieu. Chaque jour consécutif est une célébration de Sa fidélité et de votre recherche de Lui."
@@ -470,6 +456,19 @@ class I18n {
                         "welcome": "Bem-vindo ao aplicativo móvel \"Devocionais Cristãos\" (doravante, \"o Aplicativo\"), de propriedade e operado por **Develop4God**. Ao acessar ou usar o Aplicativo, você (\"o Usuário\") concorda em estar legalmente vinculado a estes Termos e Condições de Uso (doravante, \"os Termos\"). Se você não concordar com algum destes Termos, não deve usar o Aplicativo."
                     }
                 }
+            },
+            ja: {
+                "meta": { "title": "develop4God - あなたの信仰を成長させるためのスピリチュアルリソース", "description": "毎日の黙想や信仰の習慣を築くための無料クリスチャンプラットフォーム。完全無料のスピリチュアルリソース。" },
+                "tab": { "vision": "私たちのビジョン", "support": "サポート", "devotionals": "黙想", "habitus": "ハビトゥス+信仰" },
+                "vision": { "title": "私たちのビジョン", "description": "develop4Godは、信者が信仰を成長させ、霊的な習慣を維持し、毎日神とより近く歩むためのツールを作成するデジタルイニシアチブです。テクノロジーは、あなたの霊的生活を強めるためのアクセスしやすく質の高いリソースを提供することで、神の御国に仕えることができると信じています。" },
+                "header": { "title": "develop4God", "subtitle": "あなたの霊的成長のためのリソース" },
+                "hero": { "mainTitle": "develop4God", "subtitle": "信仰を強め、神と歩むためのツール", "description": "キリストにおける毎日の成長のための無料スピリチュアルリソース" },
+                "projects": { "title": "私たちのプロジェクト", "devocionales": { "title": "キリスト教黙想", "description": "神の言葉による毎日のオーディオ黙想のためのあなたの避難所", "features": ["オーディオ付き毎日の黙想", "8つの聖書バージョン", "完全オフライン", "広告なし"], "button": "黙想を探す" }, "habitus": { "title": "ハビトゥス+信仰", "description": "信仰と霊的な規律によって敬虔な習慣を築く", "features": ["習慣の追跡", "霊的目標", "聖書によるモチベーション", "個人の成長"], "button": "ハビトゥスを発見" } },
+                "downloadBanner": { "title": "キリスト教黙想アプリをダウンロード!", "subtitle": "あなたの毎日の霊的避難所がモバイルで利用可能", "features": { "free": "100%無料", "noAds": "広告なし", "offline": "オフライン利用", "downloads": "+1,000ダウンロード" }, "button": "今すぐダウンロード", "note": "Google Playで利用可能" },
+                "mission": { "title": "私たちの使命", "description": "私たちは、信者が信仰を成長させ、霊的な習慣を維持し、毎日神とより近く歩むのを助けるデジタルツールを開発しています。", "vision": "テクノロジーは、あなたの霊的生活を強めるためのアクセスしやすく質の高いリソースを提供することで、神の御国に仕えることができると信じています。" },
+                "footer": { "copyright": "© 2025 develop4God. 無断転載を禁じます。", "madeWith": "神の栄光のために愛を込めて開発", "terms": "利用規約", "privacy": "プライバシーポリシー", "contact": "お問い合わせ" },
+                "legal": { "privacy": { "title": "プライバシーポリシー - develop4God", "lastUpdated": "最終更新日:", "backToHome": "ホームに戻る", "description": "このプライバシーポリシーは、develop4Godアプリ（以下「本アプリ」）がユーザー情報をどのように取り扱うかを説明します。ユーザーのプライバシーは私たちにとって非常に重要です。" }, "terms": { "title": "利用規約 - develop4God", "lastUpdated": "最終更新日:", "backToHome": "ホームに戻る", "welcome": "develop4Godアプリ（以下「本アプリ」）へようこそ。本アプリにアクセスまたは利用することで、ユーザー（「利用者」）は本利用規約に法的に拘束されることに同意したものとみなされます。いずれかの規約に同意できない場合は、本アプリを利用しないでください。" } },
+                "support": { "title": "ミニストリーをサポートする", "description": "あなたのサポートにより、クリスチャンコミュニティのための無料で質の高いリソースを開発し続けることができます。このミッションの一員でいてくれてありがとうございます！" }
             }
         };
     }
@@ -537,15 +536,15 @@ class I18n {
                 if (res.ok) current = await res.json();
             } catch (e) { /* ignore */ }
 
-            // Load Spanish fallback
-            let es = null;
+            // Load English fallback
+            let en = null;
             try {
-                const resEs = await fetch(`${basePath}/es.json`, { cache: 'no-store' });
-                if (resEs.ok) es = await resEs.json();
+                const resEn = await fetch(`${basePath}/en.json`, { cache: 'no-store' });
+                if (resEn.ok) en = await resEn.json();
             } catch (e) { /* ignore */ }
 
             if (current) this.deepMerge(this.translations, current);
-            if (lang !== 'es' && es) this.deepMergeMissing(this.translations, es);
+            if (lang !== 'en' && en) this.deepMergeMissing(this.translations, en);
         } catch (e) {
             console.warn('External page translations not available:', e);
         }
@@ -563,7 +562,7 @@ class I18n {
 
             // Try to get saved preference (fallback to memory if localStorage fails)
             try {
-                const savedLang = localStorage.getItem('preferred-language');
+                const savedLang = localStorage.getItem('develop4God_language');
                 if (savedLang && this.supportedLanguages[savedLang]) {
                     this.currentLang = savedLang;
                     return;
@@ -592,8 +591,8 @@ class I18n {
         if (this.allTranslations[lang]) {
             this.translations = this.allTranslations[lang];
         } else {
-            console.warn(`Translations not found for ${lang}, falling back to Spanish`);
-            this.translations = this.allTranslations.es;
+            console.warn(`Translations not found for ${lang}, falling back to English`);
+            this.translations = this.allTranslations.en;
         }
     }
 
@@ -919,7 +918,7 @@ class I18n {
         
         // Save preference (fallback to memory if localStorage fails)
         try {
-            localStorage.setItem('preferred-language', lang);
+            localStorage.setItem('develop4God_language', lang);
         } catch (e) {
             console.warn('Could not save language preference to localStorage');
         }

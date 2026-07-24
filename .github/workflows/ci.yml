@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Unit + e2e tests (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Run node --test
+        run: node --test
+
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/pw-tools && cd /tmp/pw-tools
+          npm install --no-save playwright @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright e2e suite
+        run: /tmp/pw-tools/node_modules/.bin/playwright test -c e2e/
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 7
+
+  lint:
+    name: Lint (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install lint tools
+        # Pinned to match .claude/skills/web-coding-agent/SKILL.md's documented,
+        # tested versions. Unpinned installs previously resolved to stylelint 17
+        # (vs. the repo's tested v15), which renamed color-function-notation to
+        # color-function-alias-notation — silently breaking the "legacy"
+        # override in .stylelintrc.json and producing ~30 false-positive errors.
+        run: npm install -g html-validate@8 stylelint@15 stylelint-config-standard@34 eslint@8
+
+      - name: Validate HTML
+        # html-validate 8's CLI has no --exclude flag (that was silently
+        # failing every run with "unknown option --exclude", verified in
+        # CI logs — HTML was never actually being validated). List the
+        # real source directories explicitly instead of a recursive glob,
+        # so generated artifacts (e.g. e2e/playwright-report/) are never
+        # scanned in the first place.
+        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html"
+
+      - name: Validate CSS
+        run: stylelint "**/*.css" --allow-empty-input
+
+      - name: Validate JavaScript
+        run: eslint "**/*.js" --ignore-pattern "node_modules/"
+
+  broken-links:
+    name: Broken links (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check for broken links
+        # --exclude mailto: : not a fetchable HTTP(S) resource, so lychee
+        # can't check it and would otherwise report it as excluded with
+        # no explanation in the job summary. Excluded here explicitly
+        # instead of relying on lychee's undocumented defaults.
+        # fail: true marks this step failed (visible at a glance in the
+        # Actions UI) whenever lychee's own Errors/Timeouts/Unsupported
+        # counts are nonzero. The job stays non-blocking overall because
+        # of continue-on-error above.
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --exclude-path node_modules --exclude 'mailto:' --root-dir "$GITHUB_WORKSPACE" './**/*.html'
+          fail: true

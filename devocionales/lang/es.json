@@ -146,8 +146,7 @@
       "section1_list5_title": "Uso de la aplicación:",
       "section1_list5_text": "Recopilamos registros de interacción para comprender cómo los usuarios navegan y utilizan la interfaz de la aplicación.",
       "section1_list5_purpose": "Propósito:",
-      "section1_list5_purpose_text": "Para estadísticas de uso y análisis (Firebase Analytics)."
-      ,
+      "section1_list5_purpose_text": "Para estadísticas de uso y análisis (Firebase Analytics).",
       "section1_list6_title": "Configuración de la aplicación:",
       "section1_list6_text": "Almacenamos las preferencias del usuario relacionadas con las notificaciones (p. ej., si las notificaciones están habilitadas, la hora de notificación preferida, la zona horaria del usuario).",
       "section1_list6_purpose": "Propósito:",
@@ -177,5 +176,37 @@
       "section7_text": "Si tiene alguna pregunta sobre esta Política de Privacidad o desea solicitar la eliminación de sus datos, no dude en contactarnos en: develop4God@gmail.com.",
       "backToHome": "Volver a la página principal"
     }
+  },
+  "devotionals": {
+    "docTitle": "Devocional de Hoy - Devocionales Cristianos",
+    "errorLoad": "No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.",
+    "backLink": "← Inicio",
+    "eyebrow": "Devocional Diario",
+    "listen": "Escuchar",
+    "stop": "Escuchar (detener)",
+    "downloadApp": "Descarga la App",
+    "readingOptions": "Opciones de Lectura",
+    "paraMeditar": "Para Meditar",
+    "temas": "Temas",
+    "versiculo": "Versículo",
+    "reflexion": "Reflexión",
+    "oracion": "Oración",
+    "comparte": "Comparte:",
+    "shareAria": "Compartir",
+    "shareMailAria": "Compartir por correo",
+    "ttsLang": "es-ES",
+    "appBannerText": "Devocionales Cristianos — 4.9 ★★★★★ · Más de 10,000 descargas. App gratuita, 100% offline.",
+    "appBannerCta": "Obtener en Google Play",
+    "appBannerClose": "Cerrar",
+    "navVision": "Nuestra Visión",
+    "navDevotional": "Devocional de Hoy",
+    "footerTagline": "© 2026 Develop4God. Herramienta ministerial digital.",
+    "salvationPrayerTitle": "¡Oración de fe, para vida eterna!✨",
+    "salvationPrayerIntro": "Repite esta oración en voz alta, con fe y creyendo con todo el corazón❤️:",
+    "salvationPrayer": "Jesucristo, creo que moriste en la cruz por mi, te pido perdón y me arrepiento de corazón por mis pecados. Te pido seas mi Salvador y el señor de vida. Líbrame de la muerte eterna y escribe mi nombre en el libro de la vida.\nEn el poderoso nombre de Jesús, amén.",
+    "salvationPromise": "Si hiciste esta oración y lo crees:\n\nSerás salvo tu y tu casa (Hch 16:31)\nVivirás eternamente (Jn 11:25-26)\nNunca más tendrás sed (Jn 4:14)\nEstarás con Cristo en los cielos (Ap 19:9)\nHay gozo en los cielos cuando un pecador se arrepiente (Luc 15:10)\nEscrito está y Dios es fiel (Dt 7:9)\n\nDesde ya tienes salvación y vida nueva en Jesucristo.",
+    "salvationContinue": "Continuar",
+    "salvationAlreadyPrayed": "Ya la hice 🙏",
+    "salvationDontShowAgain": "No mostrar nuevamente"
   }
 }
