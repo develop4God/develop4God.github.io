@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "Debosyonal Ngayong Araw - Mga Debosyonal na Kristiyano",
     "errorLoad": "Hindi namin ma-load ang debosyonal ngayong araw. Subukan muli sa ibang pagkakataon.",
-    "backLink": "← Mga Debosyonal",
+    "backLink": "← Home",
     "eyebrow": "Araw-araw na Debosyonal",
     "listen": "Makinig",
     "stop": "Makinig (ihinto)",
@@ -196,6 +196,9 @@
     "ttsLang": "fil-PH",
     "appBannerText": "Mga Debosyonal na Kristiyano — 4.9 ★★★★★ · Mahigit 10,000 na download. Libreng app, 100% offline.",
     "appBannerCta": "Kunin sa Google Play",
-    "appBannerClose": "Isara"
+    "appBannerClose": "Isara",
+    "navVision": "Aming Bisyon",
+    "navDevotional": "Debosyonal Ngayong Araw",
+    "footerTagline": "© 2026 Develop4God. Isang digital na kasangkapan sa ministeryo."
   }
 }

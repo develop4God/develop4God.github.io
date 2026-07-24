@@ -223,7 +223,7 @@
   "devotionals": {
     "docTitle": "आज का भक्ति - ईसाई भक्ति",
     "errorLoad": "हम आज की भक्ति लोड नहीं कर सके। कृपया बाद में फिर से प्रयास करें।",
-    "backLink": "← भक्तियां",
+    "backLink": "← होम",
     "eyebrow": "दैनिक भक्ति",
     "listen": "सुनें",
     "stop": "सुनें (रोकें)",
@@ -239,6 +239,9 @@
     "ttsLang": "hi-IN",
     "appBannerText": "ईसाई भक्ति — 4.9 ★★★★★ · 10,000 से अधिक डाउनलोड। निःशुल्क ऐप, 100% ऑफ़लाइन।",
     "appBannerCta": "Google Play पर पाएं",
-    "appBannerClose": "बंद करें"
+    "appBannerClose": "बंद करें",
+    "navVision": "हमारा दृष्टिकोण",
+    "navDevotional": "आज की भक्ति",
+    "footerTagline": "© 2026 Develop4God. एक डिजिटल सेवकाई उपकरण।"
   }
 }

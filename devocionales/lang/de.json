@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "Heutige Andacht - Christliche Andachten",
     "errorLoad": "Wir konnten die heutige Andacht nicht laden. Bitte versuchen Sie es später erneut.",
-    "backLink": "← Andachten",
+    "backLink": "← Startseite",
     "eyebrow": "Tägliche Andacht",
     "listen": "Anhören",
     "stop": "Anhören (stoppen)",
@@ -196,6 +196,9 @@
     "ttsLang": "de-DE",
     "appBannerText": "Christliche Andachten — 4.9 ★★★★★ · Über 10.000 Downloads. Kostenlose App, 100 % offline nutzbar.",
     "appBannerCta": "Bei Google Play holen",
-    "appBannerClose": "Schließen"
+    "appBannerClose": "Schließen",
+    "navVision": "Unsere Vision",
+    "navDevotional": "Heutige Andacht",
+    "footerTagline": "© 2026 Develop4God. Ein digitales Werkzeug für den Dienst."
   }
 }

@@ -409,6 +409,9 @@
         if (localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }
+        document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
+        document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
+        document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
     }
 
     function render(entry, dateKey) {

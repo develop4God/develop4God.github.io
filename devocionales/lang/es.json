@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "Devocional de Hoy - Devocionales Cristianos",
     "errorLoad": "No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.",
-    "backLink": "← Devocionales",
+    "backLink": "← Inicio",
     "eyebrow": "Devocional Diario",
     "listen": "Escuchar",
     "stop": "Escuchar (detener)",
@@ -196,6 +196,9 @@
     "ttsLang": "es-ES",
     "appBannerText": "Devocionales Cristianos — 4.9 ★★★★★ · Más de 10,000 descargas. App gratuita, 100% offline.",
     "appBannerCta": "Obtener en Google Play",
-    "appBannerClose": "Cerrar"
+    "appBannerClose": "Cerrar",
+    "navVision": "Nuestra Visión",
+    "navDevotional": "Devocional de Hoy",
+    "footerTagline": "© 2026 Develop4God. Herramienta ministerial digital."
   }
 }

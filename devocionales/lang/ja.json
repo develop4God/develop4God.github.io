@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "今日のデボーション - クリスチャン・デボーション",
     "errorLoad": "今日のデボーションを読み込めませんでした。後でもう一度お試しください。",
-    "backLink": "← デボーション",
+    "backLink": "← ホーム",
     "eyebrow": "毎日のデボーション",
     "listen": "聴く",
     "stop": "聴く（停止）",
@@ -196,6 +196,9 @@
     "ttsLang": "ja-JP",
     "appBannerText": "クリスチャン・デボーション — 4.9 ★★★★★ ・10,000件以上のダウンロード。無料、完全オフライン対応。",
     "appBannerCta": "Google Playで入手",
-    "appBannerClose": "閉じる"
+    "appBannerClose": "閉じる",
+    "navVision": "私たちのビジョン",
+    "navDevotional": "今日のデボーション",
+    "footerTagline": "© 2026 Develop4God. デジタル・ミニストリーツール。"
   }
 }

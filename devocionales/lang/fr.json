@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "Méditation du Jour - Méditations Chrétiennes",
     "errorLoad": "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
-    "backLink": "← Méditations",
+    "backLink": "← Accueil",
     "eyebrow": "Méditation Quotidienne",
     "listen": "Écouter",
     "stop": "Écouter (arrêter)",
@@ -196,6 +196,9 @@
     "ttsLang": "fr-FR",
     "appBannerText": "Méditations Chrétiennes — 4.9 ★★★★★ · Plus de 10 000 téléchargements. Application gratuite, 100 % hors ligne.",
     "appBannerCta": "Disponible sur Google Play",
-    "appBannerClose": "Fermer"
+    "appBannerClose": "Fermer",
+    "navVision": "Notre Vision",
+    "navDevotional": "Méditation du Jour",
+    "footerTagline": "© 2026 Develop4God. Un outil ministériel numérique."
   }
 }

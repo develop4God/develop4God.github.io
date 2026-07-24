@@ -180,7 +180,7 @@
   "devotionals": {
     "docTitle": "今日灵修 - 基督徒灵修",
     "errorLoad": "无法加载今日灵修内容，请稍后重试。",
-    "backLink": "← 灵修",
+    "backLink": "← 首页",
     "eyebrow": "每日灵修",
     "listen": "收听",
     "stop": "收听（停止）",
@@ -196,6 +196,9 @@
     "ttsLang": "zh-CN",
     "appBannerText": "基督徒灵修 — 4.9 ★★★★★ · 下载量超过 10,000 次。免费应用，100% 离线可用。",
     "appBannerCta": "在 Google Play 获取",
-    "appBannerClose": "关闭"
+    "appBannerClose": "关闭",
+    "navVision": "我们的异象",
+    "navDevotional": "今日灵修",
+    "footerTagline": "© 2026 Develop4God。数字事工工具。"
   }
 }

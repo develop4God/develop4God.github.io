@@ -245,6 +245,11 @@
             flex-shrink: 0;
         }
         .app-banner-close:hover { color: var(--text); }
+
+        /* modern.css has a blanket "footer, footer * { color: white !important }"
+           rule for other pages' dark footers — override it here so this page's
+           theme-aware footer text stays readable in light mode. */
+        footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
     </style>
 </head>
 <body>
@@ -254,8 +259,8 @@
             <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
             <nav aria-label="Navegación principal">
                 <ul class="flex items-center gap-6 text-sm">
-                    <li><a href="/#our-vision">Nuestra Visión</a></li>
-                    <li><a href="/devocionales/" class="active">Devocional de Hoy</a></li>
+                    <li><a href="/#our-vision" id="nav-vision-label">Nuestra Visión</a></li>
+                    <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
                     <li><a href="/habitus/">Habitus+Faith</a></li>
                 </ul>
             </nav>
@@ -304,7 +309,7 @@
         <article id="devotional-content" class="hidden">
 
             <div class="mb-4">
-                <a href="/devocionales/legacy.html" id="back-link" class="text-sm" style="color: var(--text-muted);">&larr; Devocionales</a>
+                <a href="/" id="back-link" class="text-sm" style="color: var(--text-muted);">&larr; Devocionales</a>
             </div>
 
             <div class="hero-devotional mb-2">
@@ -382,7 +387,8 @@
                         <p id="devotional-oracion" class="whitespace-pre-line italic pl-4 mb-8" style="color: var(--text-muted); border-left: 2px solid var(--accent);"></p>
                     </div>
 
-                    <div class="mt-10 pt-4 flex items-center gap-4" style="border-top: 1px solid var(--border);">
+                    <!-- Share row hidden until a proper native-share (navigator.share) feature is built -->
+                    <div class="mt-10 pt-4 hidden" style="border-top: 1px solid var(--border);">
                         <span id="comparte-label" class="text-sm font-semibold" style="color: var(--text-muted);">Comparte:</span>
                         <a id="share-fb" href="#" target="_blank" aria-label="Compartir en Facebook" style="color: var(--text-muted);"><i data-lucide="share-2" class="w-5 h-5"></i></a>
                         <a id="share-x" href="#" target="_blank" aria-label="Compartir en X" style="color: var(--text-muted);"><i data-lucide="at-sign" class="w-5 h-5"></i></a>
@@ -393,8 +399,8 @@
         </article>
     </main>
 
-    <footer class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
-        <p>&copy; 2026 Develop4God. Herramienta ministerial digital.</p>
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <p id="footer-tagline">&copy; 2026 Develop4God. Herramienta ministerial digital.</p>
     </footer>
 
     <script src="/devocionales/js/modern.js"></script>
