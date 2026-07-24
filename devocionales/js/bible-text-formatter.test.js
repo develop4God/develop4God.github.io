@@ -77,23 +77,29 @@ test('normalizeTtsText: fr expands Bible version codes (fixed — was previously
     assert.match(normalizeTtsText('TOB', 'fr', 'TOB'), /Traduction Oecuménique de la Bible/);
 });
 
-test('normalizeTtsText: known bug — hi long-form version string gets double-expanded', () => {
-    // Root cause (found while investigating the "substring collision" theory,
-    // which turned out to be wrong — BIBLE_VERSION_EXPANSIONS.hi's keys are
-    // already ordered longest-first, so that's not it): HindiTtsNormalizer
-    // .preProcess() runs BEFORE this expansion loop and expands the 'ओ.वी.'
-    // abbreviation on its own, turning 'पवित्र बाइबिल (ओ.वी.)' into
-    // 'पवित्र बाइबिल (पवित्र बाइबिल पुराना संस्करण)' — which now legitimately
-    // contains a second, separate 'पवित्र बाइबिल' substring that the main
-    // loop matches and expands again. A pipeline-ordering bug, not a key-
-    // ordering one. Also present in the Dart source (hindi_tts_normalizer.dart
-    // + bible_text_formatter.dart) — ported faithfully, not introduced.
-    // Not fixed here: changing when 'ओ.वी.' expands could affect other
-    // Hindi input shapes not verified in this session — needs a human call
-    // on intended behavior before touching the pipeline order in both
-    // JS and Dart. See GitHub issue and plan backlog.
+test('normalizeTtsText: hi long-form version string expands once, not double (fixed)', () => {
+    // Two independent bugs compounded here, both now fixed:
+    // 1. HindiTtsNormalizer.preProcess() ran a standalone expansion of
+    //    'ओ.वी.' (in EXTRA_VERSION_KEYS) BEFORE the main version-expansion
+    //    loop, turning 'पवित्र बाइबिल (ओ.वी.)' into 'पवित्र बाइबिल (पवित्र
+    //    बाइबिल पुराना संस्करण)'. Verified against real content: every
+    //    occurrence (730 total across both Devocionales-json hi/HIOV year
+    //    files) of 'ओ.वी.' appears only inside the full phrase, never
+    //    standalone — the shortcut was dead weight. Removed from
+    //    EXTRA_VERSION_KEYS.
+    // 2. Separately, BIBLE_VERSION_EXPANSIONS.hi's own keys overlap (the
+    //    short key 'पवित्र बाइबिल' is a substring of the long key 'पवित्र
+    //    बाइबिल (ओ.वी.)'; 'OV' is a substring of 'HIOV'). The expansion
+    //    loop scanned keys in declaration order without stopping, so after
+    //    the long key matched and expanded, the loop kept going and the
+    //    short key matched *the expansion's own output*, double-expanding
+    //    it. Fixed by sorting keys longest-first and stopping after the
+    //    first match (safe for every language: normalizeTtsText is always
+    //    called with one version per call — see devotional-loader.js's
+    //    buildTtsText, which calls it per-field with a single entry.version
+    //    — so only one key should ever match per call).
     const result = normalizeTtsText('पवित्र बाइबिल (ओ.वी.)', 'hi', 'HIOV');
-    assert.notEqual(result, 'पवित्र बाइबिल पुराना संस्करण');
+    assert.equal(result, 'पवित्र बाइबिल पुराना संस्करण');
 });
 
 test('normalizeTtsText: Hindi Devanagari digit conversion runs before other normalization', () => {

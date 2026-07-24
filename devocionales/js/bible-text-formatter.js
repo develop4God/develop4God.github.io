@@ -30,7 +30,6 @@
         }
 
         const EXTRA_VERSION_KEYS = {
-            'ओ.वी.': 'पवित्र बाइबिल पुराना संस्करण',
             'HIOV_hi.SQLite3': 'पवित्र बाइबिल पुराना संस्करण',
             'HERV_hi.SQLite3': 'पवित्र बाइबिल हिंदी आसान पठन संस्करण',
         };
@@ -239,11 +238,19 @@
         normalized = formatBibleBook(normalized, language);
 
         const versions = getBibleVersionExpansions(language);
-        Object.keys(versions).forEach((key) => {
+        // Sorted longest-first and stopped after the first match: some
+        // languages' keys are substrings of each other (e.g. hi's 'पवित्र
+        // बाइबिल' inside 'पवित्र बाइबिल (ओ.वी.)', or 'OV' inside 'HIOV').
+        // Matching the longest key first and stopping prevents a shorter
+        // key from re-matching text that a longer key's expansion just
+        // produced.
+        const sortedKeys = Object.keys(versions).sort((a, b) => b.length - a.length);
+        for (const key of sortedKeys) {
             if (normalized.includes(key)) {
                 normalized = normalized.split(key).join(versions[key]);
+                break;
             }
-        });
+        }
 
         normalized = formatBibleReferences(normalized, language);
         return normalized.replace(/\s+/g, ' ').trim();
