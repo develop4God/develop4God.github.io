@@ -26,6 +26,7 @@
             readingOptions: 'Opciones de Lectura',
             paraMeditar: 'Para Meditar',
             temas: 'Temas',
+            versiculo: 'Versículo',
             reflexion: 'Reflexión',
             oracion: 'Oración',
             comparte: 'Comparte:',
@@ -43,6 +44,7 @@
             readingOptions: 'Reading Options',
             paraMeditar: 'To Meditate On',
             temas: 'Topics',
+            versiculo: 'Verse',
             reflexion: 'Reflection',
             oracion: 'Prayer',
             comparte: 'Share:',
@@ -60,6 +62,7 @@
             readingOptions: 'Opções de Leitura',
             paraMeditar: 'Para Meditar',
             temas: 'Temas',
+            versiculo: 'Versículo',
             reflexion: 'Reflexão',
             oracion: 'Oração',
             comparte: 'Compartilhar:',
@@ -377,18 +380,39 @@
         return parts.join('\n');
     }
 
+    // The entry currently loaded for TTS purposes. setupTts() only ever
+    // attaches ONE click listener (guarded below) and reads this on each
+    // click, instead of re-attaching a new listener — with a stale closure
+    // over the old entry — on every render(). Stacked listeners were
+    // triggering speechSynthesis.speak() multiple times per click after
+    // navigating a few times, which also broke "stop" (cancel() only
+    // silenced one of several overlapping utterances).
+    let ttsEntry = null;
+    let ttsHandlerBound = false;
+
     function setupTts(entry) {
+        ttsEntry = entry;
         const btn = document.getElementById('tts-btn');
-        const label = btn.querySelector('.tts-label');
+
         if (!('speechSynthesis' in window)) {
             btn.disabled = true;
             btn.classList.add('opacity-50', 'cursor-not-allowed');
             return;
         }
 
-        let utterance = null;
+        // Switching devotionals (nav or language change) while speech is
+        // active would otherwise keep reading the old entry's text.
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            btn.classList.remove('speaking');
+            btn.querySelector('.tts-label').textContent = UI_TEXT[LANGUAGE].listen;
+        }
+
+        if (ttsHandlerBound) return;
+        ttsHandlerBound = true;
 
         btn.addEventListener('click', () => {
+            const label = btn.querySelector('.tts-label');
             const t = UI_TEXT[LANGUAGE];
             if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
@@ -397,8 +421,7 @@
                 return;
             }
 
-            const text = buildTtsText(entry);
-            utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(buildTtsText(ttsEntry));
             utterance.lang = t.ttsLang;
             utterance.onend = () => {
                 btn.classList.remove('speaking');
@@ -423,6 +446,7 @@
         document.getElementById('reading-options-label').textContent = t.readingOptions;
         document.getElementById('para-meditar-label').textContent = t.paraMeditar;
         document.getElementById('temas-label').textContent = t.temas;
+        document.getElementById('versiculo-label').textContent = t.versiculo;
         document.getElementById('reflexion-label').textContent = t.reflexion;
         document.getElementById('oracion-label').textContent = t.oracion;
         document.getElementById('comparte-label').textContent = t.comparte;
@@ -433,10 +457,6 @@
         const { ref, texto } = splitVersiculo(entry.versiculo || '');
 
         applyStaticUiText();
-
-        // Clear any previously-inserted verse-quote node from a prior render.
-        const existingQuote = document.getElementById('devotional-verse-quote');
-        if (existingQuote) existingQuote.remove();
 
         document.getElementById('hero-image').src = heroImageForDate(dateKey);
         document.getElementById('hero-image').alt = ref;
@@ -451,15 +471,7 @@
 
         document.getElementById('devotional-reflexion').textContent = entry.reflexion || '';
         document.getElementById('devotional-oracion').textContent = entry.oracion || '';
-
-        if (texto) {
-            const versiculoNode = document.createElement('p');
-            versiculoNode.id = 'devotional-verse-quote';
-            versiculoNode.className = 'italic mb-4';
-            versiculoNode.style.color = 'var(--text-muted)';
-            versiculoNode.textContent = `"${texto}"`;
-            document.getElementById('devotional-reflexion').before(versiculoNode);
-        }
+        document.getElementById('devotional-verse-quote').textContent = texto ? `"${texto}"` : '';
 
         renderAccordion(entry.para_meditar);
         renderTags(entry.tags);
