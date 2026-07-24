@@ -22,7 +22,7 @@
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
 
     function resolveLanguage() {
-        return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'es');
+        return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'en');
     }
 
     let LANGUAGE = resolveLanguage();
@@ -403,6 +403,12 @@
         document.getElementById('oracion-label').textContent = DevotionalI18n.t('devotionals.oracion', '');
         document.getElementById('comparte-label').textContent = DevotionalI18n.t('devotionals.comparte', '');
         document.querySelector('.tts-label').textContent = DevotionalI18n.t('devotionals.listen', '');
+        document.getElementById('app-banner-message').textContent = DevotionalI18n.t('devotionals.appBannerText', '');
+        document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
+        document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
+        if (localStorage.getItem('appBannerDismissed') !== '1') {
+            document.getElementById('app-banner').classList.remove('hidden');
+        }
     }
 
     function render(entry, dateKey) {
@@ -503,7 +509,7 @@
         // language-selector (i18n.js) reports a change. Progress/position in
         // the archive is unaffected — only the content language changes.
         window.addEventListener('languageChanged', (ev) => {
-            const next = SUPPORTED_LANGUAGES.includes(ev.detail?.language) ? ev.detail.language : 'es';
+            const next = SUPPORTED_LANGUAGES.includes(ev.detail?.language) ? ev.detail.language : 'en';
             if (next === LANGUAGE) return;
             LANGUAGE = next;
             document.getElementById('loading-state').classList.remove('hidden');

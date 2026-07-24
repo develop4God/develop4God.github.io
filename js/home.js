@@ -2,7 +2,7 @@
 (function() {
   'use strict';
 
-  const DEFAULT_LANGUAGE = 'es';
+  const DEFAULT_LANGUAGE = 'en';
   const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh', 'ja', 'hi'];
   const STORAGE_KEY = 'develop4God_language';
 

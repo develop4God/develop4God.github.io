@@ -4,7 +4,7 @@
 
 class I18n {
     constructor() {
-        this.currentLang = 'es'; // Default language
+        this.currentLang = 'en'; // Default language
         this.translations = {};
         this.supportedLanguages = {
             'es': { name: 'Español', flag: '🇪🇸' },
@@ -81,15 +81,15 @@ class I18n {
                 if (res.ok) current = await res.json();
             } catch (e) { /* ignore */ }
 
-            // Load Spanish fallback
-            let es = null;
+            // Load English fallback
+            let en = null;
             try {
-                const resEs = await fetch(`${basePath}/es.json`, { cache: 'no-store' });
-                if (resEs.ok) es = await resEs.json();
+                const resEn = await fetch(`${basePath}/en.json`, { cache: 'no-store' });
+                if (resEn.ok) en = await resEn.json();
             } catch (e) { /* ignore */ }
 
             if (current) this.deepMerge(this.translations, current);
-            if (lang !== 'es' && es) this.deepMergeMissing(this.translations, es);
+            if (lang !== 'en' && en) this.deepMergeMissing(this.translations, en);
         } catch (e) {
             console.warn('External page translations not available:', e);
         }
