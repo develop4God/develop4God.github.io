@@ -91,14 +91,7 @@
     };
 
     function resolveLanguage() {
-        // Prefer the shared i18n instance if it's initialized; fall back to the
-        // same detection order it uses (?lang= then localStorage) so this works
-        // even before i18n.js finishes loading.
-        const candidate =
-            window.i18n?.currentLang ||
-            new URLSearchParams(window.location.search).get('lang') ||
-            (() => { try { return localStorage.getItem('preferred-language'); } catch { return null; } })();
-        return SUPPORTED_LANGUAGES.includes(candidate) ? candidate : 'es';
+        return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'es');
     }
 
     let LANGUAGE = resolveLanguage();
@@ -551,6 +544,13 @@
     }
 
     async function init() {
+        // Wait for the shared i18n instance to finish its async init() (which
+        // resolves ?lang=/localStorage/browser-language into currentLang)
+        // before resolving LANGUAGE — otherwise LANGUAGE would be stuck at
+        // the pre-init default from module-load time.
+        await new Promise((resolve) => DevotionalI18n.whenReady(resolve));
+        LANGUAGE = resolveLanguage();
+
         const requestedDate = new URL(window.location.href).searchParams.get('date');
         const dateKey = requestedDate || await resolveDefaultDate();
         await loadDate(dateKey, { pushHistory: false });
