@@ -69,3 +69,60 @@ test.describe('devocionales reader mobile reading order', () => {
     expect(Math.abs(meditarBox.y - versiculoBox.y)).toBeLessThan(20); // same row
   });
 });
+
+test.describe('devocionales reader share feature', () => {
+  // Issue #12: replaced hardcoded Facebook/X-only share links (no social
+  // presence to point them at) with navigator.share() + a mailto fallback.
+
+  test('mailto fallback link includes the verse text and page URL', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const mailHref = await page.locator('#share-mail').getAttribute('href');
+    const pageUrl = page.url();
+    expect(mailHref).toMatch(/^mailto:\?subject=/);
+    expect(mailHref).toContain(encodeURIComponent(pageUrl));
+  });
+
+  test('native share button calls navigator.share with current entry data when supported', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__shareCalls = [];
+      Object.defineProperty(navigator, 'share', {
+        value: (data) => {
+          window.__shareCalls.push(data);
+          return Promise.resolve();
+        },
+        configurable: true,
+      });
+    });
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const nativeBtn = page.locator('#share-native');
+    await expect(nativeBtn).toBeVisible();
+    await nativeBtn.click();
+
+    const calls = await page.evaluate(() => window.__shareCalls);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].url).toBe(page.url());
+    expect(calls[0].text.length).toBeGreaterThan(0);
+
+    // Clicking again after this should still fire exactly once more — not
+    // stack additional listeners across the module-level shareHandlerBound
+    // guard (regression coverage for the setupTts stacked-listener bug
+    // class, applied here to renderShareLinks).
+    await nativeBtn.click();
+    const callsAfterSecondClick = await page.evaluate(() => window.__shareCalls);
+    expect(callsAfterSecondClick).toHaveLength(2);
+  });
+
+  test('native share button is hidden when navigator.share is unsupported', async ({ page }) => {
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    });
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#share-native')).toBeHidden();
+    await expect(page.locator('#share-mail')).toBeVisible();
+  });
+});

@@ -286,13 +286,36 @@
         list.innerHTML = tags.map(t => `<span class="tag-pill">${t}</span>`).join('');
     }
 
+    // Same stacked-listener pitfall as setupTts (see above): renderShareLinks
+    // runs on every entry render (nav/language change), so the native-share
+    // click handler is bound once and reads current share data from this
+    // module-level variable instead of being re-attached per render.
+    let shareData = null;
+    let shareHandlerBound = false;
+
     function renderShareLinks(entry) {
         const url = window.location.href;
         const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
-        const text = encodeURIComponent(`${eyebrow}: ${entry.versiculo}`);
-        document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-        document.getElementById('share-x').href = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
-        document.getElementById('share-mail').href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
+        const shareText = `${eyebrow}: ${entry.versiculo}`;
+        shareData = { title: eyebrow, text: shareText, url };
+
+        const text = encodeURIComponent(shareText);
+        const mailBtn = document.getElementById('share-mail');
+        mailBtn.href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
+        mailBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareMailAria', ''));
+
+        const nativeBtn = document.getElementById('share-native');
+        nativeBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareAria', ''));
+        if (!navigator.share) {
+            nativeBtn.classList.add('hidden');
+            return;
+        }
+
+        if (shareHandlerBound) return;
+        shareHandlerBound = true;
+        nativeBtn.addEventListener('click', () => {
+            navigator.share(shareData).catch(() => {});
+        });
     }
 
     function setupFontSizeToggle() {
