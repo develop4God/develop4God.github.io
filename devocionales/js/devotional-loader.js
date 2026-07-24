@@ -420,10 +420,11 @@
         document.getElementById('hero-image').alt = ref;
 
         document.getElementById('devotional-verse-ref').textContent = ref;
-        // The label always shows the visitor's real calendar date — it reads as
-        // "today's devotional" regardless of which archive entry is displayed.
+        // The label shows the calendar date of the entry actually being
+        // displayed, so it updates as the visitor navigates prev/next —
+        // purely visual, doesn't affect which entry loads.
         document.getElementById('devotional-date').textContent =
-            new Date(todayKey() + 'T00:00:00').toLocaleDateString(LOCALE_TAGS[LANGUAGE], { year: 'numeric', month: 'long', day: 'numeric' });
+            new Date(dateKey + 'T00:00:00').toLocaleDateString(LOCALE_TAGS[LANGUAGE], { year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('devotional-date').setAttribute('datetime', dateKey);
 
         document.getElementById('devotional-reflexion').textContent = entry.reflexion || '';
