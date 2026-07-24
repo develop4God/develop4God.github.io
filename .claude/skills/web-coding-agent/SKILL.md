@@ -1,6 +1,6 @@
 ---
 name: web-coding-agent
-description: Day-to-day coding agent execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, implementing any feature, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test), CDP-based headless-Chrome runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "make this change", "fix this bug", "add this feature", or hands you any delegation block targeting this repo.
+description: Day-to-day coding agent execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, implementing any feature, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test), Playwright-based browser runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "make this change", "fix this bug", "add this feature", or hands you any delegation block targeting this repo.
 ---
 
 # Web Coding Agent — Execution Rules
@@ -70,9 +70,9 @@ Run these in order after every change, before reporting done.
 ### Define Success Criteria First
 
 Transform the task into a verifiable goal before starting:
-- `"Fix the bug"` → `"Write/update a test that reproduces it, make it pass, verify in headless Chrome"`
-- `"Add a feature"` → `"Add the UI, wire i18n for all languages, verify DOM state + zero console errors in headless Chrome"`
-- `"Refactor X"` → `"node --test passes before and after, headless Chrome shows identical output before and after"`
+- `"Fix the bug"` → `"Write/update a test that reproduces it, make it pass, verify with Playwright"`
+- `"Add a feature"` → `"Add the UI, wire i18n for all languages, verify DOM state + zero console errors via Playwright"`
+- `"Refactor X"` → `"node --test passes before and after, Playwright spec shows identical output before and after"`
 
 ### Gate 1 — Syntax check every edited `.js` file
 ```bash
@@ -101,7 +101,7 @@ Then from the repo root:
 - ESLint `no-constant-condition` on `while (true)` in `devotional-loader.js` (`findEarliestDate`/`findLatestDate`) — intentional bounded-by-`break` fallback walkers.
 - ESLint `no-control-regex` in `bible-text-formatter.js`'s `sanitizeInput` — the regex's whole purpose is stripping control characters.
 - ESLint `no-undef` (`require`, `global`, `__dirname`) in `*.test.js` files — Node CommonJS globals, correct usage, `.eslintrc.json`'s `env` doesn't include `node`.
-- html-validate `attribute-allowed-values`/`empty-heading`/`wcag/h30` on `devocionales/index.html`'s `hero-image src=""`, `devotional-verse-ref` empty `<h1>`, `app-banner-cta` empty anchor text — all intentionally empty in markup, populated by `devotional-loader.js` immediately after page load. Verify this in headless Chrome before assuming it's a real bug.
+- html-validate `attribute-allowed-values`/`empty-heading`/`wcag/h30` on `devocionales/index.html`'s `hero-image src=""`, `devotional-verse-ref` empty `<h1>`, `app-banner-cta` empty anchor text — all intentionally empty in markup, populated by `devotional-loader.js` immediately after page load. Verify this with a Playwright check before assuming it's a real bug.
 - html-validate `no-redundant-for` on the theme-toggle `<label for="theme-toggle">` wrapping its own `<input>` — harmless, `for` is redundant but not wrong.
 
 **Real findings to actually fix** (examples from this repo's history — the pattern to look for): missing `type="button"` on buttons inside pages with no `<form>` (silent-submit risk if a form is ever added later), icon-only links with `title` but no `aria-label` (screen readers don't reliably announce `title`), genuine duplicate CSS selectors, genuinely unused variables that aren't part of a documented public API.
@@ -115,23 +115,29 @@ node --test
 ```
 (Run from repo root — **not** `node --test devocionales/js/`, that does not work as a directory argument on this Node version, confirmed the hard way.) Currently covers `bible-text-formatter.js` (12 tests, all 10 languages, pure functions, no DOM). Zero tolerance for failures. If your change touches `bible-text-formatter.js`, update or add tests in `bible-text-formatter.test.js` — every language, every branch you touched.
 
-### Gate 4 — Headless Chrome runtime verification (CDP)
+### Gate 4 — Browser runtime verification (Playwright)
 
 **This is not optional for anything touching HTML/JS behavior.** `node --check` and lint catch syntax and style; neither catches "the page renders a blank screen" or "the button doesn't do anything" — both have happened in this repo's history and passed every static check.
 
-Pattern (Node 22 has a built-in `WebSocket`, no puppeteer needed or wanted):
+Uses [Playwright](https://playwright.dev), the standard tool for this job — not hand-rolled CDP/WebSocket calls (an earlier version of this gate did that; it was replaced because stray Chrome processes from prior rounds kept colliding on debug ports, and the protocol code had to be re-derived each session instead of being a real, versioned test). Playwright is **not a repo dependency** — install to a scratch dir once per machine/session, same convention as eslint/stylelint/html-validate:
+
 ```bash
-python3 -m http.server <PORT> --bind 127.0.0.1 &
-google-chrome --headless --disable-gpu --no-sandbox \
-  --remote-debugging-port=<PORT2> --remote-allow-origins=* about:blank &
+mkdir -p /tmp/pw-tools && cd /tmp/pw-tools
+npm install --no-save playwright @playwright/test
+npx playwright install chromium
 ```
-Then a small Node script: `PUT http://127.0.0.1:<PORT2>/json/new?about:blank` to get a `webSocketDebuggerUrl`, open a `WebSocket` to it, send `Runtime.enable`, `Network.setCacheDisabled`, `Page.navigate`, then `Runtime.evaluate` (`returnByValue: true`) to read back DOM/JS state. Listen for `Runtime.exceptionThrown` — that's your console-error signal. For visual checks, add `Emulation.setDeviceMetricsOverride` + `Page.captureScreenshot`.
 
-**Always `pkill -f "http.server <PORT>"` and `pkill -f "remote-debugging-port=<PORT2>"` after each round.** Stray background instances from earlier rounds cause port-already-bound confusion — this has wasted real time this session.
+Real, versioned test specs live in `e2e/*.spec.js` (see `e2e/README.md`). Run them from the repo root:
+```bash
+/tmp/pw-tools/node_modules/.bin/playwright test -c e2e/
+```
+The config's `webServer` block starts/stops the local server for you — no manual process juggling, no port-collision cleanup.
 
-Minimum bar for "verified": zero `Runtime.exceptionThrown` events, and the specific DOM state you changed actually reflects the change (don't just check "page loaded" — check the actual value/text/attribute you touched).
+**If your change touches a page covered by an existing spec** (currently `e2e/devocionales-reader.spec.js` — all 10 languages, TTS button click, prev/next nav) — run it and it must pass. **If your change adds new interactive behavior** (a new button, a new nav flow, a new page) — add a spec or extend an existing one; don't just eyeball it once and move on. Assert on real state: text that should have changed, an element that should be visible, `consoleErrors` empty — not just "the page returned 200."
 
-**Responsive check**, when the change touches layout: `Emulation.setDeviceMetricsOverride` at phone (375×667, 390×844) and tablet (768×1024, 1024×768) widths; `document.body.scrollWidth > window.innerWidth` is a fast overflow signal before eyeballing a screenshot.
+Minimum bar for "verified": zero console/page errors, and the specific state you changed actually reflects the change.
+
+**Responsive check**, when the change touches layout: `page.setViewportSize({ width, height })` at phone (375×667, 390×844) and tablet (768×1024, 1024×768) widths; `page.evaluate(() => document.body.scrollWidth > window.innerWidth)` is a fast overflow signal before `page.screenshot()`.
 
 **Regression discipline:** for anything shared (CSS files loaded by multiple pages, i18n default-language changes, localStorage key changes), verify **every page that loads the shared file**, not just the one you meant to change. Compare output before/after — `git stash` the change, capture baseline state, `git stash pop`, compare.
 
@@ -146,7 +152,7 @@ Checklist for any UI copy change:
 2. Is it read via `DevotionalI18n.t('devotionals.key', fallback)` (devocionales) or `window.i18n.t('key')` / `data-i18n` attribute (root/habitus) — never a literal string in the HTML or JS?
 3. If you added a key to `es.json`, did you add it to the other 9 (or 6)? `for f in devocionales/lang/*.json; do python3 -c "import json; d=json.load(open('$f')); print('$f', d['devotionals'].get('yourNewKey'))"; done` — every line should show a real value, not `None`.
 4. Did you validate every JSON file parses? `for f in devocionales/lang/*.json; do python3 -c "import json; json.load(open('$f'))" || echo "$f FAILED"; done`
-5. Verify in headless Chrome with at least 2 languages (e.g. `?lang=en` and `?lang=es`), not just the default.
+5. Verify with Playwright across at least 2 languages (e.g. `?lang=en` and `?lang=es`), not just the default.
 
 ---
 
@@ -181,7 +187,7 @@ There's no DI container or class hierarchy here — SOLID applies loosely, but t
 - node --check: ✅ clean / ❌ [file:line]
 - eslint/stylelint/html-validate: ✅ no new findings / ⚠️ [N findings — real vs. known-false-positive breakdown]
 - node --test: ✅ [N] passed / ❌ [N failed]
-- Headless Chrome verification: ✅ [what was checked, zero console errors] / ❌ [issue]
+- Playwright verification: ✅ [what was checked, zero console errors] / ❌ [issue]
 - Responsive check (if layout touched): ✅ no overflow at phone/tablet / ❌ [issue]
 
 🌍 i18n Check (if UI copy touched)
@@ -208,7 +214,7 @@ None
 | Rule | Consequence of violation |
 |---|---|
 | `node --check` not run on every edited `.js` | Do not report done |
-| Headless Chrome verification skipped for HTML/JS behavior changes | Do not report done — static checks alone have missed real breakage twice in this repo's history |
+| Playwright verification skipped for HTML/JS behavior changes | Do not report done — static checks alone have missed real breakage twice in this repo's history |
 | i18n copy added to only some language files | Hard block — fix before done |
 | `node --test` has failures | Do not report done — fix or explicitly flag as pre-existing |
 | New npm dependency added without asking | Hard block — this repo has zero dependencies by design |
