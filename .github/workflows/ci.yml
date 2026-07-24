@@ -37,9 +37,8 @@ jobs:
           retention-days: 7
 
   lint:
-    name: Lint + broken links (non-blocking)
+    name: Lint (blocking)
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -62,13 +61,20 @@ jobs:
         # real source directories explicitly instead of a recursive glob,
         # so generated artifacts (e.g. e2e/playwright-report/) are never
         # scanned in the first place.
-        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html" || echo "⚠️ HTML validation completed with warnings"
+        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html"
 
       - name: Validate CSS
-        run: stylelint "**/*.css" --allow-empty-input || echo "⚠️ CSS validation completed with warnings"
+        run: stylelint "**/*.css" --allow-empty-input
 
       - name: Validate JavaScript
-        run: eslint "**/*.js" --ignore-pattern "node_modules/" || echo "⚠️ JS validation completed with warnings"
+        run: eslint "**/*.js" --ignore-pattern "node_modules/"
+
+  broken-links:
+    name: Broken links (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Check for broken links
         uses: lycheeverse/lychee-action@v2

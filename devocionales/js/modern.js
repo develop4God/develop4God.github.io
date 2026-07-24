@@ -217,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Performance optimization: Debounce scroll events
+// eslint-disable-next-line no-unused-vars
 const debounce = (func, wait) => {
     let timeout;
     return function executedFunction(...args) {

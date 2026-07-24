@@ -116,6 +116,7 @@
 
         let fileYear = devotionalFileYear(new Date());
         let earliest = null;
+        // eslint-disable-next-line no-constant-condition -- bounded by break on fetch failure
         while (true) {
             try {
                 const fileData = await loadYearFile(fileYear);
@@ -141,6 +142,7 @@
 
         let fileYear = devotionalFileYear(new Date());
         let latest = null;
+        // eslint-disable-next-line no-constant-condition -- bounded by break on fetch failure
         while (true) {
             try {
                 const fileData = await loadYearFile(fileYear);

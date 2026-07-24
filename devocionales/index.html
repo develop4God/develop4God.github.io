@@ -315,6 +315,8 @@
             </nav>
             <div class="flex items-center gap-3">
                 <div id="language-selector"></div>
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
                 <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
                     <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
                     <input type="checkbox" id="theme-toggle">
@@ -332,6 +334,8 @@
             <i data-lucide="smartphone" class="w-4 h-4 flex-shrink-0"></i>
             <span class="app-banner-text">
                 <span id="app-banner-message"></span>
+                <!-- text set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next wcag/h30] -->
                 <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="app-banner-cta" id="app-banner-cta"></a>
             </span>
             <button type="button" id="app-banner-close" class="app-banner-close" aria-label="Cerrar">
@@ -362,11 +366,15 @@
             </div>
 
             <div class="hero-devotional mb-2">
+                <!-- src set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next attribute-allowed-values] -->
                 <img id="hero-image" src="" alt="">
             </div>
 
             <div class="text-center max-w-2xl mx-auto mb-6">
                 <div id="eyebrow-label" class="eyebrow mb-2">Devocional Diario</div>
+                <!-- text set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next empty-heading] -->
                 <h1 id="devotional-verse-ref" class="text-3xl sm:text-4xl font-extrabold mb-3" style="color: var(--text);"></h1>
 
                 <div class="flex items-center justify-center gap-3">
@@ -461,6 +469,8 @@
 
     <div id="salvation-prayer-modal" class="salvation-modal-overlay hidden">
         <div class="salvation-modal" role="dialog" aria-modal="true" aria-labelledby="salvation-modal-title">
+            <!-- text set by devotional-loader.js after page load -->
+            <!-- [html-validate-disable-next empty-heading] -->
             <h2 id="salvation-modal-title" class="salvation-modal-title"></h2>
             <div class="salvation-modal-body">
                 <p id="salvation-modal-intro"></p>
@@ -471,6 +481,8 @@
                 <input type="checkbox" id="salvation-modal-dont-show">
                 <span id="salvation-modal-already-prayed"></span>
             </label>
+            <!-- text set by devotional-loader.js after page load -->
+            <!-- [html-validate-disable-next text-content] -->
             <button type="button" id="salvation-modal-continue" class="btn-primary salvation-modal-continue"></button>
         </div>
     </div>

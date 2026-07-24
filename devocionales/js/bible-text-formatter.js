@@ -55,6 +55,7 @@
     function sanitizeInput(input) {
         if (!input) return input;
         let out = input.replace(/�/g, '');
+        // eslint-disable-next-line no-control-regex -- intentional: stripping control characters from TTS input
         out = out.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '');
         out = out.replace(/[①-⓿]/g, '');
         out = out.replace(/\s+/g, ' ').trim();
@@ -226,6 +227,7 @@
         });
     }
 
+    // eslint-disable-next-line no-unused-vars -- kept for call-site symmetry with future version-aware formatting
     function normalizeTtsText(text, language, version) {
         let normalized = sanitizeInput(text);
 
