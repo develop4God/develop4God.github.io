@@ -336,27 +336,27 @@
                         <span id="download-app-label">Descarga la App</span>
                     </a>
                 </div>
+
+                <div class="mt-6 flex flex-col items-center gap-2">
+                    <div id="reading-options-label" class="eyebrow">Opciones de Lectura</div>
+                    <div class="text-size-toggle flex items-center gap-1 text-lg">
+                        <input type="radio" id="font_normal" name="fontsize" value="" checked>
+                        <label for="font_normal">A</label>
+                        <input type="radio" id="font_large" name="fontsize" value="size-large">
+                        <label for="font_large" style="font-size:1.2em">A</label>
+                        <input type="radio" id="font_larger" name="fontsize" value="size-larger">
+                        <label for="font_larger" style="font-size:1.4em">A</label>
+                    </div>
+                </div>
             </div>
 
             <div class="md:grid md:grid-cols-12 md:gap-8 js--font-sizing" id="font-scope">
 
-                <!-- Sidebar: reading options + para meditar accordion -->
+                <!-- Sidebar: para meditar accordion -->
                 <aside class="md:col-span-4 lg:col-span-3 mb-8 md:mb-0">
                     <div class="sidebar-sticky space-y-6">
 
-                        <div class="pb-6" style="border-bottom: 1px solid var(--border);">
-                            <div id="reading-options-label" class="eyebrow mb-3">Opciones de Lectura</div>
-                            <div class="text-size-toggle flex items-center gap-1 text-lg">
-                                <input type="radio" id="font_normal" name="fontsize" value="" checked>
-                                <label for="font_normal">A</label>
-                                <input type="radio" id="font_large" name="fontsize" value="size-large">
-                                <label for="font_large" style="font-size:1.2em">A</label>
-                                <input type="radio" id="font_larger" name="fontsize" value="size-larger">
-                                <label for="font_larger" style="font-size:1.4em">A</label>
-                            </div>
-                        </div>
-
-                        <div class="pt-2">
+                        <div>
                             <div id="para-meditar-label" class="eyebrow mb-2">Para Meditar</div>
                             <div id="meditar-accordion"></div>
                         </div>
