@@ -150,24 +150,26 @@
     border-radius: 0.5rem;
 }
 
-/* Dark theme compatibility (if implemented later) */
-@media (prefers-color-scheme: dark) {
-    .language-dropdown {
-        background-color: #1f2937;
-        border-color: #374151;
-        color: #f9fafb;
-    }
-    
-    .language-option {
-        color: #f9fafb;
-    }
-    
-    .language-option:hover {
-        background-color: #374151 !important;
-    }
-    
-    .language-option[aria-selected="true"] {
-        background-color: #4c1d95 !important;
-        color: #a78bfa !important;
-    }
+/* Dark theme compatibility: follows the page's own [data-theme="dark"]
+   toggle (via CSS custom properties) instead of the OS/browser
+   preference, so the dropdown always matches whatever theme is
+   actually showing. Pages without these custom properties defined
+   (e.g. admin.html) simply keep the default light styling above. */
+:root[data-theme="dark"] .language-dropdown {
+    background-color: var(--surface, #1f2937);
+    border-color: var(--border, #374151);
+    color: var(--text, #f9fafb);
+}
+
+:root[data-theme="dark"] .language-option {
+    color: var(--text, #f9fafb);
+}
+
+:root[data-theme="dark"] .language-option:hover {
+    background-color: var(--accent-soft, #374151) !important;
+}
+
+:root[data-theme="dark"] .language-option[aria-selected="true"] {
+    background-color: var(--accent-soft, #4c1d95) !important;
+    color: var(--accent, #a78bfa) !important;
 }
