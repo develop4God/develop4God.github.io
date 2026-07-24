@@ -12,93 +12,17 @@
         en: 'NIV',
         pt: 'ARC',
         fr: 'LSG1910',
+        ja: '新改訳2003',
+        zh: '和合本1919',
+        hi: 'HIOV',
+        de: 'LU17',
+        ar: 'NAV',
+        fil: 'MBB05',
     };
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
 
-    const UI_TEXT = {
-        es: {
-            docTitle: 'Devocional de Hoy - Devocionales Cristianos',
-            errorLoad: 'No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.',
-            backLink: '← Devocionales',
-            eyebrow: 'Devocional Diario',
-            listen: 'Escuchar',
-            stop: 'Escuchar (detener)',
-            downloadApp: 'Descarga la App',
-            readingOptions: 'Opciones de Lectura',
-            paraMeditar: 'Para Meditar',
-            temas: 'Temas',
-            versiculo: 'Versículo',
-            reflexion: 'Reflexión',
-            oracion: 'Oración',
-            comparte: 'Comparte:',
-            heroCredit: 'Fotografía de paisaje',
-            ttsLang: 'es-ES',
-        },
-        en: {
-            docTitle: "Today's Devotional - Christian Devotionals",
-            errorLoad: "We couldn't load today's devotional. Please try again later.",
-            backLink: '← Devotionals',
-            eyebrow: 'Daily Devotional',
-            listen: 'Listen',
-            stop: 'Listen (stop)',
-            downloadApp: 'Download the App',
-            readingOptions: 'Reading Options',
-            paraMeditar: 'To Meditate On',
-            temas: 'Topics',
-            versiculo: 'Verse',
-            reflexion: 'Reflection',
-            oracion: 'Prayer',
-            comparte: 'Share:',
-            heroCredit: 'Landscape photo',
-            ttsLang: 'en-US',
-        },
-        pt: {
-            docTitle: 'Devocional de Hoje - Devocionais Cristãos',
-            errorLoad: 'Não foi possível carregar o devocional de hoje. Tente novamente mais tarde.',
-            backLink: '← Devocionais',
-            eyebrow: 'Devocional Diário',
-            listen: 'Ouvir',
-            stop: 'Ouvir (parar)',
-            downloadApp: 'Baixar o App',
-            readingOptions: 'Opções de Leitura',
-            paraMeditar: 'Para Meditar',
-            temas: 'Temas',
-            versiculo: 'Versículo',
-            reflexion: 'Reflexão',
-            oracion: 'Oração',
-            comparte: 'Compartilhar:',
-            heroCredit: 'Foto de paisagem',
-            ttsLang: 'pt-BR',
-        },
-        fr: {
-            docTitle: 'Méditation du Jour - Méditations Chrétiennes',
-            errorLoad: "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
-            backLink: '← Méditations',
-            eyebrow: 'Méditation Quotidienne',
-            listen: 'Écouter',
-            stop: 'Écouter (arrêter)',
-            downloadApp: "Télécharger l'App",
-            readingOptions: 'Options de Lecture',
-            paraMeditar: 'À Méditer',
-            temas: 'Thèmes',
-            versiculo: 'Verset',
-            reflexion: 'Réflexion',
-            oracion: 'Prière',
-            comparte: 'Partager :',
-            heroCredit: 'Photo de paysage',
-            ttsLang: 'fr-FR',
-        },
-    };
-
     function resolveLanguage() {
-        // Prefer the shared i18n instance if it's initialized; fall back to the
-        // same detection order it uses (?lang= then localStorage) so this works
-        // even before i18n.js finishes loading.
-        const candidate =
-            window.i18n?.currentLang ||
-            new URLSearchParams(window.location.search).get('lang') ||
-            (() => { try { return localStorage.getItem('preferred-language'); } catch { return null; } })();
-        return SUPPORTED_LANGUAGES.includes(candidate) ? candidate : 'es';
+        return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'es');
     }
 
     let LANGUAGE = resolveLanguage();
@@ -131,7 +55,9 @@
     function devotionalJsonUrl(fileYear) {
         const base = `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/Devocional_year_${fileYear}`;
         if (LANGUAGE === 'es') return `${base}.json`;
-        return `${base}_${LANGUAGE}_${LANGUAGE_VERSIONS[LANGUAGE]}.json`;
+        // encodeURIComponent covers version codes with non-ASCII characters
+        // (e.g. Japanese/Chinese) safely; it's a no-op for ASCII codes.
+        return `${base}_${LANGUAGE}_${encodeURIComponent(LANGUAGE_VERSIONS[LANGUAGE])}.json`;
     }
 
     // Cache of loaded year-files, keyed by "lang:fileYear" since the same
@@ -313,7 +239,8 @@
     function showError() {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
-        document.getElementById('error-state').querySelector('p').textContent = UI_TEXT[LANGUAGE].errorLoad;
+        document.getElementById('error-state').querySelector('p').textContent =
+            DevotionalI18n.t('devotionals.errorLoad', '');
     }
 
     function splitVersiculo(raw) {
@@ -361,10 +288,11 @@
 
     function renderShareLinks(entry) {
         const url = window.location.href;
-        const text = encodeURIComponent(`${UI_TEXT[LANGUAGE].eyebrow}: ${entry.versiculo}`);
+        const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
+        const text = encodeURIComponent(`${eyebrow}: ${entry.versiculo}`);
         document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         document.getElementById('share-x').href = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
-        document.getElementById('share-mail').href = `mailto:?subject=${encodeURIComponent(UI_TEXT[LANGUAGE].eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
+        document.getElementById('share-mail').href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
     }
 
     function setupFontSizeToggle() {
@@ -383,19 +311,22 @@
     // from the Flutter app's DevocionalTtsTextBuilder/BibleTextFormatter —
     // see bible-text-formatter.js.
     function buildTtsText(entry) {
-        const t = UI_TEXT[LANGUAGE];
+        const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
+        const reflexion = DevotionalI18n.t('devotionals.reflexion', '');
+        const paraMeditar = DevotionalI18n.t('devotionals.paraMeditar', '');
+        const oracion = DevotionalI18n.t('devotionals.oracion', '');
         const norm = (s) => BibleTextFormatter.normalizeTtsText(s || '', LANGUAGE, entry.version);
         const parts = [
-            `${t.eyebrow}: ${norm(entry.versiculo)}`,
-            `${t.reflexion}: ${norm(entry.reflexion)}`,
+            `${eyebrow}: ${norm(entry.versiculo)}`,
+            `${reflexion}: ${norm(entry.reflexion)}`,
         ];
         if (entry.para_meditar && entry.para_meditar.length) {
             const meditar = entry.para_meditar
                 .map((m) => `${norm(m.cita)}: ${m.texto}`)
                 .join('\n');
-            parts.push(`${t.paraMeditar}: ${meditar}`);
+            parts.push(`${paraMeditar}: ${meditar}`);
         }
-        parts.push(`${t.oracion}: ${norm(entry.oracion)}`);
+        parts.push(`${oracion}: ${norm(entry.oracion)}`);
         return parts.join('\n');
     }
 
@@ -424,7 +355,7 @@
         if (speechSynthesis.speaking) {
             speechSynthesis.cancel();
             btn.classList.remove('speaking');
-            btn.querySelector('.tts-label').textContent = UI_TEXT[LANGUAGE].listen;
+            btn.querySelector('.tts-label').textContent = DevotionalI18n.t('devotionals.listen', '');
         }
 
         if (ttsHandlerBound) return;
@@ -432,44 +363,46 @@
 
         btn.addEventListener('click', () => {
             const label = btn.querySelector('.tts-label');
-            const t = UI_TEXT[LANGUAGE];
+            const listen = DevotionalI18n.t('devotionals.listen', '');
             if (speechSynthesis.speaking) {
                 speechSynthesis.cancel();
                 btn.classList.remove('speaking');
-                label.textContent = t.listen;
+                label.textContent = listen;
                 return;
             }
 
             const utterance = new SpeechSynthesisUtterance(buildTtsText(ttsEntry));
-            utterance.lang = t.ttsLang;
+            utterance.lang = DevotionalI18n.t('devotionals.ttsLang', LOCALE_TAGS[LANGUAGE] || '');
             utterance.onend = () => {
                 btn.classList.remove('speaking');
-                label.textContent = t.listen;
+                label.textContent = listen;
             };
             speechSynthesis.speak(utterance);
             btn.classList.add('speaking');
-            label.textContent = t.stop;
+            label.textContent = DevotionalI18n.t('devotionals.stop', '');
         });
     }
 
     // Only wire click handlers once; render() is called on every navigation.
     let navHandlersBound = false;
 
-    const LOCALE_TAGS = { es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR' };
+    const LOCALE_TAGS = {
+        es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR',
+        ja: 'ja-JP', zh: 'zh-CN', hi: 'hi-IN', de: 'de-DE', ar: 'ar-SA', fil: 'fil-PH',
+    };
 
     function applyStaticUiText() {
-        const t = UI_TEXT[LANGUAGE];
-        document.getElementById('back-link').textContent = t.backLink;
-        document.getElementById('eyebrow-label').textContent = t.eyebrow;
-        document.getElementById('download-app-label').textContent = t.downloadApp;
-        document.getElementById('reading-options-label').textContent = t.readingOptions;
-        document.getElementById('para-meditar-label').textContent = t.paraMeditar;
-        document.getElementById('temas-label').textContent = t.temas;
-        document.getElementById('versiculo-label').textContent = t.versiculo;
-        document.getElementById('reflexion-label').textContent = t.reflexion;
-        document.getElementById('oracion-label').textContent = t.oracion;
-        document.getElementById('comparte-label').textContent = t.comparte;
-        document.querySelector('.tts-label').textContent = t.listen;
+        document.getElementById('back-link').textContent = DevotionalI18n.t('devotionals.backLink', '');
+        document.getElementById('eyebrow-label').textContent = DevotionalI18n.t('devotionals.eyebrow', '');
+        document.getElementById('download-app-label').textContent = DevotionalI18n.t('devotionals.downloadApp', '');
+        document.getElementById('reading-options-label').textContent = DevotionalI18n.t('devotionals.readingOptions', '');
+        document.getElementById('para-meditar-label').textContent = DevotionalI18n.t('devotionals.paraMeditar', '');
+        document.getElementById('temas-label').textContent = DevotionalI18n.t('devotionals.temas', '');
+        document.getElementById('versiculo-label').textContent = DevotionalI18n.t('devotionals.versiculo', '');
+        document.getElementById('reflexion-label').textContent = DevotionalI18n.t('devotionals.reflexion', '');
+        document.getElementById('oracion-label').textContent = DevotionalI18n.t('devotionals.oracion', '');
+        document.getElementById('comparte-label').textContent = DevotionalI18n.t('devotionals.comparte', '');
+        document.querySelector('.tts-label').textContent = DevotionalI18n.t('devotionals.listen', '');
     }
 
     function render(entry, dateKey) {
@@ -550,6 +483,13 @@
     }
 
     async function init() {
+        // Wait for the shared i18n instance to finish its async init() (which
+        // resolves ?lang=/localStorage/browser-language into currentLang)
+        // before resolving LANGUAGE — otherwise LANGUAGE would be stuck at
+        // the pre-init default from module-load time.
+        await new Promise((resolve) => DevotionalI18n.whenReady(resolve));
+        LANGUAGE = resolveLanguage();
+
         const requestedDate = new URL(window.location.href).searchParams.get('date');
         const dateKey = requestedDate || await resolveDefaultDate();
         await loadDate(dateKey, { pushHistory: false });

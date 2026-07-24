@@ -11,7 +11,12 @@ class I18n {
             'en': { name: 'English', flag: '🇺🇸' },
             'fr': { name: 'Français', flag: '🇫🇷' },
             'pt': { name: 'Português', flag: '🇧🇷' },
-            'hi': { name: 'हिन्दी', flag: '🇮🇳' }
+            'hi': { name: 'हिन्दी', flag: '🇮🇳' },
+            'ja': { name: '日本語', flag: '🇯🇵' },
+            'zh': { name: '中文', flag: '🇨🇳' },
+            'de': { name: 'Deutsch', flag: '🇩🇪' },
+            'ar': { name: 'العربية', flag: '🇸🇦' },
+            'fil': { name: 'Filipino', flag: '🇵🇭' }
         };
         
         // All translations embedded directly
