@@ -107,7 +107,7 @@ class I18n {
 
             // Try to get saved preference (fallback to memory if localStorage fails)
             try {
-                const savedLang = localStorage.getItem('preferred-language');
+                const savedLang = localStorage.getItem('develop4God_language');
                 if (savedLang && this.supportedLanguages[savedLang]) {
                     this.currentLang = savedLang;
                     return;
@@ -492,7 +492,7 @@ class I18n {
 
         // Save preference (fallback to memory if localStorage fails)
         try {
-            localStorage.setItem('preferred-language', lang);
+            localStorage.setItem('develop4God_language', lang);
         } catch (e) {
             console.warn('Could not save language preference to localStorage');
         }
