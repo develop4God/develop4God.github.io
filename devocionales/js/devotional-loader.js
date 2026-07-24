@@ -420,10 +420,12 @@
         document.getElementById('hero-image').alt = ref;
 
         document.getElementById('devotional-verse-ref').textContent = ref;
-        // The label always shows the visitor's real calendar date — it reads as
-        // "today's devotional" regardless of which archive entry is displayed.
+        // The label shows a visual day counter: today, shifted by however many
+        // prev/next taps the visitor has made this session — independent of
+        // which archive entry's content is actually displayed (dateKey).
+        const displayDateKey = addDays(todayKey(), displayDateOffset);
         document.getElementById('devotional-date').textContent =
-            new Date(todayKey() + 'T00:00:00').toLocaleDateString(LOCALE_TAGS[LANGUAGE], { year: 'numeric', month: 'long', day: 'numeric' });
+            new Date(displayDateKey + 'T00:00:00').toLocaleDateString(LOCALE_TAGS[LANGUAGE], { year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('devotional-date').setAttribute('datetime', dateKey);
 
         document.getElementById('devotional-reflexion').textContent = entry.reflexion || '';
@@ -459,6 +461,11 @@
     // the URL only gains a ?date= param once the visitor explicitly navigates.
     let currentDateKey = null;
 
+    // Purely a visual day counter for the displayed date label — starts at
+    // today and moves +/-1 per prev/next tap, independent of which archive
+    // entry's content actually loads (that's tracked by currentDateKey).
+    let displayDateOffset = 0;
+
     async function loadDate(dateKey, { pushHistory } = { pushHistory: true }) {
         try {
             const fileYear = devotionalFileYear(new Date(dateKey + 'T00:00:00'));
@@ -484,8 +491,12 @@
         const current = currentDateKey || todayKey();
         setNavDisabled(true, true);
         const target = await findAdjacentDate(current, direction);
-        if (target) await loadDate(target);
-        else setNavDisabled(false, false);
+        if (target) {
+            displayDateOffset += direction;
+            await loadDate(target);
+        } else {
+            setNavDisabled(false, false);
+        }
     }
 
     async function init() {
