@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Unit + e2e tests (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run node --test
+        run: node --test
+
+      - name: Install Playwright
+        run: |
+          mkdir -p /tmp/pw-tools && cd /tmp/pw-tools
+          npm install --no-save playwright @playwright/test
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright e2e suite
+        run: /tmp/pw-tools/node_modules/.bin/playwright test -c e2e/
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 7
+
+  lint:
+    name: Lint + broken links (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install lint tools
+        run: npm install -g html-validate stylelint stylelint-config-standard eslint
+
+      - name: Validate HTML
+        run: html-validate "**/*.html" --exclude "node_modules/**" || echo "⚠️ HTML validation completed with warnings"
+
+      - name: Validate CSS
+        run: stylelint "**/*.css" --allow-empty-input || echo "⚠️ CSS validation completed with warnings"
+
+      - name: Validate JavaScript
+        run: eslint "**/*.js" --ignore-pattern "node_modules/" || echo "⚠️ JS validation completed with warnings"
+
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --exclude-path node_modules './**/*.html'
+          fail: false
