@@ -12,7 +12,7 @@ module.exports = defineConfig({
   testDir: '.',
   timeout: 15_000,
   fullyParallel: true,
-  reporter: 'list',
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:8791',
     trace: 'retain-on-failure',
