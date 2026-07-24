@@ -176,5 +176,37 @@
       "section7_text": "If you have any questions about this Privacy Policy or wish to request the deletion of your data, please do not hesitate to contact us at: develop4God@gmail.com.",
       "backToHome": "Back to home page"
     }
+  },
+  "devotionals": {
+    "docTitle": "Today's Devotional - Christian Devotionals",
+    "errorLoad": "We couldn't load today's devotional. Please try again later.",
+    "backLink": "← Home",
+    "eyebrow": "Daily Devotional",
+    "listen": "Listen",
+    "stop": "Listen (stop)",
+    "downloadApp": "Download the App",
+    "readingOptions": "Reading Options",
+    "paraMeditar": "To Meditate On",
+    "temas": "Topics",
+    "versiculo": "Verse",
+    "reflexion": "Reflection",
+    "oracion": "Prayer",
+    "comparte": "Share:",
+    "shareAria": "Share",
+    "shareMailAria": "Share by email",
+    "ttsLang": "en-US",
+    "appBannerText": "Christian Devotionals — 4.9 ★★★★★ · 10,000+ downloads. Free app, 100% offline.",
+    "appBannerCta": "Get it on Google Play",
+    "appBannerClose": "Close",
+    "navVision": "Our Vision",
+    "navDevotional": "Today's Devotional",
+    "footerTagline": "© 2026 Develop4God. A digital ministry tool.",
+    "salvationPrayerTitle": "Prayer of faith, for eternal life!✨",
+    "salvationPrayerIntro": "Repeat this prayer out loud, with faith and believing with all your heart❤️:",
+    "salvationPrayer": "Jesus Christ, I believe you died on the cross for me, I ask for forgiveness and I sincerely repent for my sins. I ask you to be my Savior and the Lord of my life. Deliver me from eternal death and write my name in the book of life.\nIn the powerful name of Jesus, amen.",
+    "salvationPromise": "If you said this prayer and believe it:\n\nYou and your house will be saved (Acts 16:31)\nYou will live eternally (Jn 11:25-26)\nYou will never thirst again (Jn 4:14)\nYou will be with Christ in heaven (Rev 19:9)\nThere is joy in heaven when a sinner repents (Lk 15:10)\nIt is written and God is faithful (Dt 7:9)\n\nYou now have salvation and new life in Jesus Christ.",
+    "salvationContinue": "Continue",
+    "salvationAlreadyPrayed": "Already prayed 🙏",
+    "salvationDontShowAgain": "Don't show again"
   }
 }

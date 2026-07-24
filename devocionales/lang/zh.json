@@ -176,5 +176,37 @@
       "section7_text": "如对本隐私政策有任何疑问或希望请求删除您的数据，欢迎通过 develop4God@gmail.com 联系我们。",
       "backToHome": "返回首页"
     }
+  },
+  "devotionals": {
+    "docTitle": "今日灵修 - 基督徒灵修",
+    "errorLoad": "无法加载今日灵修内容，请稍后重试。",
+    "backLink": "← 首页",
+    "eyebrow": "每日灵修",
+    "listen": "收听",
+    "stop": "收听（停止）",
+    "downloadApp": "下载应用",
+    "readingOptions": "阅读选项",
+    "paraMeditar": "默想",
+    "temas": "主题",
+    "versiculo": "经文",
+    "reflexion": "默想",
+    "oracion": "祷告",
+    "comparte": "分享：",
+    "shareAria": "分享",
+    "shareMailAria": "通过邮件分享",
+    "ttsLang": "zh-CN",
+    "appBannerText": "基督徒灵修 — 4.9 ★★★★★ · 下载量超过 10,000 次。免费应用，100% 离线可用。",
+    "appBannerCta": "在 Google Play 获取",
+    "appBannerClose": "关闭",
+    "navVision": "我们的异象",
+    "navDevotional": "今日灵修",
+    "footerTagline": "© 2026 Develop4God。数字事工工具。",
+    "salvationPrayerTitle": "信心的祷告，为了永生！✨",
+    "salvationPrayerIntro": "大声重复这个祷告，凭信心并全心相信❤️：",
+    "salvationPrayer": "主耶稣基督，我相信你为我死在十字架上，我请求宽恕，并从心里为我的罪悔改。我请求你成为我的救主和生命的主。使我脱离永死，将我的名字写在生命册上。\n奉耶稣大能的名，阿们。",
+    "salvationPromise": "如果您祷告了这个祷告并相信它：\n\n你和你的家都必得救（使徒行传 16:31）\n你将永远活着（约翰福音 11:25-26）\n你将永不再渴（约翰福音 4:14）\n你将与基督在天堂（启录 19:9）\n当一个罪人悔改时，天上有喜乐（路加福音 15:10）\n这是写定的，神是信实的（申命记 7:9）\n\n从现在起，你在耶稣基督里有救恩和新生命。",
+    "salvationContinue": "继续",
+    "salvationAlreadyPrayed": "已经完成 🙏",
+    "salvationDontShowAgain": "不再显示"
   }
 }

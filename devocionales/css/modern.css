@@ -44,13 +44,22 @@
 
 /* Floating animation */
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
 }
 
 .float-animation {
     animation: float 3s ease-in-out infinite;
+    opacity: 1 !important;
 }
 
 /* Modern gradient text - CORREGIDO */
@@ -58,7 +67,6 @@
     /* Color sólido como respaldo */
     color: #374151 !important; 
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -173,7 +181,7 @@
 }
 
 /* Mobile-first responsive design enhancements */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .card-hover:hover {
         transform: translateY(-5px) scale(1.01);
     }
@@ -188,7 +196,7 @@
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-color: #1a1a1a;
-        --text-color: #ffffff;
+        --text-color: #fff;
         --card-bg: #2d2d2d;
     }
 }
@@ -197,8 +205,8 @@
 @media (prefers-contrast: high) {
     .gradient-bg,
     .gradient-purple {
-        background: #000000;
-        color: #ffffff;
+        background: #000;
+        color: #fff;
     }
 }
 
@@ -218,11 +226,28 @@
     }
 }
 
+/* Asegurar contraste en footer */
+footer, footer * {
+    color: white !important;
+}
+
+footer a {
+    color: #d1d5db !important; /* gray-300 */
+}
+
+footer a:hover {
+    color: white !important;
+}
+
 /* Focus states for accessibility */
 button:focus,
-a:focus,
 select:focus,
 input:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+:where(a):focus {
     outline: 2px solid #667eea;
     outline-offset: 2px;
 }
@@ -243,16 +268,10 @@ input:focus {
     top: 0;
 }
 
-/* Asegurar contraste en footer */
-footer, footer * {
-    color: white !important;
-}
-
-footer a {
-    color: #d1d5db !important; /* gray-300 */
-}
-
-footer a:hover {
+/* Forzar color blanco para todos los elementos internos del botón */
+.bg-purple-600 *,
+.bg-purple-600 span,
+.bg-purple-600 i {
     color: white !important;
 }
 
@@ -261,14 +280,9 @@ footer a:hover {
     color: white !important;
 }
 
-/* Corrección específica para elementos con animación float que puedan tener opacity 0 */
-.float-animation {
-    opacity: 1 !important;
-}
-
 /* Corrección para casos específicos de texto blanco sobre fondo blanco - MEJORADA */
 .bg-white p,
-.bg-white span:not(.text-purple-600):not(#features *) {
+.bg-white span:not(.text-purple-600, #features *) {
     color: #374151;
 }
 
@@ -294,11 +308,6 @@ footer a:hover {
 /* 1. CORRECCIÓN: Título "Our Vision" debe ser morado */
 #our-vision h2 {
     color: #7c3aed !important; /* purple-600 equivalent */
-}
-
-/* 2. CORRECCIÓN: TODOS los íconos de funciones deben ser morados */
-#features .text-purple-600 {
-    color: #7c3aed !important; /* Forzar morado para íconos */
 }
 
 /* 3. CORRECCIÓN: TODOS los títulos de funciones deben ser morados */
@@ -329,6 +338,11 @@ footer a:hover {
     color: #7c3aed !important;
 }
 
+/* 2. CORRECCIÓN: TODOS los íconos de funciones deben ser morados */
+#features .text-purple-600 {
+    color: #7c3aed !important; /* Forzar morado para íconos */
+}
+
 /* CORRECCIÓN: Elementos de contacto mantienen color blanco */
 #contact h2,
 #contact p {
@@ -352,13 +366,6 @@ a.bg-purple-600,
 a.bg-purple-600:hover,
 .inline-block.bg-purple-600:hover {
     background-color: #6d28d9 !important; /* purple-700 */
-    color: white !important;
-}
-
-/* Forzar color blanco para todos los elementos internos del botón */
-.bg-purple-600 *,
-.bg-purple-600 span,
-.bg-purple-600 i {
     color: white !important;
 }
 

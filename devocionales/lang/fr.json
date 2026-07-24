@@ -176,5 +176,37 @@
       "section7_text": "Si vous avez des questions sur cette Politique de Confidentialité ou si vous souhaitez demander la suppression de vos données, n'hésitez pas à nous contacter à : develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     }
+  },
+  "devotionals": {
+    "docTitle": "Méditation du Jour - Méditations Chrétiennes",
+    "errorLoad": "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
+    "backLink": "← Accueil",
+    "eyebrow": "Méditation Quotidienne",
+    "listen": "Écouter",
+    "stop": "Écouter (arrêter)",
+    "downloadApp": "Télécharger l'App",
+    "readingOptions": "Options de Lecture",
+    "paraMeditar": "À Méditer",
+    "temas": "Thèmes",
+    "versiculo": "Verset",
+    "reflexion": "Réflexion",
+    "oracion": "Prière",
+    "comparte": "Partager :",
+    "shareAria": "Partager",
+    "shareMailAria": "Partager par e-mail",
+    "ttsLang": "fr-FR",
+    "appBannerText": "Méditations Chrétiennes — 4.9 ★★★★★ · Plus de 10 000 téléchargements. Application gratuite, 100 % hors ligne.",
+    "appBannerCta": "Disponible sur Google Play",
+    "appBannerClose": "Fermer",
+    "navVision": "Notre Vision",
+    "navDevotional": "Méditation du Jour",
+    "footerTagline": "© 2026 Develop4God. Un outil ministériel numérique.",
+    "salvationPrayerTitle": "Prière de foi, pour la vie éternelle !✨",
+    "salvationPrayerIntro": "Répétez cette prière à haute voix, avec foi et en croyant de tout votre cœur❤️ :",
+    "salvationPrayer": "Jésus-Christ, je crois que tu es mort sur la croix pour moi, je te demande pardon et je me repens de tout mon cœur pour mes péchés. Je te demande d'être mon Sauveur et le Seigneur de ma vie. Délivre-moi de la mort éternelle et écris mon nom dans le livre de la vie.\nDans le nom puissant de Jésus, amen.",
+    "salvationPromise": "Si vous avez fait cette prière et que vous y croyez :\n\nVous et votre maison serez sauvés (Actes 16:31)\nVous vivrez éternellement (Jn 11:25-26)\nVous n'aurez plus jamais soif (Jn 4:14)\nVous serez avec Christ au ciel (Apoc 19:9)\nIl y a de la joie au ciel lorsqu'un pécheur se repent (Luc 15:10)\nC'est écrit et Dieu est fidèle (Dt 7:9)\n\nDès maintenant, vous avez le salut et une vie nouvelle en Jésus-Christ.",
+    "salvationContinue": "Continuer",
+    "salvationAlreadyPrayed": "Déjà fait 🙏",
+    "salvationDontShowAgain": "Ne plus afficher"
   }
 }
