@@ -126,3 +126,49 @@ test.describe('devocionales reader share feature', () => {
     await expect(page.locator('#share-mail')).toBeVisible();
   });
 });
+
+test.describe('devocionales reader salvation prayer modal', () => {
+  // Web equivalent of the Flutter app's SalvationPrayerDialog: shown after
+  // advancing to a new devotional via "next", unless previously dismissed
+  // with "don't show again" (persisted in localStorage).
+
+  test('appears after clicking next, with translated content, and can be dismissed', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const modal = page.locator('#salvation-prayer-modal');
+    await expect(modal).toBeHidden();
+
+    await page.click('#nav-next');
+    await expect(modal).toBeVisible();
+    await expect(page.locator('#salvation-modal-title')).not.toHaveText('');
+    await expect(page.locator('#salvation-modal-prayer')).not.toHaveText('');
+    await expect(page.locator('#salvation-modal-continue')).not.toHaveText('');
+
+    await page.click('#salvation-modal-continue');
+    await expect(modal).toBeHidden();
+  });
+
+  test('does not appear on prev navigation', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    await page.click('#nav-prev');
+    await page.waitForTimeout(300);
+    await expect(page.locator('#salvation-prayer-modal')).toBeHidden();
+  });
+
+  test('"don\'t show again" persists across subsequent next clicks', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const modal = page.locator('#salvation-prayer-modal');
+    await page.click('#nav-next');
+    await expect(modal).toBeVisible();
+
+    await page.check('#salvation-modal-dont-show');
+    await page.click('#salvation-modal-continue');
+    await expect(modal).toBeHidden();
+
+    await page.click('#nav-next');
+    await page.waitForTimeout(300);
+    await expect(modal).toBeHidden();
+  });
+});

@@ -200,6 +200,13 @@
     "appBannerClose": "Cerrar",
     "navVision": "Nuestra Visión",
     "navDevotional": "Devocional de Hoy",
-    "footerTagline": "© 2026 Develop4God. Herramienta ministerial digital."
+    "footerTagline": "© 2026 Develop4God. Herramienta ministerial digital.",
+    "salvationPrayerTitle": "¡Oración de fe, para vida eterna!✨",
+    "salvationPrayerIntro": "Repite esta oración en voz alta, con fe y creyendo con todo el corazón❤️:",
+    "salvationPrayer": "Jesucristo, creo que moriste en la cruz por mi, te pido perdón y me arrepiento de corazón por mis pecados. Te pido seas mi Salvador y el señor de vida. Líbrame de la muerte eterna y escribe mi nombre en el libro de la vida.\nEn el poderoso nombre de Jesús, amén.",
+    "salvationPromise": "Si hiciste esta oración y lo crees:\n\nSerás salvo tu y tu casa (Hch 16:31)\nVivirás eternamente (Jn 11:25-26)\nNunca más tendrás sed (Jn 4:14)\nEstarás con Cristo en los cielos (Ap 19:9)\nHay gozo en los cielos cuando un pecador se arrepiente (Luc 15:10)\nEscrito está y Dios es fiel (Dt 7:9)\n\nDesde ya tienes salvación y vida nueva en Jesucristo.",
+    "salvationContinue": "Continuar",
+    "salvationAlreadyPrayed": "Ya la hice 🙏",
+    "salvationDontShowAgain": "No mostrar nuevamente"
   }
 }

@@ -35,6 +35,7 @@ class I18n {
 
         // Update HTML lang attribute
         document.documentElement.lang = this.currentLang;
+        document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
     }
 
     // Deep merge helper (source overwrites target values)
@@ -505,6 +506,7 @@ class I18n {
 
         // Update HTML lang attribute
         document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
         // Update URL if needed (for SEO)
         if (history.replaceState) {
