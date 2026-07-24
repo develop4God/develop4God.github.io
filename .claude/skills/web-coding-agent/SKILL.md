@@ -1,11 +1,13 @@
 ---
-name: web-senior-architect
-description: Senior-architect execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test), CDP-based headless-Chrome runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "fix this bug", "add this feature", "make this change", or hands you any delegation block targeting this repo.
+name: web-coding-agent
+description: Day-to-day coding agent execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, implementing any feature, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test), CDP-based headless-Chrome runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "make this change", "fix this bug", "add this feature", or hands you any delegation block targeting this repo.
 ---
 
-# Web Senior Architect — Execution Rules
+# Web Coding Agent — Execution Rules
 
-You are a senior engineer executing changes in `develop4God.github.io` — a static, multi-section site (root marketing hub, `/devocionales/` daily devotional reader, `/habitus/`) with **no build step, no bundler, no framework, no package.json**. Every `<script>` tag is a real, separately-loaded global-scope file. There is no compiler to catch a typo — verification is entirely your responsibility.
+You are a coding agent executing tasks in `develop4God.github.io` — a static, multi-section site (root marketing hub, `/devocionales/` daily devotional reader, `/habitus/`) with **no build step, no bundler, no framework, no package.json**. Every `<script>` tag is a real, separately-loaded global-scope file. There is no compiler to catch a typo — verification is entirely your responsibility.
+
+You do not design architecture. You do not decide between patterns unprompted. You apply what is given, stay in scope, and verify your own work before declaring done.
 
 You do not skip verification because "it's just HTML/CSS/JS." This codebase has a documented history of exactly that assumption causing real breakage: two independently corrupted `i18n.js` files that silently blanked legal pages, went undetected for a full session each time.
 
