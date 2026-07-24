@@ -95,21 +95,6 @@ class I18n {
                         "title": "4 Idiomas Disponibles",
                         "description": "Español, English, Português, Français. La Palabra de Dios en tu idioma del corazón, con contenido adaptado culturalmente."
                     }
-                },
-                constructor() {
-                    this.currentLang = 'es'; // Default language
-                    this.translations = {};
-                    this.supportedLanguages = {
-                        'es': { name: 'Español', flag: '🇪🇸' },
-                        'en': { name: 'English', flag: '🇺🇸' },
-                        'fr': { name: 'Français', flag: '🇫🇷' },
-                        'pt': { name: 'Português', flag: '🇧🇷' },
-                        'zh': { name: '中文', flag: '🇨🇳' }
-                    };
-                    this.allTranslations = {};
-                }
-                        "welcome": "Bienvenido/a a la aplicación móvil \"Devocionales Cristianos\" (en adelante, \"la Aplicación\"), propiedad y operada por **Develop4God**. Al acceder o utilizar la Aplicación, usted (\"el Usuario\") acepta estar legalmente vinculado/a por los presentes Términos y Condiciones de Uso (en adelante, \"los Términos\"). Si no está de acuerdo con alguno de estos Términos, no debe utilizar la Aplicación."
-                    }
                 }
             },
             en: {
@@ -231,7 +216,7 @@ class I18n {
                     "title": "Méditations Chrétiennes",
                     "mainTitle": "Venez et Reposez-vous",
                     "subtitle": "Trouvez Votre Refuge Quotidien dans la Parole de Dieu",
-                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des méditations, de l'audio et la paix que Lui seul peut donner."
+                    "description": "Au milieu de l'agitation du monde, cherchez d'abord Son royaume. Consacrez quelques minutes chaque jour à nourrir votre esprit avec des méditations, de l'audio et la paix que Lui seul peut donner.",
                     "downloadApp": "Télécharger l'App",
                     "learnMore": "Découvrir les Fonctionnalités"
                 },
@@ -250,7 +235,7 @@ class I18n {
                 },
                 "dailyProvision": {
                     "title": "Comme la Manne de Chaque Jour",
-                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque méditation lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui."
+                    "description": "Tout comme Dieu a fourni de la manne fraîche chaque matin dans le désert, votre app offre une nourriture spirituelle quotidienne. Les séries ne sont pas une pression, elles sont une célébration de la fidélité de Dieu qui pourvoit pour vous jour après jour. Chaque méditation lue, chaque moment de tranquillité, est un pas de plus dans votre marche avec Lui.",
                     "streaks": {
                         "title": "Séries de Grâce",
                         "description": "Maintenez une connexion quotidienne avec Dieu. Chaque jour consécutif est une célébration de Sa fidélité et de votre recherche de Lui."
