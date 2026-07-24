@@ -257,9 +257,9 @@
         container.innerHTML = '';
         (paraMeditar || []).forEach((item, i) => {
             const wrap = document.createElement('div');
-            wrap.className = 'accordion-item';
+            wrap.className = 'accordion-item open';
             wrap.innerHTML = `
-                <button class="accordion-title" type="button" aria-expanded="false">
+                <button class="accordion-title" type="button" aria-expanded="true">
                     <span>${item.cita}</span>
                     <i data-lucide="chevron-down" class="chev w-4 h-4"></i>
                 </button>
