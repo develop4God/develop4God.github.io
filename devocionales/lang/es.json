@@ -146,8 +146,7 @@
       "section1_list5_title": "Uso de la aplicación:",
       "section1_list5_text": "Recopilamos registros de interacción para comprender cómo los usuarios navegan y utilizan la interfaz de la aplicación.",
       "section1_list5_purpose": "Propósito:",
-      "section1_list5_purpose_text": "Para estadísticas de uso y análisis (Firebase Analytics)."
-      ,
+      "section1_list5_purpose_text": "Para estadísticas de uso y análisis (Firebase Analytics).",
       "section1_list6_title": "Configuración de la aplicación:",
       "section1_list6_text": "Almacenamos las preferencias del usuario relacionadas con las notificaciones (p. ej., si las notificaciones están habilitadas, la hora de notificación preferida, la zona horaria del usuario).",
       "section1_list6_purpose": "Propósito:",
@@ -177,5 +176,23 @@
       "section7_text": "Si tiene alguna pregunta sobre esta Política de Privacidad o desea solicitar la eliminación de sus datos, no dude en contactarnos en: develop4God@gmail.com.",
       "backToHome": "Volver a la página principal"
     }
+  },
+  "devotionals": {
+    "docTitle": "Devocional de Hoy - Devocionales Cristianos",
+    "errorLoad": "No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.",
+    "backLink": "← Devocionales",
+    "eyebrow": "Devocional Diario",
+    "listen": "Escuchar",
+    "stop": "Escuchar (detener)",
+    "downloadApp": "Descarga la App",
+    "readingOptions": "Opciones de Lectura",
+    "paraMeditar": "Para Meditar",
+    "temas": "Temas",
+    "versiculo": "Versículo",
+    "reflexion": "Reflexión",
+    "oracion": "Oración",
+    "comparte": "Comparte:",
+    "heroCredit": "Fotografía de paisaje",
+    "ttsLang": "es-ES"
   }
 }

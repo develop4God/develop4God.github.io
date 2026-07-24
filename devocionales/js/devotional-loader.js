@@ -11,6 +11,7 @@
         es: 'RVR1960',
         en: 'NIV',
         pt: 'ARC',
+        fr: 'LSG1910',
     };
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
 
@@ -68,6 +69,24 @@
             comparte: 'Compartilhar:',
             heroCredit: 'Foto de paisagem',
             ttsLang: 'pt-BR',
+        },
+        fr: {
+            docTitle: 'Méditation du Jour - Méditations Chrétiennes',
+            errorLoad: "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
+            backLink: '← Méditations',
+            eyebrow: 'Méditation Quotidienne',
+            listen: 'Écouter',
+            stop: 'Écouter (arrêter)',
+            downloadApp: "Télécharger l'App",
+            readingOptions: 'Options de Lecture',
+            paraMeditar: 'À Méditer',
+            temas: 'Thèmes',
+            versiculo: 'Verset',
+            reflexion: 'Réflexion',
+            oracion: 'Prière',
+            comparte: 'Partager :',
+            heroCredit: 'Photo de paysage',
+            ttsLang: 'fr-FR',
         },
     };
 
@@ -436,7 +455,7 @@
     // Only wire click handlers once; render() is called on every navigation.
     let navHandlersBound = false;
 
-    const LOCALE_TAGS = { es: 'es-ES', en: 'en-US', pt: 'pt-BR' };
+    const LOCALE_TAGS = { es: 'es-ES', en: 'en-US', pt: 'pt-BR', fr: 'fr-FR' };
 
     function applyStaticUiText() {
         const t = UI_TEXT[LANGUAGE];

@@ -2,9 +2,9 @@
  * Bible text formatting utilities for TTS.
  *
  * Ported from devocional_nuevo/lib/services/tts/bible_text_formatter.dart —
- * keep both in sync when fixing verse-reading bugs. Scoped to es/en/pt to
+ * keep both in sync when fixing verse-reading bugs. Scoped to es/en/pt/fr to
  * match this site's current supported languages (the Dart source also
- * covers fr/de/ja/zh/hi/ar/fil).
+ * covers de/ja/zh/hi/ar/fil).
  */
 (function (global) {
     'use strict';
@@ -30,6 +30,10 @@
         pt: {
             regex: /(?:^|\s)([123])\s+([A-Za-záéíóúâêîôûãõç]+)/gi,
             ordinals: { 1: 'Primeiro', 2: 'Segundo', 3: 'Terceiro' },
+        },
+        fr: {
+            regex: /(?:^|\s)([123])\s+([A-Za-zéèêëàâäùûüôîïç]+)/gi,
+            ordinals: { 1: 'Premier', 2: 'Deuxième', 3: 'Troisième' },
         },
     };
 

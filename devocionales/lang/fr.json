@@ -176,5 +176,23 @@
       "section7_text": "Si vous avez des questions sur cette Politique de Confidentialité ou si vous souhaitez demander la suppression de vos données, n'hésitez pas à nous contacter à : develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     }
+  },
+  "devotionals": {
+    "docTitle": "Méditation du Jour - Méditations Chrétiennes",
+    "errorLoad": "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
+    "backLink": "← Méditations",
+    "eyebrow": "Méditation Quotidienne",
+    "listen": "Écouter",
+    "stop": "Écouter (arrêter)",
+    "downloadApp": "Télécharger l'App",
+    "readingOptions": "Options de Lecture",
+    "paraMeditar": "À Méditer",
+    "temas": "Thèmes",
+    "versiculo": "Verset",
+    "reflexion": "Réflexion",
+    "oracion": "Prière",
+    "comparte": "Partager :",
+    "heroCredit": "Photo de paysage",
+    "ttsLang": "fr-FR"
   }
 }

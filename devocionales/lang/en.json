@@ -176,5 +176,23 @@
       "section7_text": "If you have any questions about this Privacy Policy or wish to request the deletion of your data, please do not hesitate to contact us at: develop4God@gmail.com.",
       "backToHome": "Back to home page"
     }
+  },
+  "devotionals": {
+    "docTitle": "Today's Devotional - Christian Devotionals",
+    "errorLoad": "We couldn't load today's devotional. Please try again later.",
+    "backLink": "← Devotionals",
+    "eyebrow": "Daily Devotional",
+    "listen": "Listen",
+    "stop": "Listen (stop)",
+    "downloadApp": "Download the App",
+    "readingOptions": "Reading Options",
+    "paraMeditar": "To Meditate On",
+    "temas": "Topics",
+    "versiculo": "Verse",
+    "reflexion": "Reflection",
+    "oracion": "Prayer",
+    "comparte": "Share:",
+    "heroCredit": "Landscape photo",
+    "ttsLang": "en-US"
   }
 }
