@@ -355,34 +355,41 @@
                 </div>
             </div>
 
+            <!--
+              4 explicit grid items (not 2) so mobile reading order can be
+              set independently of desktop's sidebar/article visual split:
+              mobile order (via order-N, source order below is irrelevant
+              once md: grid is active): verse+reflexion, para-meditar,
+              oracion, temas. Desktop keeps its existing column placement
+              via md:col-span/lg:col-start (order-* has no effect once an
+              explicit grid-column/row isn't set, and Tailwind's default
+              `order` utilities only apply where `order` is unset on the
+              wider breakpoints below, so desktop position is unchanged).
+            -->
             <div class="md:grid md:grid-cols-12 md:gap-8 js--font-sizing" id="font-scope">
 
-                <!-- Sidebar: para meditar accordion -->
-                <aside class="md:col-span-4 lg:col-span-3 mb-8 md:mb-0">
-                    <div class="sidebar-sticky space-y-6">
-
-                        <div>
-                            <div id="para-meditar-label" class="eyebrow mb-2">Para Meditar</div>
-                            <div id="meditar-accordion"></div>
-                        </div>
-
-                        <div id="tags-wrap">
-                            <div id="temas-label" class="eyebrow mb-2">Temas</div>
-                            <div id="tags-list"></div>
-                        </div>
-
-                    </div>
-                </aside>
-
-                <!-- Main article body -->
-                <div class="md:col-span-8 lg:col-start-5">
+                <!-- Verse + Reflexión -->
+                <div class="order-1 md:order-none md:col-span-8 lg:col-start-5">
                     <div class="prose max-w-none">
                         <div id="versiculo-label" class="eyebrow mb-2">Versículo</div>
                         <p id="devotional-verse-quote" class="italic mb-6 pl-4" style="color: var(--text); border-left: 2px solid var(--accent);"></p>
 
                         <h2 id="reflexion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Reflexión</h2>
                         <p id="devotional-reflexion" class="whitespace-pre-line mb-8" style="color: var(--text-muted);"></p>
+                    </div>
+                </div>
 
+                <!-- Para Meditar: mobile order-2 (between reflexión and oración), desktop sidebar -->
+                <aside class="order-2 md:order-none md:col-span-4 lg:col-span-3 md:row-start-1 mb-8 md:mb-0">
+                    <div class="sidebar-sticky">
+                        <div id="para-meditar-label" class="eyebrow mb-2">Para Meditar</div>
+                        <div id="meditar-accordion"></div>
+                    </div>
+                </aside>
+
+                <!-- Oración + share row -->
+                <div class="order-3 md:order-none md:col-span-8 lg:col-start-5">
+                    <div class="prose max-w-none">
                         <h2 id="oracion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Oración</h2>
                         <p id="devotional-oracion" class="whitespace-pre-line italic pl-4 mb-8" style="color: var(--text-muted); border-left: 2px solid var(--accent);"></p>
                     </div>
@@ -394,6 +401,12 @@
                         <a id="share-x" href="#" target="_blank" aria-label="Compartir en X" style="color: var(--text-muted);"><i data-lucide="at-sign" class="w-5 h-5"></i></a>
                         <a id="share-mail" href="#" aria-label="Compartir por correo" style="color: var(--text-muted);"><i data-lucide="mail" class="w-5 h-5"></i></a>
                     </div>
+                </div>
+
+                <!-- Temas: mobile order-4 (last), desktop sidebar under Para Meditar -->
+                <div id="tags-wrap" class="order-4 md:order-none md:col-span-4 lg:col-span-3 md:row-start-2">
+                    <div id="temas-label" class="eyebrow mb-2">Temas</div>
+                    <div id="tags-list"></div>
                 </div>
             </div>
         </article>
