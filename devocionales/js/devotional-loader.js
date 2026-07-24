@@ -286,8 +286,10 @@
         document.getElementById('hero-credit').textContent = 'Fotografía de paisaje';
 
         document.getElementById('devotional-verse-ref').textContent = ref;
+        // The label always shows the visitor's real calendar date — it reads as
+        // "today's devotional" regardless of which archive entry is displayed.
         document.getElementById('devotional-date').textContent =
-            new Date(dateKey + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+            new Date(todayKey() + 'T00:00:00').toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('devotional-date').setAttribute('datetime', dateKey);
 
         document.getElementById('devotional-reflexion').textContent = entry.reflexion || '';
