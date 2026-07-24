@@ -21,13 +21,13 @@
 
     <style>
         :root {
-            --bg: #faf7f2;
+            --bg: #f5f2fb;
             --surface: #ffffff;
-            --text: #16150f;
-            --text-muted: #5c5a52;
-            --border: #e3ddd0;
-            --accent: #0f5c56;
-            --accent-soft: #e4efed;
+            --text: #1c1730;
+            --text-muted: #6b6280;
+            --border: #ded4ef;
+            --accent: #6d4aa8;
+            --accent-soft: #ece5f7;
             --highlight: #a8461c;
         }
         :root[data-theme="dark"] {
@@ -65,12 +65,41 @@
         .site-nav a:hover { color: var(--text); }
         .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
 
-        .theme-toggle {
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            background: var(--surface);
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
         }
-        .theme-toggle:hover { color: var(--text); }
+        .theme-switch input { display: none; }
+        .theme-switch .theme-switch-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-muted);
+            transition: color .15s ease;
+        }
+        .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+        .theme-switch-track {
+            position: relative;
+            width: 2.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: var(--border);
+            transition: background .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+        .theme-switch-dot {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 50%;
+            background: var(--surface);
+            transition: transform .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
 
         /* Neutralize the shared language-selector's hardcoded purple */
         .language-selector-button.bg-purple-700 {
@@ -199,10 +228,14 @@
             </nav>
             <div class="flex items-center gap-3">
                 <div id="language-selector"></div>
-                <button id="theme-toggle" class="theme-toggle w-9 h-9 rounded flex items-center justify-center" aria-label="Cambiar tema" type="button">
-                    <i data-lucide="moon" class="w-4 h-4 theme-icon-dark"></i>
-                    <i data-lucide="sun" class="w-4 h-4 theme-icon-light hidden"></i>
-                </button>
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
             </div>
         </div>
     </header>
@@ -327,8 +360,8 @@
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
-            const iconDark = toggle.querySelector('.theme-icon-dark');
-            const iconLight = toggle.querySelector('.theme-icon-light');
+            const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
+            const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
 
             function currentTheme() {
                 const attr = document.documentElement.getAttribute('data-theme');
@@ -336,20 +369,21 @@
                 return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
             }
 
-            function syncIcon() {
+            function syncSwitch() {
                 const isDark = currentTheme() === 'dark';
-                iconDark.classList.toggle('hidden', isDark);
-                iconLight.classList.toggle('hidden', !isDark);
+                toggle.checked = isDark;
+                iconDark.classList.toggle('is-active', isDark);
+                iconLight.classList.toggle('is-active', !isDark);
             }
 
-            toggle.addEventListener('click', () => {
-                const next = currentTheme() === 'dark' ? 'light' : 'dark';
+            toggle.addEventListener('change', () => {
+                const next = toggle.checked ? 'dark' : 'light';
                 document.documentElement.setAttribute('data-theme', next);
                 localStorage.setItem('theme', next);
-                syncIcon();
+                syncSwitch();
             });
 
-            syncIcon();
+            syncSwitch();
         })();
     </script>
 </body>
