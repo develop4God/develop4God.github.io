@@ -208,3 +208,38 @@ test.describe('devocionales reader Bible version picker', () => {
     await expect(page.locator('#version-select')).toHaveValue('NIV');
   });
 });
+
+test.describe('devocionales reader Bible version copyright notice', () => {
+  // Legally-required per-version attribution, ported from devocional_nuevo's
+  // copyright_utils.dart. Always visible (not tap-to-expand), placed after
+  // the prayer/share section, must update live when the version changes.
+
+  test('shows the current version\'s full name and copyright text', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const notice = page.locator('#version-copyright');
+    await expect(notice).toContainText('RVR1960');
+    await expect(notice).toContainText('Reina Valera 1960');
+    await expect(notice).toContainText('Sociedades Bíblicas');
+  });
+
+  test('updates when the version selection changes', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const notice = page.locator('#version-copyright');
+    await expect(notice).toContainText('RVR1960');
+
+    await page.locator('#version-select').selectOption('NVI');
+    await expect(notice).toContainText('NVI');
+    await expect(notice).toContainText('Nueva Versión Internacional');
+    await expect(notice).not.toContainText('RVR1960');
+  });
+
+  test('is localized (label text) per language', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-copyright')).toContainText('Bible version:');
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-copyright')).toContainText('Versión bíblica:');
+  });
+});
