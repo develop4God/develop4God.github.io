@@ -388,6 +388,34 @@ test.describe('devocionales reader hero image (Devocionales-assets manifest)', (
     await expect(h1).not.toHaveText('');
     expect(appErrors).toEqual([]);
   });
+
+  test('recovers on a later render after the manifest fetch fails once, instead of staying broken all page-load long', async ({ page }) => {
+    // Regression coverage for the poisoned-promise-cache bug: previously
+    // loadDevotionalImagesIndex() cached a *rejected* promise, so once the
+    // manifest fetch failed, the hero image stayed empty for every
+    // subsequent render on that page load too — the only fix was a hard
+    // reload. Abort persistently through fetchWithRetry's internal retries
+    // for the first load, then let the network through before navigating,
+    // and confirm the hero image actually recovers without a reload.
+    await page.route('**/images/devotionals/index.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toHaveJSProperty('naturalWidth', 0);
+
+    await page.unroute('**/images/devotionals/index.json');
+    await page.locator('#nav-next').click();
+
+    const salvationModal = page.locator('#salvation-prayer-modal');
+    if (await salvationModal.isVisible()) {
+      await page.locator('#salvation-modal-continue').click();
+    }
+
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidth = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidth).toBeGreaterThan(0);
+  });
 });
 
 test.describe('devocionales reader fetch retry gate', () => {
