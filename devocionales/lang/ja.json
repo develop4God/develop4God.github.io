@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "今日のデボーション - クリスチャン・デボーション",
     "errorLoad": "今日のデボーションを読み込めませんでした。後でもう一度お試しください。",
+    "errorRetry": "再試行",
     "backLink": "← ホーム",
     "eyebrow": "毎日のデボーション",
     "listen": "聴く",

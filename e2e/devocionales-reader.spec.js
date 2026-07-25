@@ -380,3 +380,80 @@ test.describe('devocionales reader hero image (Devocionales-assets manifest)', (
     expect(appErrors).toEqual([]);
   });
 });
+
+test.describe('devocionales reader fetch retry gate', () => {
+  // Covers the stale-cached-failure bug: a transient fetch failure used to
+  // leave the reader stuck on the error state with no way to recover short
+  // of a hard reload — real users only escaped via incognito/clear-cache.
+  // Deterministic via page.route() interception (abort every year-file
+  // request), not real network timing, so this isn't flaky in CI.
+
+  test('shows the error state with a working retry button when the year-file fetch fails, and recovers once the network is restored', async ({ page }) => {
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const errorState = page.locator('#error-state');
+    await expect(errorState).toBeVisible();
+    const retryBtn = page.locator('#error-retry');
+    await expect(retryBtn).toBeVisible();
+    await expect(retryBtn).not.toHaveText('');
+
+    // Restore the network, then use the retry button — not a page reload —
+    // to prove the in-page recovery path itself works, matching what a
+    // real visitor does without refreshing.
+    await page.unroute('**/Devocionales-json/**/Devocional_year_*.json');
+    await retryBtn.click();
+
+    await expect(errorState).toBeHidden();
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+
+  test('logs a devotional_load_failed gtag event when the load fails', async ({ page }) => {
+    // Block the real gtag.js network script so it can't overwrite the
+    // page's own `function gtag(){dataLayer.push(arguments)}` declaration —
+    // that inline function is what DevotionalErrorLogger actually calls,
+    // so asserting on dataLayer's contents is deterministic and needs no
+    // stubbing of window.gtag itself (which the page redefines on load).
+    await page.route('https://www.googletagmanager.com/gtag/js*', (route) => route.abort());
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#error-state')).toBeVisible();
+
+    const dataLayer = await page.evaluate(() => window.dataLayer);
+    const errorEvent = dataLayer.find((entry) => entry[0] === 'event' && entry[1] === 'devotional_load_failed');
+    expect(errorEvent).toBeDefined();
+    expect(errorEvent[2]).toMatchObject({ error_type: expect.any(String) });
+  });
+
+  test('retries transient failures automatically before surfacing the error state', async ({ page }) => {
+    // First request to each year-file URL fails, subsequent ones succeed —
+    // exercises DevotionalFetch.fetchWithRetry's internal retry without
+    // ever reaching the visible error UI.
+    const seenUrls = new Set();
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => {
+      const url = route.request().url();
+      if (!seenUrls.has(url)) {
+        seenUrls.add(url);
+        return route.abort();
+      }
+      return route.continue();
+    });
+
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#error-state')).toBeHidden();
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+});

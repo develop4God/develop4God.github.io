@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Heutige Andacht - Christliche Andachten",
     "errorLoad": "Wir konnten die heutige Andacht nicht laden. Bitte versuchen Sie es später erneut.",
+    "errorRetry": "Erneut versuchen",
     "backLink": "← Startseite",
     "eyebrow": "Tägliche Andacht",
     "listen": "Anhören",

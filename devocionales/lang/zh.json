@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "今日灵修 - 基督徒灵修",
     "errorLoad": "无法加载今日灵修内容，请稍后重试。",
+    "errorRetry": "重试",
     "backLink": "← 首页",
     "eyebrow": "每日灵修",
     "listen": "收听",

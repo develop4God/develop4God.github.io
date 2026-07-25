@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devocional de Hoy - Devocionales Cristianos</title>
@@ -395,6 +404,9 @@
         <!-- Error state -->
         <div id="error-state" class="hidden text-center py-16">
             <p style="color: var(--text-muted);">No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.</p>
+            <!-- [html-validate-disable-next text-content] -->
+            <!-- text set by devotional-loader.js's showError() after page load -->
+            <button id="error-retry" type="button" class="btn-secondary mt-4"></button>
         </div>
 
         <!-- Content -->
@@ -550,6 +562,8 @@
     <script src="/devocionales/js/bible-text-formatter.js"></script>
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
     <script src="/devocionales/js/devotional-share.js"></script>
+    <script src="/devocionales/js/devotional-fetch.js"></script>
+    <script src="/devocionales/js/devotional-error-logger.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script>
         lucide.createIcons();

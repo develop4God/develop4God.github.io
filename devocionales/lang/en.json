@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Today's Devotional - Christian Devotionals",
     "errorLoad": "We couldn't load today's devotional. Please try again later.",
+    "errorRetry": "Try again",
     "backLink": "← Home",
     "eyebrow": "Daily Devotional",
     "listen": "Listen",

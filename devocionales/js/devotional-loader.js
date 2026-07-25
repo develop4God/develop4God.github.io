@@ -106,9 +106,16 @@
 
     async function loadDevotionalImagesIndex() {
         if (!devotionalImagesIndexPromise) {
-            devotionalImagesIndexPromise = fetch(
+            // Cache only resolves to a value, never to a rejection — a
+            // transient failure would otherwise poison this promise for the
+            // rest of the page's life, with no way to recover without a
+            // full reload.
+            devotionalImagesIndexPromise = DevotionalFetch.fetchWithRetry(
                 'https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/index.json'
-            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => {
+                devotionalImagesIndexPromise = null;
+                return null;
+            });
         }
         return devotionalImagesIndexPromise;
     }
@@ -146,7 +153,7 @@
     async function loadYearFile(fileYear) {
         const cacheKey = `${LANGUAGE}:${VERSION}:${fileYear}`;
         if (loadedFiles.has(cacheKey)) return loadedFiles.get(cacheKey);
-        const res = await fetch(devotionalJsonUrl(fileYear));
+        const res = await DevotionalFetch.fetchWithRetry(devotionalJsonUrl(fileYear));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const dates = json?.data?.[LANGUAGE] || {};
@@ -167,9 +174,15 @@
 
     async function loadRepoIndex() {
         if (!repoIndexPromise) {
-            repoIndexPromise = fetch(
+            // See loadDevotionalImagesIndex above — cache only a resolved
+            // value, never a rejection, so a transient failure can be
+            // retried instead of sticking for the page's lifetime.
+            repoIndexPromise = DevotionalFetch.fetchWithRetry(
                 `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/index.json`
-            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => {
+                repoIndexPromise = null;
+                return null;
+            });
         }
         return repoIndexPromise;
     }
@@ -332,11 +345,14 @@
         return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/${file}`;
     }
 
-    function showError() {
+    function showError(onRetry) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
         document.getElementById('error-state').querySelector('p').textContent =
             DevotionalI18n.t('devotionals.errorLoad', '');
+        const retryBtn = document.getElementById('error-retry');
+        retryBtn.textContent = DevotionalI18n.t('devotionals.errorRetry', '');
+        retryBtn.onclick = onRetry;
     }
 
     function splitVersiculo(raw) {
@@ -725,7 +741,8 @@
             }
         } catch (err) {
             console.error('Failed to load devotional:', err);
-            showError();
+            DevotionalErrorLogger.logError('load_date', { message: err.message, date_key: dateKey });
+            showError(() => loadDate(dateKey, { pushHistory: false }));
         }
     }
 
@@ -756,8 +773,19 @@
         VERSION = resolveVersion(LANGUAGE);
 
         const requestedDate = new URL(window.location.href).searchParams.get('date');
-        const dateKey = requestedDate || await resolveDefaultDate();
-        await loadDate(dateKey, { pushHistory: false });
+        try {
+            const dateKey = requestedDate || await resolveDefaultDate();
+            await loadDate(dateKey, { pushHistory: false });
+        } catch (err) {
+            // resolveDefaultDate() (via findEarliestDate/findLatestDate) can
+            // throw straight out of an unguarded loadYearFile() call when
+            // index.json's known years are exhausted by fetch failures —
+            // without this, that leaves the visitor stuck on the loading
+            // skeleton forever, with no error UI and no retry path at all.
+            console.error('Failed to initialize devotional reader:', err);
+            DevotionalErrorLogger.logError('init', { message: err.message });
+            showError(() => init());
+        }
 
         window.addEventListener('popstate', (ev) => {
             const dk = ev.state?.dateKey || todayKey();

@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Méditation du Jour - Méditations Chrétiennes",
     "errorLoad": "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
+    "errorRetry": "Réessayer",
     "backLink": "← Accueil",
     "eyebrow": "Méditation Quotidienne",
     "listen": "Écouter",

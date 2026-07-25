@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Devocional de Hoje - Devocionais Cristãos",
     "errorLoad": "Não foi possível carregar o devocional de hoje. Tente novamente mais tarde.",
+    "errorRetry": "Tentar novamente",
     "backLink": "← Início",
     "eyebrow": "Devocional Diário",
     "listen": "Ouvir",
