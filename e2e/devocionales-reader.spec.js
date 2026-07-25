@@ -86,7 +86,7 @@ test.describe('devocionales reader share feature', () => {
     expect(mailHref).toBe('mailto:develop4God@gmail.com');
   });
 
-  test('native share button calls navigator.share with rich devotional content (verse, reflexión, oración)', async ({ page }) => {
+  test('native share button calls navigator.share with rich devotional content (verse, reflexión, oración, app FOMO footer)', async ({ page }) => {
     await page.addInitScript(() => {
       window.__shareCalls = [];
       Object.defineProperty(navigator, 'share', {
@@ -121,6 +121,14 @@ test.describe('devocionales reader share feature', () => {
     expect(calls[0].text).toContain(oracionText.trim());
     expect(calls[0].text).toContain('Read the full devotional here:');
     expect(calls[0].text).toContain(page.url());
+
+    // FOMO footer, mirroring devocional_nuevo's DevotionalShareHelper —
+    // turns each share into a potential new visitor + app install, not just
+    // a link back to the same page.
+    expect(calls[0].text).toContain('*This is just the beginning...*');
+    expect(calls[0].text).toContain('The complete app includes:');
+    expect(calls[0].text).toContain('*Download: Christian Devotionals*');
+    expect(calls[0].text).toContain('https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo');
 
     // Clicking again after this should still fire exactly once more — not
     // stack additional listeners across the module-level shareHandlerBound

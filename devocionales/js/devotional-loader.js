@@ -415,6 +415,16 @@
             reflexion: DevotionalI18n.t('devotionals.reflexion', ''),
             oracion: DevotionalI18n.t('devotionals.oracion', ''),
             readMore: DevotionalI18n.t('devotionals.shareReadMore', ''),
+            footerTitle: DevotionalI18n.t('devotionals.shareFooterTitle', ''),
+            footerCompleteApp: DevotionalI18n.t('devotionals.shareFooterCompleteApp', ''),
+            footerDailyDevotionals: DevotionalI18n.t('devotionals.shareFooterDailyDevotionals', ''),
+            footerAudioReading: DevotionalI18n.t('devotionals.shareFooterAudioReading', ''),
+            footerBibleStudies: DevotionalI18n.t('devotionals.shareFooterBibleStudies', ''),
+            footerBibleVersions: DevotionalI18n.t('devotionals.shareFooterBibleVersions', ''),
+            footerAndMore: DevotionalI18n.t('devotionals.shareFooterAndMore', ''),
+            footerDownload: DevotionalI18n.t('devotionals.shareFooterDownload', ''),
+            footerBenefits: DevotionalI18n.t('devotionals.shareFooterBenefits', ''),
+            footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
         };
         const shareText = DevotionalShare.buildShareText(entry, labels, url);
         shareData = { title: eyebrow, text: shareText, url };
