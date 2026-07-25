@@ -15,6 +15,11 @@
     "DevotionalFetch": "readonly",
     "DevotionalNav": "readonly",
     "DevotionalErrorLogger": "readonly",
+    "DevotionalProgress": "readonly",
+    "DevotionalVersion": "readonly",
+    "DevotionalTts": "readonly",
+    "DevotionalRenderDom": "readonly",
+    "DevotionalSalvationModal": "readonly",
     "lucide": "readonly"
   },
   "rules": {
