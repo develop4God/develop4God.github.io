@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Today's Devotional - Christian Devotionals",
     "errorLoad": "We couldn't load today's devotional. Please try again later.",
+    "errorRetry": "Try again",
     "backLink": "← Home",
     "eyebrow": "Daily Devotional",
     "listen": "Listen",
@@ -216,6 +217,8 @@
     "appBannerClose": "Close",
     "navVision": "Our Vision",
     "navDevotional": "Today's Devotional",
+    "supportMinistry": "Donate",
+    "supportMinistryTitle": "Support our ministry to bring the app to iOS and cover infrastructure costs.\n\nKeeping it free and ad-free for every user.",
     "footerTagline": "© 2026 Develop4God. A digital ministry tool.",
     "salvationPrayerTitle": "Prayer of faith, for eternal life!✨",
     "salvationPrayerIntro": "Repeat this prayer out loud, with faith and believing with all your heart❤️:",

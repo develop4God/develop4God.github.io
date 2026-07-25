@@ -12,6 +12,9 @@
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",
     "DevotionalShare": "readonly",
+    "DevotionalFetch": "readonly",
+    "DevotionalNav": "readonly",
+    "DevotionalErrorLogger": "readonly",
     "lucide": "readonly"
   },
   "rules": {
