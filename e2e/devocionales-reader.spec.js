@@ -119,8 +119,8 @@ test.describe('devocionales reader share feature', () => {
     expect(calls[0].text).toContain(reflexionText.trim());
     expect(calls[0].text).toContain('Prayer:*');
     expect(calls[0].text).toContain(oracionText.trim());
-    expect(calls[0].text).toContain('Read the full devotional here:');
-    expect(calls[0].text).toContain(page.url());
+    // Page URL isn't duplicated in the text body — navigator.share's own
+    // `url` field (asserted above) already carries it to the share sheet.
 
     // FOMO footer, mirroring devocional_nuevo's DevotionalShareHelper —
     // turns each share into a potential new visitor + app install, not just

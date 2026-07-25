@@ -11,7 +11,7 @@
     // length; mailto: and other targets just render the *asterisks* literally.
     // Labels are passed in (not read from DevotionalI18n directly) so this
     // file stays a pure, dependency-free formatter like bible-text-formatter.js.
-    function buildShareText(entry, labels, url) {
+    function buildShareText(entry, labels) {
         return [
             `📖 *${labels.eyebrow}*`,
             '',
@@ -23,9 +23,6 @@
             '',
             `🕊️ *${labels.oracion}:*`,
             entry.oracion,
-            '',
-            `🔗 ${labels.readMore}:`,
-            url,
             '',
             '━━━━━━━━━━━━━━━━',
             `🔥 *${labels.footerTitle}*`,
