@@ -119,7 +119,8 @@ test.describe('devocionales reader share feature', () => {
     expect(calls[0].text).toContain(reflexionText.trim());
     expect(calls[0].text).toContain('Prayer:*');
     expect(calls[0].text).toContain(oracionText.trim());
-    expect(calls[0].text).toContain('Read more:');
+    expect(calls[0].text).toContain('Read the full devotional here:');
+    expect(calls[0].text).toContain(page.url());
 
     // Clicking again after this should still fire exactly once more — not
     // stack additional listeners across the module-level shareHandlerBound

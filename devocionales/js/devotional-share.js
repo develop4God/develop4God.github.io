@@ -20,7 +20,8 @@
             `🕊️ *${labels.oracion}:*`,
             entry.oracion,
             '',
-            `${labels.readMore}: ${url}`,
+            `🔗 ${labels.readMore}:`,
+            url,
         ].join('\n');
     }
 
