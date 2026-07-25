@@ -559,6 +559,8 @@
         }
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
+        document.getElementById('support-ministry-label').textContent = DevotionalI18n.t('devotionals.supportMinistry', '');
+        document.getElementById('support-ministry-btn').setAttribute('title', DevotionalI18n.t('devotionals.supportMinistryTitle', ''));
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
         document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
