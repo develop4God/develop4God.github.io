@@ -419,10 +419,6 @@
         const shareText = DevotionalShare.buildShareText(entry, labels, url);
         shareData = { title: eyebrow, text: shareText, url };
 
-        const mailBtn = document.getElementById('share-mail');
-        mailBtn.href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${encodeURIComponent(shareText)}`;
-        mailBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareMailAria', ''));
-
         const nativeBtn = document.getElementById('share-native');
         nativeBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareAria', ''));
         if (!navigator.share) {
@@ -554,6 +550,7 @@
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
+        document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
         document.getElementById('version-info-btn').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionInfoAria', ''));
     }

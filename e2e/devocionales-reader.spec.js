@@ -74,17 +74,16 @@ test.describe('devocionales reader share feature', () => {
   // Issue #12: replaced hardcoded Facebook/X-only share links (no social
   // presence to point them at) with navigator.share() + a mailto fallback.
 
-  test('mailto fallback link includes the verse text and page URL exactly once', async ({ page }) => {
+  test('footer contact link is a static contact-us mailto, separate from the share row', async ({ page }) => {
+    // Regression: mail used to live inside the share row and rebuild its body
+    // from the WhatsApp-formatted share text (emoji + *bold* markdown),
+    // producing a corrupted email body. Native share already covers "share
+    // via email" — contact is now a plain footer link, independent of the
+    // current devotional and not part of the per-entry share controls.
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
-    const mailHref = await page.locator('#share-mail').getAttribute('href');
-    const pageUrl = page.url();
-    expect(mailHref).toMatch(/^mailto:\?subject=/);
-    expect(mailHref).toContain(encodeURIComponent(pageUrl));
-    // Regression: body used to append the URL a second time on top of the
-    // (URL-less) share text; now buildShareText already ends with the URL.
-    const encodedUrlOccurrences = mailHref.split(encodeURIComponent(pageUrl)).length - 1;
-    expect(encodedUrlOccurrences).toBe(1);
+    const mailHref = await page.locator('#footer-contact-mail').getAttribute('href');
+    expect(mailHref).toBe('mailto:develop4God@gmail.com');
   });
 
   test('native share button calls navigator.share with rich devotional content (verse, reflexión, oración)', async ({ page }) => {
@@ -139,7 +138,7 @@ test.describe('devocionales reader share feature', () => {
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
     await expect(page.locator('#share-native')).toBeHidden();
-    await expect(page.locator('#share-mail')).toBeVisible();
+    await expect(page.locator('#footer-contact-mail')).toBeVisible();
   });
 });
 
