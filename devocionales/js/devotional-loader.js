@@ -414,6 +414,7 @@
             versiculo: DevotionalI18n.t('devotionals.versiculo', ''),
             reflexion: DevotionalI18n.t('devotionals.reflexion', ''),
             oracion: DevotionalI18n.t('devotionals.oracion', ''),
+            readMore: DevotionalI18n.t('devotionals.shareReadMore', ''),
             footerTitle: DevotionalI18n.t('devotionals.shareFooterTitle', ''),
             footerCompleteApp: DevotionalI18n.t('devotionals.shareFooterCompleteApp', ''),
             footerDailyDevotionals: DevotionalI18n.t('devotionals.shareFooterDailyDevotionals', ''),
@@ -425,7 +426,7 @@
             footerBenefits: DevotionalI18n.t('devotionals.shareFooterBenefits', ''),
             footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
         };
-        const shareText = DevotionalShare.buildShareText(entry, labels);
+        const shareText = DevotionalShare.buildShareText(entry, labels, url);
         shareData = { title: eyebrow, text: shareText, url };
 
         const nativeBtn = document.getElementById('share-native');
