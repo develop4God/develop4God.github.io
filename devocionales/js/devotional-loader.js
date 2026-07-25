@@ -98,15 +98,20 @@
         localStorage.setItem(VERSION_KEY_PREFIX + lang, version);
     }
 
-    const HABITUS_IMAGES = [
-        'blue_mountains.avif', 'bridge_waterfall.avif', 'circle_grass_green.avif',
-        'desert_person.avif', 'desert_rocks.avif', 'desert_view_rocks.avif',
-        'grass_tree.avif', 'gray_dock_lake.avif', 'lake.avif', 'lake_colors.avif',
-        'lake_dock.avif', 'lake_flowers.avif', 'long_road.avif', 'mountain_pink.avif',
-        'mountain_river.avif', 'river_rocks_trees.avif', 'road_green_montains.avif',
-        'rocks_beach.avif', 'rocks_water.avif', 'snow_house.avif', 'snow_mountains.avif',
-        'sunset_beach.avif', 'sunset_snow.avif'
-    ];
+    // Hero image filenames — fetched from Devocionales-assets' CI-generated
+    // manifest instead of hardcoded here, so the list never drifts from the
+    // real, validated file set (see .claude/skills/web-coding-agent/SKILL.md
+    // Step 0, item 6).
+    let devotionalImagesIndexPromise = null;
+
+    async function loadDevotionalImagesIndex() {
+        if (!devotionalImagesIndexPromise) {
+            devotionalImagesIndexPromise = fetch(
+                'https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/index.json'
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+        }
+        return devotionalImagesIndexPromise;
+    }
 
     function todayKey() {
         const now = new Date();
@@ -314,13 +319,17 @@
         }
     }
 
-    function heroImageForDate(dateKey) {
+    async function heroImageForDate(dateKey) {
+        const index = await loadDevotionalImagesIndex();
+        const files = index?.files;
+        if (!files?.length) return '';
+
         let hash = 0;
         for (let i = 0; i < dateKey.length; i++) {
             hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0;
         }
-        const file = HABITUS_IMAGES[hash % HABITUS_IMAGES.length];
-        return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/habitus/${file}`;
+        const file = files[hash % files.length];
+        return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/${file}`;
     }
 
     function showError() {
@@ -599,12 +608,12 @@
         });
     }
 
-    function render(entry, dateKey) {
+    async function render(entry, dateKey) {
         const { ref, texto } = splitVersiculo(entry.versiculo || '');
 
         applyStaticUiText();
 
-        document.getElementById('hero-image').src = heroImageForDate(dateKey);
+        document.getElementById('hero-image').src = await heroImageForDate(dateKey);
         document.getElementById('hero-image').alt = ref;
 
         document.getElementById('devotional-verse-ref').textContent = ref;
@@ -690,7 +699,7 @@
             const record = recordForDate(fileData, dateKey);
             if (!record) throw new Error(`No devotional found for ${dateKey}`);
 
-            render(record, dateKey);
+            await render(record, dateKey);
             currentDateKey = dateKey;
 
             if (pushHistory) {
@@ -718,6 +727,10 @@
     }
 
     async function init() {
+        // Kick off in parallel with the rest of init — first real await is
+        // inside heroImageForDate(), during render().
+        loadDevotionalImagesIndex();
+
         // Wait for the shared i18n instance to finish its async init() (which
         // resolves ?lang=/localStorage/browser-language into currentLang)
         // before resolving LANGUAGE — otherwise LANGUAGE would be stuck at
