@@ -172,3 +172,184 @@ test.describe('devocionales reader salvation prayer modal', () => {
     await expect(modal).toBeHidden();
   });
 });
+
+test.describe('devocionales reader Bible version picker', () => {
+  test('lists both available versions for the current language, defaulting to the primary one', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const select = page.locator('#version-select');
+    const options = await select.locator('option').allTextContents();
+    expect(options).toEqual(['RVR1960', 'NVI']);
+    await expect(select).toHaveValue('RVR1960');
+  });
+
+  test('switching version reloads content under the new version and persists the choice', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const select = page.locator('#version-select');
+    const verseRef = page.locator('#devotional-verse-ref');
+    const beforeText = await verseRef.textContent();
+
+    await select.selectOption('NVI');
+    await expect(verseRef).not.toHaveText(beforeText);
+    await expect(verseRef).toContainText('NVI');
+
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(select).toHaveValue('NVI');
+    await expect(verseRef).toContainText('NVI');
+  });
+
+  test('version choice is isolated per language', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+    await page.locator('#version-select').selectOption('NVI');
+    await expect(page.locator('#devotional-verse-ref')).toContainText('NVI');
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-select')).toHaveValue('NIV');
+  });
+});
+
+test.describe('devocionales reader Bible version copyright notice', () => {
+  // Legally-required per-version attribution, ported from devocional_nuevo's
+  // copyright_utils.dart. Always visible (not tap-to-expand), placed after
+  // the prayer/share section, must update live when the version changes.
+
+  test('shows the current version\'s full name and copyright text', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const notice = page.locator('#version-copyright');
+    await expect(notice).toContainText('RVR1960');
+    await expect(notice).toContainText('Reina Valera 1960');
+    await expect(notice).toContainText('Sociedades Bíblicas');
+  });
+
+  test('updates when the version selection changes', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const notice = page.locator('#version-copyright');
+    await expect(notice).toContainText('RVR1960');
+
+    await page.locator('#version-select').selectOption('NVI');
+    await expect(notice).toContainText('NVI');
+    await expect(notice).toContainText('Nueva Versión Internacional');
+    await expect(notice).not.toContainText('RVR1960');
+  });
+
+  test('is localized (label text) per language', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-copyright')).toContainText('Bible version:');
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-copyright')).toContainText('Versión bíblica:');
+  });
+});
+
+test.describe('devocionales reader version info (i) button', () => {
+  // Quick acronym lookup next to the version dropdown ("NVI" -> "Nueva
+  // Versión Internacional") — separate from the persistent copyright
+  // notice below the prayer section, which stays visible unconditionally.
+
+  test('popover is hidden by default and shows the full name on click', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const popover = page.locator('#version-info-popover');
+    await expect(popover).toBeHidden();
+
+    await page.locator('#version-info-btn').click();
+    await expect(popover).toBeVisible();
+    await expect(popover).toContainText('Reina Valera 1960');
+    await expect(popover).toContainText('RVR1960');
+  });
+
+  test('closes when clicking outside', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    await page.locator('#version-info-btn').click();
+    await expect(page.locator('#version-info-popover')).toBeVisible();
+
+    await page.locator('body').click({ position: { x: 5, y: 5 } });
+    await expect(page.locator('#version-info-popover')).toBeHidden();
+  });
+
+  test('updates the full name when the version selection changes', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    await page.locator('#version-select').selectOption('NVI');
+    await page.waitForSelector('#devotional-content:not(.hidden)');
+    await page.locator('#version-info-btn').click();
+
+    const popover = page.locator('#version-info-popover');
+    await expect(popover).toContainText('Nueva Versión Internacional');
+    await expect(popover).not.toContainText('Reina Valera 1960');
+  });
+});
+
+test.describe('devocionales reader hero image (Devocionales-assets manifest)', () => {
+  // heroImageForDate() fetches the file list from Devocionales-assets'
+  // CI-generated index.json instead of a hardcoded array. These assert on
+  // what a real visitor sees: a real, loadable hero image, and the page
+  // still working end-to-end if that fetch fails — not on request counts
+  // or other implementation plumbing, which would make the suite brittle.
+
+  test('hero image loads from the devotionals manifest, not a local list', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toBeVisible();
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidth = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidth).toBeGreaterThan(0);
+
+    const src = await heroImage.getAttribute('src');
+    expect(src).toMatch(
+      /^https:\/\/raw\.githubusercontent\.com\/develop4God\/Devocionales-assets\/main\/images\/devotionals\/[^/]+\.avif$/
+    );
+  });
+
+  test('hero image keeps loading correctly across prev/next navigation', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toHaveJSProperty('complete', true);
+
+    const h1 = page.locator('h1').first();
+    const beforeText = await h1.textContent();
+
+    await page.locator('#nav-next').click();
+    await expect(h1).not.toHaveText(beforeText);
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidthAfterNext = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidthAfterNext).toBeGreaterThan(0);
+
+    // "next" can trigger the salvation-prayer modal, which overlays the nav
+    // buttons — dismiss it first, same as the dedicated modal tests above.
+    const salvationModal = page.locator('#salvation-prayer-modal');
+    if (await salvationModal.isVisible()) {
+      await page.locator('#salvation-modal-continue').click();
+      await expect(salvationModal).toBeHidden();
+    }
+
+    await page.locator('#nav-prev').click();
+    await expect(h1).toHaveText(beforeText);
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidthAfterPrev = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidthAfterPrev).toBeGreaterThan(0);
+  });
+
+  test('reader still renders with no app errors if the manifest fetch fails', async ({ page }) => {
+    await page.route('**/images/devotionals/index.json', (route) => route.abort());
+
+    // The aborted request itself logs a browser-level resource error
+    // ("Failed to load resource: net::ERR_FAILED") — that's expected noise
+    // from the injected failure, not an app bug. Only uncaught JS
+    // exceptions (pageerror) indicate the app itself broke.
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+});

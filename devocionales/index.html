@@ -150,6 +150,45 @@
             font-weight: 700;
         }
 
+        .version-select {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .version-select:hover { border-color: var(--accent); color: var(--accent); }
+
+        .version-select-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+        .version-info-btn {
+            background: none;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+        }
+        .version-info-btn:hover { color: var(--accent); }
+        .version-info-popover {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            z-index: 20;
+            width: max-content;
+            max-width: 260px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--text);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
         /* ---- Accordion (In Touch "Related Scripture" pattern) ---- */
         .accordion-item { border-bottom: 1px solid var(--border); }
         .accordion-title {
@@ -400,13 +439,22 @@
 
                 <div class="mt-6 flex flex-col items-center gap-2">
                     <div id="reading-options-label" class="eyebrow">Opciones de Lectura</div>
-                    <div class="text-size-toggle flex items-center gap-1 text-lg">
-                        <input type="radio" id="font_normal" name="fontsize" value="" checked>
-                        <label for="font_normal">A</label>
-                        <input type="radio" id="font_large" name="fontsize" value="size-large">
-                        <label for="font_large" style="font-size:1.2em">A</label>
-                        <input type="radio" id="font_larger" name="fontsize" value="size-larger">
-                        <label for="font_larger" style="font-size:1.4em">A</label>
+                    <div class="flex items-center gap-3">
+                        <div class="text-size-toggle flex items-center gap-1 text-lg">
+                            <input type="radio" id="font_normal" name="fontsize" value="" checked>
+                            <label for="font_normal">A</label>
+                            <input type="radio" id="font_large" name="fontsize" value="size-large">
+                            <label for="font_large" style="font-size:1.2em">A</label>
+                            <input type="radio" id="font_larger" name="fontsize" value="size-larger">
+                            <label for="font_larger" style="font-size:1.4em">A</label>
+                        </div>
+                        <div class="version-select-wrap">
+                            <select id="version-select" class="version-select"></select>
+                            <button id="version-info-btn" type="button" class="version-info-btn" aria-label="Nombre completo de la versión" aria-haspopup="true" aria-expanded="false">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                            </button>
+                            <div id="version-info-popover" class="version-info-popover hidden" role="tooltip"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -463,6 +511,10 @@
                     <div id="temas-label" class="eyebrow mb-2">Temas</div>
                     <div id="tags-list"></div>
                 </div>
+
+                <!-- Bible version copyright/attribution — legally required per-version notice,
+                     always visible (not tap-to-expand), last on mobile and full-width on desktop -->
+                <p id="version-copyright" class="order-5 md:order-none md:col-span-12 text-xs text-center mt-8 pt-4" style="color: var(--text-muted); border-top: 1px solid var(--border);"></p>
             </div>
         </article>
     </main>

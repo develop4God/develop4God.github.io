@@ -39,6 +39,27 @@ Before writing a single line:
 
 **Never edit a file you haven't read in full. Never assume two same-named files are identical — check with `diff`.**
 
+6. **Before hardcoding any content-shaped data — lists, name mappings,
+   copyright/legal text, image filenames, version tables, anything that
+   isn't logic — check whether it already has a canonical source:**
+   `Devocionales-json` (devotional content, `index.json`, Bible-version
+   metadata), `Devocionales-assets` (images), or a Dart file in
+   `devocional_nuevo` treated as the app's own SOT (e.g.
+   `copyright_utils.dart`, `bible_version_registry.dart`). If a source
+   exists, fetch it or reference it remotely — don't transcribe it into a
+   JS/JSON literal in this repo, even if that's faster to ship. If you
+   genuinely can't wire up a live fetch in scope, that's a real
+   constraint — say so explicitly and ask, rather than silently
+   hardcoding a local copy and filing "make this dynamic later" as a
+   backlog item. A hardcoded copy of data that has a canonical source
+   is a second copy that will drift, not a shortcut — this has already
+   happened twice: `HABITUS_IMAGES` (a 23-item filename array in
+   `devotional-loader.js`, when the images live in `Devocionales-assets`)
+   and `BIBLE_VERSION_INFO` (version names + copyright text transcribed
+   from `devocional_nuevo`'s Dart source instead of fetched from a shared
+   JSON source). Reaching for "hardcode it" as the default because it's
+   fastest for the task in front of you is exactly the mistake to avoid.
+
 ### Think Before Coding
 
 - **State your assumptions explicitly.** If uncertain about scope, ask — don't guess and ship.
