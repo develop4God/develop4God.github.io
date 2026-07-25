@@ -106,7 +106,10 @@ test.describe('devocionales reader share feature', () => {
 
     const calls = await page.evaluate(() => window.__shareCalls);
     expect(calls).toHaveLength(1);
-    expect(calls[0].url).toBe(page.url());
+    // No separate `url` field passed to navigator.share() — some share
+    // targets append it a second time on top of `text`, duplicating the
+    // link that's already embedded in the "read more" line below.
+    expect(calls[0].url).toBeUndefined();
     expect(calls[0].text.length).toBeGreaterThan(0);
 
     const verseRef = await page.locator('#devotional-verse-ref').textContent();

@@ -427,7 +427,10 @@
             footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
         };
         const shareText = DevotionalShare.buildShareText(entry, labels, url);
-        shareData = { title: eyebrow, text: shareText, url };
+        // No separate `url` field here: shareText already embeds the link
+        // (via the "read more" line), and some share targets append a
+        // provided `url` a second time on top of `text`, duplicating it.
+        shareData = { title: eyebrow, text: shareText };
 
         const nativeBtn = document.getElementById('share-native');
         nativeBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareAria', ''));
