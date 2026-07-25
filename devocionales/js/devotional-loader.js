@@ -21,12 +21,28 @@
         fil: 'MBB05',
     };
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
+    const VERSION_KEY_PREFIX = 'devocionalVersion:';
 
     function resolveLanguage() {
         return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'en');
     }
 
     let LANGUAGE = resolveLanguage();
+
+    // Selected Bible version per language, persisted independently per
+    // language (a version choice in one language has no meaning in another).
+    // Falls back to LANGUAGE_VERSIONS' default until the visitor picks one,
+    // or if the stored code isn't (no longer) a valid option for that language.
+    function resolveVersion(lang) {
+        const stored = localStorage.getItem(VERSION_KEY_PREFIX + lang);
+        return stored || LANGUAGE_VERSIONS[lang];
+    }
+
+    let VERSION = resolveVersion(LANGUAGE);
+
+    function setVersion(lang, version) {
+        localStorage.setItem(VERSION_KEY_PREFIX + lang, version);
+    }
 
     const HABITUS_IMAGES = [
         'blue_mountains.avif', 'bridge_waterfall.avif', 'circle_grass_green.avif',
@@ -55,18 +71,21 @@
 
     function devotionalJsonUrl(fileYear) {
         const base = `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/Devocional_year_${fileYear}`;
-        if (LANGUAGE === 'es') return `${base}.json`;
+        // The legacy no-suffix filename only covers 'es' at its default
+        // version (RVR1960) — any other version, including a non-default
+        // 'es' pick, needs the lang+version-suffixed filename.
+        if (LANGUAGE === 'es' && VERSION === LANGUAGE_VERSIONS.es) return `${base}.json`;
         // encodeURIComponent covers version codes with non-ASCII characters
         // (e.g. Japanese/Chinese) safely; it's a no-op for ASCII codes.
-        return `${base}_${LANGUAGE}_${encodeURIComponent(LANGUAGE_VERSIONS[LANGUAGE])}.json`;
+        return `${base}_${LANGUAGE}_${encodeURIComponent(VERSION)}.json`;
     }
 
-    // Cache of loaded year-files, keyed by "lang:fileYear" since the same
-    // fileYear number maps to a different file per language.
+    // Cache of loaded year-files, keyed by "lang:version:fileYear" since the
+    // same fileYear number maps to a different file per language+version.
     const loadedFiles = new Map();
 
     async function loadYearFile(fileYear) {
-        const cacheKey = `${LANGUAGE}:${fileYear}`;
+        const cacheKey = `${LANGUAGE}:${VERSION}:${fileYear}`;
         if (loadedFiles.has(cacheKey)) return loadedFiles.get(cacheKey);
         const res = await fetch(devotionalJsonUrl(fileYear));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -98,10 +117,21 @@
 
     async function availableFileYears() {
         const index = await loadRepoIndex();
-        const version = LANGUAGE_VERSIONS[LANGUAGE];
-        const years = index?.files?.[LANGUAGE]?.[version]?.files;
+        const years = index?.files?.[LANGUAGE]?.[VERSION]?.files;
         if (years) return Object.keys(years).map(Number).sort((a, b) => a - b);
         return null;
+    }
+
+    // Which version codes index.json actually publishes for a language,
+    // in stable order (defaults to LANGUAGE_VERSIONS' own order first).
+    async function availableVersions(lang) {
+        const index = await loadRepoIndex();
+        const versions = index?.files?.[lang];
+        if (!versions) return [LANGUAGE_VERSIONS[lang]];
+        const codes = Object.keys(versions);
+        return codes.includes(LANGUAGE_VERSIONS[lang])
+            ? [LANGUAGE_VERSIONS[lang], ...codes.filter((c) => c !== LANGUAGE_VERSIONS[lang])]
+            : codes;
     }
 
     // Walks backwards from the current year-file to find the oldest year-file
@@ -438,6 +468,33 @@
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
+        document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
+    }
+
+    // Populates the version <select> with whatever index.json publishes for
+    // the current LANGUAGE, and re-loads the current date under the newly
+    // selected version on change. Rebuilt on every render() (language can
+    // change the option list), but the change listener is bound once and
+    // reads LANGUAGE/VERSION via closure — same stacked-listener avoidance
+    // as setupTts/renderShareLinks above.
+    let versionHandlerBound = false;
+
+    async function setupVersionSelect() {
+        const select = document.getElementById('version-select');
+        const versions = await availableVersions(LANGUAGE);
+
+        select.innerHTML = versions.map((v) => `<option value="${v}">${v}</option>`).join('');
+        select.value = VERSION;
+
+        if (versionHandlerBound) return;
+        versionHandlerBound = true;
+        select.addEventListener('change', () => {
+            VERSION = select.value;
+            setVersion(LANGUAGE, VERSION);
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('devotional-content').classList.add('hidden');
+            loadDate(currentDateKey || todayKey(), { pushHistory: false });
+        });
     }
 
     function render(entry, dateKey) {
@@ -465,6 +522,7 @@
         renderTags(entry.tags);
         renderShareLinks(entry);
         setupFontSizeToggle();
+        setupVersionSelect();
         setupTts(entry);
 
         if (!navHandlersBound) {
@@ -563,6 +621,7 @@
         // the pre-init default from module-load time.
         await new Promise((resolve) => DevotionalI18n.whenReady(resolve));
         LANGUAGE = resolveLanguage();
+        VERSION = resolveVersion(LANGUAGE);
 
         const requestedDate = new URL(window.location.href).searchParams.get('date');
         const dateKey = requestedDate || await resolveDefaultDate();
@@ -580,6 +639,7 @@
             const next = SUPPORTED_LANGUAGES.includes(ev.detail?.language) ? ev.detail.language : 'en';
             if (next === LANGUAGE) return;
             LANGUAGE = next;
+            VERSION = resolveVersion(LANGUAGE);
             document.getElementById('loading-state').classList.remove('hidden');
             document.getElementById('devotional-content').classList.add('hidden');
             loadDate(currentDateKey || todayKey(), { pushHistory: false });

@@ -150,6 +150,17 @@
             font-weight: 700;
         }
 
+        .version-select {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .version-select:hover { border-color: var(--accent); color: var(--accent); }
+
         /* ---- Accordion (In Touch "Related Scripture" pattern) ---- */
         .accordion-item { border-bottom: 1px solid var(--border); }
         .accordion-title {
@@ -400,13 +411,16 @@
 
                 <div class="mt-6 flex flex-col items-center gap-2">
                     <div id="reading-options-label" class="eyebrow">Opciones de Lectura</div>
-                    <div class="text-size-toggle flex items-center gap-1 text-lg">
-                        <input type="radio" id="font_normal" name="fontsize" value="" checked>
-                        <label for="font_normal">A</label>
-                        <input type="radio" id="font_large" name="fontsize" value="size-large">
-                        <label for="font_large" style="font-size:1.2em">A</label>
-                        <input type="radio" id="font_larger" name="fontsize" value="size-larger">
-                        <label for="font_larger" style="font-size:1.4em">A</label>
+                    <div class="flex items-center gap-3">
+                        <div class="text-size-toggle flex items-center gap-1 text-lg">
+                            <input type="radio" id="font_normal" name="fontsize" value="" checked>
+                            <label for="font_normal">A</label>
+                            <input type="radio" id="font_large" name="fontsize" value="size-large">
+                            <label for="font_large" style="font-size:1.2em">A</label>
+                            <input type="radio" id="font_larger" name="fontsize" value="size-larger">
+                            <label for="font_larger" style="font-size:1.4em">A</label>
+                        </div>
+                        <select id="version-select" class="version-select"></select>
                     </div>
                 </div>
             </div>

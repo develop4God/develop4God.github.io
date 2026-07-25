@@ -172,3 +172,39 @@ test.describe('devocionales reader salvation prayer modal', () => {
     await expect(modal).toBeHidden();
   });
 });
+
+test.describe('devocionales reader Bible version picker', () => {
+  test('lists both available versions for the current language, defaulting to the primary one', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const select = page.locator('#version-select');
+    const options = await select.locator('option').allTextContents();
+    expect(options).toEqual(['RVR1960', 'NVI']);
+    await expect(select).toHaveValue('RVR1960');
+  });
+
+  test('switching version reloads content under the new version and persists the choice', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const select = page.locator('#version-select');
+    const verseRef = page.locator('#devotional-verse-ref');
+    const beforeText = await verseRef.textContent();
+
+    await select.selectOption('NVI');
+    await expect(verseRef).not.toHaveText(beforeText);
+    await expect(verseRef).toContainText('NVI');
+
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(select).toHaveValue('NVI');
+    await expect(verseRef).toContainText('NVI');
+  });
+
+  test('version choice is isolated per language', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+    await page.locator('#version-select').selectOption('NVI');
+    await expect(page.locator('#devotional-verse-ref')).toContainText('NVI');
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#version-select')).toHaveValue('NIV');
+  });
+});
