@@ -60,6 +60,24 @@ Before writing a single line:
    JSON source). Reaching for "hardcode it" as the default because it's
    fastest for the task in front of you is exactly the mistake to avoid.
 
+7. **GATE — before writing any code that touches an existing file, do a
+   SOLID/god-object check on that file, out loud, and surface it to the
+   user before coding — do not silently decide and proceed:** does this
+   file already show the god-object smell (many unrelated top-level
+   functions/responsibilities — `devotional-loader.js` is the standing
+   example)? If yes, is the change you're about to make a distinct
+   concern that should be extracted into its own file *right now*, in
+   this same change, rather than added as one more top-level function?
+   State the finding and your extraction suggestion to the user and get
+   their confirmation before starting to code — this is a discussion
+   gate, not a check you resolve on your own and report after the fact.
+   This is not optional and not deferrable to "a future refactor" — see
+   Step 4's SOLID-lite section for the extraction pattern
+   (`window.XyzHelper` in its own `<script>`-loaded file,
+   dependency-injected like `devotional-nav.js`/`bible-text-formatter.js`).
+   Do this check, and have the discussion, before Step 1 (Apply the
+   Task) — not after.
+
 ### Think Before Coding
 
 - **State your assumptions explicitly.** If uncertain about scope, ask — don't guess and ship.
