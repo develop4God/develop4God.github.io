@@ -1,6 +1,6 @@
 ---
 name: web-coding-agent
-description: Day-to-day coding agent execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, implementing any feature, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test), Playwright-based browser runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "make this change", "fix this bug", "add this feature", or hands you any delegation block targeting this repo.
+description: Day-to-day coding agent execution rules for develop4God.github.io (static HTML/CSS/JS, no bundler, no framework, GitHub Pages + Cloudflare Pages). Load this skill before making any code change, applying any delegation block, implementing any feature, or fixing any bug in this repo. Enforces mandatory quality gates (node --check, eslint, stylelint, html-validate, node --test, c8 coverage report), Playwright-based browser runtime verification, SOLID-lite discipline for a vanilla-JS site, and regression-test coverage on every fix. Use when the user says "apply this", "implement this", "make this change", "fix this bug", "add this feature", or hands you any delegation block targeting this repo.
 ---
 
 # Web Coding Agent — Execution Rules
@@ -153,7 +153,24 @@ Stylelint will surface a long tail of pure style-convention findings (hex-length
 ```bash
 node --test
 ```
-(Run from repo root — **not** `node --test devocionales/js/`, that does not work as a directory argument on this Node version, confirmed the hard way.) Currently covers `bible-text-formatter.js` (12 tests, all 10 languages, pure functions, no DOM). Zero tolerance for failures. If your change touches `bible-text-formatter.js`, update or add tests in `bible-text-formatter.test.js` — every language, every branch you touched.
+(Run from repo root — **not** `node --test devocionales/js/`, that does not work as a directory argument on this Node version, confirmed the hard way.) Currently covers `bible-text-formatter.js` (12 tests, all 10 languages, pure functions, no DOM), `devotional-progress.js` (date-math + localStorage progress), and `devotional-tts.js`'s `buildTtsText` (pure text-assembly, real i18n copy, no DOM/speechSynthesis). Zero tolerance for failures. If your change touches a file with a matching `*.test.js`, update or add tests there — every language/branch you touched.
+
+**Module-loading pattern for any newly-extracted pure-logic module:** load the real browser-IIFE source with `vm.runInThisContext`, passing an explicit `filename` option — **not** `new Function('window', source)`. Both execute the code identically, but `new Function` produces an anonymous eval with no source location, so c8/V8 cannot attribute coverage back to the real file — it silently reports 0% (or omits the file entirely) even when every line actually ran under real tests. This was caught the hard way: `devotional-progress.test.js`/`devotional-tts.test.js` initially used `new Function` and showed 0% coverage for both modules despite 100% of their tests passing, while `bible-text-formatter.test.js` (which already used the correct pattern) showed real, accurate numbers. The correct form:
+```js
+const vm = require('node:vm');
+const filename = path.join(__dirname, 'the-module.js');
+const source = fs.readFileSync(filename, 'utf8');
+vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+```
+No hand-written fakes of the module under test — see `devotional-progress.test.js`/`devotional-tts.test.js` for the localStorage/global-identifier stand-ins this pattern requires (bare `localStorage`/`DevotionalI18n`/etc. inside a browser IIFE resolve to `global.*` in Node, not `window.*` — set both, or set the global directly, matching what the module's own bare identifiers will actually resolve to).
+
+### Gate 3b — `c8` coverage report
+
+```bash
+npx c8 node --test
+npx c8 report --reporter=text --reporter=html
+```
+Not a bundler dependency — installs to npx's cache on demand, same zero-footprint convention as eslint/stylelint/Playwright. Report-only: there is no enforced minimum threshold, so a lower number doesn't block the gate — but read the text report and flag any newly-added pure-logic file that shows as uncovered or thin, rather than silently shipping it. Use it to catch exactly the gap this repo hit once already: a god-object split (`devotional-loader.js` → 5 modules) that shipped with zero unit coverage on its pure functions, relying only on Playwright's incidental UI-interaction coverage.
 
 ### Gate 4 — Browser runtime verification (Playwright)
 
@@ -228,6 +245,7 @@ There's no DI container or class hierarchy here — SOLID applies loosely, but t
 - node --check: ✅ clean / ❌ [file:line]
 - eslint/stylelint/html-validate: ✅ no new findings / ⚠️ [N findings — real vs. known-false-positive breakdown]
 - node --test: ✅ [N] passed / ❌ [N failed]
+- c8 coverage: ✅ [% for any file touched/added] / ⚠️ [new pure-logic file shipped uncovered — flag it]
 - Playwright verification: ✅ [what was checked, zero console errors] / ❌ [issue]
 - Responsive check (if layout touched): ✅ no overflow at phone/tablet / ❌ [issue]
 
@@ -258,6 +276,8 @@ None
 | Playwright verification skipped for HTML/JS behavior changes | Do not report done — static checks alone have missed real breakage twice in this repo's history |
 | i18n copy added to only some language files | Hard block — fix before done |
 | `node --test` has failures | Do not report done — fix or explicitly flag as pre-existing |
+| New pure-logic module shipped with no c8-visible test coverage | Flag it — no enforced threshold, but silent 0% on new logic is exactly the gap this rule exists to catch |
+| New `*.test.js` loads browser-IIFE source via `new Function` instead of `vm.runInThisContext` | Fix before done — c8 can't attribute coverage to an anonymous eval, so it silently under-reports |
 | New npm dependency added without asking | Hard block — this repo has zero dependencies by design |
 | Shared CSS/JS file changed without checking all pages that load it | Hard block — verify every consumer, not just the one you meant to change |
 | Dart/JS port touched on only one side without checking the other | Flag and ask, unless it's a clear missing-entirely gap being restored |

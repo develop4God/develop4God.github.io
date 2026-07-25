@@ -4,16 +4,16 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const fs = require('node:fs');
+const vm = require('node:vm');
 
 // bible-text-formatter.js is a browser IIFE that attaches to `window`.
 // Node has no `window`; supply a plain object as the attachment target.
 global.window = global.window || {};
-const source = fs.readFileSync(
-    path.join(__dirname, 'bible-text-formatter.js'),
-    'utf8'
-);
-// eslint-disable-next-line no-new-func
-new Function('window', source)(global.window);
+const filename = path.join(__dirname, 'bible-text-formatter.js');
+const source = fs.readFileSync(filename, 'utf8');
+// vm.runInThisContext (not new Function) so c8/V8 can attribute coverage
+// back to this real filename instead of an anonymous eval.
+vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
 const { formatBibleBook, formatBibleReferences, normalizeTtsText, getBibleVersionExpansions } = global.window.BibleTextFormatter;
 
 test('formatBibleBook: book-ordinal formatting per language', () => {
