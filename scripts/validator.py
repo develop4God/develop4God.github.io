@@ -11,9 +11,10 @@ versions, same file globs) so a local pass means CI will pass too.
   PHASE 2: eslint             — devocionales/js, js, habitus/js
   PHASE 3: stylelint          — every .css file
   PHASE 4: html-validate      — root/devocionales/habitus .html
-  PHASE 5: node --test        — bible-text-formatter unit tests
-  PHASE 6: Playwright e2e     — full browser runtime verification (e2e/)
-  PHASE 7: SOT manifest       — fetches Devocionales-assets' devotionals
+  PHASE 5: node --test        — unit tests (bible-text-formatter, devotional-progress, devotional-tts)
+  PHASE 6: c8 coverage        — report-only, no enforced threshold (npx, scratch-installed)
+  PHASE 7: Playwright e2e     — full browser runtime verification (e2e/)
+  PHASE 8: SOT manifest       — fetches Devocionales-assets' devotionals
                                  index.json and validates its shape
 
 Lint tools are expected globally installed at the CI-pinned versions
@@ -179,7 +180,27 @@ def phase_node_test():
     return rc == 0, ''
 
 
-# ── Phase 6: Playwright e2e ──────────────────────────────────────────────
+# ── Phase 6: c8 coverage (report-only, no enforced threshold) ───────────
+
+def phase_c8_coverage():
+    if _tool_missing('npx'):
+        return False, 'npx not found on PATH — install Node.js'
+    rc, out, err = run_cmd(['npx', '--yes', 'c8', 'node', '--test'])
+    if rc != 0:
+        print(out)
+        print(err)
+        return False, ''
+    rc2, out2, err2 = run_cmd(['npx', '--yes', 'c8', 'report', '--reporter=text'])
+    print(out2)
+    if err2.strip():
+        print(err2)
+    # Report-only: a low/uncovered number never fails this phase — only a
+    # tool/runtime error does. Read the printed table and flag any new
+    # pure-logic file that shows uncovered, per the skill's Gate 3b.
+    return rc2 == 0, ''
+
+
+# ── Phase 7: Playwright e2e ──────────────────────────────────────────────
 
 def phase_playwright():
     if not PW_TOOLS.exists():
@@ -196,7 +217,7 @@ def phase_playwright():
     return rc == 0, ''
 
 
-# ── Phase 7: SOT manifest (Devocionales-assets devotionals index.json) ──
+# ── Phase 8: SOT manifest (Devocionales-assets devotionals index.json) ──
 
 def phase_devotionals_manifest():
     try:
@@ -248,8 +269,9 @@ def main():
     gate('3. stylelint', phase_stylelint)
     gate('4. html-validate', phase_html_validate)
     gate('5. node --test', phase_node_test)
-    gate('6. Playwright e2e', phase_playwright)
-    gate('7. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
+    gate('6. c8 coverage', phase_c8_coverage)
+    gate('7. Playwright e2e', phase_playwright)
+    gate('8. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
 
     print_summary()
     sys.exit(0 if all(p.passed for p in PHASES) else 1)
