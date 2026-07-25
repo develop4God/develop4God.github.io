@@ -540,6 +540,7 @@
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
+        document.getElementById('version-info-btn').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionInfoAria', ''));
     }
 
     // Populates the version <select> with whatever index.json publishes for
@@ -556,15 +557,45 @@
 
         select.innerHTML = versions.map((v) => `<option value="${v}">${v}</option>`).join('');
         select.value = VERSION;
+        updateVersionInfoPopover();
 
         if (versionHandlerBound) return;
         versionHandlerBound = true;
         select.addEventListener('change', () => {
             VERSION = select.value;
             setVersion(LANGUAGE, VERSION);
+            updateVersionInfoPopover();
             document.getElementById('loading-state').classList.remove('hidden');
             document.getElementById('devotional-content').classList.add('hidden');
             loadDate(currentDateKey || todayKey(), { pushHistory: false });
+        });
+    }
+
+    // (i) button next to the version dropdown: shows the selected version's
+    // full display name (e.g. "NVI" -> "Nueva Versión Internacional") for
+    // visitors who don't recognize the acronym. Separate from
+    // renderVersionCopyright's persistent legal notice — this is a quick,
+    // dismissible lookup, not the compliance-required text.
+    let versionInfoHandlerBound = false;
+
+    function updateVersionInfoPopover() {
+        const info = versionInfo(LANGUAGE, VERSION);
+        const popover = document.getElementById('version-info-popover');
+        popover.textContent = info ? `${info.name} (${VERSION})` : VERSION;
+
+        if (versionInfoHandlerBound) return;
+        versionInfoHandlerBound = true;
+        const btn = document.getElementById('version-info-btn');
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const isOpen = popover.classList.toggle('hidden') === false;
+            btn.setAttribute('aria-expanded', String(isOpen));
+        });
+        document.addEventListener('click', (ev) => {
+            if (!popover.classList.contains('hidden') && !popover.contains(ev.target) && ev.target !== btn) {
+                popover.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
         });
     }
 

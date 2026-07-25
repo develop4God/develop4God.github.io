@@ -243,3 +243,43 @@ test.describe('devocionales reader Bible version copyright notice', () => {
     await expect(page.locator('#version-copyright')).toContainText('Versión bíblica:');
   });
 });
+
+test.describe('devocionales reader version info (i) button', () => {
+  // Quick acronym lookup next to the version dropdown ("NVI" -> "Nueva
+  // Versión Internacional") — separate from the persistent copyright
+  // notice below the prayer section, which stays visible unconditionally.
+
+  test('popover is hidden by default and shows the full name on click', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const popover = page.locator('#version-info-popover');
+    await expect(popover).toBeHidden();
+
+    await page.locator('#version-info-btn').click();
+    await expect(popover).toBeVisible();
+    await expect(popover).toContainText('Reina Valera 1960');
+    await expect(popover).toContainText('RVR1960');
+  });
+
+  test('closes when clicking outside', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    await page.locator('#version-info-btn').click();
+    await expect(page.locator('#version-info-popover')).toBeVisible();
+
+    await page.locator('body').click({ position: { x: 5, y: 5 } });
+    await expect(page.locator('#version-info-popover')).toBeHidden();
+  });
+
+  test('updates the full name when the version selection changes', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    await page.locator('#version-select').selectOption('NVI');
+    await page.waitForSelector('#devotional-content:not(.hidden)');
+    await page.locator('#version-info-btn').click();
+
+    const popover = page.locator('#version-info-popover');
+    await expect(popover).toContainText('Nueva Versión Internacional');
+    await expect(popover).not.toContainText('Reina Valera 1960');
+  });
+});
