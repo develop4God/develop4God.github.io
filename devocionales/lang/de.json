@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Heutige Andacht - Christliche Andachten",
     "errorLoad": "Wir konnten die heutige Andacht nicht laden. Bitte versuchen Sie es später erneut.",
+    "errorRetry": "Erneut versuchen",
     "backLink": "← Startseite",
     "eyebrow": "Tägliche Andacht",
     "listen": "Anhören",
@@ -216,6 +217,8 @@
     "appBannerClose": "Schließen",
     "navVision": "Unsere Vision",
     "navDevotional": "Heutige Andacht",
+    "supportMinistry": "Spenden",
+    "supportMinistryTitle": "Unterstütze unseren Dienst, damit die App auch für iOS erscheint und die Infrastrukturkosten gedeckt werden.\n\nDamit sie für alle Nutzer kostenlos und werbefrei bleibt.",
     "footerTagline": "© 2026 Develop4God. Ein digitales Werkzeug für den Dienst.",
     "salvationPrayerTitle": "Gebet des Glaubens für das ewige Leben!✨",
     "salvationPrayerIntro": "Wiederhole dieses Gebet laut, mit Glauben und ganzem Herzen❤️:",

@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Devocional de Hoy - Devocionales Cristianos</title>
@@ -56,13 +65,13 @@
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
 
         .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
-        .site-nav a {
+        .site-nav a:not(.btn-primary) {
             color: var(--text-muted);
             font-weight: 500;
             padding: 0.5rem 0;
             border-bottom: 2px solid transparent;
         }
-        .site-nav a:hover { color: var(--text); }
+        .site-nav a:not(.btn-primary):hover { color: var(--text); }
         .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
 
         .theme-switch {
@@ -121,6 +130,19 @@
             transition: opacity .15s ease;
         }
         .btn-primary:hover { opacity: 0.85; }
+
+        .support-btn-icon { animation: support-heartbeat 1.8s ease-in-out infinite; }
+        @keyframes support-heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            60% { transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .support-btn-icon { animation: none; }
+        }
+
         .btn-secondary {
             background: transparent;
             color: var(--text);
@@ -353,6 +375,12 @@
                 </ul>
             </nav>
             <div class="flex items-center gap-3">
+                <!-- [html-validate-disable-next wcag/h30] -->
+                <!-- text set by devotional-loader.js's applyStaticUiText() after page load -->
+                <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" id="support-ministry-btn" class="btn-primary px-5 py-2 flex items-center gap-2">
+                    <i data-lucide="heart" class="w-4 h-4 support-btn-icon" fill="currentColor"></i>
+                    <span id="support-ministry-label"></span>
+                </a>
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
                 <!-- [html-validate-disable-next no-redundant-for] -->
@@ -395,6 +423,9 @@
         <!-- Error state -->
         <div id="error-state" class="hidden text-center py-16">
             <p style="color: var(--text-muted);">No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.</p>
+            <!-- [html-validate-disable-next text-content] -->
+            <!-- text set by devotional-loader.js's showError() after page load -->
+            <button id="error-retry" type="button" class="btn-secondary mt-4"></button>
         </div>
 
         <!-- Content -->
@@ -550,6 +581,9 @@
     <script src="/devocionales/js/bible-text-formatter.js"></script>
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
     <script src="/devocionales/js/devotional-share.js"></script>
+    <script src="/devocionales/js/devotional-fetch.js"></script>
+    <script src="/devocionales/js/devotional-error-logger.js"></script>
+    <script src="/devocionales/js/devotional-nav.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script>
         lucide.createIcons();

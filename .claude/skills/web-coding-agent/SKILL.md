@@ -117,8 +117,9 @@ Then from the repo root:
 /tmp/lint-tools/node_modules/.bin/html-validate "devocionales/*.html" "*.html" "habitus/*.html"
 ```
 
-**Known accepted false positives — do not "fix" these, they are correct code:**
-- ESLint `no-undef` on `DevotionalI18n`, `BibleTextFormatter`, `lucide`, `i18n` — these are real cross-`<script>` globals ESLint can't see without a `.eslintrc` `globals` block (not configured; adding one is a fine, low-risk task if you want to reduce noise, but don't chase these findings as bugs).
+**Every new cross-`<script>` global MUST be added to `.eslintrc.json`'s `globals` block in the same commit that introduces it.** `.eslintrc.json` already has this block configured (`DevotionalI18n`, `BibleTextFormatter`, `DevotionalShare`, etc.) specifically so eslint runs clean — a genuinely zero-dependency site is not a reason to tolerate `no-undef` noise as "expected." If you add a new `window.XyzHelper = {...}` module (see Step 4's SOLID pattern), register its name in `.eslintrc.json` before reporting the task done. Do not describe `no-undef` on a real global as a "known false positive to leave alone" — that is hand-waving past a one-line fix, not a legitimate exception. This was gotten wrong once (three new modules — `DevotionalFetch`, `DevotionalNav`, `DevotionalErrorLogger` — shipped across several commits before the config was updated, and eslint noise was excused as "expected" instead of fixed immediately) — don't repeat it.
+
+**Known accepted false positives — genuinely cannot be configured away, do not "fix" these:**
 - ESLint `no-constant-condition` on `while (true)` in `devotional-loader.js` (`findEarliestDate`/`findLatestDate`) — intentional bounded-by-`break` fallback walkers.
 - ESLint `no-control-regex` in `bible-text-formatter.js`'s `sanitizeInput` — the regex's whole purpose is stripping control characters.
 - ESLint `no-undef` (`require`, `global`, `__dirname`) in `*.test.js` files — Node CommonJS globals, correct usage, `.eslintrc.json`'s `env` doesn't include `node`.

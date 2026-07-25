@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Méditation du Jour - Méditations Chrétiennes",
     "errorLoad": "Nous n'avons pas pu charger la méditation du jour. Veuillez réessayer plus tard.",
+    "errorRetry": "Réessayer",
     "backLink": "← Accueil",
     "eyebrow": "Méditation Quotidienne",
     "listen": "Écouter",
@@ -216,6 +217,8 @@
     "appBannerClose": "Fermer",
     "navVision": "Notre Vision",
     "navDevotional": "Méditation du Jour",
+    "supportMinistry": "Faire un don",
+    "supportMinistryTitle": "Soutenez notre ministère pour lancer l'app sur iOS et couvrir les coûts d'infrastructure.\n\nEt la garder gratuite et sans publicité pour tous les utilisateurs.",
     "footerTagline": "© 2026 Develop4God. Un outil ministériel numérique.",
     "salvationPrayerTitle": "Prière de foi, pour la vie éternelle !✨",
     "salvationPrayerIntro": "Répétez cette prière à haute voix, avec foi et en croyant de tout votre cœur❤️ :",

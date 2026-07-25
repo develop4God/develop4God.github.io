@@ -181,6 +181,7 @@
   "devotionals": {
     "docTitle": "Devocional de Hoje - Devocionais Cristãos",
     "errorLoad": "Não foi possível carregar o devocional de hoje. Tente novamente mais tarde.",
+    "errorRetry": "Tentar novamente",
     "backLink": "← Início",
     "eyebrow": "Devocional Diário",
     "listen": "Ouvir",
@@ -216,6 +217,8 @@
     "appBannerClose": "Fechar",
     "navVision": "Nossa Visão",
     "navDevotional": "Devocional de Hoje",
+    "supportMinistry": "Doar",
+    "supportMinistryTitle": "Apoie nosso ministério para levar o app ao iOS e custear a infraestrutura.\n\nMantendo-o gratuito e sem anúncios para todos os usuários.",
     "footerTagline": "© 2026 Develop4God. Ferramenta ministerial digital.",
     "salvationPrayerTitle": "Oração de fé, para vida eterna!✨",
     "salvationPrayerIntro": "Repite esta oração em voz alta, con fé e acreditando com todo o coração❤️:",

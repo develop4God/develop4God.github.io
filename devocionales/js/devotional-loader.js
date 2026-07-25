@@ -106,9 +106,16 @@
 
     async function loadDevotionalImagesIndex() {
         if (!devotionalImagesIndexPromise) {
-            devotionalImagesIndexPromise = fetch(
+            // Cache only resolves to a value, never to a rejection — a
+            // transient failure would otherwise poison this promise for the
+            // rest of the page's life, with no way to recover without a
+            // full reload.
+            devotionalImagesIndexPromise = DevotionalFetch.fetchWithRetry(
                 'https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/index.json'
-            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => {
+                devotionalImagesIndexPromise = null;
+                return null;
+            });
         }
         return devotionalImagesIndexPromise;
     }
@@ -146,7 +153,7 @@
     async function loadYearFile(fileYear) {
         const cacheKey = `${LANGUAGE}:${VERSION}:${fileYear}`;
         if (loadedFiles.has(cacheKey)) return loadedFiles.get(cacheKey);
-        const res = await fetch(devotionalJsonUrl(fileYear));
+        const res = await DevotionalFetch.fetchWithRetry(devotionalJsonUrl(fileYear));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
         const dates = json?.data?.[LANGUAGE] || {};
@@ -167,9 +174,15 @@
 
     async function loadRepoIndex() {
         if (!repoIndexPromise) {
-            repoIndexPromise = fetch(
+            // See loadDevotionalImagesIndex above — cache only a resolved
+            // value, never a rejection, so a transient failure can be
+            // retried instead of sticking for the page's lifetime.
+            repoIndexPromise = DevotionalFetch.fetchWithRetry(
                 `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/index.json`
-            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => {
+                repoIndexPromise = null;
+                return null;
+            });
         }
         return repoIndexPromise;
     }
@@ -296,28 +309,9 @@
         return target;
     }
 
-    async function findAdjacentDate(dateKey, direction) {
-        const fileYear = devotionalFileYear(new Date(dateKey + 'T00:00:00'));
-        const fileData = await loadYearFile(fileYear);
-        const idx = fileData.sortedKeys.indexOf(dateKey);
-
-        if (idx === -1) return null;
-
-        const nextIdx = idx + direction;
-        if (nextIdx >= 0 && nextIdx < fileData.sortedKeys.length) {
-            return fileData.sortedKeys[nextIdx];
-        }
-
-        // Crossed a file boundary — try the adjacent year-file.
-        const adjacentFileYear = fileYear + direction;
-        try {
-            const adjacentData = await loadYearFile(adjacentFileYear);
-            if (!adjacentData.sortedKeys.length) return null;
-            return direction > 0 ? adjacentData.sortedKeys[0] : adjacentData.sortedKeys[adjacentData.sortedKeys.length - 1];
-        } catch {
-            return null;
-        }
-    }
+    // Injected into DevotionalNav's dependency-free functions — see
+    // devotional-nav.js.
+    const navDeps = { devotionalFileYear, loadYearFile, availableFileYears };
 
     async function heroImageForDate(dateKey) {
         const index = await loadDevotionalImagesIndex();
@@ -332,11 +326,14 @@
         return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/${file}`;
     }
 
-    function showError() {
+    function showError(onRetry) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
         document.getElementById('error-state').querySelector('p').textContent =
             DevotionalI18n.t('devotionals.errorLoad', '');
+        const retryBtn = document.getElementById('error-retry');
+        retryBtn.textContent = DevotionalI18n.t('devotionals.errorRetry', '');
+        retryBtn.onclick = onRetry;
     }
 
     function splitVersiculo(raw) {
@@ -562,6 +559,8 @@
         }
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
+        document.getElementById('support-ministry-label').textContent = DevotionalI18n.t('devotionals.supportMinistry', '');
+        document.getElementById('support-ministry-btn').setAttribute('title', DevotionalI18n.t('devotionals.supportMinistryTitle', ''));
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
         document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
@@ -664,7 +663,7 @@
         document.getElementById('devotional-content').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
 
-        setNavDisabled(false, false);
+        await DevotionalNav.updateNavAvailability(dateKey, navDeps);
     }
 
     // Salvation prayer modal — shown after the visitor advances to a new
@@ -694,11 +693,6 @@
         });
     }
 
-    function setNavDisabled(prevDisabled, nextDisabled) {
-        document.getElementById('nav-prev').disabled = prevDisabled;
-        document.getElementById('nav-next').disabled = nextDisabled;
-    }
-
     // Tracks whichever date is currently rendered, independent of the URL —
     // the URL only gains a ?date= param once the visitor explicitly navigates.
     let currentDateKey = null;
@@ -725,20 +719,21 @@
             }
         } catch (err) {
             console.error('Failed to load devotional:', err);
-            showError();
+            DevotionalErrorLogger.logError('load_date', { message: err.message, date_key: dateKey });
+            showError(() => loadDate(dateKey, { pushHistory: false }));
         }
     }
 
     async function navigate(direction) {
         const current = currentDateKey || todayKey();
-        setNavDisabled(true, true);
-        const target = await findAdjacentDate(current, direction);
+        DevotionalNav.setNavDisabled(true, true);
+        const target = await DevotionalNav.findAdjacentDate(current, direction, navDeps);
         if (target) {
             displayDateOffset += direction;
             await loadDate(target);
             if (direction > 0) showSalvationPrayerModal();
         } else {
-            setNavDisabled(false, false);
+            await DevotionalNav.updateNavAvailability(current, navDeps);
         }
     }
 
@@ -756,8 +751,19 @@
         VERSION = resolveVersion(LANGUAGE);
 
         const requestedDate = new URL(window.location.href).searchParams.get('date');
-        const dateKey = requestedDate || await resolveDefaultDate();
-        await loadDate(dateKey, { pushHistory: false });
+        try {
+            const dateKey = requestedDate || await resolveDefaultDate();
+            await loadDate(dateKey, { pushHistory: false });
+        } catch (err) {
+            // resolveDefaultDate() (via findEarliestDate/findLatestDate) can
+            // throw straight out of an unguarded loadYearFile() call when
+            // index.json's known years are exhausted by fetch failures —
+            // without this, that leaves the visitor stuck on the loading
+            // skeleton forever, with no error UI and no retry path at all.
+            console.error('Failed to initialize devotional reader:', err);
+            DevotionalErrorLogger.logError('init', { message: err.message });
+            showError(() => init());
+        }
 
         window.addEventListener('popstate', (ev) => {
             const dk = ev.state?.dateKey || todayKey();

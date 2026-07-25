@@ -70,6 +70,65 @@ test.describe('devocionales reader mobile reading order', () => {
   });
 });
 
+test.describe('devocionales reader support-ministry button', () => {
+  // Header CTA linking out to PayPal — asks visitors to help fund the iOS
+  // release and keep the app free/ad-free. No in-repo payment integration;
+  // this is a plain external link, same PayPal.me URL already used on the
+  // root marketing page.
+
+  test('links to the PayPal donation page and has translated, non-empty text', async ({ page }) => {
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const btn = page.locator('#support-ministry-btn');
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveAttribute('href', 'https://www.paypal.com/paypalme/develop4godOfficial');
+    await expect(btn).toHaveAttribute('target', '_blank');
+    await expect(btn).toHaveAttribute('rel', 'noopener');
+
+    const label = page.locator('#support-ministry-label');
+    await expect(label).not.toHaveText('');
+    await expect(label).toHaveText('Donate');
+
+    // Regression: the button used to clip its own label text instead of
+    // sizing to fit it.
+    const isClipped = await label.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(isClipped).toBe(false);
+  });
+
+  test('label and title are localized per language', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+    await expect(page.locator('#support-ministry-label')).toHaveText('Donar');
+    await expect(page.locator('#support-ministry-btn')).toHaveAttribute('title', /iOS/);
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#support-ministry-label')).toHaveText('Donate');
+    await expect(page.locator('#support-ministry-btn')).toHaveAttribute('title', /iOS/);
+  });
+
+  test('button sizes to fit even the longest translation ("Faire un don")', async ({ page }) => {
+    await page.goto('/devocionales/?lang=fr', { waitUntil: 'networkidle' });
+
+    const label = page.locator('#support-ministry-label');
+    await expect(label).toHaveText('Faire un don');
+
+    const isClipped = await label.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(isClipped).toBe(false);
+  });
+
+  test('has the same horizontal padding as the other .btn-primary CTA (tts-btn)', async ({ page }) => {
+    // Regression: .site-nav a's generic nav-link rule (padding: 0.5rem 0)
+    // was matching this button too, since it's an <a> inside the header —
+    // silently zeroing its left/right padding while the Tailwind px-5
+    // utility class lost the specificity fight. tts-btn is a <button>, so
+    // it was never affected and looked correct while this one didn't.
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const supportPadding = await page.locator('#support-ministry-btn').evaluate((el) => getComputedStyle(el).padding);
+    const ttsPadding = await page.locator('#tts-btn').evaluate((el) => getComputedStyle(el).padding);
+    expect(supportPadding).toBe(ttsPadding);
+  });
+});
+
 test.describe('devocionales reader share feature', () => {
   // Issue #12: replaced hardcoded Facebook/X-only share links (no social
   // presence to point them at) with navigator.share() + a mailto fallback.
@@ -177,6 +236,15 @@ test.describe('devocionales reader salvation prayer modal', () => {
 
   test('does not appear on prev navigation', async ({ page }) => {
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    // A fresh session starts at the archive's oldest entry (day 1), where
+    // "prev" is correctly disabled (see devotional-nav.js) — advance one
+    // step first so there's somewhere to go back to, then dismiss the
+    // salvation modal that "next" triggers before testing "prev" itself.
+    await page.click('#nav-next');
+    await expect(page.locator('#salvation-prayer-modal')).toBeVisible();
+    await page.click('#salvation-modal-continue');
+    await expect(page.locator('#salvation-prayer-modal')).toBeHidden();
 
     await page.click('#nav-prev');
     await page.waitForTimeout(300);
@@ -377,6 +445,181 @@ test.describe('devocionales reader hero image (Devocionales-assets manifest)', (
 
     const h1 = page.locator('h1').first();
     await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+
+  test('recovers on a later render after the manifest fetch fails once, instead of staying broken all page-load long', async ({ page }) => {
+    // Regression coverage for the poisoned-promise-cache bug: previously
+    // loadDevotionalImagesIndex() cached a *rejected* promise, so once the
+    // manifest fetch failed, the hero image stayed empty for every
+    // subsequent render on that page load too — the only fix was a hard
+    // reload. Abort persistently through fetchWithRetry's internal retries
+    // for the first load, then let the network through before navigating,
+    // and confirm the hero image actually recovers without a reload.
+    await page.route('**/images/devotionals/index.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toHaveJSProperty('naturalWidth', 0);
+
+    await page.unroute('**/images/devotionals/index.json');
+    await page.locator('#nav-next').click();
+
+    const salvationModal = page.locator('#salvation-prayer-modal');
+    if (await salvationModal.isVisible()) {
+      await page.locator('#salvation-modal-continue').click();
+    }
+
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidth = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidth).toBeGreaterThan(0);
+  });
+});
+
+test.describe('devocionales reader fetch retry gate', () => {
+  // Covers the stale-cached-failure bug: a transient fetch failure used to
+  // leave the reader stuck on the error state with no way to recover short
+  // of a hard reload — real users only escaped via incognito/clear-cache.
+  // Deterministic via page.route() interception (abort every year-file
+  // request), not real network timing, so this isn't flaky in CI.
+
+  test('shows the error state with a working retry button when the year-file fetch fails, and recovers once the network is restored', async ({ page }) => {
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    const errorState = page.locator('#error-state');
+    await expect(errorState).toBeVisible();
+    const retryBtn = page.locator('#error-retry');
+    await expect(retryBtn).toBeVisible();
+    await expect(retryBtn).not.toHaveText('');
+
+    // Restore the network, then use the retry button — not a page reload —
+    // to prove the in-page recovery path itself works, matching what a
+    // real visitor does without refreshing.
+    await page.unroute('**/Devocionales-json/**/Devocional_year_*.json');
+    await retryBtn.click();
+
+    await expect(errorState).toBeHidden();
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+
+  test('logs a devotional_load_failed gtag event when the load fails', async ({ page }) => {
+    // Block the real gtag.js network script so it can't overwrite the
+    // page's own `function gtag(){dataLayer.push(arguments)}` declaration —
+    // that inline function is what DevotionalErrorLogger actually calls,
+    // so asserting on dataLayer's contents is deterministic and needs no
+    // stubbing of window.gtag itself (which the page redefines on load).
+    await page.route('https://www.googletagmanager.com/gtag/js*', (route) => route.abort());
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => route.abort());
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await expect(page.locator('#error-state')).toBeVisible();
+
+    const dataLayer = await page.evaluate(() => window.dataLayer);
+    const errorEvent = dataLayer.find((entry) => entry[0] === 'event' && entry[1] === 'devotional_load_failed');
+    expect(errorEvent).toBeDefined();
+    expect(errorEvent[2]).toMatchObject({ error_type: expect.any(String) });
+  });
+
+  test('retries transient failures automatically before surfacing the error state', async ({ page }) => {
+    // First request to each year-file URL fails, subsequent ones succeed —
+    // exercises DevotionalFetch.fetchWithRetry's internal retry without
+    // ever reaching the visible error UI.
+    const seenUrls = new Set();
+    await page.route('**/Devocionales-json/**/Devocional_year_*.json', (route) => {
+      const url = route.request().url();
+      if (!seenUrls.has(url)) {
+        seenUrls.add(url);
+        return route.abort();
+      }
+      return route.continue();
+    });
+
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#error-state')).toBeHidden();
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+});
+
+test.describe('devocionales reader nav availability at archive edges', () => {
+  // devotional-nav.js's updateNavAvailability() disables "prev"/"next" when
+  // there's genuinely nothing to navigate to — previously both buttons were
+  // always enabled after render(), so "prev" was clickable-but-inert on a
+  // visitor's very first devotional (no earlier entry exists). A mocked,
+  // 3-entry single-year archive gives deterministic control over both edges
+  // without depending on where the real Devocionales-json archive currently
+  // starts/ends.
+  const MOCK_DATES = ['2020-01-01', '2020-01-02', '2020-01-03'];
+
+  async function mockSmallArchive(page) {
+    await page.route('**/Devocionales-json/**/index.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        files: { en: { NIV: { files: { 2019: 'Devocional_year_2019_en_NIV.json' } } } },
+      }),
+    }));
+    await page.route('**/Devocionales-json/**/Devocional_year_2019_en_NIV.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: {
+          en: Object.fromEntries(MOCK_DATES.map((d, i) => [d, [{
+            id: `mock-${i}`, date: d, language: 'en', version: 'NIV',
+            versiculo: `Mock ${i} 1:1 NIV: "text"`, reflexion: 'r', oracion: 'o', para_meditar: [], tags: [],
+          }]])),
+        },
+      }),
+    }));
+  }
+
+  test('prev is disabled on the oldest devotional, enabled after moving forward', async ({ page }) => {
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[0]}`, { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#nav-prev')).toBeDisabled();
+    await expect(page.locator('#nav-next')).toBeEnabled();
+
+    await page.click('#nav-next');
+    await expect(page.locator('#salvation-prayer-modal')).toBeVisible();
+    await page.click('#salvation-modal-continue');
+
+    await expect(page.locator('#nav-prev')).toBeEnabled();
+  });
+
+  test('next is disabled on the newest devotional', async ({ page }) => {
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[MOCK_DATES.length - 1]}`, { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#nav-next')).toBeDisabled();
+    await expect(page.locator('#nav-prev')).toBeEnabled();
+  });
+
+  test('clicking a disabled prev button does nothing (no navigation, no console errors)', async ({ page }) => {
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[0]}`, { waitUntil: 'networkidle' });
+
+    const h1 = page.locator('h1').first();
+    const beforeText = await h1.textContent();
+
+    await page.locator('#nav-prev').click({ force: true });
+    await page.waitForTimeout(300);
+
+    await expect(h1).toHaveText(beforeText);
     expect(appErrors).toEqual([]);
   });
 });
