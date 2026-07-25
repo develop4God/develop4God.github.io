@@ -178,6 +178,15 @@ test.describe('devocionales reader salvation prayer modal', () => {
   test('does not appear on prev navigation', async ({ page }) => {
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
+    // A fresh session starts at the archive's oldest entry (day 1), where
+    // "prev" is correctly disabled (see devotional-nav.js) — advance one
+    // step first so there's somewhere to go back to, then dismiss the
+    // salvation modal that "next" triggers before testing "prev" itself.
+    await page.click('#nav-next');
+    await expect(page.locator('#salvation-prayer-modal')).toBeVisible();
+    await page.click('#salvation-modal-continue');
+    await expect(page.locator('#salvation-prayer-modal')).toBeHidden();
+
     await page.click('#nav-prev');
     await page.waitForTimeout(300);
     await expect(page.locator('#salvation-prayer-modal')).toBeHidden();
@@ -454,6 +463,76 @@ test.describe('devocionales reader fetch retry gate', () => {
     await expect(page.locator('#error-state')).toBeHidden();
     const h1 = page.locator('h1').first();
     await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+});
+
+test.describe('devocionales reader nav availability at archive edges', () => {
+  // devotional-nav.js's updateNavAvailability() disables "prev"/"next" when
+  // there's genuinely nothing to navigate to — previously both buttons were
+  // always enabled after render(), so "prev" was clickable-but-inert on a
+  // visitor's very first devotional (no earlier entry exists). A mocked,
+  // 3-entry single-year archive gives deterministic control over both edges
+  // without depending on where the real Devocionales-json archive currently
+  // starts/ends.
+  const MOCK_DATES = ['2020-01-01', '2020-01-02', '2020-01-03'];
+
+  async function mockSmallArchive(page) {
+    await page.route('**/Devocionales-json/**/index.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        files: { en: { NIV: { files: { 2019: 'Devocional_year_2019_en_NIV.json' } } } },
+      }),
+    }));
+    await page.route('**/Devocionales-json/**/Devocional_year_2019_en_NIV.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: {
+          en: Object.fromEntries(MOCK_DATES.map((d, i) => [d, [{
+            id: `mock-${i}`, date: d, language: 'en', version: 'NIV',
+            versiculo: `Mock ${i} 1:1 NIV: "text"`, reflexion: 'r', oracion: 'o', para_meditar: [], tags: [],
+          }]])),
+        },
+      }),
+    }));
+  }
+
+  test('prev is disabled on the oldest devotional, enabled after moving forward', async ({ page }) => {
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[0]}`, { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#nav-prev')).toBeDisabled();
+    await expect(page.locator('#nav-next')).toBeEnabled();
+
+    await page.click('#nav-next');
+    await expect(page.locator('#salvation-prayer-modal')).toBeVisible();
+    await page.click('#salvation-modal-continue');
+
+    await expect(page.locator('#nav-prev')).toBeEnabled();
+  });
+
+  test('next is disabled on the newest devotional', async ({ page }) => {
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[MOCK_DATES.length - 1]}`, { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#nav-next')).toBeDisabled();
+    await expect(page.locator('#nav-prev')).toBeEnabled();
+  });
+
+  test('clicking a disabled prev button does nothing (no navigation, no console errors)', async ({ page }) => {
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await mockSmallArchive(page);
+    await page.goto(`/devocionales/?lang=en&date=${MOCK_DATES[0]}`, { waitUntil: 'networkidle' });
+
+    const h1 = page.locator('h1').first();
+    const beforeText = await h1.textContent();
+
+    await page.locator('#nav-prev').click({ force: true });
+    await page.waitForTimeout(300);
+
+    await expect(h1).toHaveText(beforeText);
     expect(appErrors).toEqual([]);
   });
 });

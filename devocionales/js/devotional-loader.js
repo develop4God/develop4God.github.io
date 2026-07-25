@@ -309,28 +309,9 @@
         return target;
     }
 
-    async function findAdjacentDate(dateKey, direction) {
-        const fileYear = devotionalFileYear(new Date(dateKey + 'T00:00:00'));
-        const fileData = await loadYearFile(fileYear);
-        const idx = fileData.sortedKeys.indexOf(dateKey);
-
-        if (idx === -1) return null;
-
-        const nextIdx = idx + direction;
-        if (nextIdx >= 0 && nextIdx < fileData.sortedKeys.length) {
-            return fileData.sortedKeys[nextIdx];
-        }
-
-        // Crossed a file boundary — try the adjacent year-file.
-        const adjacentFileYear = fileYear + direction;
-        try {
-            const adjacentData = await loadYearFile(adjacentFileYear);
-            if (!adjacentData.sortedKeys.length) return null;
-            return direction > 0 ? adjacentData.sortedKeys[0] : adjacentData.sortedKeys[adjacentData.sortedKeys.length - 1];
-        } catch {
-            return null;
-        }
-    }
+    // Injected into DevotionalNav's dependency-free functions — see
+    // devotional-nav.js.
+    const navDeps = { devotionalFileYear, loadYearFile, availableFileYears };
 
     async function heroImageForDate(dateKey) {
         const index = await loadDevotionalImagesIndex();
@@ -680,7 +661,7 @@
         document.getElementById('devotional-content').classList.remove('hidden');
         if (window.lucide) lucide.createIcons();
 
-        setNavDisabled(false, false);
+        await DevotionalNav.updateNavAvailability(dateKey, navDeps);
     }
 
     // Salvation prayer modal — shown after the visitor advances to a new
@@ -708,11 +689,6 @@
             if (dontShow) localStorage.setItem(SALVATION_DONT_SHOW_KEY, '1');
             modal.classList.add('hidden');
         });
-    }
-
-    function setNavDisabled(prevDisabled, nextDisabled) {
-        document.getElementById('nav-prev').disabled = prevDisabled;
-        document.getElementById('nav-next').disabled = nextDisabled;
     }
 
     // Tracks whichever date is currently rendered, independent of the URL —
@@ -748,14 +724,14 @@
 
     async function navigate(direction) {
         const current = currentDateKey || todayKey();
-        setNavDisabled(true, true);
-        const target = await findAdjacentDate(current, direction);
+        DevotionalNav.setNavDisabled(true, true);
+        const target = await DevotionalNav.findAdjacentDate(current, direction, navDeps);
         if (target) {
             displayDateOffset += direction;
             await loadDate(target);
             if (direction > 0) showSalvationPrayerModal();
         } else {
-            setNavDisabled(false, false);
+            await DevotionalNav.updateNavAvailability(current, navDeps);
         }
     }
 
