@@ -409,13 +409,28 @@
     function renderShareLinks(entry) {
         const url = window.location.href;
         const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
-        const shareText = `${eyebrow}: ${entry.versiculo}`;
-        shareData = { title: eyebrow, text: shareText, url };
-
-        const text = encodeURIComponent(shareText);
-        const mailBtn = document.getElementById('share-mail');
-        mailBtn.href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
-        mailBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareMailAria', ''));
+        const labels = {
+            eyebrow,
+            versiculo: DevotionalI18n.t('devotionals.versiculo', ''),
+            reflexion: DevotionalI18n.t('devotionals.reflexion', ''),
+            oracion: DevotionalI18n.t('devotionals.oracion', ''),
+            readMore: DevotionalI18n.t('devotionals.shareReadMore', ''),
+            footerTitle: DevotionalI18n.t('devotionals.shareFooterTitle', ''),
+            footerCompleteApp: DevotionalI18n.t('devotionals.shareFooterCompleteApp', ''),
+            footerDailyDevotionals: DevotionalI18n.t('devotionals.shareFooterDailyDevotionals', ''),
+            footerAudioReading: DevotionalI18n.t('devotionals.shareFooterAudioReading', ''),
+            footerBibleStudies: DevotionalI18n.t('devotionals.shareFooterBibleStudies', ''),
+            footerBibleVersions: DevotionalI18n.t('devotionals.shareFooterBibleVersions', ''),
+            footerAndMore: DevotionalI18n.t('devotionals.shareFooterAndMore', ''),
+            footerDownload: DevotionalI18n.t('devotionals.shareFooterDownload', ''),
+            footerBenefits: DevotionalI18n.t('devotionals.shareFooterBenefits', ''),
+            footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
+        };
+        const shareText = DevotionalShare.buildShareText(entry, labels, url);
+        // No separate `url` field here: shareText already embeds the link
+        // (via the "read more" line), and some share targets append a
+        // provided `url` a second time on top of `text`, duplicating it.
+        shareData = { title: eyebrow, text: shareText };
 
         const nativeBtn = document.getElementById('share-native');
         nativeBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareAria', ''));
@@ -548,6 +563,7 @@
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
+        document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
         document.getElementById('version-info-btn').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionInfoAria', ''));
     }

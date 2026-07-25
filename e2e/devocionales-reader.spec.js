@@ -74,16 +74,19 @@ test.describe('devocionales reader share feature', () => {
   // Issue #12: replaced hardcoded Facebook/X-only share links (no social
   // presence to point them at) with navigator.share() + a mailto fallback.
 
-  test('mailto fallback link includes the verse text and page URL', async ({ page }) => {
+  test('footer contact link is a static contact-us mailto, separate from the share row', async ({ page }) => {
+    // Regression: mail used to live inside the share row and rebuild its body
+    // from the WhatsApp-formatted share text (emoji + *bold* markdown),
+    // producing a corrupted email body. Native share already covers "share
+    // via email" — contact is now a plain footer link, independent of the
+    // current devotional and not part of the per-entry share controls.
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
-    const mailHref = await page.locator('#share-mail').getAttribute('href');
-    const pageUrl = page.url();
-    expect(mailHref).toMatch(/^mailto:\?subject=/);
-    expect(mailHref).toContain(encodeURIComponent(pageUrl));
+    const mailHref = await page.locator('#footer-contact-mail').getAttribute('href');
+    expect(mailHref).toBe('mailto:develop4God@gmail.com');
   });
 
-  test('native share button calls navigator.share with current entry data when supported', async ({ page }) => {
+  test('native share button calls navigator.share with rich devotional content (verse, reflexión, oración, app FOMO footer)', async ({ page }) => {
     await page.addInitScript(() => {
       window.__shareCalls = [];
       Object.defineProperty(navigator, 'share', {
@@ -103,8 +106,32 @@ test.describe('devocionales reader share feature', () => {
 
     const calls = await page.evaluate(() => window.__shareCalls);
     expect(calls).toHaveLength(1);
-    expect(calls[0].url).toBe(page.url());
+    // No separate `url` field passed to navigator.share() — some share
+    // targets append it a second time on top of `text`, duplicating the
+    // link that's already embedded in the "read more" line below.
+    expect(calls[0].url).toBeUndefined();
     expect(calls[0].text.length).toBeGreaterThan(0);
+
+    const verseRef = await page.locator('#devotional-verse-ref').textContent();
+    const reflexionText = await page.locator('#devotional-reflexion').textContent();
+    const oracionText = await page.locator('#devotional-oracion').textContent();
+
+    expect(calls[0].text).toContain('*Daily Devotional*');
+    expect(calls[0].text).toContain(verseRef.trim());
+    expect(calls[0].text).toContain('Reflection:*');
+    expect(calls[0].text).toContain(reflexionText.trim());
+    expect(calls[0].text).toContain('Prayer:*');
+    expect(calls[0].text).toContain(oracionText.trim());
+    expect(calls[0].text).toContain('More devotional content here:');
+    expect(calls[0].text).toContain(page.url());
+
+    // FOMO footer, mirroring devocional_nuevo's DevotionalShareHelper —
+    // turns each share into a potential new visitor + app install, not just
+    // a link back to the same page.
+    expect(calls[0].text).toContain('*This is just the beginning...*');
+    expect(calls[0].text).toContain('The complete app includes:');
+    expect(calls[0].text).toContain('*Download: Christian Devotionals*');
+    expect(calls[0].text).toContain('https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo');
 
     // Clicking again after this should still fire exactly once more — not
     // stack additional listeners across the module-level shareHandlerBound
@@ -123,7 +150,7 @@ test.describe('devocionales reader share feature', () => {
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
     await expect(page.locator('#share-native')).toBeHidden();
-    await expect(page.locator('#share-mail')).toBeVisible();
+    await expect(page.locator('#footer-contact-mail')).toBeVisible();
   });
 });
 
