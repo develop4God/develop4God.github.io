@@ -242,7 +242,7 @@
 
         #tts-btn.speaking { background: var(--highlight); }
 
-        #share-native:hover, #share-mail:hover { color: var(--accent); }
+        #share-native:hover, #footer-contact-mail:hover { color: var(--accent); }
 
         .skeleton {
             background: linear-gradient(90deg, var(--surface) 25%, var(--accent-soft) 37%, var(--surface) 63%);
@@ -498,11 +498,10 @@
                         <p id="devotional-oracion" class="whitespace-pre-line italic pl-4 mb-8" style="color: var(--text-muted); border-left: 2px solid var(--accent);"></p>
                     </div>
 
-                    <!-- Share row: navigator.share() (native share sheet) with a mailto fallback for browsers without it -->
+                    <!-- Share row: navigator.share() (native share sheet, covers email itself). Contact-us mailto lives in the page footer, not here. -->
                     <div class="mt-10 pt-4" style="border-top: 1px solid var(--border);">
                         <span id="comparte-label" class="text-sm font-semibold" style="color: var(--text-muted);">Comparte:</span>
                         <button id="share-native" type="button" aria-label="Compartir" style="color: var(--text-muted); background: none; border: none; cursor: pointer;"><i data-lucide="share-2" class="w-5 h-5"></i></button>
-                        <a id="share-mail" href="#" aria-label="Compartir por correo" style="color: var(--text-muted);"><i data-lucide="mail" class="w-5 h-5"></i></a>
                     </div>
                 </div>
 
@@ -541,11 +540,16 @@
 
     <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
         <p id="footer-tagline">&copy; 2026 Develop4God. Herramienta ministerial digital.</p>
+        <a id="footer-contact-mail" href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+            <span id="footer-contact-label">Contáctanos</span>
+        </a>
     </footer>
 
     <script src="/devocionales/js/modern.js"></script>
     <script src="/devocionales/js/bible-text-formatter.js"></script>
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
+    <script src="/devocionales/js/devotional-share.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script>
         lucide.createIcons();

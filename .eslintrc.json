@@ -11,6 +11,7 @@
     "DevotionalI18n": "readonly",
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",
+    "DevotionalShare": "readonly",
     "lucide": "readonly"
   },
   "rules": {
