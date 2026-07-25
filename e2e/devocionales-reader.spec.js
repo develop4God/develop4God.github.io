@@ -74,16 +74,20 @@ test.describe('devocionales reader share feature', () => {
   // Issue #12: replaced hardcoded Facebook/X-only share links (no social
   // presence to point them at) with navigator.share() + a mailto fallback.
 
-  test('mailto fallback link includes the verse text and page URL', async ({ page }) => {
+  test('mailto fallback link includes the verse text and page URL exactly once', async ({ page }) => {
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
 
     const mailHref = await page.locator('#share-mail').getAttribute('href');
     const pageUrl = page.url();
     expect(mailHref).toMatch(/^mailto:\?subject=/);
     expect(mailHref).toContain(encodeURIComponent(pageUrl));
+    // Regression: body used to append the URL a second time on top of the
+    // (URL-less) share text; now buildShareText already ends with the URL.
+    const encodedUrlOccurrences = mailHref.split(encodeURIComponent(pageUrl)).length - 1;
+    expect(encodedUrlOccurrences).toBe(1);
   });
 
-  test('native share button calls navigator.share with current entry data when supported', async ({ page }) => {
+  test('native share button calls navigator.share with rich devotional content (verse, reflexión, oración)', async ({ page }) => {
     await page.addInitScript(() => {
       window.__shareCalls = [];
       Object.defineProperty(navigator, 'share', {
@@ -105,6 +109,18 @@ test.describe('devocionales reader share feature', () => {
     expect(calls).toHaveLength(1);
     expect(calls[0].url).toBe(page.url());
     expect(calls[0].text.length).toBeGreaterThan(0);
+
+    const verseRef = await page.locator('#devotional-verse-ref').textContent();
+    const reflexionText = await page.locator('#devotional-reflexion').textContent();
+    const oracionText = await page.locator('#devotional-oracion').textContent();
+
+    expect(calls[0].text).toContain('*Daily Devotional*');
+    expect(calls[0].text).toContain(verseRef.trim());
+    expect(calls[0].text).toContain('Reflection:*');
+    expect(calls[0].text).toContain(reflexionText.trim());
+    expect(calls[0].text).toContain('Prayer:*');
+    expect(calls[0].text).toContain(oracionText.trim());
+    expect(calls[0].text).toContain('Read more:');
 
     // Clicking again after this should still fire exactly once more — not
     // stack additional listeners across the module-level shareHandlerBound

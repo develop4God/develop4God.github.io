@@ -409,12 +409,18 @@
     function renderShareLinks(entry) {
         const url = window.location.href;
         const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
-        const shareText = `${eyebrow}: ${entry.versiculo}`;
+        const labels = {
+            eyebrow,
+            versiculo: DevotionalI18n.t('devotionals.versiculo', ''),
+            reflexion: DevotionalI18n.t('devotionals.reflexion', ''),
+            oracion: DevotionalI18n.t('devotionals.oracion', ''),
+            readMore: DevotionalI18n.t('devotionals.shareReadMore', ''),
+        };
+        const shareText = DevotionalShare.buildShareText(entry, labels, url);
         shareData = { title: eyebrow, text: shareText, url };
 
-        const text = encodeURIComponent(shareText);
         const mailBtn = document.getElementById('share-mail');
-        mailBtn.href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${text}%20${encodeURIComponent(url)}`;
+        mailBtn.href = `mailto:?subject=${encodeURIComponent(eyebrow)}&body=${encodeURIComponent(shareText)}`;
         mailBtn.setAttribute('aria-label', DevotionalI18n.t('devotionals.shareMailAria', ''));
 
         const nativeBtn = document.getElementById('share-native');
