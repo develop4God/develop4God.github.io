@@ -16,8 +16,18 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Run node --test
-        run: node --test
+      - name: Run node --test with c8 coverage
+        run: |
+          npx --yes c8 node --test
+          npx --yes c8 report --reporter=text --reporter=html
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
 
       - name: Install Playwright
         run: |
