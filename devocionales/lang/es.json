@@ -13,6 +13,7 @@
   },
   "header": {
     "title": "Devocionales Cristianos",
+    "mainTitle": "Ven y Descansa",
     "subtitle": "Tu Compañero Espiritual Diario",
     "description": "Fortalece tu fe con reflexiones bíblicas inspiradoras y contenido espiritual diseñado para nutrir tu alma cada día.",
     "downloadApp": "Descarga App",
@@ -186,6 +187,9 @@
     "stop": "Escuchar (detener)",
     "downloadApp": "Descarga la App",
     "readingOptions": "Opciones de Lectura",
+    "versionSelectAria": "Versión de la Biblia",
+    "versionInfoAria": "Nombre completo de la versión",
+    "versionCopyrightLabel": "Versión bíblica",
     "paraMeditar": "Para Meditar",
     "temas": "Temas",
     "versiculo": "Versículo",

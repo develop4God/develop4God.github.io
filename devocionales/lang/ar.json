@@ -13,6 +13,7 @@
   },
   "header": {
     "title": "تأملات مسيحية",
+    "mainTitle": "تعال واسترح",
     "subtitle": "رفيقك الروحي اليومي",
     "description": "قوِّ إيمانك بتأملات كتابية ملهمة ومحتوى روحي مصمم لتغذية روحك كل يوم.",
     "downloadApp": "حمّل التطبيق",
@@ -186,6 +187,9 @@
     "stop": "استمع (إيقاف)",
     "downloadApp": "حمّل التطبيق",
     "readingOptions": "خيارات القراءة",
+    "versionSelectAria": "إصدار الكتاب المقدس",
+    "versionInfoAria": "الاسم الكامل للإصدار",
+    "versionCopyrightLabel": "إصدار الكتاب المقدس",
     "paraMeditar": "للتأمل",
     "temas": "المواضيع",
     "versiculo": "الآية",

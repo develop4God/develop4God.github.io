@@ -13,6 +13,7 @@
   },
   "header": {
     "title": "基督徒灵修",
+    "mainTitle": "来歇息吧",
     "subtitle": "您的每日属灵伴侣",
     "description": "通过鼓舞人心的圣经反思和属灵内容，每天滋养您的心灵，坚固您的信仰。",
     "downloadApp": "下载应用",
@@ -186,6 +187,9 @@
     "stop": "收听（停止）",
     "downloadApp": "下载应用",
     "readingOptions": "阅读选项",
+    "versionSelectAria": "圣经版本",
+    "versionInfoAria": "版本全称",
+    "versionCopyrightLabel": "圣经版本",
     "paraMeditar": "默想",
     "temas": "主题",
     "versiculo": "经文",

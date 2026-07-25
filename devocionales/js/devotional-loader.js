@@ -21,6 +21,61 @@
         fil: 'MBB05',
     };
     const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_VERSIONS);
+    const VERSION_KEY_PREFIX = 'devocionalVersion:';
+
+    // Full display name + legal copyright/attribution text per (language,
+    // version) — ported from devocional_nuevo (Flutter app)'s
+    // lib/utils/copyright_utils.dart (copyright text) and
+    // bible_reader_core/lib/src/bible_version_registry.dart (display names),
+    // consolidated into one table and scoped to the 20 codes this repo
+    // actually serves (confirmed against Devocionales-json's index.json).
+    // Keep in sync with the Dart source if either changes.
+    const BIBLE_VERSION_INFO = {
+        es: {
+            RVR1960: { name: 'Reina Valera 1960', copyright: 'El texto bíblico Reina-Valera 1960® Sociedades Bíblicas en América Latina, 1960. Derechos renovados 1988, Sociedades Bíblicas Unidas.' },
+            NVI: { name: 'Nueva Versión Internacional', copyright: 'El texto bíblico Nueva Versión Internacional® © 1999 Biblica, Inc. Todos los derechos reservados.' },
+        },
+        en: {
+            KJV: { name: 'King James Version', copyright: 'The biblical text King James Version® Public Domain.' },
+            NIV: { name: 'New International Version', copyright: 'The biblical text New International Version® © 2011 Biblica, Inc. All rights reserved.' },
+        },
+        pt: {
+            ARC: { name: 'Almeida Revista e Corrigida', copyright: 'O texto bíblico Almeida Revista e Corrigida® Domínio Público.' },
+            NVI: { name: 'Nova Versão Internacional', copyright: 'O texto bíblico Nova Versão Internacional® © 2000 Biblica, Inc. Todos os direitos reservados.' },
+        },
+        fr: {
+            LSG1910: { name: 'Louis Segond 1910', copyright: 'Le texte biblique Louis Segond 1910® Domaine Public.' },
+            TOB: { name: 'Traduction Oecuménique de la Bible', copyright: 'Le texte biblique Traduction Oecuménique de la Bible® © Société Biblique Française et Éditions du Cerf.' },
+        },
+        ja: {
+            '新改訳2003': { name: '新改訳2003', copyright: '聖書本文 新改訳2003聖書® © 2003 新日本聖書刊行会。すべての権利が保護されています。' },
+            'リビングバイブル': { name: 'リビングバイブル', copyright: '聖書本文 リビングバイブル® © 1997 新日本聖書刊行会。すべての権利が保護されています。' },
+        },
+        zh: {
+            '和合本1919': { name: '和合本1919', copyright: '圣经和合本版权属于公有领域。' },
+            '新译本': { name: '新译本', copyright: '圣经《新译本》版权属于环球圣经公会，蒙允准使用。版权所有，不得翻印。' },
+        },
+        hi: {
+            HIOV: { name: 'पवित्र बाइबिल (ओ.वी.)', copyright: 'पवित्र बाइबिल हिन्दी ओ.वी. संस्करण (HIOV) © Bible Society of India. सभी अधिकार सुरक्षित।' },
+            HERV: { name: 'पवित्र बाइबिल (HERV)', copyright: 'पवित्र बाइबिल आसान हिंदी संस्करण (HERV) © 1995, 2010 Bible League International. सभी अधिकार सुरक्षित।' },
+        },
+        de: {
+            LU17: { name: 'Lutherbibel 2017', copyright: 'Lutherbibel, revidiert 2017, © 2016 Deutsche Bibelgesellschaft, Stuttgart.' },
+            SCH2000: { name: 'Schlachter 2000', copyright: 'Schlachter 2000 © Genfer Bibelgesellschaft. Alle Rechte vorbehalten.' },
+        },
+        ar: {
+            NAV: { name: 'كتاب الحياة', copyright: 'النص الكتابي الترجمة العربية الجديدة © 2005 Biblica, Inc. جميع الحقوق محفوظة.' },
+            SVDA: { name: 'فان دايك', copyright: 'النص الكتابي ترجمة سميث وفاندايك، ملك عام.' },
+        },
+        fil: {
+            MBB05: { name: 'Magandang Balita Biblia', copyright: 'Ang Magandang Balita Biblia (MBB) © 2005, 2012 Philippine Bible Society. Lahat ng karapatan ay nakalaan.' },
+            ASND: { name: 'Ang Salita ng Dios', copyright: 'Ang Salita ng Dios (Tagalog Contemporary Bible) © 2009, 2011, 2014, 2015 Biblica, Inc. ® Ginamit sa pahintulot ng Biblica, Inc.® Lahat ng karapatan ay nakalaan sa buong mundo.' },
+        },
+    };
+
+    function versionInfo(lang, version) {
+        return (BIBLE_VERSION_INFO[lang] && BIBLE_VERSION_INFO[lang][version]) || null;
+    }
 
     function resolveLanguage() {
         return DevotionalI18n.getLanguage(SUPPORTED_LANGUAGES, 'en');
@@ -28,15 +83,35 @@
 
     let LANGUAGE = resolveLanguage();
 
-    const HABITUS_IMAGES = [
-        'blue_mountains.avif', 'bridge_waterfall.avif', 'circle_grass_green.avif',
-        'desert_person.avif', 'desert_rocks.avif', 'desert_view_rocks.avif',
-        'grass_tree.avif', 'gray_dock_lake.avif', 'lake.avif', 'lake_colors.avif',
-        'lake_dock.avif', 'lake_flowers.avif', 'long_road.avif', 'mountain_pink.avif',
-        'mountain_river.avif', 'river_rocks_trees.avif', 'road_green_montains.avif',
-        'rocks_beach.avif', 'rocks_water.avif', 'snow_house.avif', 'snow_mountains.avif',
-        'sunset_beach.avif', 'sunset_snow.avif'
-    ];
+    // Selected Bible version per language, persisted independently per
+    // language (a version choice in one language has no meaning in another).
+    // Falls back to LANGUAGE_VERSIONS' default until the visitor picks one,
+    // or if the stored code isn't (no longer) a valid option for that language.
+    function resolveVersion(lang) {
+        const stored = localStorage.getItem(VERSION_KEY_PREFIX + lang);
+        return stored || LANGUAGE_VERSIONS[lang];
+    }
+
+    let VERSION = resolveVersion(LANGUAGE);
+
+    function setVersion(lang, version) {
+        localStorage.setItem(VERSION_KEY_PREFIX + lang, version);
+    }
+
+    // Hero image filenames — fetched from Devocionales-assets' CI-generated
+    // manifest instead of hardcoded here, so the list never drifts from the
+    // real, validated file set (see .claude/skills/web-coding-agent/SKILL.md
+    // Step 0, item 6).
+    let devotionalImagesIndexPromise = null;
+
+    async function loadDevotionalImagesIndex() {
+        if (!devotionalImagesIndexPromise) {
+            devotionalImagesIndexPromise = fetch(
+                'https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/index.json'
+            ).then((res) => (res.ok ? res.json() : null)).catch(() => null);
+        }
+        return devotionalImagesIndexPromise;
+    }
 
     function todayKey() {
         const now = new Date();
@@ -55,18 +130,21 @@
 
     function devotionalJsonUrl(fileYear) {
         const base = `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/${JSON_BRANCH}/Devocional_year_${fileYear}`;
-        if (LANGUAGE === 'es') return `${base}.json`;
+        // The legacy no-suffix filename only covers 'es' at its default
+        // version (RVR1960) — any other version, including a non-default
+        // 'es' pick, needs the lang+version-suffixed filename.
+        if (LANGUAGE === 'es' && VERSION === LANGUAGE_VERSIONS.es) return `${base}.json`;
         // encodeURIComponent covers version codes with non-ASCII characters
         // (e.g. Japanese/Chinese) safely; it's a no-op for ASCII codes.
-        return `${base}_${LANGUAGE}_${encodeURIComponent(LANGUAGE_VERSIONS[LANGUAGE])}.json`;
+        return `${base}_${LANGUAGE}_${encodeURIComponent(VERSION)}.json`;
     }
 
-    // Cache of loaded year-files, keyed by "lang:fileYear" since the same
-    // fileYear number maps to a different file per language.
+    // Cache of loaded year-files, keyed by "lang:version:fileYear" since the
+    // same fileYear number maps to a different file per language+version.
     const loadedFiles = new Map();
 
     async function loadYearFile(fileYear) {
-        const cacheKey = `${LANGUAGE}:${fileYear}`;
+        const cacheKey = `${LANGUAGE}:${VERSION}:${fileYear}`;
         if (loadedFiles.has(cacheKey)) return loadedFiles.get(cacheKey);
         const res = await fetch(devotionalJsonUrl(fileYear));
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -98,10 +176,21 @@
 
     async function availableFileYears() {
         const index = await loadRepoIndex();
-        const version = LANGUAGE_VERSIONS[LANGUAGE];
-        const years = index?.files?.[LANGUAGE]?.[version]?.files;
+        const years = index?.files?.[LANGUAGE]?.[VERSION]?.files;
         if (years) return Object.keys(years).map(Number).sort((a, b) => a - b);
         return null;
+    }
+
+    // Which version codes index.json actually publishes for a language,
+    // in stable order (defaults to LANGUAGE_VERSIONS' own order first).
+    async function availableVersions(lang) {
+        const index = await loadRepoIndex();
+        const versions = index?.files?.[lang];
+        if (!versions) return [LANGUAGE_VERSIONS[lang]];
+        const codes = Object.keys(versions);
+        return codes.includes(LANGUAGE_VERSIONS[lang])
+            ? [LANGUAGE_VERSIONS[lang], ...codes.filter((c) => c !== LANGUAGE_VERSIONS[lang])]
+            : codes;
     }
 
     // Walks backwards from the current year-file to find the oldest year-file
@@ -230,13 +319,17 @@
         }
     }
 
-    function heroImageForDate(dateKey) {
+    async function heroImageForDate(dateKey) {
+        const index = await loadDevotionalImagesIndex();
+        const files = index?.files;
+        if (!files?.length) return '';
+
         let hash = 0;
         for (let i = 0; i < dateKey.length; i++) {
             hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0;
         }
-        const file = HABITUS_IMAGES[hash % HABITUS_IMAGES.length];
-        return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/habitus/${file}`;
+        const file = files[hash % files.length];
+        return `https://raw.githubusercontent.com/develop4God/Devocionales-assets/main/images/devotionals/${file}`;
     }
 
     function showError() {
@@ -287,6 +380,23 @@
             return;
         }
         list.innerHTML = tags.map(t => `<span class="tag-pill">${t}</span>`).join('');
+    }
+
+    // Legally-required per-version attribution/copyright notice, always
+    // visible (not tap-to-expand) — matches the Flutter app's persistent
+    // inline-text pattern (see devocional_nuevo's copyright_utils.dart).
+    // Uses entry.version (the version actually loaded for this content),
+    // not the module-level VERSION selector state, so it's never out of
+    // sync with what's on screen.
+    function renderVersionCopyright(entry) {
+        const el = document.getElementById('version-copyright');
+        const info = versionInfo(LANGUAGE, entry.version);
+        if (!info) {
+            el.textContent = '';
+            return;
+        }
+        const label = DevotionalI18n.t('devotionals.versionCopyrightLabel', 'Bible version');
+        el.textContent = `${label}: ${info.name} (${entry.version}) — ${info.copyright}`;
     }
 
     // Same stacked-listener pitfall as setupTts (see above): renderShareLinks
@@ -438,14 +548,72 @@
         document.getElementById('nav-vision-label').textContent = DevotionalI18n.t('devotionals.navVision', '');
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
+        document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
+        document.getElementById('version-info-btn').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionInfoAria', ''));
     }
 
-    function render(entry, dateKey) {
+    // Populates the version <select> with whatever index.json publishes for
+    // the current LANGUAGE, and re-loads the current date under the newly
+    // selected version on change. Rebuilt on every render() (language can
+    // change the option list), but the change listener is bound once and
+    // reads LANGUAGE/VERSION via closure — same stacked-listener avoidance
+    // as setupTts/renderShareLinks above.
+    let versionHandlerBound = false;
+
+    async function setupVersionSelect() {
+        const select = document.getElementById('version-select');
+        const versions = await availableVersions(LANGUAGE);
+
+        select.innerHTML = versions.map((v) => `<option value="${v}">${v}</option>`).join('');
+        select.value = VERSION;
+        updateVersionInfoPopover();
+
+        if (versionHandlerBound) return;
+        versionHandlerBound = true;
+        select.addEventListener('change', () => {
+            VERSION = select.value;
+            setVersion(LANGUAGE, VERSION);
+            updateVersionInfoPopover();
+            document.getElementById('loading-state').classList.remove('hidden');
+            document.getElementById('devotional-content').classList.add('hidden');
+            loadDate(currentDateKey || todayKey(), { pushHistory: false });
+        });
+    }
+
+    // (i) button next to the version dropdown: shows the selected version's
+    // full display name (e.g. "NVI" -> "Nueva Versión Internacional") for
+    // visitors who don't recognize the acronym. Separate from
+    // renderVersionCopyright's persistent legal notice — this is a quick,
+    // dismissible lookup, not the compliance-required text.
+    let versionInfoHandlerBound = false;
+
+    function updateVersionInfoPopover() {
+        const info = versionInfo(LANGUAGE, VERSION);
+        const popover = document.getElementById('version-info-popover');
+        popover.textContent = info ? `${info.name} (${VERSION})` : VERSION;
+
+        if (versionInfoHandlerBound) return;
+        versionInfoHandlerBound = true;
+        const btn = document.getElementById('version-info-btn');
+        btn.addEventListener('click', (ev) => {
+            ev.stopPropagation();
+            const isOpen = popover.classList.toggle('hidden') === false;
+            btn.setAttribute('aria-expanded', String(isOpen));
+        });
+        document.addEventListener('click', (ev) => {
+            if (!popover.classList.contains('hidden') && !popover.contains(ev.target) && ev.target !== btn) {
+                popover.classList.add('hidden');
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    async function render(entry, dateKey) {
         const { ref, texto } = splitVersiculo(entry.versiculo || '');
 
         applyStaticUiText();
 
-        document.getElementById('hero-image').src = heroImageForDate(dateKey);
+        document.getElementById('hero-image').src = await heroImageForDate(dateKey);
         document.getElementById('hero-image').alt = ref;
 
         document.getElementById('devotional-verse-ref').textContent = ref;
@@ -464,7 +632,9 @@
         renderAccordion(entry.para_meditar);
         renderTags(entry.tags);
         renderShareLinks(entry);
+        renderVersionCopyright(entry);
         setupFontSizeToggle();
+        setupVersionSelect();
         setupTts(entry);
 
         if (!navHandlersBound) {
@@ -529,7 +699,7 @@
             const record = recordForDate(fileData, dateKey);
             if (!record) throw new Error(`No devotional found for ${dateKey}`);
 
-            render(record, dateKey);
+            await render(record, dateKey);
             currentDateKey = dateKey;
 
             if (pushHistory) {
@@ -557,12 +727,17 @@
     }
 
     async function init() {
+        // Kick off in parallel with the rest of init — first real await is
+        // inside heroImageForDate(), during render().
+        loadDevotionalImagesIndex();
+
         // Wait for the shared i18n instance to finish its async init() (which
         // resolves ?lang=/localStorage/browser-language into currentLang)
         // before resolving LANGUAGE — otherwise LANGUAGE would be stuck at
         // the pre-init default from module-load time.
         await new Promise((resolve) => DevotionalI18n.whenReady(resolve));
         LANGUAGE = resolveLanguage();
+        VERSION = resolveVersion(LANGUAGE);
 
         const requestedDate = new URL(window.location.href).searchParams.get('date');
         const dateKey = requestedDate || await resolveDefaultDate();
@@ -580,6 +755,7 @@
             const next = SUPPORTED_LANGUAGES.includes(ev.detail?.language) ? ev.detail.language : 'en';
             if (next === LANGUAGE) return;
             LANGUAGE = next;
+            VERSION = resolveVersion(LANGUAGE);
             document.getElementById('loading-state').classList.remove('hidden');
             document.getElementById('devotional-content').classList.add('hidden');
             loadDate(currentDateKey || todayKey(), { pushHistory: false });
