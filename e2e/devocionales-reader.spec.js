@@ -283,3 +283,73 @@ test.describe('devocionales reader version info (i) button', () => {
     await expect(popover).not.toContainText('Reina Valera 1960');
   });
 });
+
+test.describe('devocionales reader hero image (Devocionales-assets manifest)', () => {
+  // heroImageForDate() fetches the file list from Devocionales-assets'
+  // CI-generated index.json instead of a hardcoded array. These assert on
+  // what a real visitor sees: a real, loadable hero image, and the page
+  // still working end-to-end if that fetch fails — not on request counts
+  // or other implementation plumbing, which would make the suite brittle.
+
+  test('hero image loads from the devotionals manifest, not a local list', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toBeVisible();
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidth = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidth).toBeGreaterThan(0);
+
+    const src = await heroImage.getAttribute('src');
+    expect(src).toMatch(
+      /^https:\/\/raw\.githubusercontent\.com\/develop4God\/Devocionales-assets\/main\/images\/devotionals\/[^/]+\.avif$/
+    );
+  });
+
+  test('hero image keeps loading correctly across prev/next navigation', async ({ page }) => {
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const heroImage = page.locator('#hero-image');
+    await expect(heroImage).toHaveJSProperty('complete', true);
+
+    const h1 = page.locator('h1').first();
+    const beforeText = await h1.textContent();
+
+    await page.locator('#nav-next').click();
+    await expect(h1).not.toHaveText(beforeText);
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidthAfterNext = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidthAfterNext).toBeGreaterThan(0);
+
+    // "next" can trigger the salvation-prayer modal, which overlays the nav
+    // buttons — dismiss it first, same as the dedicated modal tests above.
+    const salvationModal = page.locator('#salvation-prayer-modal');
+    if (await salvationModal.isVisible()) {
+      await page.locator('#salvation-modal-continue').click();
+      await expect(salvationModal).toBeHidden();
+    }
+
+    await page.locator('#nav-prev').click();
+    await expect(h1).toHaveText(beforeText);
+    await expect(heroImage).toHaveJSProperty('complete', true);
+    const naturalWidthAfterPrev = await heroImage.evaluate((img) => img.naturalWidth);
+    expect(naturalWidthAfterPrev).toBeGreaterThan(0);
+  });
+
+  test('reader still renders with no app errors if the manifest fetch fails', async ({ page }) => {
+    await page.route('**/images/devotionals/index.json', (route) => route.abort());
+
+    // The aborted request itself logs a browser-level resource error
+    // ("Failed to load resource: net::ERR_FAILED") — that's expected noise
+    // from the injected failure, not an app bug. Only uncaught JS
+    // exceptions (pageerror) indicate the app itself broke.
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+
+    const h1 = page.locator('h1').first();
+    await expect(h1).not.toHaveText('');
+    expect(appErrors).toEqual([]);
+  });
+});

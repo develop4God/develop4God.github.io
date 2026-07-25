@@ -13,6 +13,8 @@ versions, same file globs) so a local pass means CI will pass too.
   PHASE 4: html-validate      — root/devocionales/habitus .html
   PHASE 5: node --test        — bible-text-formatter unit tests
   PHASE 6: Playwright e2e     — full browser runtime verification (e2e/)
+  PHASE 7: SOT manifest       — fetches Devocionales-assets' devotionals
+                                 index.json and validates its shape
 
 Lint tools are expected globally installed at the CI-pinned versions
 (html-validate@8, stylelint@15, stylelint-config-standard@34, eslint@8) —
@@ -25,14 +27,21 @@ Exit codes: 0 = all phases passed, 1 = a phase failed (or a required tool
 is missing).
 """
 
+import json
 import shutil
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PW_TOOLS = Path('/tmp/pw-tools/node_modules/.bin/playwright')
+DEVOTIONALS_INDEX_URL = (
+    'https://raw.githubusercontent.com/develop4God/Devocionales-assets/'
+    'main/images/devotionals/index.json'
+)
 
 
 class Report:
@@ -187,6 +196,49 @@ def phase_playwright():
     return rc == 0, ''
 
 
+# ── Phase 7: SOT manifest (Devocionales-assets devotionals index.json) ──
+
+def phase_devotionals_manifest():
+    try:
+        with urllib.request.urlopen(DEVOTIONALS_INDEX_URL, timeout=15) as res:
+            if res.status != 200:
+                return False, ''
+            data = json.loads(res.read())
+    except (urllib.error.URLError, TimeoutError) as e:
+        print(f"  ❌ Could not fetch {DEVOTIONALS_INDEX_URL}: {e}")
+        return False, ''
+    except json.JSONDecodeError as e:
+        print(f"  ❌ Manifest is not valid JSON: {e}")
+        return False, ''
+
+    ok = True
+    for key in ('version', 'generatedAt', 'files'):
+        if key not in data:
+            print(f"  ❌ Manifest missing required key: {key!r}")
+            ok = False
+
+    files = data.get('files')
+    if not isinstance(files, list) or not files:
+        print("  ❌ 'files' must be a non-empty list")
+        ok = False
+    else:
+        bad = [f for f in files if not isinstance(f, str) or not f.endswith('.avif')]
+        if bad:
+            print(f"  ❌ {len(bad)} file(s) not a .avif filename: {bad[:5]}")
+            ok = False
+        else:
+            print(f"  ✓ {len(files)} .avif filenames listed")
+
+    version = data.get('version')
+    if not isinstance(version, str) or not version:
+        print("  ❌ 'version' must be a non-empty string fingerprint")
+        ok = False
+    else:
+        print(f"  ✓ version: {version}")
+
+    return ok, ''
+
+
 def main():
     print("develop4God.github.io — pre-commit validation")
     print(f"Repo: {REPO_ROOT}")
@@ -197,6 +249,7 @@ def main():
     gate('4. html-validate', phase_html_validate)
     gate('5. node --test', phase_node_test)
     gate('6. Playwright e2e', phase_playwright)
+    gate('7. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
 
     print_summary()
     sys.exit(0 if all(p.passed for p in PHASES) else 1)
