@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Makipagtrabaho Sa Akin - Develop4God",
+    "description": "AI engineer at full-stack developer na available para sa mga ministeryo, negosyo, at indibidwal na nangangailangan ng apps, AI automation, at custom na sistema."
+  },
+  "navigation": {
+    "home": "Home",
+    "whatIBuild": "Ano ang Maaari Kong Buuin",
+    "proof": "Patunay ng Gawa",
+    "why": "Bakit Ko Ginagawa Ito",
+    "contact": "Makipag-ugnayan"
+  },
+  "header": {
+    "title": "Makipagtrabaho Sa Akin",
+    "mainTitle": "Mga ministeryo, negosyo, at indibidwal: binubuo ko ang mga tool na kailangan mo.",
+    "subtitle": "Mga sistema ng AI, apps, at automation, ginawa ng full-stack engineer na naglilingkod sa Diyos sa pamamagitan ng teknolohiya.",
+    "tag": "Mula sa developer sa likod ng Mga Debosyonal na Kristiyano",
+    "contactCta": "Pag-usapan natin ang iyong proyekto",
+    "verseQuote": "Anuman ang inyong ginagawa, gawin ninyo nang buong puso na parang sa Panginoon kayo naglilingkod at hindi sa tao.",
+    "verseCitation": "Colosas 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ Download",
+    "countries": "99+ Bansa",
+    "users": "6,300+ Aktibong Gumagamit",
+    "rating": "4.9 ★ Rating",
+    "languages": "10 Wika"
+  },
+  "whatIBuild": {
+    "title": "Ano ang Maaari Kong Buuin Para Sa Iyo",
+    "ai": {
+      "title": "AI at Automation",
+      "description": "Custom na AI pipeline, chatbot, sistema ng paglikha ng content, at automation ng proseso."
+    },
+    "apps": {
+      "title": "Apps at Websites",
+      "description": "Mobile at web applications, binuo mula simula hanggang katapusan, handa na para sa produksyon."
+    },
+    "systems": {
+      "title": "Data at Sistema",
+      "description": "Mga dashboard, integrasyon, at custom na backend system para sa iyong organisasyon."
+    }
+  },
+  "proof": {
+    "title": "Patunay ng Gawa",
+    "devocionales": {
+      "title": "Mga Debosyonal na Kristiyano",
+      "description": "Live na app ng araw-araw na debosyonal, may audio, maraming wika, at mga bersyon ng Bibliya.",
+      "button": "Tingnan ang Mga Debosyonal"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Habit tracker na may on-device machine learning model para sa churn prediction.",
+      "button": "Tingnan ang Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "Bakit Ko Ginagawa Ito",
+    "description": "Ito ay gawaing ministeryo muna, kita pagkatapos. Bumubuo ako ng mga tool upang paglingkuran ang Diyos at available akong tumulong sa ibang ministeryo, negosyo, at indibidwal na gawin din ito."
+  },
+  "contact": {
+    "title": "May proyekto ka bang naiisip?",
+    "description": "Sumulat sa akin at pag-usapan natin kung paano kita matutulungan na buuin ito.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Padalhan ako ng email"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Nakalaan ang lahat ng karapatan.",
+    "madeWith": "Ginawa nang may ♥️ ni develop4God",
+    "contact": "Makipag-ugnayan"
+  },
+  "statsLabels": {
+    "downloads": "Download",
+    "countries": "Bansa",
+    "users": "Aktibong Gumagamit",
+    "rating": "Rating",
+    "languages": "Wika"
+  }
+}

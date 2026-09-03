@@ -15,6 +15,7 @@ const TARGETS = [
   path.join(REPO_ROOT, 'lang', 'home'),
   path.join(REPO_ROOT, 'devocionales', 'lang'),
   path.join(REPO_ROOT, 'habitus', 'lang'),
+  path.join(REPO_ROOT, 'work-with-me', 'lang'),
 ];
 
 function flatten(obj, prefix = '') {

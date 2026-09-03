@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Work With Me - Develop4God",
+    "description": "AI engineer and full-stack developer available for ministries, businesses, and individuals who need apps, AI automation, and custom systems."
+  },
+  "navigation": {
+    "home": "Home",
+    "whatIBuild": "What I Can Build",
+    "proof": "Proof of Work",
+    "why": "Why I Do This",
+    "contact": "Contact"
+  },
+  "header": {
+    "title": "Work With Me",
+    "mainTitle": "Ministries, businesses, and individuals: I build the tools you need.",
+    "subtitle": "AI systems, apps, and automation, built by a full-stack engineer who serves God through technology.",
+    "tag": "By the developer behind Christian Devotionals",
+    "contactCta": "Let's talk about your project",
+    "verseQuote": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men;",
+    "verseCitation": "Colossians 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ Downloads",
+    "countries": "99+ Countries",
+    "users": "6,300+ Active Users",
+    "rating": "4.9 ★ Rating",
+    "languages": "10 Languages"
+  },
+  "whatIBuild": {
+    "title": "What I Can Build For You",
+    "ai": {
+      "title": "AI and Automation",
+      "description": "Custom AI pipelines, chatbots, content generation systems, and process automation."
+    },
+    "apps": {
+      "title": "Apps and Websites",
+      "description": "Mobile and web applications, built end to end, production-ready."
+    },
+    "systems": {
+      "title": "Data and Systems",
+      "description": "Dashboards, integrations, and custom backend systems for your organization."
+    }
+  },
+  "proof": {
+    "title": "Proof of Work",
+    "devocionales": {
+      "title": "Christian Devotionals",
+      "description": "Daily devotionals app in production, with audio, multiple languages, and Bible versions.",
+      "button": "View Devotionals"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Habit tracker with an on-device machine learning model for churn prediction.",
+      "button": "View Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "Why I Do This",
+    "description": "This is ministry work first, income second. I build tools to serve God and I'm available to help other ministries, businesses, and individuals do the same."
+  },
+  "contact": {
+    "title": "Have a project in mind?",
+    "description": "Write to me and let's talk about how I can help you build it.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Send me an email"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. All rights reserved.",
+    "madeWith": "Made with ♥️ by develop4God",
+    "contact": "Contact"
+  },
+  "statsLabels": {
+    "downloads": "Downloads",
+    "countries": "Countries",
+    "users": "Active Users",
+    "rating": "Rating",
+    "languages": "Languages"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Arbeiten Sie Mit Mir - Develop4God",
+    "description": "KI-Ingenieur und Full-Stack-Entwickler verfügbar für Dienste, Unternehmen und Einzelpersonen, die Apps, KI-Automatisierung und maßgeschneiderte Systeme benötigen."
+  },
+  "navigation": {
+    "home": "Startseite",
+    "whatIBuild": "Was Ich Bauen Kann",
+    "proof": "Nachweis der Arbeit",
+    "why": "Warum Ich Das Tue",
+    "contact": "Kontakt"
+  },
+  "header": {
+    "title": "Arbeiten Sie Mit Mir",
+    "mainTitle": "Dienste, Unternehmen und Einzelpersonen: Ich baue die Werkzeuge, die Sie brauchen.",
+    "subtitle": "KI-Systeme, Apps und Automatisierung, gebaut von einem Full-Stack-Ingenieur, der Gott durch Technologie dient.",
+    "tag": "Vom Entwickler hinter Christliche Andachten",
+    "contactCta": "Lassen Sie uns über Ihr Projekt sprechen",
+    "verseQuote": "Alles, was ihr tut, das tut von Herzen als dem Herrn und nicht den Menschen,",
+    "verseCitation": "Kolosser 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ Downloads",
+    "countries": "99+ Länder",
+    "users": "6.300+ Aktive Nutzer",
+    "rating": "4,9 ★ Bewertung",
+    "languages": "10 Sprachen"
+  },
+  "whatIBuild": {
+    "title": "Was Ich Für Sie Bauen Kann",
+    "ai": {
+      "title": "KI und Automatisierung",
+      "description": "Maßgeschneiderte KI-Pipelines, Chatbots, Content-Generierungssysteme und Prozessautomatisierung."
+    },
+    "apps": {
+      "title": "Apps und Websites",
+      "description": "Mobile und Web-Anwendungen, von Anfang bis Ende gebaut, produktionsbereit."
+    },
+    "systems": {
+      "title": "Daten und Systeme",
+      "description": "Dashboards, Integrationen und maßgeschneiderte Backend-Systeme für Ihre Organisation."
+    }
+  },
+  "proof": {
+    "title": "Nachweis der Arbeit",
+    "devocionales": {
+      "title": "Christliche Andachten",
+      "description": "Tägliche Andachten-App in Produktion, mit Audio, mehreren Sprachen und Bibelversionen.",
+      "button": "Andachten Ansehen"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Gewohnheits-Tracker mit einem Machine-Learning-Modell auf dem Gerät zur Abwanderungsvorhersage.",
+      "button": "Habitus+Faith Ansehen"
+    }
+  },
+  "why": {
+    "title": "Warum Ich Das Tue",
+    "description": "Dies ist zuerst Dienstarbeit, dann Einkommen. Ich baue Werkzeuge, um Gott zu dienen, und ich stehe zur Verfügung, um anderen Diensten, Unternehmen und Einzelpersonen zu helfen, dasselbe zu tun."
+  },
+  "contact": {
+    "title": "Haben Sie ein Projekt im Sinn?",
+    "description": "Schreiben Sie mir und lassen Sie uns besprechen, wie ich Ihnen beim Aufbau helfen kann.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Senden Sie mir eine E-Mail"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Alle Rechte vorbehalten.",
+    "madeWith": "Mit ♥️ entwickelt von develop4God",
+    "contact": "Kontakt"
+  },
+  "statsLabels": {
+    "downloads": "Downloads",
+    "countries": "Länder",
+    "users": "Aktive Nutzer",
+    "rating": "Bewertung",
+    "languages": "Sprachen"
+  }
+}

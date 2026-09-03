@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "与我合作 - Develop4God",
+    "description": "AI工程师和全栈开发者，为需要应用程序、AI自动化和定制系统的事工、企业和个人提供服务。"
+  },
+  "navigation": {
+    "home": "首页",
+    "whatIBuild": "我能构建什么",
+    "proof": "工作成果",
+    "why": "我为何这样做",
+    "contact": "联系"
+  },
+  "header": {
+    "title": "与我合作",
+    "mainTitle": "事工、企业和个人：我构建你需要的工具。",
+    "subtitle": "AI系统、应用程序和自动化，由一位通过技术服侍神的全栈工程师打造。",
+    "tag": "由基督教灵修背后的开发者打造",
+    "contactCta": "让我们谈谈你的项目",
+    "verseQuote": "无论作什么，都要从心里作，像是给主作的，不是给人作的，",
+    "verseCitation": "歌罗西书 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ 下载量",
+    "countries": "99+ 国家",
+    "users": "6,300+ 活跃用户",
+    "rating": "4.9 ★ 评分",
+    "languages": "10 种语言"
+  },
+  "whatIBuild": {
+    "title": "我能为你构建什么",
+    "ai": {
+      "title": "AI与自动化",
+      "description": "定制AI管道、聊天机器人、内容生成系统和流程自动化。"
+    },
+    "apps": {
+      "title": "应用与网站",
+      "description": "端到端构建的移动和网页应用程序，可直接投入生产。"
+    },
+    "systems": {
+      "title": "数据与系统",
+      "description": "为你的组织定制的仪表盘、集成和后端系统。"
+    }
+  },
+  "proof": {
+    "title": "工作成果",
+    "devocionales": {
+      "title": "基督教灵修",
+      "description": "已上线的每日灵修应用，配有音频、多语言支持和圣经版本。",
+      "button": "查看灵修"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "带有设备端机器学习模型的习惯追踪器，用于预测流失。",
+      "button": "查看 Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "我为何这样做",
+    "description": "这首先是事工工作，其次才是收入。我构建工具来服侍神，也愿意帮助其他事工、企业和个人做同样的事。"
+  },
+  "contact": {
+    "title": "有项目想法吗？",
+    "description": "写信给我，让我们谈谈我如何帮助你实现它。",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "给我发邮件"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. 版权所有。",
+    "madeWith": "由 develop4God 用 ♥️ 开发",
+    "contact": "联系"
+  },
+  "statsLabels": {
+    "downloads": "下载量",
+    "countries": "国家",
+    "users": "活跃用户",
+    "rating": "评分",
+    "languages": "种语言"
+  }
+}

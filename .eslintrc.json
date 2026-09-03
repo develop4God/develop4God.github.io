@@ -23,6 +23,7 @@
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",
+    "WorkWithMeI18n": "readonly",
     "lucide": "readonly"
   },
   "rules": {

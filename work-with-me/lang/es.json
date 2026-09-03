@@ -15,7 +15,9 @@
     "mainTitle": "Ministerios, negocios y personas: construyo las herramientas que necesitas.",
     "subtitle": "Sistemas de IA, apps y automatización, hechos por un ingeniero full-stack que sirve a Dios a través de la tecnología.",
     "tag": "Por el desarrollador detrás de Devocionales Cristianos",
-    "contactCta": "Hablemos de tu proyecto"
+    "contactCta": "Hablemos de tu proyecto",
+    "verseQuote": "Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres.",
+    "verseCitation": "Colosenses 3:23"
   },
   "stats": {
     "downloads": "15K+ Descargas",
@@ -66,5 +68,12 @@
     "copyright": "© 2026 Develop4God. Todos los derechos reservados.",
     "madeWith": "Desarrollado con ♥️ por develop4God",
     "contact": "Contacto"
+  },
+  "statsLabels": {
+    "downloads": "Descargas",
+    "countries": "Países",
+    "users": "Usuarios Activos",
+    "rating": "Calificación",
+    "languages": "Idiomas"
   }
 }

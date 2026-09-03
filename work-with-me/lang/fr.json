@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Travaillez Avec Moi - Develop4God",
+    "description": "Ingénieur IA et développeur full-stack disponible pour les ministères, entreprises et particuliers ayant besoin d'applications, d'automatisation IA et de systèmes sur mesure."
+  },
+  "navigation": {
+    "home": "Accueil",
+    "whatIBuild": "Ce Que Je Peux Construire",
+    "proof": "Travaux Réalisés",
+    "why": "Pourquoi Je Fais Cela",
+    "contact": "Contact"
+  },
+  "header": {
+    "title": "Travaillez Avec Moi",
+    "mainTitle": "Ministères, entreprises et particuliers : je construis les outils dont vous avez besoin.",
+    "subtitle": "Systèmes IA, applications et automatisation, réalisés par un ingénieur full-stack qui sert Dieu à travers la technologie.",
+    "tag": "Par le développeur derrière Méditations Chrétiennes",
+    "contactCta": "Parlons de votre projet",
+    "verseQuote": "Tout ce que vous faites, faites-le de bon cœur, comme pour le Seigneur et non pour des hommes,",
+    "verseCitation": "Colossiens 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ Téléchargements",
+    "countries": "99+ Pays",
+    "users": "6 300+ Utilisateurs Actifs",
+    "rating": "4,9 ★ Note",
+    "languages": "10 Langues"
+  },
+  "whatIBuild": {
+    "title": "Ce Que Je Peux Construire Pour Vous",
+    "ai": {
+      "title": "IA et Automatisation",
+      "description": "Pipelines IA sur mesure, chatbots, systèmes de génération de contenu et automatisation des processus."
+    },
+    "apps": {
+      "title": "Applications et Sites Web",
+      "description": "Applications mobiles et web, construites de bout en bout, prêtes pour la production."
+    },
+    "systems": {
+      "title": "Données et Systèmes",
+      "description": "Tableaux de bord, intégrations et systèmes backend sur mesure pour votre organisation."
+    }
+  },
+  "proof": {
+    "title": "Travaux Réalisés",
+    "devocionales": {
+      "title": "Méditations Chrétiennes",
+      "description": "Application de méditations quotidiennes en production, avec audio, plusieurs langues et versions bibliques.",
+      "button": "Voir les Méditations"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Suivi d'habitudes avec un modèle d'apprentissage automatique embarqué pour la prédiction d'abandon.",
+      "button": "Voir Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "Pourquoi Je Fais Cela",
+    "description": "C'est un travail de ministère d'abord, de revenu ensuite. Je construis des outils pour servir Dieu et je suis disponible pour aider d'autres ministères, entreprises et particuliers à faire de même."
+  },
+  "contact": {
+    "title": "Vous avez un projet en tête ?",
+    "description": "Écrivez-moi et parlons de la façon dont je peux vous aider à le construire.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Envoyez-moi un e-mail"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Tous droits réservés.",
+    "madeWith": "Développé avec ♥️ par develop4God",
+    "contact": "Contact"
+  },
+  "statsLabels": {
+    "downloads": "Téléchargements",
+    "countries": "Pays",
+    "users": "Utilisateurs Actifs",
+    "rating": "Note",
+    "languages": "Langues"
+  }
+}
