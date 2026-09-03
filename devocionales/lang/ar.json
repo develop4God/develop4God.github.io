@@ -212,7 +212,7 @@
     "shareFooterBenefits": "مجاني 100% | بدون إعلانات | يعمل بدون إنترنت",
     "shareFooterDeveloper": "Develop4God",
     "ttsLang": "ar-SA",
-    "appBannerText": "تأملات مسيحية — 4.9 ★★★★★ · أكثر من 10,000 تحميل. تطبيق مجاني يعمل بدون إنترنت بالكامل.",
+    "appBannerText": "تأملات مسيحية — 4.9 ★★★★★ · أكثر من {downloads} تحميل. تطبيق مجاني يعمل بدون إنترنت بالكامل.",
     "appBannerCta": "احصل عليه من Google Play",
     "appBannerClose": "إغلاق",
     "navVision": "رؤيتنا",

@@ -212,7 +212,7 @@
     "shareFooterBenefits": "100%無料 | 広告なし | オフライン使用",
     "shareFooterDeveloper": "Develop4God",
     "ttsLang": "ja-JP",
-    "appBannerText": "クリスチャン・デボーション — 4.9 ★★★★★ ・10,000件以上のダウンロード。無料、完全オフライン対応。",
+    "appBannerText": "クリスチャン・デボーション — 4.9 ★★★★★ ・{downloads}件以上のダウンロード。無料、完全オフライン対応。",
     "appBannerCta": "Google Playで入手",
     "appBannerClose": "閉じる",
     "navVision": "私たちのビジョン",
