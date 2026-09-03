@@ -300,11 +300,23 @@ class I18n {
             const text = privacy[`section${s}_text`];
             if (title) parts.push(`<h2>${title}</h2>`);
             if (text) parts.push(`<p>${text}</p>`);
-            // Generic list items like section4_list1..n
+            // List items, either flat strings (section4_list1) or title+text
+            // pairs (section2_list1_title / section2_list1_text), same
+            // pattern as section 1's list above.
             const listItems = [];
             for (let i = 1; i <= 20; i++) {
                 const item = privacy[`section${s}_list${i}`];
-                if (item) listItems.push(`<li>${item}</li>`);
+                const itemTitle = privacy[`section${s}_list${i}_title`];
+                const itemText = privacy[`section${s}_list${i}_text`];
+                if (item) {
+                    listItems.push(`<li>${item}</li>`);
+                } else if (itemTitle || itemText) {
+                    let li = '<li>';
+                    if (itemTitle) li += `<strong>${itemTitle}</strong> `;
+                    if (itemText) li += `${itemText}`;
+                    li += '</li>';
+                    listItems.push(li);
+                }
             }
             if (listItems.length) parts.push(`<ul>${listItems.join('')}</ul>`);
         }
