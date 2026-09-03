@@ -5,7 +5,6 @@
   },
   "tab": {
     "vision": "Notre Vision",
-    "support": "Soutien",
     "devotionals": "Méditations",
     "habitus": "Habitus+Faith"
   },
@@ -13,12 +12,7 @@
     "title": "Notre Vision",
     "description": "develop4God est une initiative numérique qui vise à créer des outils pour aider les croyants à grandir dans leur foi, à maintenir des disciplines spirituelles et à marcher plus près de Dieu chaque jour. Nous croyons que la technologie peut servir le royaume de Dieu en fournissant des ressources accessibles et de qualité pour renforcer votre vie spirituelle."
   },
-  "header": {
-    "title": "develop4God",
-    "subtitle": "Ressources pour Votre Croissance Spirituelle"
-  },
   "hero": {
-    "mainTitle": "develop4God",
     "subtitle": "Outils pour Renforcer Votre Foi et Marcher avec Dieu",
     "description": "Ressources spirituelles pour votre croissance quotidienne en Christ"
   },
@@ -27,30 +21,18 @@
     "devocionales": {
       "title": "Méditations Chrétiennes",
       "description": "Votre refuge quotidien dans la Parole de Dieu avec des méditations audio",
-      "features": [
-        "Méditations quotidiennes avec audio",
-        "8 versions bibliques",
-        "Complètement hors ligne",
-        "Sans publicité"
-      ],
       "button": "Explorer les Méditations"
     },
     "habitus": {
       "title": "Habitus+Faith",
       "description": "Construisez des habitudes pieuses par la foi et la discipline spirituelle",
-      "features": [
-        "Suivi des habitudes",
-        "Objectifs spirituels",
-        "Motivation biblique",
-        "Progrès personnel"
-      ],
       "button": "Découvrir Habitus"
+    },
+    "aiAutomation": {
+      "title": "IA et Automatisation des Données",
+      "description": "Génération, révision et automatisation des données avec l'Intelligence Artificielle",
+      "button": "En Savoir Plus"
     }
-  },
-  "mission": {
-    "title": "Notre Mission",
-    "description": "Nous développons des outils numériques qui aident les croyants à grandir dans leur foi, à maintenir des disciplines spirituelles et à marcher plus près de Dieu chaque jour.",
-    "vision": "Nous croyons que la technologie peut servir le royaume de Dieu en fournissant des ressources accessibles et de qualité pour renforcer votre vie spirituelle."
   },
   "footer": {
     "copyright": "© 2026 develop4God. Tous droits réservés.",

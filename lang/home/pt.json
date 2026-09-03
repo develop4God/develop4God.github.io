@@ -5,7 +5,6 @@
   },
   "tab": {
     "vision": "Nossa Visão",
-    "support": "Apoio",
     "devotionals": "Devocionais",
     "habitus": "Habitus+Faith"
   },
@@ -13,12 +12,7 @@
     "title": "Nossa Visão",
     "description": "develop4God é uma iniciativa digital que busca criar ferramentas para ajudar os crentes a crescerem em sua fé, manter disciplinas espirituais e caminhar mais perto de Deus todos os dias. Acreditamos que a tecnologia pode servir ao reino de Deus, fornecendo recursos acessíveis e de qualidade para fortalecer sua vida espiritual."
   },
-  "header": {
-    "title": "develop4God",
-    "subtitle": "Recursos para o Seu Crescimento Espiritual"
-  },
   "hero": {
-    "mainTitle": "develop4God",
     "subtitle": "Ferramentas para Fortalecer sua Fé e Caminhar com Deus",
     "description": "Recursos espirituais para seu crescimento diário em Cristo"
   },
@@ -27,30 +21,18 @@
     "devocionales": {
       "title": "Devocionais Cristãos",
       "description": "Seu refúgio diário na Palavra de Deus com devocionais em áudio",
-      "features": [
-        "Devocionais diários com áudio",
-        "8 versões bíblicas",
-        "Completamente offline",
-        "Sem anúncios"
-      ],
       "button": "Explorar Devocionais"
     },
     "habitus": {
       "title": "Habitus+Faith",
       "description": "Construa hábitos piedosos através da fé e disciplina espiritual",
-      "features": [
-        "Acompanhamento de hábitos",
-        "Metas espirituais",
-        "Motivação bíblica",
-        "Progresso pessoal"
-      ],
       "button": "Descobrir Habitus"
+    },
+    "aiAutomation": {
+      "title": "IA e Automação de Dados",
+      "description": "Geração, revisão e automação de dados com Inteligência Artificial",
+      "button": "Saiba Mais"
     }
-  },
-  "mission": {
-    "title": "Nossa Missão",
-    "description": "Desenvolvemos ferramentas digitais que ajudam os crentes a crescer em sua fé, manter disciplinas espirituais e caminhar mais perto de Deus todos os dias.",
-    "vision": "Acreditamos que a tecnologia pode servir ao reino de Deus, fornecendo recursos acessíveis e de qualidade para fortalecer sua vida espiritual."
   },
   "footer": {
     "copyright": "© 2026 develop4God. Todos os direitos reservados.",

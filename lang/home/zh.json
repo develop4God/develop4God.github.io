@@ -5,7 +5,6 @@
   },
   "tab": {
     "vision": "我们的愿景",
-    "support": "支持",
     "devotionals": "灵修",
     "habitus": "Habitus+Faith"
   },
@@ -13,12 +12,7 @@
     "title": "我们的愿景",
     "description": "develop4God 是一个数字化倡议，旨在为信徒提供帮助其在信仰中成长、保持属灵纪律、每天与神更亲近的工具。我们相信科技可以服务于神的国度，提供优质且易于获取的资源来加强你的属灵生活。"
   },
-  "header": {
-    "title": "develop4God",
-    "subtitle": "属灵成长资源"
-  },
   "hero": {
-    "mainTitle": "develop4God",
     "subtitle": "坚固信仰、与神同行的工具",
     "description": "在基督里每日成长的属灵资源"
   },
@@ -27,30 +21,18 @@
     "devocionales": {
       "title": "基督教灵修",
       "description": "在神的话语中每日避难所，配有音频灵修",
-      "features": [
-        "每日音频灵修",
-        "8个圣经版本",
-        "完全离线",
-        "无广告"
-      ],
       "button": "探索灵修"
     },
     "habitus": {
       "title": "Habitus+Faith",
       "description": "通过信仰和属灵纪律建立敬虔的习惯",
-      "features": [
-        "习惯追踪",
-        "属灵目标",
-        "圣经激励",
-        "个人进步"
-      ],
       "button": "发现 Habitus"
+    },
+    "aiAutomation": {
+      "title": "人工智能与数据自动化",
+      "description": "利用人工智能进行数据生成、审核与自动化",
+      "button": "了解更多"
     }
-  },
-  "mission": {
-    "title": "我们的使命",
-    "description": "我们开发数字工具，帮助信徒在信仰中成长，保持属灵纪律，每天与神更亲近。",
-    "vision": "我们相信技术可以服务于神的国度，提供优质的资源来加强你的属灵生活。"
   },
   "footer": {
     "copyright": "© 2026 develop4God. 版权所有。",
