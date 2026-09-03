@@ -29,7 +29,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.js", "e2e/**/*.js"],
+      "files": ["**/*.test.js", "e2e/**/*.js", "scripts/**/*.js"],
       "env": {
         "node": true
       }
