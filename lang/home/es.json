@@ -6,7 +6,8 @@
   "tab": {
     "vision": "Nuestra Visión",
     "devotionals": "Devocionales",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Trabaja Conmigo"
   },
   "vision": {
     "title": "Nuestra Visión",
@@ -42,5 +43,9 @@
     "copyright": "© 2026 develop4God. Todos los derechos reservados.",
     "madeWith": "Desarrollado con amor para la gloria de Dios",
     "contact": "Contacto"
+  },
+  "workWithMeCta": {
+    "question": "¿Eres un ministerio, negocio o persona que necesita programas, apps o herramientas?",
+    "button": "Trabaja Conmigo"
   }
 }

@@ -6,7 +6,8 @@
   "tab": {
     "vision": "رؤيتنا",
     "devotionals": "التأملات",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "اعمل معي"
   },
   "vision": {
     "title": "رؤيتنا",
@@ -42,5 +43,9 @@
     "copyright": "© 2026 develop4God. جميع الحقوق محفوظة.",
     "madeWith": "صُنع بحب لمجد الله",
     "contact": "تواصل معنا"
+  },
+  "workWithMeCta": {
+    "question": "هل أنت خدمة أو شركة أو شخص يحتاج إلى برامج أو تطبيقات أو أدوات؟",
+    "button": "اعمل معي"
   }
 }

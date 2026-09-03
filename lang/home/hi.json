@@ -6,7 +6,8 @@
   "tab": {
     "vision": "हमारा दृष्टिकोण",
     "devotionals": "भक्ति",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "मेरे साथ काम करें"
   },
   "vision": {
     "title": "हमारा दृष्टिकोण",
@@ -42,5 +43,9 @@
     "copyright": "© 2026 develop4God. सर्वाधिकार सुरक्षित।",
     "madeWith": "परमेश्वर की महिमा के लिए प्रेम से विकसित",
     "contact": "संपर्क"
+  },
+  "workWithMeCta": {
+    "question": "क्या आप एक मंत्रालय, व्यवसाय या व्यक्ति हैं जिसे सॉफ़्टवेयर, ऐप्स या उपकरणों की आवश्यकता है?",
+    "button": "मेरे साथ काम करें"
   }
 }

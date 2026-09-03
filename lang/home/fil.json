@@ -6,7 +6,8 @@
   "tab": {
     "vision": "Aming Bisyon",
     "devotionals": "Mga Debosyonal",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Makipagtrabaho Sa Akin"
   },
   "vision": {
     "title": "Aming Bisyon",
@@ -42,5 +43,9 @@
     "copyright": "© 2026 develop4God. Nakalaan ang lahat ng karapatan.",
     "madeWith": "Ginawa nang may pagmamahal para sa kaluwalhatian ng Diyos",
     "contact": "Makipag-ugnayan"
+  },
+  "workWithMeCta": {
+    "question": "Ikaw ba ay isang ministeryo, negosyo, o indibidwal na nangangailangan ng software, apps, o mga tool?",
+    "button": "Makipagtrabaho Sa Akin"
   }
 }

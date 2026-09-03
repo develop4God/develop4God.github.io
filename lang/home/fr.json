@@ -6,7 +6,8 @@
   "tab": {
     "vision": "Notre Vision",
     "devotionals": "Méditations",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Travaillez Avec Moi"
   },
   "vision": {
     "title": "Notre Vision",
@@ -42,5 +43,9 @@
   "support": {
     "title": "Soutenir le Ministère",
     "description": "Votre soutien nous permet de continuer à développer des ressources gratuites et de qualité pour la communauté chrétienne. Merci de faire partie de cette mission !"
+  },
+  "workWithMeCta": {
+    "question": "Êtes-vous un ministère, une entreprise ou une personne qui a besoin de logiciels, d'applications ou d'outils ?",
+    "button": "Travaillez Avec Moi"
   }
 }

@@ -6,7 +6,8 @@
   "tab": {
     "vision": "我们的愿景",
     "devotionals": "灵修",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "与我合作"
   },
   "vision": {
     "title": "我们的愿景",
@@ -42,5 +43,9 @@
   "support": {
     "title": "支持事工",
     "description": "您的支持让我们能够持续为基督徒社区开发免费且优质的资源。感谢您成为这项使命的一部分！"
+  },
+  "workWithMeCta": {
+    "question": "您是需要软件、应用程序或工具的事工、企业或个人吗？",
+    "button": "与我合作"
   }
 }
