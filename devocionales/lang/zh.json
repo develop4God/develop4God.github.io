@@ -65,7 +65,7 @@
   "contact": {
     "title": "有问题？联系我们！",
     "description": "如有疑问、建议或想打招呼，欢迎随时联系我们。",
-    "email": "develop4God@gmail.com",
+    "email": "Develop4God@gmail.com",
     "sendEmail": "发送邮件"
   },
   "donation": {
@@ -76,7 +76,7 @@
   },
   "footer": {
     "copyright": "© 2025 基督徒灵修。保留所有权利。",
-    "madeWith": "由 develop4God 爱心开发",
+    "madeWith": "由 Develop4God 爱心开发",
     "terms": "条款与条件",
     "privacy": "隐私政策",
     "deleteData": "请求删除数据",
@@ -86,7 +86,7 @@
     "terms": {
       "title": "“基督徒灵修”应用条款与条件",
       "lastUpdated": "最后更新日期：",
-      "date": "2025年7月28日",
+      "date": "2026年9月3日",
       "welcome": "欢迎使用“基督徒灵修”移动应用（以下简称“本应用”），由 **Develop4God** 拥有和运营。访问或使用本应用即表示您（“用户”）同意受本条款与条件（以下简称“条款”）的法律约束。如果您不同意任何条款，请勿使用本应用。",
       "section1_title": "1. 应用描述",
       "section1_text": "“基督徒灵修”应用是一款数字平台，旨在提供每日、每周或定期的灵修文本，促进属灵反思和个人成长。主要功能包括阅读灵修、收藏灵修、通过移动设备功能与联系人分享灵修、截屏灵修内容，以及自愿捐赠以支持本应用。",
@@ -118,13 +118,13 @@
       "section9_title": "9. 适用法律与管辖权",
       "section9_text": "本条款受**巴拿马共和国**法律管辖并依其解释，不考虑其法律冲突规定。因本条款引起的任何争议均受**巴拿马共和国巴拿马市**法院专属管辖。",
       "section10_title": "10. 联系方式",
-      "section10_text": "如对本条款有任何疑问，可通过 develop4God@gmail.com 联系我们。",
+      "section10_text": "如对本条款有任何疑问，可通过 Develop4God@gmail.com 联系我们。",
       "backToHome": "返回首页"
     },
     "privacy": {
       "title": "“基督徒灵修”应用隐私政策",
       "lastUpdated": "最后更新日期：",
-      "date": "2025年7月28日",
+      "date": "2026年9月3日",
       "description": "本隐私政策描述了“基督徒灵修”移动应用（以下简称“本应用”）由 **Develop4God** 拥有和运营，如何处理用户信息。我们非常重视用户的隐私。",
       "section1_title": "1. 我们收集的信息及用途",
       "section1_text": "“基督徒灵修”应用会收集和处理某些类型的数据，以提供功能并提升用户体验。我们希望对收集哪些数据及其用途保持透明：",
@@ -167,14 +167,13 @@
       "section4_title": "4. 第三方服务",
       "section4_text": "本应用使用第三方服务，可能会收集信息。这些服务有各自的隐私政策：",
       "section4_list1": "**Firebase（谷歌）：** 用于认证、数据库（Firestore）、通知（FCM）和分析。Firebase 隐私政策见 [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy)。",
-      "section4_list2": "**PayPal：** 用于捐赠。PayPal 隐私政策见 [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub)。",
       "section4_list3": "其他服务：本应用还可能为特定功能（如发送邮件）使用其他第三方服务。这些服务仅能访问提供服务所需的信息。",
       "section5_title": "5. 儿童隐私",
       "section5_text": "本应用不面向13岁以下儿童。我们不会有意收集13岁以下儿童的个人信息。如发现无父母同意收集了13岁以下儿童信息，我们将采取措施从服务器中删除。",
       "section6_title": "6. 隐私政策变更",
       "section6_text": "我们可能会不时更新本隐私政策。我们将通过在本页面发布新政策并更新“最后更新日期”来通知您任何更改。建议您定期查阅本隐私政策。",
       "section7_title": "7. 联系方式",
-      "section7_text": "如对本隐私政策有任何疑问或希望请求删除您的数据，欢迎通过 develop4God@gmail.com 联系我们。",
+      "section7_text": "如对本隐私政策有任何疑问或希望请求删除您的数据，欢迎通过 Develop4God@gmail.com 联系我们。",
       "backToHome": "返回首页"
     }
   },

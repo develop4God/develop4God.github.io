@@ -65,7 +65,7 @@
   "contact": {
     "title": "Dúvidas? Entre em Contato!",
     "description": "Se você tiver alguma dúvida, sugestão ou apenas quiser dizer oi, não hesite em entrar em contato conosco.",
-    "email": "develop4God@gmail.com",
+    "email": "Develop4God@gmail.com",
     "sendEmail": "Envie-nos um e-mail"
   },
   "donation": {
@@ -76,7 +76,7 @@
   },
   "footer": {
     "copyright": "© 2025 Devocionais Cristãos. Todos os direitos reservados.",
-    "madeWith": "Feito com ♥️ por develop4God",
+    "madeWith": "Feito com ♥️ por Develop4God",
     "terms": "Termos e Condições",
     "privacy": "Política de Privacidade",
     "deleteData": "Solicitar Exclusão de Dados",
@@ -86,7 +86,7 @@
     "terms": {
       "title": "Termos e Condições de Uso do Aplicativo \"Devocionais Cristãos\"",
       "lastUpdated": "Última Atualização:",
-      "date": "28 de julho de 2025",
+      "date": "3 de setembro de 2026",
       "welcome": "Bem-vindo ao aplicativo móvel \"Devocionais Cristãos\" (doravante, \"o Aplicativo\"), de propriedade e operado pela **Develop4God**. Ao acessar ou usar o Aplicativo, você (\"o Usuário\") concorda em estar legalmente vinculado a estes Termos e Condições de Uso (doravante, \"os Termos\"). Se você não concorda com algum destes Termos, não deve usar o Aplicativo.",
       "section1_title": "1. Descrição do Aplicativo",
       "section1_text": "O Aplicativo \"Devocionais Cristãos\" é uma plataforma digital projetada para fornecer acesso a textos devocionais diários, semanais ou periódicos, com o objetivo de fomentar a reflexão espiritual e o crescimento pessoal. As principais funcionalidades incluem a leitura de devocionais, a capacidade de salvar devocionais como favoritos, a opção de compartilhar devocionais com contatos através das funções do seu dispositivo móvel, a captura de tela do conteúdo do devocional e a possibilidade de fazer doações voluntárias para apoiar o Aplicativo.",
@@ -118,13 +118,13 @@
       "section9_title": "9. Lei Aplicável e Jurisdição",
       "section9_text": "Estes Termos serão regidos e interpretados de acordo com as leis da **República do Panamá**, sem levar em conta suas disposições sobre conflitos de leis. Qualquer disputa que surja em conexão com estes Termos estará sujeita à jurisdição exclusiva dos tribunais da **Cidade do Panamá, República do Panamá**.",
       "section10_title": "10. Contato",
-      "section10_text": "Se você tiver alguma dúvida sobre estes Termos, pode nos contatar em: develop4God@gmail.com.",
+      "section10_text": "Se você tiver alguma dúvida sobre estes Termos, pode nos contatar em: Develop4God@gmail.com.",
       "backToHome": "Voltar à página inicial"
     },
     "privacy": {
       "title": "Política de Privacidade do Aplicativo \"Devocionais Cristãos\"",
       "lastUpdated": "Última Atualização:",
-      "date": "28 de julho de 2025",
+      "date": "3 de setembro de 2026",
       "description": "Esta Política de Privacidade descreve como o aplicativo móvel \"Devocionais Cristãos\" (doravante, \"o Aplicativo\"), de propriedade e operado pela **Develop4God**, lida com as informações do usuário. A privacidade de nossos usuários é de extrema importância para nós.",
       "section1_title": "1. Informações que Coletamos e Como as Usamos",
       "section1_text": "O Aplicativo \"Devocionais Cristãos\" coleta e processa certos tipos de dados para oferecer suas funcionalidades e melhorar a experiência do usuário. Queremos ser transparentes sobre quais dados são coletados e com qual finalidade:",
@@ -167,14 +167,13 @@
       "section4_title": "4. Serviços de Terceiros",
       "section4_text": "O Aplicativo usa serviços de terceiros que podem coletar informações. Esses serviços têm suas próprias políticas de privacidade:",
       "section4_list1": "**Firebase (Google):** Para autenticação, bancos de dados (Firestore), notificações (FCM) e análises. A política de privacidade do Firebase está disponível em [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
-      "section4_list2": "**PayPal:** Para doações. A política de privacidade do PayPal está disponível em [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
       "section4_list3": "Outros serviços: O Aplicativo também pode usar outros serviços de terceiros para funções específicas, como o envio de e-mails. Esses serviços terão acesso apenas às informações necessárias para fornecer seu serviço.",
       "section5_title": "5. Privacidade das Crianças",
       "section5_text": "O Aplicativo não se destina ao uso por crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos. Se tomarmos conhecimento de que coletamos informações de uma criança menor de 13 anos sem o consentimento verificável dos pais, tomaremos medidas para remover essa informação de nossos servidores.",
       "section6_title": "6. Alterações nesta Política de Privacidade",
       "section6_text": "Podemos atualizar nossa Política de Privacidade de tempos em tempos. Iremos notificá-lo sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data de \"Última Atualização\" no topo. Recomendamos que você revise esta Política de Privacidade periodicamente para quaisquer alterações.",
       "section7_title": "7. Contato",
-      "section7_text": "Se você tiver alguma dúvida sobre esta Política de Privacidade ou desejar solicitar a exclusão de seus dados, não hesite em nos contatar em: develop4God@gmail.com.",
+      "section7_text": "Se você tiver alguma dúvida sobre esta Política de Privacidade ou desejar solicitar a exclusão de seus dados, não hesite em nos contatar em: Develop4God@gmail.com.",
       "backToHome": "Voltar à página inicial"
     }
   },

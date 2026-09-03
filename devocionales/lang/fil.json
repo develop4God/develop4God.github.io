@@ -65,7 +65,7 @@
   "contact": {
     "title": "May Mga Tanong? Makipag-ugnayan sa Amin!",
     "description": "Kung mayroon kang anumang tanong, mungkahi, o gusto mo lang bumati, huwag mag-atubiling makipag-ugnayan sa amin.",
-    "email": "develop4God@gmail.com",
+    "email": "Develop4God@gmail.com",
     "sendEmail": "Padalhan Kami ng Email"
   },
   "donation": {
@@ -75,8 +75,8 @@
     "donationText": "Isaalang-alang ang paggawa ng donasyon."
   },
   "footer": {
-    "copyright": "© 2026 Mga Debosyonal na Kristiyano. Nakalaan ang lahat ng karapatan.",
-    "madeWith": "Ginawa nang may ♥️ ni develop4God",
+    "copyright": "© 2025 Mga Debosyonal na Kristiyano. Nakalaan ang lahat ng karapatan.",
+    "madeWith": "Ginawa nang may ♥️ ni Develop4God",
     "terms": "Mga Tuntunin at Kondisyon",
     "privacy": "Patakaran sa Privacy",
     "deleteData": "Humiling ng Pagtanggal ng Data",
@@ -86,7 +86,7 @@
     "terms": {
       "title": "Mga Tuntunin at Kondisyon sa Paggamit ng Application na \"Mga Debosyonal na Kristiyano\"",
       "lastUpdated": "Petsa ng Huling Pag-update:",
-      "date": "Hulyo 28, 2025",
+      "date": "Setyembre 3, 2026",
       "welcome": "Maligayang pagdating sa mobile application na \"Mga Debosyonal na Kristiyano\" (mula ngayon, \"ang Application\"), na pag-aari at pinapatakbo ng **Develop4God**. Sa pag-access o paggamit ng Application, ikaw (\"ang Gumagamit\") ay sumasang-ayon na legal na mabigkis sa mga Tuntunin at Kondisyon sa Paggamit na ito (mula ngayon, \"ang Mga Tuntunin\"). Kung hindi ka sumasang-ayon sa alinman sa mga Tuntuning ito, hindi mo dapat gamitin ang Application.",
       "section1_title": "1. Paglalarawan ng Application",
       "section1_text": "Ang Application na \"Mga Debosyonal na Kristiyano\" ay isang digital na plataporma na idinisenyo upang magbigay ng access sa araw-araw, lingguhan, o pana-panahong mga debosyonal na teksto, na may layuning itaguyod ang espirituwal na pagninilay at personal na paglago. Kasama sa mga pangunahing tampok ang pagbabasa ng mga debosyonal, ang kakayahang i-save ang mga debosyonal bilang paborito, ang opsyon na ibahagi ang mga debosyonal sa mga kontak sa pamamagitan ng mga function ng iyong mobile device, ang pagkuha ng screenshot ng nilalaman ng debosyonal, at ang posibilidad ng paggawa ng kusang-loob na donasyon upang suportahan ang Application.",
@@ -118,13 +118,13 @@
       "section9_title": "9. Namumunong Batas at Hurisdiksyon",
       "section9_text": "Ang Mga Tuntuning ito ay pamamahalaan at bibigyang-kahulugan alinsunod sa mga batas ng **Republika ng Panama**, nang hindi isinasaalang-alang ang mga probisyon nito sa salungatan ng batas. Anumang hindi pagkakaunawaan na lumitaw kaugnay ng Mga Tuntuning ito ay sasailalim sa eksklusibong hurisdiksyon ng mga korte ng **Panama City, Republika ng Panama**.",
       "section10_title": "10. Makipag-ugnayan",
-      "section10_text": "Kung mayroon kang anumang tanong tungkol sa Mga Tuntuning ito, maaari kang makipag-ugnayan sa amin sa: develop4God@gmail.com.",
+      "section10_text": "Kung mayroon kang anumang tanong tungkol sa Mga Tuntuning ito, maaari kang makipag-ugnayan sa amin sa: Develop4God@gmail.com.",
       "backToHome": "Bumalik sa Pangunahing Pahina"
     },
     "privacy": {
       "title": "Patakaran sa Privacy ng Application na \"Mga Debosyonal na Kristiyano\"",
       "lastUpdated": "Petsa ng Huling Pag-update:",
-      "date": "Hulyo 28, 2025",
+      "date": "Setyembre 3, 2026",
       "description": "Ang Patakaran sa Privacy na ito ay naglalarawan kung paano hinahawakan ng mobile application na \"Mga Debosyonal na Kristiyano\" (mula ngayon, \"ang Application\"), na pag-aari at pinapatakbo ng **Develop4God**, ang impormasyon ng gumagamit. Ang privacy ng aming mga gumagamit ay napakahalaga sa amin.",
       "section1_title": "1. Impormasyong Aming Kinokolekta at Kung Paano Namin Ito Ginagamit",
       "section1_text": "Kinokolekta at pinoproseso ng Application na \"Mga Debosyonal na Kristiyano\" ang ilang uri ng data upang mag-alok ng mga tampok nito at pagbutihin ang karanasan ng gumagamit. Nais naming maging transparent tungkol sa kung anong data ang kinokolekta at para sa anong layunin:",
@@ -167,14 +167,13 @@
       "section4_title": "4. Mga Serbisyo ng Ikatlong Partido",
       "section4_text": "Ang Application ay gumagamit ng mga serbisyo ng ikatlong partido na maaaring kumolekta ng impormasyon. Ang mga serbisyong ito ay may sariling mga patakaran sa privacy:",
       "section4_list1": "**Firebase (Google):** Para sa authentication, mga database (Firestore), abiso (FCM), at pagsusuri. Ang patakaran sa privacy ng Firebase ay makikita sa [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
-      "section4_list2": "**PayPal:** Para sa mga donasyon. Ang patakaran sa privacy ng PayPal ay makikita sa [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
       "section4_list3": "Iba pang serbisyo: Maaari ding gumamit ang Application ng ibang mga serbisyo ng ikatlong partido para sa mga tukoy na function, tulad ng pagpapadala ng mga email. Ang mga serbisyong ito ay magkakaroon lamang ng access sa impormasyong kinakailangan upang maibigay ang kanilang serbisyo.",
       "section5_title": "5. Privacy ng Mga Bata",
       "section5_text": "Ang Application ay hindi inilaan para sa paggamit ng mga batang wala pang 13 taong gulang. Hindi kami sinasadyang kumokolekta ng personal na impormasyon mula sa mga batang wala pang 13 taong gulang. Kung mapansin naming nakakolekta kami ng impormasyon mula sa isang batang wala pang 13 taong gulang nang walang mapatutunayang pahintulot ng magulang, gagawa kami ng mga hakbang upang alisin ang impormasyong iyon mula sa aming mga server.",
       "section6_title": "6. Mga Pagbabago sa Patakaran sa Privacy na Ito",
       "section6_text": "Maaari naming i-update ang aming Patakaran sa Privacy paminsan-minsan. Aabisuhan ka namin ng anumang pagbabago sa pamamagitan ng paglalathala ng bagong Patakaran sa Privacy sa pahinang ito at pag-update ng petsa ng \"Huling Pag-update\" sa itaas. Inirerekomenda naming suriin ang Patakaran sa Privacy na ito paminsan-minsan para sa anumang pagbabago.",
       "section7_title": "7. Makipag-ugnayan",
-      "section7_text": "Kung mayroon kang anumang tanong tungkol sa Patakaran sa Privacy na ito o nais mong humiling ng pagtanggal ng iyong data, huwag mag-atubiling makipag-ugnayan sa amin sa: develop4God@gmail.com.",
+      "section7_text": "Kung mayroon kang anumang tanong tungkol sa Patakaran sa Privacy na ito o nais mong humiling ng pagtanggal ng iyong data, huwag mag-atubiling makipag-ugnayan sa amin sa: Develop4God@gmail.com.",
       "backToHome": "Bumalik sa Pangunahing Pahina"
     }
   },
@@ -219,7 +218,7 @@
     "navDevotional": "Debosyonal Ngayong Araw",
     "supportMinistry": "Mag-donate",
     "supportMinistryTitle": "Suportahan ang aming ministeryo para mailunsad ang app sa iOS at masagot ang gastos sa infrastructure.\n\nPara manatiling libre at walang ads para sa lahat ng users.",
-    "footerTagline": "© 2026 Develop4God. Isang digital na kasangkapan sa ministeryo.",
+    "footerTagline": "© 2025 Develop4God. Isang digital na kasangkapan sa ministeryo.",
     "salvationPrayerTitle": "Panalangin ng pananampalataya, para sa buhay na walang hanggan!✨",
     "salvationPrayerIntro": "Ulitin ang panalanging ito nang malakas, may pananampalataya at naniniwala nang buong puso❤️:",
     "salvationPrayer": "Hesukristo, naniniwala ako na namatay Ka sa krus para sa akin, humihingi ako ng kapatawaran at tunay na nagsisisi sa aking mga kasalanan. Hinihiling ko sa Iyo na maging aking Tagapagligtas at Panginoon ng aking buhay. Iligtas mo ako mula sa walang hanggang kamatayan at isulat ang aking pangalan sa aklat ng buhay.\nSa makapangyarihang pangalan ni Jesus, amen.",
