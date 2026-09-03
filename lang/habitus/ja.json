@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Develop4God",
+    "description": "Habitus+Faith：信仰ベースの習慣トラッカー。マイクロ習慣、聖書の御言葉、内蔵聖書を備えています。"
+  },
+  "navigation": {
+    "home": "ホーム",
+    "devotionals": "黙想",
+    "habitus": "ハビトゥス+信仰",
+    "workWithMe": "私と一緒に働きませんか"
+  },
+  "header": {
+    "tag": "信仰ベースの習慣トラッカー",
+    "mainTitle": "信仰をあなたの毎日の最高の習慣に",
+    "subtitle": "提案されるマイクロ習慣と聖書の御言葉で、敬虔な習慣を築きましょう。",
+    "download": "アプリをダウンロード"
+  },
+  "features": {
+    "title": "主な機能",
+    "ai": {
+      "title": "最初のマイクロ習慣",
+      "description": "目標を入力すると、始めるための習慣を提案します。"
+    },
+    "tracking": {
+      "title": "習慣管理",
+      "description": "連続記録と、習慣の簡単な並べ替え。"
+    },
+    "notes": {
+      "title": "メモ",
+      "description": "チェックリスト、番号付きリスト、絵文字で毎日を記録。"
+    },
+    "bible": {
+      "title": "聖書と黙想",
+      "description": "アプリを離れずに聖書と黙想を読めます。"
+    },
+    "privacy": {
+      "title": "プライバシー第一",
+      "description": "匿名認証、個人データ不要、完全なオフライン機能。"
+    }
+  },
+  "support": {
+    "title": "ミニストリーをサポートする",
+    "description": "あなたのサポートにより、クリスチャンコミュニティのための無料で質の高いリソースを開発し続けることができます。このミッションの一員でいてくれてありがとうございます！"
+  },
+  "footer": {
+    "copyright": "© 2026 develop4God. 無断転載を禁じます。",
+    "madeWith": "神の栄光のために愛を込めて開発",
+    "contact": "お問い合わせ"
+  }
+}

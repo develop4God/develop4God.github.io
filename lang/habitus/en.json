@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Develop4God",
+    "description": "Habitus+Faith: a faith-based habit tracker with micro-habits, Bible verses, and an integrated Bible."
+  },
+  "navigation": {
+    "home": "Home",
+    "devotionals": "Devotionals",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Work With Me"
+  },
+  "header": {
+    "tag": "The faith-based habit tracker",
+    "mainTitle": "Make faith your best daily habit",
+    "subtitle": "Build godly habits with suggested micro-habits and Bible verses.",
+    "download": "Download app"
+  },
+  "features": {
+    "title": "Features",
+    "ai": {
+      "title": "Starter micro-habits",
+      "description": "Enter a goal and get suggested habits to get started."
+    },
+    "tracking": {
+      "title": "Habit tracking",
+      "description": "Streaks and easy habit reordering."
+    },
+    "notes": {
+      "title": "Notes",
+      "description": "Checklists, numbered lists, and emojis to jot down your day."
+    },
+    "bible": {
+      "title": "Bible & devotionals",
+      "description": "Read the Bible and devotionals without leaving the app."
+    },
+    "privacy": {
+      "title": "Privacy First",
+      "description": "Anonymous authentication, no personal data required, and full offline functionality."
+    }
+  },
+  "support": {
+    "title": "Support the Ministry",
+    "description": "Your support allows us to continue developing free, high-quality resources for the Christian community. Thank you for being part of this mission!"
+  },
+  "footer": {
+    "copyright": "© 2026 develop4God. All rights reserved.",
+    "madeWith": "Made with love for God's glory",
+    "contact": "Contact"
+  }
+}

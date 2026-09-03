@@ -1,64 +1,305 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KBGE96RQML');
-  </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
 
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Habitus+Faith - Construye Hábitos Piadosos</title>
-  <meta name="description" content="Herramienta para construir hábitos espirituales y crecer en disciplina con motivación bíblica.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/habitus/css/habitus.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habitus+Faith - Develop4God</title>
+    <meta name="description" content="Habitus+Faith: rastreador de hábitos basado en la fe, con micro-hábitos, versículos bíblicos y Biblia integrada.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/modern.css">
+    <link rel="stylesheet" href="/devocionales/css/language-selector.css">
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: #f5f2fb;
+            --surface: #ffffff;
+            --text: #1c1730;
+            --text-muted: #6b6280;
+            --border: #ded4ef;
+            --accent: #6d4aa8;
+            --accent-soft: #ece5f7;
+            --highlight: #a8461c;
+        }
+        :root[data-theme="dark"] {
+            --bg: #0b0b0a;
+            --surface: #151412;
+            --text: #f2f0ea;
+            --text-muted: #a39e91;
+            --border: #2a2822;
+            --accent: #5fb8ae;
+            --accent-soft: #16302d;
+            --highlight: #e08a5c;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0b0b0a;
+                --surface: #151412;
+                --text: #f2f0ea;
+                --text-muted: #a39e91;
+                --border: #2a2822;
+                --accent: #5fb8ae;
+                --accent-soft: #16302d;
+                --highlight: #e08a5c;
+            }
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+        .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
+        .site-nav a:not(.btn-primary) {
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .site-nav a:not(.btn-primary):hover { color: var(--text); }
+        .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .theme-switch input { display: none; }
+        .theme-switch .theme-switch-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-muted);
+            transition: color .15s ease;
+        }
+        .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+        .theme-switch-track {
+            position: relative;
+            width: 2.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: var(--border);
+            transition: background .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+        .theme-switch-dot {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 50%;
+            background: var(--surface);
+            transition: transform .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
+
+        /* Neutralize the shared language-selector's hardcoded purple */
+        .language-selector-button.bg-purple-700 {
+            background-color: var(--surface) !important;
+            border-color: var(--border) !important;
+            color: var(--text) !important;
+        }
+        .language-selector-button.bg-purple-700:hover {
+            background-color: var(--accent-soft) !important;
+        }
+
+        .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: opacity .15s ease;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        .service-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
+    </style>
 </head>
 <body>
-  <header>
-    <div class="container">
-      <div class="header-content">
-        <div style="display:flex;align-items:center;">
-          <a href="/index.html" class="home-link" title="Inicio" aria-label="Inicio" style="margin-right:1em;display:flex;align-items:center;">
-            <i data-lucide="home" class="w-8 h-8 text-white"></i>
-          </a>
-          <a href="/habitus/" class="logo" data-i18n="header.title">Habitus+Faith</a>
-        </div>
-        <div class="language-selector-wrapper">
-          <div id="language-selector"></div>
-        </div>
-      </div>
-    </div>
-  </header>
 
-  <main>
-    <section class="coming-soon">
-      <div class="container">
-        <div class="coming-soon-content">
-          <div class="icon-large">✨</div>
-          <h2 data-i18n="comingSoon.title">Próximamente</h2>
-          <p data-i18n="comingSoon.message">Estamos trabajando en traerte una experiencia increíble para construir hábitos de fe.</p>
-          <a href="/" class="back-link" data-i18n="comingSoon.backHome">Volver al Inicio</a>
+    <header class="site-nav">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <nav aria-label="Navegación principal">
+                <ul class="flex items-center gap-6 text-sm">
+                    <li><a href="/" data-i18n="navigation.home">Inicio</a></li>
+                    <li><a href="/devocionales/" data-i18n="navigation.devotionals">Devocionales</a></li>
+                    <li><a href="/habitus/" class="active" data-i18n="navigation.habitus">Habitus+Faith</a></li>
+                    <li><a href="/work-with-me/" data-i18n="navigation.workWithMe">Trabaja Conmigo</a></li>
+                </ul>
+            </nav>
+            <div class="flex items-center gap-3">
+                <div id="language-selector"></div>
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
+            </div>
         </div>
-      </div>
-    </section>
-  </main>
+    </header>
 
-  <footer>
-    <div class="container">
-      <div class="footer-content">
-        <p data-i18n="footer.copyright">© 2025 develop4God. Todos los derechos reservados.</p>
-        <p data-i18n="footer.madeWith">Desarrollado con amor para la gloria de Dios</p>
-        <p><a href="/" class="footer-link" data-i18n="footer.backToHub">Volver al Hub Principal</a></p>
-      </div>
-    </div>
-  </footer>
+    <main class="max-w-5xl mx-auto px-4 py-12">
 
-  <script src="/habitus/js/habitus.js"></script>
+        <!-- Hero -->
+        <section class="text-center max-w-3xl mx-auto mb-16">
+            <a href="https://play.google.com/store/apps/details?id=com.develop4God.habitus_faith" target="_blank" rel="noopener" aria-label="Habitus+Faith en Google Play">
+                <img src="/habitus/img/habitus-icon.png" alt="Habitus+Faith" style="height:5rem;width:5rem;margin:0 auto 1.5rem;display:block;border-radius:1rem;">
+            </a>
+            <div class="eyebrow mb-3" data-i18n="header.tag">Rastreador de hábitos basado en la fe</div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-4" style="color: var(--text);" data-i18n="header.mainTitle">
+                Haz que la fe sea tu mejor hábito diario
+            </h1>
+            <p class="text-lg mb-6" style="color: var(--text-muted);" data-i18n="header.subtitle">
+                Construye hábitos piadosos con micro-hábitos sugeridos y versículos bíblicos.
+            </p>
+            <a href="https://play.google.com/store/apps/details?id=com.develop4God.habitus_faith" target="_blank" rel="noopener" class="btn-primary px-6 py-3 inline-flex items-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span data-i18n="header.download">Descargar app</span>
+            </a>
+        </section>
+
+        <!-- Features -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--text);" data-i18n="features.title">Características</h2>
+            <div class="flex flex-wrap justify-center gap-6">
+                <div class="service-card" style="flex:1 1 260px;max-width:320px;">
+                    <div class="service-card-icon"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="features.ai.title">Micro-hábitos iniciales</h3>
+                    <p style="color: var(--text-muted);" data-i18n="features.ai.description">Escribe una meta y recibe hábitos sugeridos para empezar.</p>
+                </div>
+                <div class="service-card" style="flex:1 1 260px;max-width:320px;">
+                    <div class="service-card-icon"><i data-lucide="flame" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="features.tracking.title">Seguimiento de hábitos</h3>
+                    <p style="color: var(--text-muted);" data-i18n="features.tracking.description">Rachas y reordena tus hábitos fácilmente.</p>
+                </div>
+                <div class="service-card" style="flex:1 1 260px;max-width:320px;">
+                    <div class="service-card-icon"><i data-lucide="notebook-pen" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="features.notes.title">Notas</h3>
+                    <p style="color: var(--text-muted);" data-i18n="features.notes.description">Listas, checklists y emojis para anotar lo que vives cada día.</p>
+                </div>
+                <div class="service-card" style="flex:1 1 260px;max-width:320px;">
+                    <div class="service-card-icon"><i data-lucide="book-open" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="features.bible.title">Biblia y devocionales</h3>
+                    <p style="color: var(--text-muted);" data-i18n="features.bible.description">Lee la Biblia y devocionales sin salir de la app.</p>
+                </div>
+                <div class="service-card" style="flex:1 1 260px;max-width:320px;">
+                    <div class="service-card-icon"><i data-lucide="shield-check" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="features.privacy.title">Privacidad Primero</h3>
+                    <p style="color: var(--text-muted);" data-i18n="features.privacy.description">Autenticación anónima, sin datos personales requeridos, y funcionalidad completa sin conexión.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donación -->
+        <section id="donacion" class="text-center max-w-2xl mx-auto">
+            <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" style="color: var(--highlight);" aria-label="Donar en PayPal">
+                <i data-lucide="heart" class="w-8 h-8 mx-auto mb-4" fill="currentColor"></i>
+            </a>
+            <h2 class="text-2xl font-bold mb-3" style="color: var(--text);" data-i18n="support.title">Apoya el Ministerio</h2>
+            <p class="mb-6" style="color: var(--text-muted);" data-i18n="support.description">
+                Tu apoyo nos permite seguir desarrollando recursos gratuitos y de calidad para la comunidad cristiana. ¡Gracias por ser parte de esta misión!
+            </p>
+            <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" class="btn-primary px-6 py-3 inline-flex items-center gap-2">
+                <i data-lucide="gift" class="w-4 h-4"></i>
+                <span data-i18n="support.title">Apoyar el Ministerio</span>
+            </a>
+        </section>
+
+    </main>
+
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <p><a href="mailto:develop4God@gmail.com" style="color: var(--text-muted);" data-i18n="footer.contact">Contacto</a></p>
+    </footer>
+
+    <script src="/js/site-footer.js"></script>
+    <script src="/js/rtl-helper.js"></script>
+    <script src="/habitus/js/habitus-i18n.js"></script>
+    <script>
+        lucide.createIcons();
+        // Footer's shared copyright/made-with lines are rendered by
+        // habitus-i18n.js's applyTranslations() (live-fetched
+        // translations.footer), on both initial load and language change.
+
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
+            const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
+
+            function currentTheme() {
+                const attr = document.documentElement.getAttribute('data-theme');
+                if (attr) return attr;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function syncSwitch() {
+                const isDark = currentTheme() === 'dark';
+                toggle.checked = isDark;
+                iconDark.classList.toggle('is-active', isDark);
+                iconLight.classList.toggle('is-active', !isDark);
+            }
+
+            toggle.addEventListener('change', () => {
+                const next = toggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                syncSwitch();
+            });
+
+            syncSwitch();
+        })();
+    </script>
 </body>
 </html>
