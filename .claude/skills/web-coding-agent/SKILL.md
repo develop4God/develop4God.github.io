@@ -154,6 +154,14 @@ node --test
 ```
 (Run from repo root — **not** `node --test devocionales/js/`, that does not work as a directory argument on this Node version, confirmed the hard way.) Currently covers `bible-text-formatter.js` (12 tests, all 10 languages, pure functions, no DOM), `devotional-progress.js` (date-math + localStorage progress), and `devotional-tts.js`'s `buildTtsText` (pure text-assembly, real i18n copy, no DOM/speechSynthesis). Zero tolerance for failures. If your change touches a file with a matching `*.test.js`, update or add tests there — every language/branch you touched.
 
+**Gate 3a — Red/green is mandatory for every bug fix, not just "add a test."** A test that only ever ran against the fixed code proves nothing — it could pass by coincidence, assert the wrong thing, or not actually exercise the broken path. For every bug fix (new test or updated existing one):
+1. Write the test asserting the *correct* behavior.
+2. Prove it fails against the pre-fix code, for the right reason — not a crash or unrelated error. The fastest way: `git stash` your fix (keep the new test), run the test, confirm it fails with an assertion that matches the actual bug (not a syntax error or missing file), then `git stash pop` to restore the fix.
+3. Confirm it passes against the fixed code.
+4. Report both outcomes explicitly (see Gate 3a line in Step 6's report format) — "tests added" alone is not sufficient, state that red was confirmed and why it failed, then that green was confirmed after.
+
+This is exactly how the `renderLegalPrivacy()` section-2 list-item bug was verified: the regression test was run against a copy of the pre-fix `i18n.js` from `main`, confirmed to fail with the missing list items (and the code's own "[Error] missing sections" fallback firing, showing the bug was worse than a cosmetic gap), then confirmed to pass once the fix was restored. A test that was only ever run once, against already-fixed code, does not meet this gate.
+
 **Module-loading pattern for any newly-extracted pure-logic module:** load the real browser-IIFE source with `vm.runInThisContext`, passing an explicit `filename` option — **not** `new Function('window', source)`. Both execute the code identically, but `new Function` produces an anonymous eval with no source location, so c8/V8 cannot attribute coverage back to the real file — it silently reports 0% (or omits the file entirely) even when every line actually ran under real tests. This was caught the hard way: `devotional-progress.test.js`/`devotional-tts.test.js` initially used `new Function` and showed 0% coverage for both modules despite 100% of their tests passing, while `bible-text-formatter.test.js` (which already used the correct pattern) showed real, accurate numbers. The correct form:
 ```js
 const vm = require('node:vm');
@@ -255,6 +263,7 @@ There's no DI container or class hierarchy here — SOLID applies loosely, but t
 
 🧪 Tests Added/Updated
 [Test file] — [what's covered]
+— Red/green: ✅ confirmed test fails against pre-fix code ([why it failed]), passes against the fix
 — OR —
 N/A — [reason, e.g. "DOM-only change, no pure-function logic to unit test"]
 
@@ -275,6 +284,7 @@ None
 | Playwright verification skipped for HTML/JS behavior changes | Do not report done — static checks alone have missed real breakage twice in this repo's history |
 | i18n copy added to only some language files | Hard block — fix before done |
 | `node --test` has failures | Do not report done — fix or explicitly flag as pre-existing |
+| Bug-fix test added/updated without confirming it fails against pre-fix code | Do not report done — a test never shown red proves nothing; re-run it against the pre-fix code (`git stash` the fix) before claiming coverage |
 | New pure-logic module shipped with no c8-visible test coverage | Flag it — no enforced threshold, but silent 0% on new logic is exactly the gap this rule exists to catch |
 | New `*.test.js` loads browser-IIFE source via `new Function` instead of `vm.runInThisContext` | Fix before done — c8 can't attribute coverage to an anonymous eval, so it silently under-reports |
 | New npm dependency added without asking | Hard block — this repo has zero dependencies by design |
