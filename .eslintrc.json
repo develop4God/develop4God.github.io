@@ -22,6 +22,7 @@
     "DevotionalSalvationModal": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
+    "SiteFooter": "readonly",
     "lucide": "readonly"
   },
   "rules": {

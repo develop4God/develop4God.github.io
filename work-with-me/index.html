@@ -318,12 +318,14 @@
     </main>
 
     <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
-        <p>&copy; 2026 Develop4God. Todos los derechos reservados.</p>
+        <p><a href="mailto:develop4God@gmail.com" style="color: var(--text-muted);">Contacto</a></p>
     </footer>
 
+    <script src="/js/site-footer.js"></script>
     <script src="/js/app-stats.js"></script>
     <script>
         lucide.createIcons();
+        SiteFooter.renderSharedLines(document.getElementById('page-footer'));
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
