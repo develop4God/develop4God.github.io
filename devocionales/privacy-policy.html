@@ -16,117 +16,173 @@
     <meta name="title-key" content="legal.privacy.title">
     <meta name="description" content="Política de Privacidad de la aplicación Devocionales Cristianos. Información sobre el manejo de datos y privacidad de los usuarios.">
 
-    <!-- Enlace al CDN de Tailwind CSS para estilos básicos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Enlace a Google Fonts para la fuente "Inter" -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Modern CSS enhancements -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="/devocionales/css/modern.css">
-    <!-- Internationalization system -->
-    <script src="/js/i18n.js"></script>
-    <!-- Modern enhancements -->
-    <script src="/devocionales/js/modern.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/language-selector.css">
+    <script src="/js/rtl-helper.js"></script>
+    <script src="/devocionales/js/i18n.js"></script>
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
+        :root {
+            --bg: #f5f2fb;
+            --surface: #ffffff;
+            --text: #1c1730;
+            --text-muted: #6b6280;
+            --border: #ded4ef;
+            --accent: #6d4aa8;
+            --accent-soft: #ece5f7;
+            --highlight: #a8461c;
         }
-        .container-legal {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        :root[data-theme="dark"] {
+            --bg: #0b0b0a;
+            --surface: #151412;
+            --text: #f2f0ea;
+            --text-muted: #a39e91;
+            --border: #2a2822;
+            --accent: #5fb8ae;
+            --accent-soft: #16302d;
+            --highlight: #e08a5c;
         }
-        h1 {
-            font-size: 2.5em;
-            color: #4a0e4e; /* Morado oscuro para títulos principales */
-            margin-bottom: 20px;
-            text-align: center;
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0b0b0a;
+                --surface: #151412;
+                --text: #f2f0ea;
+                --text-muted: #a39e91;
+                --border: #2a2822;
+                --accent: #5fb8ae;
+                --accent-soft: #16302d;
+                --highlight: #e08a5c;
+            }
         }
-        h2 {
-            font-size: 1.8em;
-            color: #6c236f; /* Un tono de morado un poco más claro */
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+        .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
+
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
         }
-        h3 {
-            font-size: 1.4em;
-            color: #8c3b90; /* Otro tono de morado */
-            margin-top: 20px;
-            margin-bottom: 10px;
+        .theme-switch input { display: none; }
+        .theme-switch .theme-switch-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-muted);
+            transition: color .15s ease;
         }
-        p, ul, ol {
-            margin-bottom: 1em;
+        .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+        .theme-switch-track {
+            position: relative;
+            width: 2.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: var(--border);
+            transition: background .15s ease;
         }
-        ul {
-            list-style-type: disc;
-            margin-left: 20px;
+        .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+        .theme-switch-dot {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 50%;
+            background: var(--surface);
+            transition: transform .15s ease;
         }
-        ol {
-            list-style-type: decimal;
-            margin-left: 20px;
+        .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
+
+        /* Neutralize the shared language-selector's hardcoded purple */
+        .language-selector-button.bg-purple-700 {
+            background-color: var(--surface) !important;
+            border-color: var(--border) !important;
+            color: var(--text) !important;
         }
-        a {
-            color: #6d28d9; /* Morado de Tailwind para enlaces */
-            text-decoration: underline;
+        .language-selector-button.bg-purple-700:hover {
+            background-color: var(--accent-soft) !important;
         }
-        a:hover {
-            color: #5b21b6;
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: opacity .15s ease;
         }
-        .back-link {
-            display: block;
-            margin-top: 40px;
-            text-align: center;
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            font-weight: 600;
         }
-        .back-link a {
-            background-color: #a78bfa; /* Botón morado claro */
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        .legal-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 2rem;
         }
-        .back-link a:hover {
-            background-color: #8b5cf6; /* Morado un poco más oscuro al pasar el ratón */
-        }
-        /* Forzar texto blanco en botón principal de volver */
-        .inline-block.bg-purple-600 {
-            color: white !important;
-        }
+        .legal-card h1 { color: var(--text); }
+        .legal-card h2 { color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: .5rem; margin-top: 2rem; }
+        .legal-card h3 { color: var(--text); margin-top: 1.25rem; }
+        .legal-card p, .legal-card ul, .legal-card ol { color: var(--text-muted); margin-bottom: 1em; overflow-wrap: break-word; }
+        .legal-card a { color: var(--accent); overflow-wrap: break-word; }
+
+        /* modern.css has a blanket "footer, footer * { color: white !important }"
+           rule for other pages' dark footers — override it here so this page's
+           theme-aware footer text stays readable in light mode. */
+        footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-    <!-- Header with language selector -->
-    <header class="gradient-purple text-white p-4 shadow-md">
-        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
-            <a href="index.html" class="text-xl sm:text-2xl font-bold hover:text-purple-200 transition-colors mb-2 sm:mb-0">
-                <i class="fas fa-shield-alt mr-2"></i><span data-i18n="legal.privacy.title">Política de Privacidad</span>
-            </a>
-            <div class="flex items-center space-x-4">
-                <div id="language-selector" class="language-selector">
-                    <select class="bg-transparent text-white border border-purple-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-white transition-colors">
-                    </select>
-                </div>
-                <a href="index.html" class="bg-purple-800 hover:bg-purple-900 px-3 py-1 rounded text-sm transition-colors">
-                    <i class="fas fa-home mr-1"></i><span data-i18n="legal.privacy.backToHome">Volver al inicio</span>
+<body>
+
+    <header class="site-nav">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <div class="flex items-center gap-3">
+                <a href="/devocionales/" class="btn-secondary px-3 py-1.5 text-sm flex items-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span data-i18n="legal.privacy.backToHome">Volver al inicio</span>
                 </a>
+                <div id="language-selector"></div>
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
             </div>
         </div>
     </header>
 
-    <div class="container mx-auto py-8 px-4 max-w-4xl">
-        <div class="bg-white rounded-lg shadow-xl p-8 scroll-reveal">
-            <h1 class="text-3xl sm:text-4xl font-bold text-center text-purple-800 mb-6" data-i18n="legal.privacy.title">Política de Privacidad de la Aplicación "Devocionales Cristianos"</h1>
-            <p class="text-center text-gray-600 mb-8">
+    <main class="max-w-4xl mx-auto px-4 py-10">
+        <div class="legal-card">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-center mb-4" data-i18n="legal.privacy.title">Política de Privacidad de la Aplicación "Devocionales Cristianos"</h1>
+
+            <div id="legal-privacy-content-meta" class="text-center text-sm mb-8" style="color: var(--text-muted);">
                 <strong data-i18n="legal.privacy.lastUpdated">Fecha de Última Actualización:</strong>
                 <span data-i18n="legal.privacy.date">28 de julio de 2025</span>
-            </p>
+            </div>
 
             <div class="prose prose-lg max-w-none">
                 <p data-i18n="legal.privacy.description">Esta Política de Privacidad describe cómo la aplicación móvil "Devocionales Cristianos" (en adelante, "la Aplicación"), propiedad y operada por **Develop4God**, maneja la información del usuario. La privacidad de nuestros usuarios es de suma importancia para nosotros.</p>
@@ -134,21 +190,60 @@
                 <!-- Dynamic privacy content injected from translations -->
                 <div id="legal-privacy-content"></div>
 
-                <div class="text-center mt-12 p-6 bg-purple-50 rounded-lg">
-                    <a href="index.html" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-home mr-2"></i><span data-i18n="legal.privacy.backToHome">Volver a la página principal</span>
+                <div class="text-center mt-12 pt-6" style="border-top: 1px solid var(--border);">
+                    <a href="/devocionales/" class="btn-primary inline-flex items-center gap-2 px-6 py-3">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span data-i18n="legal.privacy.backToHome">Volver a la página principal</span>
                     </a>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-8 px-4 mt-8">
-        <div class="container mx-auto text-center">
-            <p class="text-sm" data-i18n="footer.copyright">© 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
-            <p class="text-sm mt-2" data-i18n="footer.madeWith">Desarrollado con ♥️ por develop4God</p>
-        </div>
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <p id="footer-tagline" data-i18n="footer.copyright">&copy; 2025 Devocionales Cristianos. Todos los derechos reservados.</p>
+        <a id="footer-contact-mail" href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+            <span data-i18n="footer.contact">Contáctanos</span>
+        </a>
+        <p style="margin-top: 8px;">
+            <a href="/devocionales/privacy-policy.html" style="color: var(--text-muted);" data-i18n="footer.privacy">Política de Privacidad</a>
+            &nbsp;&middot;&nbsp;
+            <a href="/devocionales/terms-and-conditions.html" style="color: var(--text-muted);" data-i18n="footer.terms">Términos y Condiciones</a>
+        </p>
     </footer>
+
+    <script src="/devocionales/js/modern.js"></script>
+    <script>
+        lucide.createIcons();
+
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
+            const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
+
+            function currentTheme() {
+                const attr = document.documentElement.getAttribute('data-theme');
+                if (attr) return attr;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function syncSwitch() {
+                const isDark = currentTheme() === 'dark';
+                toggle.checked = isDark;
+                iconDark.classList.toggle('is-active', isDark);
+                iconLight.classList.toggle('is-active', !isDark);
+            }
+
+            toggle.addEventListener('change', () => {
+                const next = toggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                syncSwitch();
+            });
+
+            syncSwitch();
+        })();
+    </script>
 </body>
 </html>
