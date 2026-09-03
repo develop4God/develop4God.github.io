@@ -7,7 +7,8 @@
     "vision": "私たちのビジョン",
     "devotionals": "黙想",
     "habitus": "ハビトゥス+信仰",
-    "workWithMe": "私と一緒に働きませんか"
+    "workWithMe": "私と一緒に働きませんか",
+    "donate": "寄付する"
   },
   "vision": {
     "title": "私たちのビジョン",
@@ -36,7 +37,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 develop4God. 無断転載を禁じます。",
+    "copyright": "© 2026 Develop4God. 無断転載を禁じます。",
     "madeWith": "神の栄光のために愛を込めて開発",
     "contact": "お問い合わせ"
   },

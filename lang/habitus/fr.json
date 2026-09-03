@@ -7,7 +7,8 @@
     "home": "Accueil",
     "devotionals": "Méditations",
     "habitus": "Habitus+Faith",
-    "workWithMe": "Travaillez Avec Moi"
+    "workWithMe": "Travaillez Avec Moi",
+    "donate": "Faire un don"
   },
   "header": {
     "tag": "Le tracker d'habitudes basé sur la foi",
@@ -43,7 +44,7 @@
     "description": "Votre soutien nous permet de continuer à développer des ressources gratuites et de qualité pour la communauté chrétienne. Merci de faire partie de cette mission !"
   },
   "footer": {
-    "copyright": "© 2026 develop4God. Tous droits réservés.",
+    "copyright": "© 2026 Develop4God. Tous droits réservés.",
     "madeWith": "Développé avec amour pour la gloire de Dieu",
     "contact": "Contact"
   }

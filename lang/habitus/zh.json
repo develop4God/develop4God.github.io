@@ -7,7 +7,8 @@
     "home": "首页",
     "devotionals": "灵修",
     "habitus": "Habitus+Faith",
-    "workWithMe": "与我合作"
+    "workWithMe": "与我合作",
+    "donate": "捐赠"
   },
   "header": {
     "tag": "基于信仰的习惯追踪器",
@@ -43,7 +44,7 @@
     "description": "您的支持让我们能够持续为基督徒社区开发免费且优质的资源。感谢您成为这项使命的一部分！"
   },
   "footer": {
-    "copyright": "© 2026 develop4God. 版权所有。",
+    "copyright": "© 2026 Develop4God. 版权所有。",
     "madeWith": "为神的荣耀用爱开发",
     "contact": "联系"
   }

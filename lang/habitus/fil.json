@@ -7,7 +7,8 @@
     "home": "Home",
     "devotionals": "Mga Debosyonal",
     "habitus": "Habitus+Faith",
-    "workWithMe": "Makipagtrabaho Sa Akin"
+    "workWithMe": "Makipagtrabaho Sa Akin",
+    "donate": "Mag-donate"
   },
   "header": {
     "tag": "Ang habit tracker na batay sa pananampalataya",
@@ -43,7 +44,7 @@
     "description": "Ang iyong suporta ay nagbibigay-daan sa amin na patuloy na bumuo ng libre, mataas na kalidad na mapagkukunan para sa komunidad ng mga Kristiyano. Salamat sa pagiging bahagi ng misyong ito!"
   },
   "footer": {
-    "copyright": "© 2026 develop4God. Nakalaan ang lahat ng karapatan.",
+    "copyright": "© 2026 Develop4God. Nakalaan ang lahat ng karapatan.",
     "madeWith": "Ginawa nang may pagmamahal para sa kaluwalhatian ng Diyos",
     "contact": "Makipag-ugnayan"
   }

@@ -7,7 +7,8 @@
     "home": "Startseite",
     "devotionals": "Andachten",
     "habitus": "Habitus+Faith",
-    "workWithMe": "Arbeiten Sie Mit Mir"
+    "workWithMe": "Arbeiten Sie Mit Mir",
+    "donate": "Spenden"
   },
   "header": {
     "tag": "Der glaubensbasierte Gewohnheits-Tracker",
@@ -43,7 +44,7 @@
     "description": "Ihre Unterstützung ermöglicht es uns, weiterhin kostenlose, hochwertige Ressourcen für die christliche Gemeinschaft zu entwickeln. Danke, dass Sie Teil dieser Mission sind!"
   },
   "footer": {
-    "copyright": "© 2026 develop4God. Alle Rechte vorbehalten.",
+    "copyright": "© 2026 Develop4God. Alle Rechte vorbehalten.",
     "madeWith": "Mit Liebe für Gottes Ehre gemacht",
     "contact": "Kontakt"
   }
