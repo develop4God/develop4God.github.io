@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabaja Conmigo - Develop4God</title>
+    <meta name="description" content="Ingeniero de IA y desarrollador full-stack disponible para ministerios, negocios y personas que necesitan apps, automatización con IA y sistemas a medida.">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/modern.css">
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: #f5f2fb;
+            --surface: #ffffff;
+            --text: #1c1730;
+            --text-muted: #6b6280;
+            --border: #ded4ef;
+            --accent: #6d4aa8;
+            --accent-soft: #ece5f7;
+            --highlight: #a8461c;
+        }
+        :root[data-theme="dark"] {
+            --bg: #0b0b0a;
+            --surface: #151412;
+            --text: #f2f0ea;
+            --text-muted: #a39e91;
+            --border: #2a2822;
+            --accent: #5fb8ae;
+            --accent-soft: #16302d;
+            --highlight: #e08a5c;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0b0b0a;
+                --surface: #151412;
+                --text: #f2f0ea;
+                --text-muted: #a39e91;
+                --border: #2a2822;
+                --accent: #5fb8ae;
+                --accent-soft: #16302d;
+                --highlight: #e08a5c;
+            }
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+        .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
+        .site-nav a:not(.btn-primary) {
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .site-nav a:not(.btn-primary):hover { color: var(--text); }
+        .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .theme-switch input { display: none; }
+        .theme-switch .theme-switch-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-muted);
+            transition: color .15s ease;
+        }
+        .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+        .theme-switch-track {
+            position: relative;
+            width: 2.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: var(--border);
+            transition: background .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+        .theme-switch-dot {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 50%;
+            background: var(--surface);
+            transition: transform .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
+
+        .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: opacity .15s ease;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* ---- Stats strip ---- */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            text-align: center;
+        }
+        @media (min-width: 768px) {
+            .stats-strip { grid-template-columns: repeat(5, 1fr); }
+        }
+        .stat-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); }
+
+        /* ---- Service cards ---- */
+        .service-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+        .service-card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background: var(--accent-soft);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* ---- Proof-of-work cards ---- */
+        .proof-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
+    </style>
+</head>
+<body>
+
+    <header class="site-nav">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <nav aria-label="Navegación principal">
+                <ul class="flex items-center gap-6 text-sm">
+                    <li><a href="/#our-vision">Nuestra Visión</a></li>
+                    <li><a href="/devocionales/">Devocional de Hoy</a></li>
+                    <li><a href="/habitus/">Habitus+Faith</a></li>
+                    <li><a href="/work-with-me/" class="active">Trabaja Conmigo</a></li>
+                </ul>
+            </nav>
+            <div class="flex items-center gap-3">
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12">
+
+        <!-- Hero -->
+        <section class="text-center max-w-3xl mx-auto mb-16">
+            <div class="eyebrow mb-3">Por el desarrollador detrás de Devocionales Cristianos</div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-4" style="color: var(--text);">
+                Ministerios, negocios y personas: construyo las herramientas que necesitas.
+            </h1>
+            <p class="text-lg mb-8" style="color: var(--text-muted);">
+                Sistemas de IA, apps y automatización, hechos por un ingeniero full-stack que sirve a Dios a través de la tecnología.
+            </p>
+            <a href="https://wa.me/50688424291" target="_blank" rel="noopener" class="btn-primary px-6 py-3 inline-flex items-center gap-2">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                Hablemos de tu proyecto
+            </a>
+            <p class="mt-8 italic max-w-xl mx-auto pl-4 text-center" style="color: var(--text-muted); border-left: 2px solid var(--accent);">
+                "Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres."
+                <br><span class="not-italic font-semibold" style="color: var(--accent);">— Colosenses 3:23 —</span>
+            </p>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-strip mb-16 pb-12" style="border-bottom: 1px solid var(--border);">
+            <div>
+                <div class="stat-value">15K+</div>
+                <div class="stat-label">Descargas</div>
+            </div>
+            <div>
+                <div class="stat-value">99+</div>
+                <div class="stat-label">Países</div>
+            </div>
+            <div>
+                <div class="stat-value">6,300+</div>
+                <div class="stat-label">Usuarios Activos</div>
+            </div>
+            <div>
+                <div class="stat-value">4.9 ★</div>
+                <div class="stat-label">Calificación</div>
+            </div>
+            <div>
+                <div class="stat-value">10</div>
+                <div class="stat-label">Idiomas</div>
+            </div>
+        </section>
+
+        <!-- What I can build -->
+        <section id="what-i-build" class="mb-16">
+            <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--text);">Qué Puedo Construir Para Ti</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="service-card">
+                    <div class="service-card-icon"><i data-lucide="bot" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);">IA y Automatización</h3>
+                    <p style="color: var(--text-muted);">Pipelines de IA a medida, chatbots, sistemas de generación de contenido y automatización de procesos.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-card-icon"><i data-lucide="smartphone" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);">Apps y Sitios Web</h3>
+                    <p style="color: var(--text-muted);">Aplicaciones móviles y web, construidas de principio a fin, listas para producción.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-card-icon"><i data-lucide="database" class="w-5 h-5"></i></div>
+                    <h3 class="font-bold mb-2" style="color: var(--text);">Datos y Sistemas</h3>
+                    <p style="color: var(--text-muted);">Dashboards, integraciones y sistemas backend a medida para tu organización.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proof of work -->
+        <section id="proof" class="mb-16">
+            <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--text);">Trabajo Realizado</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="proof-card">
+                    <h3 class="font-bold mb-2" style="color: var(--text);">Devocionales Cristianos</h3>
+                    <p class="mb-4 flex-1" style="color: var(--text-muted);">App de devocionales diarios en producción, con audio, múltiples idiomas y versiones bíblicas.</p>
+                    <a href="/devocionales/" class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start">
+                        Ver Devocionales
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <div class="proof-card">
+                    <h3 class="font-bold mb-2" style="color: var(--text);">Habitus+Faith</h3>
+                    <p class="mb-4 flex-1" style="color: var(--text-muted);">Rastreador de hábitos con modelo de aprendizaje automático en el dispositivo para predicción de abandono.</p>
+                    <a href="/habitus/" class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start">
+                        Ver Habitus+Faith
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why -->
+        <section id="why" class="text-center max-w-2xl mx-auto mb-16">
+            <h2 class="text-2xl font-bold mb-4" style="color: var(--text);">Por Qué Hago Esto</h2>
+            <p style="color: var(--text-muted);">
+                Este es un trabajo de ministerio primero, ingreso después. Construyo herramientas para servir a Dios y estoy disponible para ayudar a otros ministerios, negocios y personas a hacer lo mismo.
+            </p>
+        </section>
+
+        <!-- Contact -->
+        <section id="work-contact" class="text-center max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold mb-3" style="color: var(--text);">¿Tienes un proyecto en mente?</h2>
+            <p class="mb-6" style="color: var(--text-muted);">Escríbeme y conversemos sobre cómo puedo ayudarte a construirlo.</p>
+            <div class="flex flex-wrap justify-center gap-3">
+                <a href="mailto:develop4God@gmail.com" class="btn-primary px-6 py-3 inline-flex items-center gap-2">
+                    <i data-lucide="mail" class="w-4 h-4"></i>
+                    Envíame un correo
+                </a>
+                <a href="https://wa.me/50688424291" target="_blank" rel="noopener" class="btn-secondary px-6 py-3 inline-flex items-center gap-2">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    WhatsApp
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <p>&copy; 2026 Develop4God. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
+            const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
+
+            function currentTheme() {
+                const attr = document.documentElement.getAttribute('data-theme');
+                if (attr) return attr;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function syncSwitch() {
+                const isDark = currentTheme() === 'dark';
+                toggle.checked = isDark;
+                iconDark.classList.toggle('is-active', isDark);
+                iconLight.classList.toggle('is-active', !isDark);
+            }
+
+            toggle.addEventListener('change', () => {
+                const next = toggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                syncSwitch();
+            });
+
+            syncSwitch();
+        })();
+    </script>
+</body>
+</html>
