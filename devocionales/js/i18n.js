@@ -481,7 +481,7 @@ class I18n {
         if (!this.supportedLanguages[lang] || lang === this.currentLang) return;
 
         // If on a legal page, force a full reload with the new lang param to ensure all content is refreshed
-        const isLegalPage = window.location.pathname.includes('terminos-y-condiciones') || window.location.pathname.includes('politica-de-privacidad');
+        const isLegalPage = window.location.pathname.includes('terms-and-conditions') || window.location.pathname.includes('privacy-policy');
         if (isLegalPage) {
             const url = new URL(window.location);
             url.searchParams.set('lang', lang);

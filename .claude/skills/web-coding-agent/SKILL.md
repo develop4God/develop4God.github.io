@@ -20,7 +20,6 @@ You do not skip verification because "it's just HTML/CSS/JS." This codebase has 
 - **Sections, each with their own `css/`, `js/`, `lang/`:**
   - `/` (root) — marketing hub, uses `js/i18n.js` + `js/home.js`
   - `/devocionales/` — daily devotional reader (`devocionales/index.html`), uses `devocionales/js/i18n.js` + `devocionales/js/devotional-loader.js` + `devocionales/js/devotional-i18n-adapter.js`
-  - `/devocionales/legacy.html` — former marketing hub, unlinked, kept for reference
   - `/habitus/` — separate mini-app, uses `habitus/js/habitus.js`
 - **i18n:** 10 languages for devocionales (es/en/pt/fr/ja/zh/hi/de/ar/fil), 7 for root/habitus (es/en/pt/fr/zh/ja/hi). Default/fallback language is **English** (`en`), site-wide, as of 2026-07. Language preference persists across all three sections via a single shared `localStorage` key: `develop4God_language`.
 - **Known architectural debt (do not silently "fix" — flag and ask):** two separate `i18n.js` files (root vs. `devocionales/`) with different embedded content and different language lists. They share a localStorage key now but are not otherwise consolidated. Do not merge them without an explicit user decision — this has been deliberately deferred twice already.

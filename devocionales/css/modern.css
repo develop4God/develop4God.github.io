@@ -305,11 +305,6 @@ input:focus {
 
 /* CORRECCIONES ESPECÍFICAS PARA COLORES MORADOS */
 
-/* 1. CORRECCIÓN: Título "Our Vision" debe ser morado */
-#our-vision h2 {
-    color: #7c3aed !important; /* purple-600 equivalent */
-}
-
 /* 3. CORRECCIÓN: TODOS los títulos de funciones deben ser morados */
 #features h3 {
     color: #7c3aed !important; /* Forzar morado para títulos de funciones */

@@ -112,6 +112,12 @@
         });
     }
 
+    function applyAppBannerText(downloadsPlain) {
+        const template = DevotionalI18n.t('devotionals.appBannerText', '');
+        document.getElementById('app-banner-message').textContent =
+            downloadsPlain ? template.replace('{downloads}', downloadsPlain) : template;
+    }
+
     function applyStaticUiText() {
         document.getElementById('back-link').textContent = DevotionalI18n.t('devotionals.backLink', '');
         document.getElementById('eyebrow-label').textContent = DevotionalI18n.t('devotionals.eyebrow', '');
@@ -124,7 +130,13 @@
         document.getElementById('oracion-label').textContent = DevotionalI18n.t('devotionals.oracion', '');
         document.getElementById('comparte-label').textContent = DevotionalI18n.t('devotionals.comparte', '');
         document.querySelector('.tts-label').textContent = DevotionalI18n.t('devotionals.listen', '');
-        document.getElementById('app-banner-message').textContent = DevotionalI18n.t('devotionals.appBannerText', '');
+        if (global.AppStats) {
+            global.AppStats.fetchStats()
+                .then((stats) => applyAppBannerText(stats.downloadsPlain))
+                .catch(() => applyAppBannerText());
+        } else {
+            applyAppBannerText();
+        }
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
         if (localStorage.getItem('appBannerDismissed') !== '1') {
@@ -136,6 +148,8 @@
         document.getElementById('support-ministry-btn').setAttribute('title', DevotionalI18n.t('devotionals.supportMinistryTitle', ''));
         document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
         document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
+        document.getElementById('footer-privacy-link').textContent = DevotionalI18n.t('footer.privacy', '');
+        document.getElementById('footer-terms-link').textContent = DevotionalI18n.t('footer.terms', '');
         document.getElementById('version-select').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionSelectAria', ''));
         document.getElementById('version-info-btn').setAttribute('aria-label', DevotionalI18n.t('devotionals.versionInfoAria', ''));
     }

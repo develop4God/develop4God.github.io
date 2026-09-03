@@ -212,7 +212,7 @@
     "shareFooterBenefits": "100% kostenlos | Keine Werbung | Offline nutzbar",
     "shareFooterDeveloper": "Develop4God",
     "ttsLang": "de-DE",
-    "appBannerText": "Christliche Andachten — 4.9 ★★★★★ · Über 10.000 Downloads. Kostenlose App, 100 % offline nutzbar.",
+    "appBannerText": "Christliche Andachten — 4.9 ★★★★★ · Über {downloads} Downloads. Kostenlose App, 100 % offline nutzbar.",
     "appBannerCta": "Bei Google Play holen",
     "appBannerClose": "Schließen",
     "navVision": "Unsere Vision",

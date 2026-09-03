@@ -82,9 +82,6 @@
         element.setAttribute('placeholder', value);
       }
     });
-
-    // Update project features
-    updateProjectFeatures();
   }
 
   // Get nested translation value
@@ -101,63 +98,151 @@
     return value;
   }
 
-  // Update project features lists
-  function updateProjectFeatures() {
-    const devoFeatures = document.getElementById('devocionales-features');
-    const habitusFeatures = document.getElementById('habitus-features');
+  // Language metadata (subset of devocionales/js/i18n.js's supportedLanguages,
+  // matching home's SUPPORTED_LANGUAGES set)
+  const LANGUAGE_INFO = {
+    es: { name: 'Español', flag: '🇪🇸' },
+    en: { name: 'English', flag: '🇺🇸' },
+    pt: { name: 'Português', flag: '🇧🇷' },
+    fr: { name: 'Français', flag: '🇫🇷' },
+    zh: { name: '中文', flag: '🇨🇳' },
+    ja: { name: '日本語', flag: '🇯🇵' },
+    hi: { name: 'हिन्दी', flag: '🇮🇳' }
+  };
 
-    if (devoFeatures && translations.projects?.devocionales?.features) {
-      devoFeatures.innerHTML = translations.projects.devocionales.features
-        .map(feature => `<li>${feature}</li>`)
-        .join('');
-    }
-
-    if (habitusFeatures && translations.projects?.habitus?.features) {
-      habitusFeatures.innerHTML = translations.projects.habitus.features
-        .map(feature => `<li>${feature}</li>`)
-        .join('');
-    }
-  }
-
-  // Create language selector
+  // Create language selector — custom dropdown matching devocionales'
+  // .custom-language-selector markup/CSS (devocionales/css/language-selector.css)
   function createLanguageSelector() {
     const wrapper = document.getElementById('language-selector');
     if (!wrapper) return;
 
-    // Limpiar el selector antes de agregar el nuevo <select>
-    wrapper.innerHTML = '';
+    const current = LANGUAGE_INFO[currentLanguage] || LANGUAGE_INFO[DEFAULT_LANGUAGE];
 
-    const select = document.createElement('select');
-    select.id = 'language-select';
-    select.className = 'language-select';
-    select.setAttribute('aria-label', 'Select language');
+    wrapper.innerHTML = `
+      <div class="custom-language-selector relative">
+        <button
+          type="button"
+          class="language-selector-button bg-purple-700 hover:bg-purple-600 text-white border border-purple-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-white transition-all duration-200 flex items-center gap-2 min-w-32 interactive"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+        >
+          <span class="language-current flex items-center gap-2">
+            <span class="text-base">${current.flag}</span>
+            <span class="font-medium">${current.name}</span>
+          </span>
+          <svg class="language-arrow w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
 
-    const languages = {
-      es: 'Español',
-      en: 'English',
-      pt: 'Português',
-      fr: 'Français',
-      zh: '中文',
-      ja: '日本語',
-      hi: 'हिन्दी'
-    };
+        <div class="language-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 opacity-0 invisible transform scale-95 transition-all duration-200 overflow-hidden">
+          <ul class="language-options" role="listbox">
+            ${SUPPORTED_LANGUAGES.map((code) => {
+              const info = LANGUAGE_INFO[code];
+              const isCurrent = code === currentLanguage;
+              return `
+                <li>
+                  <button
+                    type="button"
+                    class="language-option w-full px-4 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors duration-150 ${isCurrent ? 'bg-purple-100 text-purple-700' : 'text-gray-700'}"
+                    data-lang="${code}"
+                    role="option"
+                    ${isCurrent ? 'aria-selected="true"' : 'aria-selected="false"'}
+                  >
+                    <span class="text-lg">${info.flag}</span>
+                    <span class="font-medium">${info.name}</span>
+                    ${isCurrent ? '<span class="ml-auto text-purple-600">✓</span>' : ''}
+                  </button>
+                </li>
+              `;
+            }).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
 
-    Object.entries(languages).forEach(([code, name]) => {
-      const option = document.createElement('option');
-      option.value = code;
-      option.textContent = name;
-      if (code === currentLanguage) {
-        option.selected = true;
+    setupLanguageSelectorEvents(wrapper);
+  }
+
+  function setupLanguageSelectorEvents(container) {
+    const button = container.querySelector('.language-selector-button');
+    const dropdown = container.querySelector('.language-dropdown');
+    const arrow = container.querySelector('.language-arrow');
+    const options = container.querySelectorAll('.language-option');
+
+    function openDropdown() {
+      button.setAttribute('aria-expanded', 'true');
+      dropdown.classList.remove('opacity-0', 'invisible', 'scale-95');
+      dropdown.classList.add('opacity-100', 'visible', 'scale-100');
+      arrow.classList.add('rotate-180');
+    }
+
+    function closeDropdown() {
+      button.setAttribute('aria-expanded', 'false');
+      dropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+      dropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+      arrow.classList.remove('rotate-180');
+    }
+
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+      if (isExpanded) {
+        closeDropdown();
+      } else {
+        openDropdown();
       }
-      select.appendChild(option);
     });
 
-    select.addEventListener('change', async (e) => {
-      const newLang = e.target.value;
-      await changeLanguage(newLang);
+    options.forEach((option) => {
+      option.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const lang = option.getAttribute('data-lang');
+        closeDropdown();
+        await changeLanguage(lang);
+      });
     });
 
-    wrapper.appendChild(select);
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target)) {
+        closeDropdown();
+      }
+    });
+
+    button.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        button.click();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        openDropdown();
+        options[0]?.focus();
+      }
+    });
+
+    options.forEach((option, index) => {
+      option.addEventListener('keydown', (e) => {
+        switch (e.key) {
+          case 'ArrowDown':
+            e.preventDefault();
+            options[(index + 1) % options.length]?.focus();
+            break;
+          case 'ArrowUp':
+            e.preventDefault();
+            options[(index - 1 + options.length) % options.length]?.focus();
+            break;
+          case 'Enter':
+          case ' ':
+            e.preventDefault();
+            option.click();
+            break;
+          case 'Escape':
+            closeDropdown();
+            button.focus();
+            break;
+        }
+      });
+    });
   }
 
   // Change language
@@ -170,6 +255,7 @@
     saveLanguage(lang);
     translations = await fetchTranslations(lang);
     applyTranslations();
+    createLanguageSelector();
 
     // Update HTML lang attribute
     document.documentElement.setAttribute('lang', lang);
