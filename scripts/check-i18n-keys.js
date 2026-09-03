@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-// Validates that every locale JSON file in a given i18n directory has the
-// same set of keys as a canonical locale. Flags missing and extra keys.
+// Validates every locale JSON file in a given i18n directory: each file must
+// parse as valid JSON, and every file's key set must exactly match the union
+// of keys across ALL locale files in that directory (not just diff against
+// one canonical locale — a key present in any locale must be present in
+// every locale, and nothing should be missing from all but one).
 // Usage: node scripts/check-i18n-keys.js
 
 const fs = require('node:fs');
@@ -9,9 +12,9 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..');
 
 const TARGETS = [
-  { dir: path.join(REPO_ROOT, 'lang', 'home'), canonical: 'en' },
-  { dir: path.join(REPO_ROOT, 'devocionales', 'lang'), canonical: 'en' },
-  { dir: path.join(REPO_ROOT, 'habitus', 'lang'), canonical: 'en' },
+  path.join(REPO_ROOT, 'lang', 'home'),
+  path.join(REPO_ROOT, 'devocionales', 'lang'),
+  path.join(REPO_ROOT, 'habitus', 'lang'),
 ];
 
 function flatten(obj, prefix = '') {
@@ -27,69 +30,62 @@ function flatten(obj, prefix = '') {
   return keys;
 }
 
-function checkDir({ dir, canonical }) {
-  const canonicalPath = path.join(dir, `${canonical}.json`);
-  if (!fs.existsSync(canonicalPath)) {
-    return { dir, error: `canonical locale "${canonical}" not found at ${canonicalPath}` };
-  }
+function checkDir(dir) {
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json'));
 
-  const canonicalData = JSON.parse(fs.readFileSync(canonicalPath, 'utf8'));
-  const canonicalKeys = new Set(flatten(canonicalData));
-
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.json') && f !== `${canonical}.json`);
-
-  const results = [];
+  const parsed = {};
+  const parseErrors = [];
   for (const file of files) {
     const filePath = path.join(dir, file);
-    let data;
     try {
-      data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      parsed[file] = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } catch (err) {
-      results.push({ file, parseError: err.message });
-      continue;
-    }
-    const keys = new Set(flatten(data));
-    const missing = [...canonicalKeys].filter((k) => !keys.has(k));
-    const extra = [...keys].filter((k) => !canonicalKeys.has(k));
-    if (missing.length || extra.length) {
-      results.push({ file, missing, extra });
+      parseErrors.push({ file, message: err.message });
     }
   }
 
-  return { dir, canonical, results };
+  const keysByFile = {};
+  const unionKeys = new Set();
+  for (const [file, data] of Object.entries(parsed)) {
+    const keys = new Set(flatten(data));
+    keysByFile[file] = keys;
+    for (const k of keys) unionKeys.add(k);
+  }
+
+  const results = [];
+  for (const [file, keys] of Object.entries(keysByFile)) {
+    const missing = [...unionKeys].filter((k) => !keys.has(k));
+    if (missing.length) {
+      results.push({ file, missing });
+    }
+  }
+
+  return { dir, parseErrors, results, fileCount: files.length, unionSize: unionKeys.size };
 }
 
 function main() {
   let hasDrift = false;
 
-  for (const target of TARGETS) {
-    const report = checkDir(target);
-    console.log(`\n=== ${path.relative(REPO_ROOT, report.dir)} (canonical: ${report.canonical}) ===`);
+  for (const dir of TARGETS) {
+    const report = checkDir(dir);
+    console.log(`\n=== ${path.relative(REPO_ROOT, report.dir)} (${report.fileCount} files, ${report.unionSize} keys in union) ===`);
 
-    if (report.error) {
-      console.log(`  ERROR: ${report.error}`);
+    if (report.parseErrors.length) {
       hasDrift = true;
-      continue;
+      for (const e of report.parseErrors) {
+        console.log(`  ${e.file}: PARSE ERROR — ${e.message}`);
+      }
     }
 
-    if (report.results.length === 0) {
-      console.log('  OK — no drift');
+    if (report.results.length === 0 && report.parseErrors.length === 0) {
+      console.log('  OK — no drift, all files valid JSON');
       continue;
     }
 
     for (const r of report.results) {
       hasDrift = true;
-      if (r.parseError) {
-        console.log(`  ${r.file}: PARSE ERROR — ${r.parseError}`);
-        continue;
-      }
       console.log(`  ${r.file}:`);
-      if (r.missing.length) {
-        console.log(`    missing (${r.missing.length}): ${r.missing.join(', ')}`);
-      }
-      if (r.extra.length) {
-        console.log(`    extra (${r.extra.length}): ${r.extra.join(', ')}`);
-      }
+      console.log(`    missing (${r.missing.length}): ${r.missing.join(', ')}`);
     }
   }
 
@@ -98,7 +94,7 @@ function main() {
     console.log('i18n key drift detected.');
     process.exit(1);
   } else {
-    console.log('All i18n directories in sync.');
+    console.log('All i18n directories in sync — every key present in every locale, all files valid JSON.');
     process.exit(0);
   }
 }

@@ -21,6 +21,7 @@
     "DevotionalRenderDom": "readonly",
     "DevotionalSalvationModal": "readonly",
     "AppStats": "readonly",
+    "RtlHelper": "readonly",
     "lucide": "readonly"
   },
   "rules": {

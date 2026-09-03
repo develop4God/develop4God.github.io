@@ -3,7 +3,7 @@
   'use strict';
 
   const DEFAULT_LANGUAGE = 'en';
-  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh', 'ja', 'hi'];
+  const SUPPORTED_LANGUAGES = ['es', 'en', 'pt', 'fr', 'zh', 'ja', 'hi', 'de', 'ar', 'fil'];
   const STORAGE_KEY = 'develop4God_language';
 
   let currentLanguage = DEFAULT_LANGUAGE;
@@ -107,7 +107,10 @@
     fr: { name: 'Français', flag: '🇫🇷' },
     zh: { name: '中文', flag: '🇨🇳' },
     ja: { name: '日本語', flag: '🇯🇵' },
-    hi: { name: 'हिन्दी', flag: '🇮🇳' }
+    hi: { name: 'हिन्दी', flag: '🇮🇳' },
+    de: { name: 'Deutsch', flag: '🇩🇪' },
+    ar: { name: 'العربية', flag: '🇸🇦' },
+    fil: { name: 'Filipino', flag: '🇵🇭' }
   };
 
   // Create language selector — custom dropdown matching devocionales'
@@ -257,15 +260,15 @@
     applyTranslations();
     createLanguageSelector();
 
-    // Update HTML lang attribute
-    document.documentElement.setAttribute('lang', lang);
+    // Update HTML lang/dir attributes
+    window.RtlHelper.applyDirection(lang);
   }
 
   // Initialize
   async function init() {
     currentLanguage = loadSavedLanguage();
-    document.documentElement.setAttribute('lang', currentLanguage);
-    
+    window.RtlHelper.applyDirection(currentLanguage);
+
     translations = await fetchTranslations(currentLanguage);
     applyTranslations();
     createLanguageSelector();
