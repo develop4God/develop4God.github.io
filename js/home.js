@@ -82,6 +82,17 @@
         element.setAttribute('placeholder', value);
       }
     });
+
+    // The footer's shared copyright/made-with lines are DOM-inserted by
+    // SiteFooter (not static elements with data-i18n), so re-render them
+    // here with the live-fetched translations every time translations change.
+    if (translations.footer && window.SiteFooter) {
+      const copyright = translations.footer.copyright.replace(/©\s*\d{4}/, `© ${currentYear}`);
+      window.SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
+        copyright,
+        madeWith: translations.footer.madeWith
+      });
+    }
   }
 
   // Get nested translation value

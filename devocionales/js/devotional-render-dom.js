@@ -146,7 +146,12 @@
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('support-ministry-label').textContent = DevotionalI18n.t('devotionals.supportMinistry', '');
         document.getElementById('support-ministry-btn').setAttribute('title', DevotionalI18n.t('devotionals.supportMinistryTitle', ''));
-        document.getElementById('footer-tagline').textContent = DevotionalI18n.t('devotionals.footerTagline', '');
+        if (global.SiteFooter) {
+            global.SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
+                copyright: DevotionalI18n.t('footer.copyright', ''),
+                madeWith: DevotionalI18n.t('footer.madeWith', '')
+            });
+        }
         document.getElementById('footer-contact-label').textContent = DevotionalI18n.t('devotionals.contactMailAria', '');
         document.getElementById('footer-privacy-link').textContent = DevotionalI18n.t('footer.privacy', '');
         document.getElementById('footer-terms-link').textContent = DevotionalI18n.t('footer.terms', '');
