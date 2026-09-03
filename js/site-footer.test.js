@@ -8,12 +8,18 @@ const vm = require('node:vm');
 
 global.window = global.window || {};
 
-function makeFakeElement(tagName) {
-    return {
+function makeFakeElement(tagName, ownerFooter) {
+    const el = {
         tagName,
         textContent: '',
+        dataset: {},
         children: [],
+        remove() {
+            const index = ownerFooter.children.indexOf(el);
+            if (index !== -1) ownerFooter.children.splice(index, 1);
+        },
     };
+    return el;
 }
 
 function makeFakeFooter(initialChildren) {
@@ -26,6 +32,10 @@ function makeFakeFooter(initialChildren) {
             const index = referenceNode === null ? this.children.length : this.children.indexOf(referenceNode);
             this.children.splice(index, 0, newNode);
             return newNode;
+        },
+        querySelectorAll(selector) {
+            if (selector !== '[data-site-footer-line]') throw new Error(`unsupported selector: ${selector}`);
+            return footer.children.filter((el) => el.dataset.siteFooterLine !== undefined);
         },
     };
     return footer;
@@ -41,12 +51,11 @@ test('renderSharedLines: does nothing when footerEl is null', () => {
 });
 
 test('renderSharedLines: inserts copyright then made-with as the first two children, in order', () => {
-    global.document = {
-        createElement: (tag) => makeFakeElement(tag),
-    };
-    const existingLine = makeFakeElement('p');
+    const footer = makeFakeFooter([]);
+    global.document = { createElement: (tag) => makeFakeElement(tag, footer) };
+    const existingLine = makeFakeElement('p', footer);
     existingLine.textContent = 'page-specific contact line';
-    const footer = makeFakeFooter([existingLine]);
+    footer.children.push(existingLine);
 
     renderSharedLines(footer, {
         copyright: '© 2026 Develop4God. Todos los derechos reservados.',
@@ -60,14 +69,28 @@ test('renderSharedLines: inserts copyright then made-with as the first two child
 });
 
 test('renderSharedLines: works on an empty footer', () => {
-    global.document = {
-        createElement: (tag) => makeFakeElement(tag),
-    };
     const footer = makeFakeFooter([]);
+    global.document = { createElement: (tag) => makeFakeElement(tag, footer) };
 
     renderSharedLines(footer, { copyright: 'C', madeWith: 'M' });
 
     assert.equal(footer.children.length, 2);
     assert.equal(footer.children[0].textContent, 'C');
     assert.equal(footer.children[1].textContent, 'M');
+});
+
+test('renderSharedLines: re-rendering (e.g. language switch) replaces shared lines instead of stacking them', () => {
+    const footer = makeFakeFooter([]);
+    global.document = { createElement: (tag) => makeFakeElement(tag, footer) };
+    const contactLine = makeFakeElement('p', footer);
+    contactLine.textContent = 'Contacto';
+    footer.children.push(contactLine);
+
+    renderSharedLines(footer, { copyright: '© Español', madeWith: 'Hecho con amor' });
+    renderSharedLines(footer, { copyright: '© Português', madeWith: 'Feito com amor' });
+
+    assert.equal(footer.children.length, 3);
+    assert.equal(footer.children[0].textContent, '© Português');
+    assert.equal(footer.children[1].textContent, 'Feito com amor');
+    assert.equal(footer.children[2], contactLine);
 });

@@ -65,7 +65,7 @@
   "contact": {
     "title": "Des Questions ? Contactez-nous !",
     "description": "Si vous avez des questions, des suggestions, ou si vous voulez simplement dire bonjour, n'hésitez pas à nous contacter.",
-    "email": "develop4God@gmail.com",
+    "email": "Develop4God@gmail.com",
     "sendEmail": "Envoyez-nous un e-mail"
   },
   "donation": {
@@ -76,7 +76,7 @@
   },
   "footer": {
     "copyright": "© 2025 Méditations Chrétiennes. Tous droits réservés.",
-    "madeWith": "Fait avec ♥️ par develop4God",
+    "madeWith": "Fait avec ♥️ par Develop4God",
     "terms": "Termes et Conditions",
     "privacy": "Politique de Confidentialité",
     "deleteData": "Demander Suppression des Données",
@@ -86,7 +86,7 @@
     "terms": {
       "title": "Termes et Conditions d'Utilisation de l'Application \"Méditations Chrétiennes\"",
       "lastUpdated": "Dernière mise à jour :",
-      "date": "28 juillet 2025",
+      "date": "3 septembre 2026",
       "welcome": "Bienvenue dans l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**. En accédant ou en utilisant l'Application, vous (\"l'Utilisateur\") acceptez d'être légalement lié par les présentes Conditions d'utilisation (ci-après, \"les Termes\"). Si vous n'êtes pas d'accord avec l'un de ces Termes, vous ne devez pas utiliser l'Application.",
       "section1_title": "1. Description de l'Application",
       "section1_text": "L'Application \"Méditations Chrétiennes\" est une plateforme numérique conçue pour fournir un accès à des textes de méditation quotidiens, hebdomadaires ou périodiques, dans le but de favoriser la réflexion spirituelle et la croissance personnelle. Les principales fonctionnalités incluent la lecture de méditations, la possibilité de sauvegarder des méditations comme favorites, l'option de partager des méditations avec des contacts via les fonctions de votre appareil mobile, la capture d'écran du contenu de la méditation et la possibilité de faire des dons volontaires pour soutenir l'Application.",
@@ -94,7 +94,7 @@
       "section2_1_title": "2.1. Contenu Dévotionnel :",
       "section2_1_text": "Tout le contenu dévotionnel (textes, réflexions, commentaires, etc.) présenté dans l'Application est la propriété de **Develop4God**. Bien qu'une partie de ce contenu ait été initialement générée avec l'aide de l'Intelligence Artificielle (IA), elle a été revue, éditée et approuvée par **Develop4God**, qui en assume l'entière responsabilité et la propriété. Ce contenu est protégé par les lois sur le droit d'auteur et d'autres lois sur la propriété intellectuelle.",
       "section2_2_title": "2.2. Utilisation du Contenu :",
-      "section2_2_text": "Les Utilisateurs peuvent utiliser le contenu dévotionnel à des fins personnelles et non commerciales (y compris la lecture, l'option de partager avec des contacts, la capture d'écran du contenu de la dévotion et l'ajout aux favoris). Cette utilisation est permise tant qu'aucun revenu direct ou indirect n'est généré par cette utilisation. Pour toute utilisation dépassant le cadre personnel et...",
+      "section2_2_text": "Les Utilisateurs peuvent utiliser le contenu dévotionnel à des fins personnelles et non commerciales (y compris la lecture, l'option de partager avec des contacts, la capture d'écran du contenu de la dévotion et l'ajout aux favoris). Cette utilisation est permise tant qu'aucun revenu direct ou indirect n'est généré par cette utilisation. Pour toute utilisation dépassant le cadre personnel et non commercial, une autorisation écrite préalable de **Develop4God** est requise.",
       "section3_title": "3. Responsabilités de l'Utilisateur",
       "section3_text": "En utilisant l'Application, vous vous engagez à :",
       "section3_list1": "Utiliser l'Application de manière légale et éthique.",
@@ -118,13 +118,13 @@
       "section9_title": "9. Droit Applicable et Juridiction",
       "section9_text": "Ces Termes seront régis et interprétés conformément aux lois de la **République du Panama**, sans tenir compte de ses dispositions en matière de conflits de lois. Tout litige découlant de ces Termes sera soumis à la juridiction exclusive des tribunaux de la **Ville de Panama, République du Panama**.",
       "section10_title": "10. Contact",
-      "section10_text": "Si vous avez des questions sur ces Termes, vous pouvez nous contacter à : develop4God@gmail.com.",
+      "section10_text": "Si vous avez des questions sur ces Termes, vous pouvez nous contacter à : Develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     },
     "privacy": {
       "title": "Politique de Confidentialité de l'Application \"Méditations Chrétiennes\"",
       "lastUpdated": "Dernière mise à jour :",
-      "date": "28 juillet 2025",
+      "date": "3 septembre 2026",
       "description": "Cette Politique de Confidentialité décrit comment l'application mobile \"Méditations Chrétiennes\" (ci-après, \"l'Application\"), détenue et exploitée par **Develop4God**, gère les informations de l'utilisateur. La confidentialité de nos utilisateurs est de la plus haute importance pour nous.",
       "section1_title": "1. Informations que Nous Collectons et Comment Nous les Utilisons",
       "section1_text": "L'Application \"Méditations Chrétiennes\" collecte et traite certains types de données pour offrir ses fonctionnalités et améliorer l'expérience utilisateur. Nous voulons être transparents sur les données collectées et dans quel but :",
@@ -167,14 +167,13 @@
       "section4_title": "4. Services Tiers",
       "section4_text": "L'Application utilise des services tiers qui peuvent collecter des informations. Ces services ont leurs propres politiques de confidentialité :",
       "section4_list1": "**Firebase (Google) :** Pour l'authentification, les bases de données (Firestore), les notifications (FCM) et l'analyse. La politique de confidentialité de Firebase est disponible à l'adresse [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
-      "section4_list2": "**PayPal :** Pour les dons. La politique de confidentialité de PayPal est disponible à l'adresse [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
       "section4_list3": "Autres services : L'Application peut également utiliser d'autres services tiers pour des fonctions spécifiques, telles que l'envoi d'e-mails. Ces services n'auront accès qu'aux informations nécessaires pour fournir leur service.",
       "section5_title": "5. Confidentialité des Enfants",
       "section5_text": "L'Application n'est pas destinée à être utilisée par des enfants de moins de 13 ans. Nous ne collectons pas sciemment d'informations personnelles auprès d'enfants de moins de 13 ans. Si nous apprenons que nous avons collecté des informations auprès d'un enfant de moins de 13 ans sans le consentement parental vérifiable, nous prendrons des mesures pour supprimer ces informations de nos serveurs.",
       "section6_title": "6. Modifications de cette Politique de Confidentialité",
       "section6_text": "Nous pouvons mettre à jour notre Politique de Confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle Politique de Confidentialité sur cette page et en mettant à jour la date de \"Dernière mise à jour\" en haut de la page. Nous vous encourageons à revoir cette Politique de Confidentialité périodiquement pour tout changement.",
       "section7_title": "7. Contact",
-      "section7_text": "Si vous avez des questions sur cette Politique de Confidentialité ou si vous souhaitez demander la suppression de vos données, n'hésitez pas à nous contacter à : develop4God@gmail.com.",
+      "section7_text": "Si vous avez des questions sur cette Politique de Confidentialité ou si vous souhaitez demander la suppression de vos données, n'hésitez pas à nous contacter à : Develop4God@gmail.com.",
       "backToHome": "Retour à la page d'accueil"
     }
   },

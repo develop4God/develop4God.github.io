@@ -7,7 +7,8 @@
     "vision": "Aming Bisyon",
     "devotionals": "Mga Debosyonal",
     "habitus": "Habitus+Faith",
-    "workWithMe": "Makipagtrabaho Sa Akin"
+    "workWithMe": "Makipagtrabaho Sa Akin",
+    "donate": "Mag-donate"
   },
   "vision": {
     "title": "Aming Bisyon",
@@ -40,7 +41,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 develop4God. Nakalaan ang lahat ng karapatan.",
+    "copyright": "© 2026 Develop4God. Nakalaan ang lahat ng karapatan.",
     "madeWith": "Ginawa nang may pagmamahal para sa kaluwalhatian ng Diyos",
     "contact": "Makipag-ugnayan"
   },

@@ -7,7 +7,8 @@
     "vision": "हमारा दृष्टिकोण",
     "devotionals": "भक्ति",
     "habitus": "Habitus+Faith",
-    "workWithMe": "मेरे साथ काम करें"
+    "workWithMe": "मेरे साथ काम करें",
+    "donate": "दान करें"
   },
   "vision": {
     "title": "हमारा दृष्टिकोण",
@@ -40,7 +41,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 develop4God. सर्वाधिकार सुरक्षित।",
+    "copyright": "© 2026 Develop4God. सर्वाधिकार सुरक्षित।",
     "madeWith": "परमेश्वर की महिमा के लिए प्रेम से विकसित",
     "contact": "संपर्क"
   },

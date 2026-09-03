@@ -1,22 +1,49 @@
 #!/usr/bin/env node
-// Validates every locale JSON file in a given i18n directory: each file must
-// parse as valid JSON, and every file's key set must exactly match the union
-// of keys across ALL locale files in that directory (not just diff against
-// one canonical locale — a key present in any locale must be present in
-// every locale, and nothing should be missing from all but one).
+// Validates every locale JSON file in every i18n directory in the repo: each
+// file must parse as valid JSON, and every file's key set must exactly match
+// the union of keys across ALL locale files in that directory (not just diff
+// against one canonical locale — a key present in any locale must be present
+// in every locale, and nothing should be missing from all but one).
+//
+// Targets are discovered, not hardcoded: any directory named "lang" is a
+// candidate, and so is any subdirectory of one that directly holds .json
+// files (e.g. lang/home/, lang/habitus/) — so a renamed or newly added i18n
+// directory is picked up automatically instead of silently going unchecked.
 // Usage: node scripts/check-i18n-keys.js
 
 const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '..');
+const SKIP_DIR_NAMES = new Set(['node_modules', 'coverage', '.git']);
 
-const TARGETS = [
-  path.join(REPO_ROOT, 'lang', 'home'),
-  path.join(REPO_ROOT, 'devocionales', 'lang'),
-  path.join(REPO_ROOT, 'habitus', 'lang'),
-  path.join(REPO_ROOT, 'work-with-me', 'lang'),
-];
+function hasJsonFiles(dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).some((e) => e.isFile() && e.name.endsWith('.json'));
+}
+
+function findLangDirs(dir, found) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || SKIP_DIR_NAMES.has(entry.name)) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.name === 'lang') {
+      if (hasJsonFiles(full)) {
+        found.push(full);
+      }
+      for (const sub of fs.readdirSync(full, { withFileTypes: true })) {
+        if (sub.isDirectory() && hasJsonFiles(path.join(full, sub.name))) {
+          found.push(path.join(full, sub.name));
+        }
+      }
+    } else {
+      findLangDirs(full, found);
+    }
+  }
+  return found;
+}
+
+function discoverTargets() {
+  return findLangDirs(REPO_ROOT, []).sort();
+}
 
 function flatten(obj, prefix = '') {
   const keys = [];
@@ -67,7 +94,10 @@ function checkDir(dir) {
 function main() {
   let hasDrift = false;
 
-  for (const dir of TARGETS) {
+  const targets = discoverTargets();
+  console.log(`Discovered ${targets.length} i18n directories: ${targets.map((d) => path.relative(REPO_ROOT, d)).join(', ')}`);
+
+  for (const dir of targets) {
     const report = checkDir(dir);
     console.log(`\n=== ${path.relative(REPO_ROOT, report.dir)} (${report.fileCount} files, ${report.unionSize} keys in union) ===`);
 
@@ -104,4 +134,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { flatten, checkDir };
+module.exports = { flatten, checkDir, findLangDirs, discoverTargets };
