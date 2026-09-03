@@ -1,0 +1,71 @@
+{
+  "meta": {
+    "title": "Trabaja Conmigo - Develop4God",
+    "description": "Ingeniero de IA y desarrollador full-stack disponible para ministerios, negocios y personas que necesitan apps, automatización con IA y sistemas a medida."
+  },
+  "navigation": {
+    "home": "Inicio",
+    "whatIBuild": "Qué Puedo Construir",
+    "proof": "Trabajo Realizado",
+    "why": "Por Qué Hago Esto",
+    "contact": "Contacto"
+  },
+  "header": {
+    "title": "Trabaja Conmigo",
+    "mainTitle": "Ministerios, negocios y personas: construyo las herramientas que necesitas.",
+    "subtitle": "Sistemas de IA, apps y automatización, hechos por un ingeniero full-stack que sirve a Dios a través de la tecnología.",
+    "tag": "Por el desarrollador detrás de Devocionales Cristianos",
+    "contactCta": "Hablemos de tu proyecto"
+  },
+  "stats": {
+    "downloads": "15K+ Descargas",
+    "countries": "99+ Países",
+    "users": "6,300+ Usuarios Activos",
+    "rating": "4.9 ★ Calificación",
+    "languages": "10 Idiomas"
+  },
+  "whatIBuild": {
+    "title": "Qué Puedo Construir Para Ti",
+    "ai": {
+      "title": "IA y Automatización",
+      "description": "Pipelines de IA a medida, chatbots, sistemas de generación de contenido y automatización de procesos."
+    },
+    "apps": {
+      "title": "Apps y Sitios Web",
+      "description": "Aplicaciones móviles y web, construidas de principio a fin, listas para producción."
+    },
+    "systems": {
+      "title": "Datos y Sistemas",
+      "description": "Dashboards, integraciones y sistemas backend a medida para tu organización."
+    }
+  },
+  "proof": {
+    "title": "Trabajo Realizado",
+    "devocionales": {
+      "title": "Devocionales Cristianos",
+      "description": "App de devocionales diarios en producción, con audio, múltiples idiomas y versiones bíblicas.",
+      "button": "Ver Devocionales"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Rastreador de hábitos con modelo de aprendizaje automático en el dispositivo para predicción de abandono.",
+      "button": "Ver Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "Por Qué Hago Esto",
+    "description": "Este es un trabajo de ministerio primero, ingreso después. Construyo herramientas para servir a Dios y estoy disponible para ayudar a otros ministerios, negocios y personas a hacer lo mismo."
+  },
+  "contact": {
+    "title": "¿Tienes un proyecto en mente?",
+    "description": "Escríbeme y conversemos sobre cómo puedo ayudarte a construirlo.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Envíame un correo",
+    "downloadCv": "Descargar mi CV"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Todos los derechos reservados.",
+    "madeWith": "Desarrollado con ♥️ para la gloria de Dios",
+    "contact": "Contacto"
+  }
+}

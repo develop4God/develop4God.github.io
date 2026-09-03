@@ -75,6 +75,29 @@ header {
   gap: 0.5rem;
 }
 
+/* Work With Me Banner */
+.work-with-me-banner {
+  display: block;
+  background: var(--primary-purple-dark);
+  color: var(--white);
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.work-with-me-banner:hover {
+  background: var(--primary-purple);
+}
+
+.work-with-me-banner-text {
+  font-weight: 500;
+}
+
+.work-with-me-banner-cta {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* App Download Banner */
 .app-download-banner {
   background: linear-gradient(135deg, #1DE9B6 0%, #00B8D4 100%);
