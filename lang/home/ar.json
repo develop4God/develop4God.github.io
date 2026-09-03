@@ -7,7 +7,8 @@
     "vision": "رؤيتنا",
     "devotionals": "التأملات",
     "habitus": "Habitus+Faith",
-    "workWithMe": "اعمل معي"
+    "workWithMe": "اعمل معي",
+    "donate": "تبرّع"
   },
   "vision": {
     "title": "رؤيتنا",
@@ -40,7 +41,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 develop4God. جميع الحقوق محفوظة.",
+    "copyright": "© 2026 Develop4God. جميع الحقوق محفوظة.",
     "madeWith": "صُنع بحب لمجد الله",
     "contact": "تواصل معنا"
   },

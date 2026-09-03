@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Develop4God",
+    "description": "Habitus+Faith: rastreador de hábitos basado en la fe, con micro-hábitos, versículos bíblicos y Biblia integrada."
+  },
+  "navigation": {
+    "home": "Inicio",
+    "devotionals": "Devocionales",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Trabaja Conmigo",
+    "donate": "Donar"
+  },
+  "header": {
+    "tag": "Rastreador de hábitos basado en la fe",
+    "mainTitle": "Haz que la fe sea tu mejor hábito diario",
+    "subtitle": "Construye hábitos piadosos con micro-hábitos sugeridos y versículos bíblicos.",
+    "download": "Descargar app"
+  },
+  "features": {
+    "title": "Características",
+    "ai": {
+      "title": "Micro-hábitos iniciales",
+      "description": "Escribe una meta y recibe hábitos sugeridos para empezar."
+    },
+    "tracking": {
+      "title": "Seguimiento de hábitos",
+      "description": "Rachas y reordena tus hábitos fácilmente."
+    },
+    "notes": {
+      "title": "Notas",
+      "description": "Listas, checklists y emojis para anotar lo que vives cada día."
+    },
+    "bible": {
+      "title": "Biblia y devocionales",
+      "description": "Lee la Biblia y devocionales sin salir de la app."
+    },
+    "privacy": {
+      "title": "Privacidad Primero",
+      "description": "Autenticación anónima, sin datos personales requeridos, y funcionalidad completa sin conexión."
+    }
+  },
+  "support": {
+    "title": "Apoya el Ministerio",
+    "description": "Tu apoyo nos permite seguir desarrollando recursos gratuitos y de calidad para la comunidad cristiana. ¡Gracias por ser parte de esta misión!"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Todos los derechos reservados.",
+    "madeWith": "Desarrollado con amor para la gloria de Dios",
+    "contact": "Contacto"
+  }
+}

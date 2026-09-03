@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Develop4God",
+    "description": "Habitus+Faith: glaubensbasierter Gewohnheits-Tracker mit Mikro-Gewohnheiten, Bibelversen und integrierter Bibel."
+  },
+  "navigation": {
+    "home": "Startseite",
+    "devotionals": "Andachten",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Arbeiten Sie Mit Mir",
+    "donate": "Spenden"
+  },
+  "header": {
+    "tag": "Der glaubensbasierte Gewohnheits-Tracker",
+    "mainTitle": "Machen Sie den Glauben zu Ihrer besten täglichen Gewohnheit",
+    "subtitle": "Bauen Sie gottgefällige Gewohnheiten mit vorgeschlagenen Mikro-Gewohnheiten und Bibelversen auf.",
+    "download": "App herunterladen"
+  },
+  "features": {
+    "title": "Funktionen",
+    "ai": {
+      "title": "Erste Mikro-Gewohnheiten",
+      "description": "Geben Sie ein Ziel ein und erhalten Sie vorgeschlagene Gewohnheiten für den Einstieg."
+    },
+    "tracking": {
+      "title": "Gewohnheiten verfolgen",
+      "description": "Serien und einfache Neuordnung Ihrer Gewohnheiten."
+    },
+    "notes": {
+      "title": "Notizen",
+      "description": "Listen, Checklisten und Emojis, um Ihren Tag festzuhalten."
+    },
+    "bible": {
+      "title": "Bibel und Andachten",
+      "description": "Lesen Sie die Bibel und Andachten, ohne die App zu verlassen."
+    },
+    "privacy": {
+      "title": "Datenschutz zuerst",
+      "description": "Anonyme Authentifizierung, keine persönlichen Daten erforderlich und vollständige Offline-Funktionalität."
+    }
+  },
+  "support": {
+    "title": "Unterstützen Sie den Dienst",
+    "description": "Ihre Unterstützung ermöglicht es uns, weiterhin kostenlose, hochwertige Ressourcen für die christliche Gemeinschaft zu entwickeln. Danke, dass Sie Teil dieser Mission sind!"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Alle Rechte vorbehalten.",
+    "madeWith": "Mit Liebe für Gottes Ehre gemacht",
+    "contact": "Kontakt"
+  }
+}

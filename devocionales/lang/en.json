@@ -65,7 +65,7 @@
   "contact": {
     "title": "Questions? Contact Us!",
     "description": "If you have any questions, suggestions, or just want to say hello, don't hesitate to get in touch with us.",
-    "email": "develop4God@gmail.com",
+    "email": "Develop4God@gmail.com",
     "sendEmail": "Send us an email"
   },
   "donation": {
@@ -76,7 +76,7 @@
   },
   "footer": {
     "copyright": "© 2025 Christian Devotionals. All rights reserved.",
-    "madeWith": "Made with ♥️ by develop4God",
+    "madeWith": "Made with ♥️ by Develop4God",
     "terms": "Terms and Conditions",
     "privacy": "Privacy Policy",
     "deleteData": "Request Data Deletion",
@@ -86,7 +86,7 @@
     "terms": {
       "title": "Terms and Conditions of Use for the 'Christian Devotionals' Application",
       "lastUpdated": "Last Updated:",
-      "date": "July 28, 2025",
+      "date": "September 3, 2026",
       "welcome": "Welcome to the 'Christian Devotionals' mobile application (hereinafter, 'the Application'), owned and operated by **Develop4God**. By accessing or using the Application, you ('the User') agree to be legally bound by these Terms and Conditions of Use ('the Terms'). If you do not agree with any of these Terms, do not use the Application.",
       "section1_title": "1. Application Description",
       "section1_text": "The 'Christian Devotionals' Application is a digital platform designed to provide access to daily, weekly, or periodic devotional texts, with the purpose of fostering spiritual reflection and personal growth. The main functionalities include reading devotionals, saving devotionals as favorites, sharing devotionals with contacts through your mobile device, taking screenshots of devotional content, and making voluntary donations to support the Application.",
@@ -94,7 +94,7 @@
       "section2_1_title": "2.1. Devotional Content:",
       "section2_1_text": "All devotional content (texts, reflections, comments, etc.) presented in the Application is the property of **Develop4God**. While some of this content was initially generated with the assistance of Artificial Intelligence (AI), it has been reviewed, edited, and approved by **Develop4God**, who assumes full responsibility and ownership. This content is protected by copyright and other intellectual property laws.",
       "section2_2_title": "2.2. Use of Content:",
-      "section2_2_text": "Users may use the devotional content for personal and non-commercial purposes (including reading, sharing with contacts, taking screenshots of devotional content, and adding to favorites). This use is permitted as long as no direct or indirect income is generated from such use. For any use that exceeds personal and...",
+      "section2_2_text": "Users may use the devotional content for personal and non-commercial purposes (including reading, sharing with contacts, taking screenshots of devotional content, and adding to favorites). This use is permitted as long as no direct or indirect income is generated from such use. For any use that exceeds personal and non-commercial use, prior written authorization from **Develop4God** is required.",
       "section3_title": "3. User Responsibilities",
       "section3_text": "By using the Application, you agree to:",
       "section3_list1": "Use the Application legally and ethically.",
@@ -118,13 +118,13 @@
       "section9_title": "9. Governing Law and Jurisdiction",
       "section9_text": "These Terms shall be governed by and construed in accordance with the laws of the Republic of Panama, without regard to its conflict of law provisions. Any dispute arising in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of Panama City, Republic of Panama.",
       "section10_title": "10. Contact",
-      "section10_text": "If you have any questions about these Terms, you can contact us at: develop4God@gmail.com.",
+      "section10_text": "If you have any questions about these Terms, you can contact us at: Develop4God@gmail.com.",
       "backToHome": "Back to home page"
     },
     "privacy": {
       "title": "Privacy Policy for the 'Christian Devotionals' Application",
       "lastUpdated": "Last Updated:",
-      "date": "July 28, 2025",
+      "date": "September 3, 2026",
       "description": "This Privacy Policy describes how the 'Christian Devotionals' mobile application (hereinafter, 'the Application'), owned and operated by **Develop4God**, handles user information. The privacy of our users is of utmost importance to us.",
       "section1_title": "1. Information We Collect and How We Use It",
       "section1_text": "The 'Christian Devotionals' Application collects and processes certain types of data to offer its functionalities and improve the user experience. We want to be transparent about what data is collected and for what purpose:",
@@ -167,14 +167,13 @@
       "section4_title": "4. Third-Party Services",
       "section4_text": "The Application uses third-party services that may collect information. These services have their own privacy policies:",
       "section4_list1": "**Firebase (Google):** For authentication, databases (Firestore), notifications (FCM), and analytics. Firebase's privacy policy is available at [https://firebase.google.com/support/privacy](https://firebase.google.com/support/privacy).",
-      "section4_list2": "**PayPal:** For donations. PayPal's privacy policy is available at [https://www.paypal.com/myaccount/privacy/privacyhub](https://www.paypal.com/myaccount/privacy/privacyhub).",
       "section4_list3": "Other services: The Application may also use other third-party services for specific functions, such as sending emails. These services will only have access to the information necessary to provide their service.",
       "section5_title": "5. Children's Privacy",
       "section5_text": "The Application is not intended for use by children under 13 years of age. We do not knowingly collect personal information from children under 13. If we become aware that we have collected information from a child under 13 without verifiable parental consent, we will take steps to remove that information from our servers.",
       "section6_title": "6. Changes to This Privacy Policy",
       "section6_text": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the 'Last Updated' date at the top. We recommend reviewing this Privacy Policy periodically for any changes.",
       "section7_title": "7. Contact",
-      "section7_text": "If you have any questions about this Privacy Policy or wish to request the deletion of your data, please do not hesitate to contact us at: develop4God@gmail.com.",
+      "section7_text": "If you have any questions about this Privacy Policy or wish to request the deletion of your data, please do not hesitate to contact us at: Develop4God@gmail.com.",
       "backToHome": "Back to home page"
     }
   },

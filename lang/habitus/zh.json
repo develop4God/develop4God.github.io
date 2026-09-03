@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "Habitus+Faith - Develop4God",
+    "description": "Habitus+Faith：基于信仰的习惯追踪应用，包含微习惯、圣经经文和内置圣经。"
+  },
+  "navigation": {
+    "home": "首页",
+    "devotionals": "灵修",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "与我合作",
+    "donate": "捐赠"
+  },
+  "header": {
+    "tag": "基于信仰的习惯追踪器",
+    "mainTitle": "让信仰成为你每日最好的习惯",
+    "subtitle": "通过推荐的微习惯和圣经经文，建立敬虔的习惯。",
+    "download": "下载应用"
+  },
+  "features": {
+    "title": "功能特色",
+    "ai": {
+      "title": "入门微习惯",
+      "description": "输入一个目标，获得帮助你开始的习惯建议。"
+    },
+    "tracking": {
+      "title": "习惯追踪",
+      "description": "连续记录，轻松调整习惯顺序。"
+    },
+    "notes": {
+      "title": "笔记",
+      "description": "清单、编号列表和表情符号，记录你的一天。"
+    },
+    "bible": {
+      "title": "圣经与灵修",
+      "description": "无需离开应用即可阅读圣经和灵修内容。"
+    },
+    "privacy": {
+      "title": "隐私优先",
+      "description": "匿名身份验证，无需个人数据，完全支持离线使用。"
+    }
+  },
+  "support": {
+    "title": "支持事工",
+    "description": "您的支持让我们能够持续为基督徒社区开发免费且优质的资源。感谢您成为这项使命的一部分！"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. 版权所有。",
+    "madeWith": "为神的荣耀用爱开发",
+    "contact": "联系"
+  }
+}

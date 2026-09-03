@@ -14,10 +14,14 @@
   function renderSharedLines(footerEl, { copyright, madeWith }) {
     if (!footerEl) return;
 
+    footerEl.querySelectorAll('[data-site-footer-line]').forEach((el) => el.remove());
+
     const copyrightEl = document.createElement('p');
+    copyrightEl.dataset.siteFooterLine = 'copyright';
     copyrightEl.textContent = copyright;
 
     const madeWithEl = document.createElement('p');
+    madeWithEl.dataset.siteFooterLine = 'madeWith';
     madeWithEl.textContent = madeWith;
 
     footerEl.insertBefore(madeWithEl, footerEl.firstChild);

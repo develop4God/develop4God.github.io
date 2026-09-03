@@ -7,7 +7,8 @@
     "vision": "Unsere Vision",
     "devotionals": "Andachten",
     "habitus": "Habitus+Faith",
-    "workWithMe": "Arbeiten Sie Mit Mir"
+    "workWithMe": "Arbeiten Sie Mit Mir",
+    "donate": "Spenden"
   },
   "vision": {
     "title": "Unsere Vision",
@@ -40,7 +41,7 @@
     }
   },
   "footer": {
-    "copyright": "© 2026 develop4God. Alle Rechte vorbehalten.",
+    "copyright": "© 2026 Develop4God. Alle Rechte vorbehalten.",
     "madeWith": "Mit Liebe für Gottes Ehre gemacht",
     "contact": "Kontakt"
   },
