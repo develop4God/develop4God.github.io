@@ -172,7 +172,7 @@
           <li><a href="#our-vision" data-i18n="tab.vision">Nuestra Visión</a></li>
           <li><a href="/devocionales/" data-i18n="tab.devotionals">Devocionales</a></li>
           <li><a href="/habitus/" data-i18n="tab.habitus">Habitus+Faith</a></li>
-          <li><a href="/work-with-me/">Trabaja Conmigo</a></li>
+          <li><a href="/work-with-me/" data-i18n="tab.workWithMe">Trabaja Conmigo</a></li>
         </ul>
       </nav>
       <div class="flex items-center gap-3">
@@ -202,9 +202,9 @@
 
     <!-- Work With Me CTA -->
     <a href="/work-with-me/" class="service-card mb-16 flex-row items-center justify-between gap-4" style="flex-direction: row; flex-wrap: wrap; text-decoration: none;">
-      <span style="color: var(--text);">¿Eres un ministerio, negocio o persona que necesita programas, apps o herramientas?</span>
+      <span style="color: var(--text);" data-i18n="workWithMeCta.question">¿Eres un ministerio, negocio o persona que necesita programas, apps o herramientas?</span>
       <span class="btn-primary px-4 py-2 inline-flex items-center gap-2" style="white-space: nowrap;">
-        Trabaja Conmigo
+        <span data-i18n="workWithMeCta.button">Trabaja Conmigo</span>
         <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </span>
     </a>
@@ -273,6 +273,7 @@
     <p><a href="mailto:develop4God@gmail.com" style="color: var(--text-muted);" data-i18n="footer.contact">Contacto</a></p>
   </footer>
 
+  <script src="/js/rtl-helper.js"></script>
   <script src="/js/home.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

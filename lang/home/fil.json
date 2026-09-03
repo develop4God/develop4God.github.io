@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "develop4God - Espirituwal na Mapagkukunan para sa Paglago ng Iyong Pananampalataya",
+    "description": "Kristiyanong plataporma na may araw-araw na debosyonal at mga tool para bumuo ng mga gawi ng pananampalataya. Ganap na libreng espirituwal na mapagkukunan."
+  },
+  "tab": {
+    "vision": "Aming Bisyon",
+    "devotionals": "Mga Debosyonal",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Makipagtrabaho Sa Akin"
+  },
+  "vision": {
+    "title": "Aming Bisyon",
+    "description": "Ang develop4God ay isang digital na inisyatiba na naglalayong lumikha ng mga tool upang tulungan ang mga mananampalataya na lumago sa kanilang pananampalataya, mapanatili ang mga espirituwal na disiplina, at lumakad nang mas malapit sa Diyos araw-araw. Naniniwala kami na ang teknolohiya ay maaaring maglingkod sa kaharian ng Diyos sa pamamagitan ng pagbibigay ng naa-access at mataas na kalidad na mapagkukunan upang palakasin ang iyong espirituwal na buhay."
+  },
+  "support": {
+    "title": "Suportahan ang Ministeryo",
+    "description": "Ang iyong suporta ay nagbibigay-daan sa amin na patuloy na bumuo ng libre, mataas na kalidad na mapagkukunan para sa komunidad ng mga Kristiyano. Salamat sa pagiging bahagi ng misyong ito!"
+  },
+  "hero": {
+    "subtitle": "Mga Tool para Palakasin ang Iyong Pananampalataya at Lumakad kasama ang Diyos",
+    "description": "Espirituwal na mapagkukunan para sa iyong araw-araw na paglago kay Cristo"
+  },
+  "projects": {
+    "title": "Aming Mga Proyekto",
+    "devocionales": {
+      "title": "Mga Debosyonal na Kristiyano",
+      "description": "Ang iyong araw-araw na kanlungan sa Salita ng Diyos na may mga audio na debosyonal",
+      "button": "Tuklasin ang Mga Debosyonal"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Bumuo ng mga makadiyos na gawi sa pamamagitan ng pananampalataya at espirituwal na disiplina",
+      "button": "Tuklasin ang Habitus"
+    },
+    "aiAutomation": {
+      "title": "AI at Automation ng Data",
+      "description": "Paglikha, pagsusuri, at automation ng data gamit ang Artificial Intelligence",
+      "button": "Alamin Pa"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 develop4God. Nakalaan ang lahat ng karapatan.",
+    "madeWith": "Ginawa nang may pagmamahal para sa kaluwalhatian ng Diyos",
+    "contact": "Makipag-ugnayan"
+  },
+  "workWithMeCta": {
+    "question": "Ikaw ba ay isang ministeryo, negosyo, o indibidwal na nangangailangan ng software, apps, o mga tool?",
+    "button": "Makipagtrabaho Sa Akin"
+  }
+}

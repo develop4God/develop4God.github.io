@@ -5,9 +5,9 @@
   },
   "tab": {
     "vision": "Nuestra Visión",
-    "support": "Apoyo",
     "devotionals": "Devocionales",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Trabaja Conmigo"
   },
   "vision": {
     "title": "Nuestra Visión",
@@ -17,12 +17,7 @@
     "title": "Apoya el Ministerio",
     "description": "Tu apoyo nos permite seguir desarrollando recursos gratuitos y de calidad para la comunidad cristiana. ¡Gracias por ser parte de esta misión!"
   },
-  "header": {
-    "title": "develop4God",
-    "subtitle": "Recursos para tu Crecimiento Espiritual"
-  },
   "hero": {
-    "mainTitle": "develop4God",
     "subtitle": "Herramientas para Fortalecer tu Fe y Caminar con Dios",
     "description": "Recursos espirituales para tu crecimiento diario en Cristo"
   },
@@ -44,14 +39,13 @@
       "button": "Conocer Más"
     }
   },
-  "mission": {
-    "title": "Nuestra Misión",
-    "description": "Desarrollamos herramientas digitales que ayudan a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día.",
-    "vision": "Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual."
-  },
   "footer": {
     "copyright": "© 2026 develop4God. Todos los derechos reservados.",
     "madeWith": "Desarrollado con amor para la gloria de Dios",
     "contact": "Contacto"
+  },
+  "workWithMeCta": {
+    "question": "¿Eres un ministerio, negocio o persona que necesita programas, apps o herramientas?",
+    "button": "Trabaja Conmigo"
   }
 }

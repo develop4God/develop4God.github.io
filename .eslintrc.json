@@ -21,6 +21,9 @@
     "DevotionalRenderDom": "readonly",
     "DevotionalSalvationModal": "readonly",
     "AppStats": "readonly",
+    "RtlHelper": "readonly",
+    "SiteFooter": "readonly",
+    "WorkWithMeI18n": "readonly",
     "lucide": "readonly"
   },
   "rules": {
@@ -29,7 +32,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.js", "e2e/**/*.js"],
+      "files": ["**/*.test.js", "e2e/**/*.js", "scripts/**/*.js"],
       "env": {
         "node": true
       }

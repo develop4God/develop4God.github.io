@@ -5,9 +5,9 @@
   },
   "tab": {
     "vision": "Our Vision",
-    "support": "Support",
     "devotionals": "Devotionals",
-    "habitus": "Habitus+Faith"
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Work With Me"
   },
   "vision": {
     "title": "Our Vision",
@@ -17,12 +17,7 @@
     "title": "Support the Ministry",
     "description": "Your support allows us to continue developing free, high-quality resources for the Christian community. Thank you for being part of this mission!"
   },
-  "header": {
-    "title": "develop4God",
-    "subtitle": "Resources for Your Spiritual Growth"
-  },
   "hero": {
-    "mainTitle": "develop4God",
     "subtitle": "Tools to Strengthen Your Faith and Walk with God",
     "description": "Spiritual resources for your daily growth in Christ"
   },
@@ -31,34 +26,26 @@
     "devocionales": {
       "title": "Christian Devotionals",
       "description": "Your daily refuge in God's Word with audio devotionals",
-      "features": [
-        "Daily devotionals with audio",
-        "8 Bible versions",
-        "Completely offline",
-        "Ad-free"
-      ],
       "button": "Explore Devotionals"
     },
     "habitus": {
       "title": "Habitus+Faith",
       "description": "Build godly habits through faith and spiritual discipline",
-      "features": [
-        "Habit tracking",
-        "Spiritual goals",
-        "Biblical motivation",
-        "Personal progress"
-      ],
       "button": "Discover Habitus"
+    },
+    "aiAutomation": {
+      "title": "AI and Data Automation",
+      "description": "Generation, review, and automation of data with Artificial Intelligence",
+      "button": "Learn More"
     }
-  },
-  "mission": {
-    "title": "Our Mission",
-    "description": "We develop digital tools that help believers grow in their faith, maintain spiritual disciplines, and walk closer to God every day.",
-    "vision": "We believe technology can serve God's kingdom by providing accessible, quality resources to strengthen your spiritual life."
   },
   "footer": {
     "copyright": "© 2026 develop4God. All rights reserved.",
     "madeWith": "Made with love for God's glory",
     "contact": "Contact"
+  },
+  "workWithMeCta": {
+    "question": "Are you a ministry, business, or individual who needs software, apps, or tools?",
+    "button": "Work With Me"
   }
 }

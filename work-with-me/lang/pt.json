@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "title": "Trabalhe Comigo - Develop4God",
+    "description": "Engenheiro de IA e desenvolvedor full-stack disponível para ministérios, negócios e pessoas que precisam de apps, automação com IA e sistemas sob medida."
+  },
+  "navigation": {
+    "home": "Início",
+    "whatIBuild": "O Que Posso Construir",
+    "proof": "Trabalho Realizado",
+    "why": "Por Que Faço Isso",
+    "contact": "Contato"
+  },
+  "header": {
+    "title": "Trabalhe Comigo",
+    "mainTitle": "Ministérios, negócios e pessoas: construo as ferramentas que você precisa.",
+    "subtitle": "Sistemas de IA, apps e automação, feitos por um engenheiro full-stack que serve a Deus através da tecnologia.",
+    "tag": "Pelo desenvolvedor por trás de Devocionais Cristãos",
+    "contactCta": "Vamos falar sobre seu projeto",
+    "verseQuote": "E, tudo quanto fizerdes, fazei-o de todo o coração, como ao Senhor e não aos homens,",
+    "verseCitation": "Colossenses 3:23"
+  },
+  "stats": {
+    "downloads": "15K+ Downloads",
+    "countries": "99+ Países",
+    "users": "6.300+ Usuários Ativos",
+    "rating": "4,9 ★ Avaliação",
+    "languages": "10 Idiomas"
+  },
+  "whatIBuild": {
+    "title": "O Que Posso Construir Para Você",
+    "ai": {
+      "title": "IA e Automação",
+      "description": "Pipelines de IA sob medida, chatbots, sistemas de geração de conteúdo e automação de processos."
+    },
+    "apps": {
+      "title": "Apps e Sites",
+      "description": "Aplicativos móveis e web, construídos do início ao fim, prontos para produção."
+    },
+    "systems": {
+      "title": "Dados e Sistemas",
+      "description": "Dashboards, integrações e sistemas backend sob medida para sua organização."
+    }
+  },
+  "proof": {
+    "title": "Trabalho Realizado",
+    "devocionales": {
+      "title": "Devocionais Cristãos",
+      "description": "App de devocionais diários em produção, com áudio, múltiplos idiomas e versões bíblicas.",
+      "button": "Ver Devocionais"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Rastreador de hábitos com modelo de aprendizado de máquina no dispositivo para previsão de abandono.",
+      "button": "Ver Habitus+Faith"
+    }
+  },
+  "why": {
+    "title": "Por Que Faço Isso",
+    "description": "Este é um trabalho de ministério primeiro, renda depois. Construo ferramentas para servir a Deus e estou disponível para ajudar outros ministérios, negócios e pessoas a fazerem o mesmo."
+  },
+  "contact": {
+    "title": "Tem um projeto em mente?",
+    "description": "Escreva para mim e vamos conversar sobre como posso ajudar você a construí-lo.",
+    "email": "develop4God@gmail.com",
+    "sendEmail": "Envie-me um e-mail"
+  },
+  "footer": {
+    "copyright": "© 2026 Develop4God. Todos os direitos reservados.",
+    "madeWith": "Desenvolvido com ♥️ por develop4God",
+    "contact": "Contato"
+  },
+  "statsLabels": {
+    "downloads": "Downloads",
+    "countries": "Países",
+    "users": "Usuários Ativos",
+    "rating": "Avaliação",
+    "languages": "Idiomas"
+  }
+}

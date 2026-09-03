@@ -1,5 +1,9 @@
-// Home Hub JavaScript - Internationalization
-(function() {
+// Work-With-Me page i18n. Fetch-based, modeled on js/home.js: fetches
+// /work-with-me/lang/{locale}.json, applies data-i18n text, handles
+// meta.title/meta.description, builds a language-switcher dropdown reusing
+// the same 10-language metadata as home.js, and persists the chosen
+// language to the shared cross-section localStorage key.
+(function () {
   'use strict';
 
   const DEFAULT_LANGUAGE = 'en';
@@ -9,14 +13,12 @@
   let currentLanguage = DEFAULT_LANGUAGE;
   let translations = {};
 
-  // Get browser language
   function getBrowserLanguage() {
     const lang = navigator.language || navigator.userLanguage;
     const shortLang = lang.split('-')[0].toLowerCase();
     return SUPPORTED_LANGUAGES.includes(shortLang) ? shortLang : DEFAULT_LANGUAGE;
   }
 
-  // Load language from localStorage or browser
   function loadSavedLanguage() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && SUPPORTED_LANGUAGES.includes(saved)) {
@@ -25,15 +27,13 @@
     return getBrowserLanguage();
   }
 
-  // Save language to localStorage
   function saveLanguage(lang) {
     localStorage.setItem(STORAGE_KEY, lang);
   }
 
-  // Fetch translations
   async function fetchTranslations(lang) {
     try {
-      const response = await fetch(`/lang/home/${lang}.json`);
+      const response = await fetch(`/work-with-me/lang/${lang}.json`);
       if (!response.ok) {
         throw new Error(`Failed to load translations for ${lang}`);
       }
@@ -47,47 +47,10 @@
     }
   }
 
-  // Apply translations to the page
-  function applyTranslations() {
-    const currentYear = new Date().getFullYear();
-
-    // Update meta tags
-    if (translations.meta) {
-      document.title = translations.meta.title || document.title;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc && translations.meta.description) {
-        metaDesc.setAttribute('content', translations.meta.description);
-      }
-    }
-
-    // Update all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-      const key = element.getAttribute('data-i18n');
-      const value = getNestedTranslation(key);
-      if (value) {
-        // Automatically update copyright year for footer.copyright elements
-        if (key === 'footer.copyright') {
-          element.textContent = value.replace(/©\s*\d{4}/, `© ${currentYear}`);
-        } else {
-          element.textContent = value;
-        }
-      }
-    });
-
-    // Update all elements with data-i18n-placeholder attribute
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
-      const key = element.getAttribute('data-i18n-placeholder');
-      const value = getNestedTranslation(key);
-      if (value) {
-        element.setAttribute('placeholder', value);
-      }
-    });
-  }
-
-  // Get nested translation value
-  function getNestedTranslation(key) {
+  // Get nested translation value — pure, testable.
+  function getNestedTranslation(obj, key) {
     const keys = key.split('.');
-    let value = translations;
+    let value = obj;
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
@@ -98,8 +61,36 @@
     return value;
   }
 
-  // Language metadata (subset of devocionales/js/i18n.js's supportedLanguages,
-  // matching home's SUPPORTED_LANGUAGES set)
+  function applyTranslations() {
+    if (translations.meta) {
+      document.title = translations.meta.title || document.title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && translations.meta.description) {
+        metaDesc.setAttribute('content', translations.meta.description);
+      }
+    }
+
+    document.querySelectorAll('[data-i18n]').forEach((element) => {
+      const key = element.getAttribute('data-i18n');
+      const value = getNestedTranslation(translations, key);
+      if (value) {
+        element.textContent = value;
+      }
+    });
+
+    // The footer's shared copyright/made-with lines are DOM-inserted by
+    // SiteFooter (not static elements with data-i18n), so re-render them
+    // here with the live-fetched translations every time translations change.
+    if (translations.footer && window.SiteFooter) {
+      window.SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
+        copyright: translations.footer.copyright,
+        madeWith: translations.footer.madeWith
+      });
+    }
+  }
+
+  // Language metadata — same set as js/home.js's LANGUAGE_INFO, reused here
+  // so the dropdown shows identical names/flags across sections.
   const LANGUAGE_INFO = {
     es: { name: 'Español', flag: '🇪🇸' },
     en: { name: 'English', flag: '🇺🇸' },
@@ -113,8 +104,6 @@
     fil: { name: 'Filipino', flag: '🇵🇭' }
   };
 
-  // Create language selector — custom dropdown matching devocionales'
-  // .custom-language-selector markup/CSS (devocionales/css/language-selector.css)
   function createLanguageSelector() {
     const wrapper = document.getElementById('language-selector');
     if (!wrapper) return;
@@ -248,7 +237,6 @@
     });
   }
 
-  // Change language
   async function changeLanguage(lang) {
     if (!SUPPORTED_LANGUAGES.includes(lang)) {
       lang = DEFAULT_LANGUAGE;
@@ -260,11 +248,9 @@
     applyTranslations();
     createLanguageSelector();
 
-    // Update HTML lang/dir attributes
     window.RtlHelper.applyDirection(lang);
   }
 
-  // Initialize
   async function init() {
     currentLanguage = loadSavedLanguage();
     window.RtlHelper.applyDirection(currentLanguage);
@@ -274,10 +260,21 @@
     createLanguageSelector();
   }
 
-  // Run on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
+
+  window.WorkWithMeI18n = {
+    getNestedTranslation,
+    // Test seam: applies a given translations object to the DOM the same
+    // way the live fetch-driven flow does, without touching module state.
+    applyTranslationsForTest: (t) => {
+      const previous = translations;
+      translations = t;
+      applyTranslations();
+      translations = previous;
+    }
+  };
 })();

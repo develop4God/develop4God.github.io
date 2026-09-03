@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "title": "develop4God - Geistliche Ressourcen für Ihr Glaubenswachstum",
+    "description": "Christliche Plattform mit täglichen Andachten und Tools zum Aufbau geistlicher Gewohnheiten. Völlig kostenlose geistliche Ressourcen."
+  },
+  "tab": {
+    "vision": "Unsere Vision",
+    "devotionals": "Andachten",
+    "habitus": "Habitus+Faith",
+    "workWithMe": "Arbeiten Sie Mit Mir"
+  },
+  "vision": {
+    "title": "Unsere Vision",
+    "description": "develop4God ist eine digitale Initiative, die Tools schaffen möchte, um Gläubigen zu helfen, in ihrem Glauben zu wachsen, geistliche Disziplinen zu bewahren und jeden Tag näher mit Gott zu wandeln. Wir glauben, dass Technologie dem Reich Gottes dienen kann, indem sie zugängliche, hochwertige Ressourcen zur Stärkung Ihres geistlichen Lebens bereitstellt."
+  },
+  "support": {
+    "title": "Unterstützen Sie den Dienst",
+    "description": "Ihre Unterstützung ermöglicht es uns, weiterhin kostenlose, hochwertige Ressourcen für die christliche Gemeinschaft zu entwickeln. Danke, dass Sie Teil dieser Mission sind!"
+  },
+  "hero": {
+    "subtitle": "Werkzeuge, um Ihren Glauben zu stärken und mit Gott zu wandeln",
+    "description": "Geistliche Ressourcen für Ihr tägliches Wachstum in Christus"
+  },
+  "projects": {
+    "title": "Unsere Projekte",
+    "devocionales": {
+      "title": "Christliche Andachten",
+      "description": "Ihre tägliche Zuflucht in Gottes Wort mit Audio-Andachten",
+      "button": "Andachten entdecken"
+    },
+    "habitus": {
+      "title": "Habitus+Faith",
+      "description": "Bauen Sie gottgefällige Gewohnheiten durch Glauben und geistliche Disziplin auf",
+      "button": "Habitus entdecken"
+    },
+    "aiAutomation": {
+      "title": "KI und Datenautomatisierung",
+      "description": "Erstellung, Überprüfung und Automatisierung von Daten mit Künstlicher Intelligenz",
+      "button": "Mehr erfahren"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 develop4God. Alle Rechte vorbehalten.",
+    "madeWith": "Mit Liebe für Gottes Ehre gemacht",
+    "contact": "Kontakt"
+  },
+  "workWithMeCta": {
+    "question": "Sind Sie ein Dienst, ein Unternehmen oder eine Person, die Software, Apps oder Werkzeuge benötigt?",
+    "button": "Arbeiten Sie Mit Mir"
+  }
+}

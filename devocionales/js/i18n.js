@@ -33,9 +33,8 @@ class I18n {
         // Setup language selector
         this.setupLanguageSelector();
 
-        // Update HTML lang attribute
-        document.documentElement.lang = this.currentLang;
-        document.documentElement.dir = this.currentLang === 'ar' ? 'rtl' : 'ltr';
+        // Update HTML lang/dir attributes
+        window.RtlHelper.applyDirection(this.currentLang);
     }
 
     // Deep merge helper (source overwrites target values)
@@ -504,9 +503,8 @@ class I18n {
         await this.loadExternalPageTranslationsIfAvailable();
         this.translatePage();
 
-        // Update HTML lang attribute
-        document.documentElement.lang = lang;
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        // Update HTML lang/dir attributes
+        window.RtlHelper.applyDirection(lang);
 
         // Update URL if needed (for SEO)
         if (history.replaceState) {
