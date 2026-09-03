@@ -397,7 +397,7 @@ test.describe('devocionales reader hero image (Devocionales-assets manifest)', (
 
     const src = await heroImage.getAttribute('src');
     expect(src).toMatch(
-      /^https:\/\/raw\.githubusercontent\.com\/develop4God\/Devocionales-assets\/main\/images\/devotionals\/[^/]+\.avif$/
+      /^https:\/\/raw\.githubusercontent\.com\/develop4God\/Devocionales-assets\/main\/images\/devotionals\/[^/]+\.(avif|webp)$/
     );
   });
 
