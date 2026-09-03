@@ -159,34 +159,6 @@
       justify-content: center;
       margin-bottom: 1rem;
     }
-    .service-card ul { list-style: none; padding: 0; margin: 0 0 1.5rem; }
-    .service-card ul li {
-      padding: 0.35rem 0 0.35rem 1.4rem;
-      position: relative;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-    .service-card ul li::before {
-      content: '✓';
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-      font-weight: 700;
-    }
-
-    .download-feature {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--accent-soft);
-      color: var(--text);
-      padding: 0.4rem 0.9rem;
-      border-radius: 2rem;
-      font-size: 0.85rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
-    }
-
     footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
   </style>
 </head>
@@ -237,41 +209,14 @@
       </span>
     </a>
 
-    <!-- App Download CTA -->
-    <section class="service-card mb-16 text-center items-center">
-      <h2 class="text-2xl font-bold mb-2" style="color: var(--text);" data-i18n="downloadBanner.title">¡Descarga la App de Devocionales Cristianos!</h2>
-      <p class="mb-4" style="color: var(--text-muted);" data-i18n="downloadBanner.subtitle">Tu refugio espiritual diario, ahora en tu móvil</p>
-      <div class="flex flex-wrap justify-center gap-3 mb-6">
-        <span class="download-feature"><span data-i18n="downloadBanner.features.free">100% Gratis</span></span>
-        <span class="download-feature"><span data-i18n="downloadBanner.features.noAds">Sin Anuncios</span></span>
-        <span class="download-feature"><span data-i18n="downloadBanner.features.offline">Uso Offline</span></span>
-        <span class="download-feature"><span data-i18n="downloadBanner.features.downloads">+5,000 Descargas</span></span>
-        <span class="download-feature"><span data-i18n="downloadBanner.features.rating">⭐⭐⭐⭐⭐ Google Play</span></span>
-      </div>
-      <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share"
-         class="btn-primary px-6 py-3 inline-flex items-center gap-2"
-         target="_blank"
-         rel="noopener noreferrer">
-        <i data-lucide="download" class="w-4 h-4"></i>
-        <span data-i18n="downloadBanner.button">Descargar Ahora</span>
-      </a>
-      <p class="mt-2 text-sm" style="color: var(--text-muted);" data-i18n="downloadBanner.note">Disponible en Google Play</p>
-    </section>
-
     <!-- Projects -->
     <section class="mb-16">
       <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--text);" data-i18n="projects.title">Nuestros Proyectos</h2>
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid md:grid-cols-3 gap-6">
         <a href="/devocionales/" class="service-card" style="text-decoration: none;">
           <div class="service-card-icon"><i data-lucide="book-open" class="w-5 h-5"></i></div>
           <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.devocionales.title">Devocionales Cristianos</h3>
           <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.devocionales.description">Tu refugio diario en la Palabra de Dios con devocionales en audio</p>
-          <ul id="devocionales-features">
-            <li>Devocionales diarios con audio</li>
-            <li>8 versiones bíblicas</li>
-            <li>Completamente offline</li>
-            <li>Sin anuncios</li>
-          </ul>
           <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.devocionales.button">
             Explorar Devocionales
           </span>
@@ -281,14 +226,17 @@
           <div class="service-card-icon"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
           <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.habitus.title">Habitus+Faith</h3>
           <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.habitus.description">Construye hábitos piadosos a través de la fe y la disciplina espiritual</p>
-          <ul id="habitus-features">
-            <li>Seguimiento de hábitos</li>
-            <li>Metas espirituales</li>
-            <li>Motivación bíblica</li>
-            <li>Progreso personal</li>
-          </ul>
           <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.habitus.button">
             Descubrir Habitus
+          </span>
+        </a>
+
+        <a href="/work-with-me/" class="service-card" style="text-decoration: none;">
+          <div class="service-card-icon"><i data-lucide="bot" class="w-5 h-5"></i></div>
+          <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.aiAutomation.title">IA y Automatización de Datos</h3>
+          <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.aiAutomation.description">Generación, revisión y automatización de datos con Inteligencia Artificial</p>
+          <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.aiAutomation.button">
+            Conocer Más
           </span>
         </a>
       </div>

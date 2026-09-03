@@ -82,9 +82,6 @@
         element.setAttribute('placeholder', value);
       }
     });
-
-    // Update project features
-    updateProjectFeatures();
   }
 
   // Get nested translation value
@@ -99,24 +96,6 @@
       }
     }
     return value;
-  }
-
-  // Update project features lists
-  function updateProjectFeatures() {
-    const devoFeatures = document.getElementById('devocionales-features');
-    const habitusFeatures = document.getElementById('habitus-features');
-
-    if (devoFeatures && translations.projects?.devocionales?.features) {
-      devoFeatures.innerHTML = translations.projects.devocionales.features
-        .map(feature => `<li>${feature}</li>`)
-        .join('');
-    }
-
-    if (habitusFeatures && translations.projects?.habitus?.features) {
-      habitusFeatures.innerHTML = translations.projects.habitus.features
-        .map(feature => `<li>${feature}</li>`)
-        .join('');
-    }
   }
 
   // Language metadata (subset of devocionales/js/i18n.js's supportedLanguages,
