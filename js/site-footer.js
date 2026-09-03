@@ -1,26 +1,28 @@
-// Shared footer content used by every page on the site (root, devocionales,
+// Shared footer rendering used by every page on the site (root, devocionales,
 // habitus, work-with-me). Renders the two lines common to all footers
 // (copyright, made-with-love) into a #page-footer element; page-specific
 // content (contact link, privacy/terms links, back-to-hub, etc.) stays as
 // markup each page writes itself, alongside this shared block.
+//
+// Deliberately takes the text as parameters instead of owning translations
+// itself — each page's own i18n system (or, for pages without one yet,
+// its lang/*.json values directly) is the source of truth for the strings;
+// this module only owns the shared DOM structure.
 (function (window) {
   'use strict';
 
-  const COPYRIGHT_TEXT = '© 2026 Develop4God. Todos los derechos reservados.';
-  const MADE_WITH_TEXT = 'Desarrollado con ♥️ por develop4God';
-
-  function renderSharedLines(footerEl) {
+  function renderSharedLines(footerEl, { copyright, madeWith }) {
     if (!footerEl) return;
 
-    const copyright = document.createElement('p');
-    copyright.textContent = COPYRIGHT_TEXT;
+    const copyrightEl = document.createElement('p');
+    copyrightEl.textContent = copyright;
 
-    const madeWith = document.createElement('p');
-    madeWith.textContent = MADE_WITH_TEXT;
+    const madeWithEl = document.createElement('p');
+    madeWithEl.textContent = madeWith;
 
-    footerEl.insertBefore(madeWith, footerEl.firstChild);
-    footerEl.insertBefore(copyright, madeWith);
+    footerEl.insertBefore(madeWithEl, footerEl.firstChild);
+    footerEl.insertBefore(copyrightEl, madeWithEl);
   }
 
-  window.SiteFooter = { renderSharedLines, COPYRIGHT_TEXT, MADE_WITH_TEXT };
+  window.SiteFooter = { renderSharedLines };
 })(window);

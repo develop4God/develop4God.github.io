@@ -325,7 +325,10 @@
     <script src="/js/app-stats.js"></script>
     <script>
         lucide.createIcons();
-        SiteFooter.renderSharedLines(document.getElementById('page-footer'));
+        SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
+            copyright: '© 2026 Develop4God. Todos los derechos reservados.',
+            madeWith: 'Desarrollado con ♥️ por develop4God'
+        });
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
