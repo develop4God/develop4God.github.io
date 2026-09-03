@@ -164,6 +164,16 @@ class I18n {
 
         // Render dynamic legal content if placeholders exist
         this.renderLegalPages();
+
+        // The footer's shared copyright/made-with lines are DOM-inserted by
+        // SiteFooter (not static elements with data-i18n), so re-render them
+        // here with the live-fetched translations every time translations change.
+        if (window.SiteFooter) {
+            window.SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
+                copyright: this.t('footer.copyright'),
+                madeWith: this.t('footer.madeWith')
+            });
+        }
     }
 
     translateMetaTags() {
