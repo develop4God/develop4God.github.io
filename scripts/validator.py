@@ -243,12 +243,12 @@ def phase_devotionals_manifest():
         print("  ❌ 'files' must be a non-empty list")
         ok = False
     else:
-        bad = [f for f in files if not isinstance(f, str) or not f.endswith('.avif')]
+        bad = [f for f in files if not isinstance(f, str) or not f.endswith(('.avif', '.webp'))]
         if bad:
-            print(f"  ❌ {len(bad)} file(s) not a .avif filename: {bad[:5]}")
+            print(f"  ❌ {len(bad)} file(s) not a .avif/.webp filename: {bad[:5]}")
             ok = False
         else:
-            print(f"  ✓ {len(files)} .avif filenames listed")
+            print(f"  ✓ {len(files)} .avif/.webp filenames listed")
 
     version = data.get('version')
     if not isinstance(version, str) or not version:
