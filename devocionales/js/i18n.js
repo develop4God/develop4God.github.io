@@ -72,7 +72,7 @@ class I18n {
             if (!isDevocionalesPage) return;
 
             const lang = this.currentLang;
-            const basePath = '/devocionales/lang';
+            const basePath = '/lang/devocionales';
 
             // Load current language file if present
             let current = null;
