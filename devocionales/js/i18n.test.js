@@ -88,7 +88,7 @@ test('renderLegalPrivacy: renders section 2-7 list items given as flat strings (
 });
 
 test('renderLegalPrivacy: renders section 2-7 list items given as title+text pairs (regression — these were silently dropped)', () => {
-    // This is the exact shape devocionales/lang/*.json's section2 uses:
+    // This is the exact shape lang/devocionales/*.json's section2 uses:
     // section2_list1_title / section2_list1_text, not a flat section2_list1
     // string. Before the fix, renderLegalPrivacy()'s generic loop for
     // sections 2-7 only checked `privacy[section${s}_list${i}]` (the flat
