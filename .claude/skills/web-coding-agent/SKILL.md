@@ -17,10 +17,10 @@ You do not skip verification because "it's just HTML/CSS/JS." This codebase has 
 
 - **Repo:** `develop4God/develop4God.github.io`
 - **Stack:** Vanilla HTML/CSS/JS, Tailwind via CDN `<script>`, Lucide icons via CDN. No npm install, no build step. Deploys directly to GitHub Pages / Cloudflare Pages from the repo as-is.
-- **Sections, each with their own `css/`, `js/`, `lang/`:**
-  - `/` (root) — marketing hub, uses `js/home.js` (JSON-fetch i18n; `js/i18n.js` was dead code, removed)
-  - `/devocionales/` — daily devotional reader (`devocionales/index.html`), uses `devocionales/js/i18n.js` + `devocionales/js/devotional-loader.js` + `devocionales/js/devotional-i18n-adapter.js`
-  - `/habitus/` — separate mini-app, uses `habitus/js/habitus.js`
+- **Sections, each with their own `css/`, `js/`:**
+  - `/` (root) — marketing hub, uses `js/home.js` (JSON-fetch i18n; `js/i18n.js` was dead code, removed); lang files at `lang/home/`
+  - `/devocionales/` — daily devotional reader (`devocionales/index.html`), uses `devocionales/js/i18n.js` + `devocionales/js/devotional-loader.js` + `devocionales/js/devotional-i18n-adapter.js`; lang files at `lang/devocionales/` (namespace-first, matching root/habitus — moved from `devocionales/lang/`)
+  - `/habitus/` — separate mini-app, uses `habitus/js/habitus.js`; lang files at `lang/habitus/`
 - **i18n:** 10 languages for devocionales (es/en/pt/fr/ja/zh/hi/de/ar/fil), 7 for root/habitus (es/en/pt/fr/zh/ja/hi). Default/fallback language is **English** (`en`), site-wide, as of 2026-07. Language preference persists across all three sections via a single shared `localStorage` key: `develop4God_language`.
 - **Known architectural debt (do not silently "fix" — flag and ask):** each section (root, devocionales, habitus, work-with-me) runs its own independent i18n implementation (JSON-fetch pattern, but separate modules/files). They share a localStorage key now but are not otherwise consolidated. Do not merge them without an explicit user decision.
 
@@ -31,7 +31,7 @@ You do not skip verification because "it's just HTML/CSS/JS." This codebase has 
 Before writing a single line:
 
 1. Read every file named in the task, in full — not a grep snippet.
-2. Read the direct dependencies: if you're touching `devotional-loader.js`, also read `devotional-i18n-adapter.js` (the seam it depends on) and the relevant `devocionales/lang/*.json` file(s).
+2. Read the direct dependencies: if you're touching `devotional-loader.js`, also read `devotional-i18n-adapter.js` (the seam it depends on) and the relevant `lang/devocionales/*.json` file(s).
 3. If the task touches i18n copy — check **all 10 (or 7) language JSON files** have the key, not just `es`/`en`. A key added to one language and forgotten in the other nine is the single most common mistake in this repo's history.
 4. If the task touches shared CSS (`modern.css`, `language-selector.css`) — grep for every `<link>` that loads it. These files are shared across 3–6 pages; a change "for one page" silently changes all of them. This has caused a real bug this session (a blanket `footer, footer * { color: white !important }` rule breaking a different page's footer).
 5. If the task touches a file that exists in two copies (root `js/` vs `devocionales/js/`) — check which pages load which copy before assuming they're interchangeable. `grep -rn "path/to/file" --include="*.html" .`
@@ -212,10 +212,10 @@ Minimum bar for "verified": zero console/page errors, and the specific state you
 Every hardcoded UI string found in an HTML file is a bug waiting to be filed, even if it "looks fine right now" in the default language. This repo's history: hardcoded nav labels, footer text, and error copy have each individually caused a "why isn't this translating" bug report.
 
 Checklist for any UI copy change:
-1. Does this string live in a `devocionales/lang/{lang}.json` (or `lang/home/{lang}.json`) file under the right key, for **all** languages that section supports?
+1. Does this string live in a `lang/devocionales/{lang}.json` (or `lang/home/{lang}.json`) file under the right key, for **all** languages that section supports?
 2. Is it read via `DevotionalI18n.t('devotionals.key', fallback)` (devocionales) or `window.i18n.t('key')` / `data-i18n` attribute (root/habitus) — never a literal string in the HTML or JS?
-3. If you added a key to `es.json`, did you add it to the other 9 (or 6)? `for f in devocionales/lang/*.json; do python3 -c "import json; d=json.load(open('$f')); print('$f', d['devotionals'].get('yourNewKey'))"; done` — every line should show a real value, not `None`.
-4. Did you validate every JSON file parses? `for f in devocionales/lang/*.json; do python3 -c "import json; json.load(open('$f'))" || echo "$f FAILED"; done`
+3. If you added a key to `es.json`, did you add it to the other 9 (or 6)? `for f in lang/devocionales/*.json; do python3 -c "import json; d=json.load(open('$f')); print('$f', d['devotionals'].get('yourNewKey'))"; done` — every line should show a real value, not `None`.
+4. Did you validate every JSON file parses? `for f in lang/devocionales/*.json; do python3 -c "import json; json.load(open('$f'))" || echo "$f FAILED"; done`
 5. Verify with Playwright across at least 2 languages (e.g. `?lang=en` and `?lang=es`), not just the default.
 
 ---

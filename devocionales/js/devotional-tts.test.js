@@ -23,8 +23,8 @@ function loadBrowserModule(moduleFilename) {
 
 loadBrowserModule('bible-text-formatter.js');
 
-const enTranslations = JSON.parse(fs.readFileSync(path.join(__dirname, '../lang/en.json'), 'utf8'));
-const esTranslations = JSON.parse(fs.readFileSync(path.join(__dirname, '../lang/es.json'), 'utf8'));
+const enTranslations = JSON.parse(fs.readFileSync(path.join(__dirname, '../../lang/devocionales/en.json'), 'utf8'));
+const esTranslations = JSON.parse(fs.readFileSync(path.join(__dirname, '../../lang/devocionales/es.json'), 'utf8'));
 
 // Real i18n.t() contract: dot-path lookup into `this.translations`, raw key
 // returned on a miss. DevotionalI18n.t() then swaps that miss for `fallback`.
