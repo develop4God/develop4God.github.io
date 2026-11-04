@@ -78,9 +78,13 @@ def gate(name: str, fn):
     ok, skip_reason = fn()
     elapsed = time.monotonic() - start
     PHASES.append(Phase(name, ok, elapsed, skip_reason))
-    if skip_reason:
+    if skip_reason and ok:
         print(f"⬜ SKIPPED  ({elapsed:.1f}s) — {skip_reason}")
         return
+    if skip_reason:
+        print(f"❌ FAILED  ({elapsed:.1f}s) — {skip_reason}")
+        print_summary()
+        sys.exit(1)
     if ok:
         print(f"✅ PASSED  ({elapsed:.1f}s)")
     else:
@@ -94,7 +98,7 @@ def print_summary():
     print("SUMMARY")
     print('=' * 70)
     for p in PHASES:
-        if p.skipped_reason:
+        if p.skipped_reason and p.passed:
             icon = '⬜ SKIP'
         elif p.passed:
             icon = '✅ PASS'

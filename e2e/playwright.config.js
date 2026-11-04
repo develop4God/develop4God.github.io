@@ -12,7 +12,9 @@ module.exports = defineConfig({
   testDir: '.',
   timeout: 15_000,
   fullyParallel: true,
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  // Generated output goes outside the repo so eslint/stylelint/html-validate never lint it.
+  outputDir: '/tmp/pw-results',
+  reporter: [['list'], ['html', { outputFolder: '/tmp/pw-report', open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:8791',
     trace: 'retain-on-failure',
