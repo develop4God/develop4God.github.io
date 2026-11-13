@@ -51,22 +51,32 @@
     return l;
   }
 
-  // opts: { canvas, pin, story, sceneIds, getProgress, reduce, logoUrl?, getFree? }
+  // opts: { canvas, pin, story, sceneIds, getProgress, reduce, logoUrl?, getFree?, transition? }
+  // transition: 'paired' (position-paired straight paths), 'catalog' (random pairing with
+  // per-dot stagger) or 'flow' (arcing paths, overlapping windows and a glow in transit).
   function create(opts) {
     var cv = opts.canvas, cx = cv.getContext('2d'), pin = opts.pin, reduce = opts.reduce;
-    var N = S.N, scenes = [], introCloud = null, stagger = [];
+    var N = S.N, scenes = [], introCloud = null, stagger = [], wob = [], perp = [];
+    var mode = M.resolveTransition(opts.transition);
     var W = 0, H = 0, wide = true, dark = true, pal = ['#fff', '#b4d447', '#dea946', '#8f7fd0'];
     var yaw = 0, pitch = 0, lw = 0, driftAng = 0, globeAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     var t0 = performance.now(), running = false, raf = 0;
     var buckets = [], out = { c: 0, a: 0 }, pr = {}, free = 0, freeAt = -1e9;
 
     var r2 = M.rng(99);
-    for (var i = 0; i < N; i++) stagger.push(r2());
+    var r3 = M.rng(1234);
+    for (var i = 0; i < N; i++) {
+      stagger.push(r2());
+      wob.push(0.4 + r3() * 0.6);
+      var vx = r3() - 0.5, vy = r3() - 0.5, vz = r3() - 0.5, vl = Math.hypot(vx, vy, vz) || 1;
+      perp.push([vx / vl, vy / vl, vz / vl]);
+    }
     for (var b = 0; b < pal.length * LEVELS; b++) buckets.push({ x: [], y: [], r: [], n: 0 });
 
     function setScenes(list, cloud) {
-      scenes = S.alignChain(list);
-      introCloud = cloud ? S.align(scenes[0], cloud) : null;
+      // 'catalog' keeps the scenes' own point order (random pairing), the others pair by position.
+      scenes = mode === 'catalog' ? list : S.alignChain(list);
+      introCloud = cloud ? (mode === 'catalog' ? cloud : S.align(scenes[0], cloud)) : null;
     }
 
     var ids = opts.sceneIds.slice(), hasLogo = ids[0] === 'logo';
@@ -136,22 +146,28 @@
 
       for (j = 0; j < buckets.length; j++) buckets[j].n = 0;
       for (i = 0; i < N; i++) {
-        var k2 = M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
+        var k2 = mode === 'flow' ? M.ease(M.smooth(stagger[i] * 0.4, stagger[i] * 0.4 + 0.6, lt)) : M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
         if (intro < 1) {
           var cp = introCloud.pts[i], e = M.ease(M.clamp(intro * 1.4 - stagger[i] * 0.4, 0, 1));
           px = cp[0] + (px - cp[0]) * e; py = cp[1] + (py - cp[1]) * e; pz = cp[2] + (pz - cp[2]) * e;
         }
-        var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2;
+        var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2, glow = 0;
+        if (mode === 'flow') {
+          // Dots travel on arcs and brighten while in transit, like a flowing stream.
+          glow = Math.sin(Math.PI * k2);
+          var arc = glow * 0.55 * wob[i];
+          x += perp[i][0] * arc; y += perp[i][1] * arc; z += perp[i][2] * arc;
+        }
         M.project(x, y, z, rot, pr);
         var sc = k2 > 0.5 ? B : A;
         S.paint(sc, i, t, out);
         var far = sc.id === 'globe' && pr.z > 0.1 ? 0.1 : 1;
         var sceneA = dark ? out.a : 0.55 + 0.45 * out.a;
-        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1), 0, 1);
+        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1) * (1 + 0.5 * glow), 0, 1);
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
-        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35);
+        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35) + 0.8 * glow;
         bk.n++;
       }
       cx.clearRect(0, 0, W, H);

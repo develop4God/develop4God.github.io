@@ -95,17 +95,22 @@
     return inner ? Math.max(0, panel.offsetTop + inner.offsetTop - 20) : 0;
   }
 
+  // Transition style for the point-cloud morphs; ?t=paired|catalog|flow (default paired).
+  var TRANSITION = window.TerminalMath.resolveTransition(new URLSearchParams(window.location.search).get('t'));
+
   function ensureStory(name) {
     if (stories[name]) return stories[name];
     var root = $('#story-' + name), pin = $('.pin', root);
     var dwell = (root.getAttribute('data-dwell') || '').split(',').filter(Boolean).map(Number);
     var ctrl = window.TerminalStory.create({
-      story: root, panels: $all('[data-panel]', root), dots: $all('.sdots .dot', root), reduce: reduce, dwell: dwell, loop: root.hasAttribute('data-loop')
+      story: root, panels: $all('[data-panel]', root), dots: $all('.sdots .dot', root), reduce: reduce, dwell: dwell, loop: root.hasAttribute('data-loop'),
+      morphSpeed: TRANSITION === 'flow' ? 0.5 : 0.75
     });
     window.TerminalCanvas.create({
       canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress,
       sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null,
-      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null
+      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null,
+      transition: TRANSITION
     });
     var pause = $('.pause', root);
     if (pause) {

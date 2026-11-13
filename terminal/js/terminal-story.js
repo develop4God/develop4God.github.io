@@ -8,9 +8,8 @@
   'use strict';
 
   var M = window.TerminalMath;
-  var MORPH_SPEED = 0.75; // scenes per second: one morph takes about 1.3s
 
-  // opts: { story, panels, dots, reduce, dwell:[ms per scene], loop }
+  // opts: { story, panels, dots, reduce, dwell:[ms per scene], loop, morphSpeed (scenes per second, default 0.75) }
   function create(opts) {
     var story = opts.story, panels = opts.panels, dots = opts.dots, reduce = opts.reduce;
     var count = panels.length, current = 0, pos = 0, lastT = 0, timer = 0, visible = false, paused = false;
@@ -66,7 +65,7 @@
       // active scene at a fixed speed and returns it as 0..1 across all scenes.
       getProgress: function () {
         var now = performance.now();
-        pos = M.stepToward(pos, current, lastT ? Math.min(now - lastT, 50) : 0, MORPH_SPEED);
+        pos = M.stepToward(pos, current, lastT ? Math.min(now - lastT, 50) : 0, opts.morphSpeed || 0.75);
         lastT = now;
         return count > 1 ? pos / (count - 1) : 0;
       },

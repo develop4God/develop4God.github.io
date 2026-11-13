@@ -64,6 +64,23 @@ test('nextIndex advances, loops when asked, and stops at the end otherwise', () 
   assert.strictEqual(M.nextIndex(0, 0, true), -1);
 });
 
+test('smooth is a clamped smoothstep: 0 before, 1 after, 0.5 at the middle', () => {
+  assert.strictEqual(M.smooth(0.2, 0.8, 0), 0);
+  assert.strictEqual(M.smooth(0.2, 0.8, 1), 1);
+  assert.ok(Math.abs(M.smooth(0.2, 0.8, 0.5) - 0.5) < 1e-9);
+  assert.strictEqual(M.smooth(0.5, 0.5, 0.4), 0);
+  assert.strictEqual(M.smooth(0.5, 0.5, 0.6), 1);
+});
+
+test('resolveTransition accepts known modes and falls back to paired for anything else', () => {
+  assert.strictEqual(M.resolveTransition('flow'), 'flow');
+  assert.strictEqual(M.resolveTransition('catalog'), 'catalog');
+  assert.strictEqual(M.resolveTransition('paired'), 'paired');
+  assert.strictEqual(M.resolveTransition('nope'), 'paired');
+  assert.strictEqual(M.resolveTransition(null), 'paired');
+  assert.strictEqual(M.resolveTransition('__proto__'), 'paired');
+});
+
 test('project: centre point is unscaled; nearer points are larger than farther ones', () => {
   const out = {};
   const rot = M.rotation(0, 0);

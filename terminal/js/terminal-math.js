@@ -35,6 +35,20 @@
     return { a: a, lt: seg - a, active: Math.round(seg) };
   }
 
+  // Smoothstep window: 0 before a, 1 after b, eased in between.
+  function smooth(a, b, x) {
+    if (b <= a) return x < a ? 0 : 1;
+    var t = clamp((x - a) / (b - a), 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  var TRANSITIONS = ['paired', 'catalog', 'flow'];
+
+  // Known transition mode, or 'paired' for anything else.
+  function resolveTransition(name) {
+    return TRANSITIONS.indexOf(name) >= 0 ? name : 'paired';
+  }
+
   // Moves `value` toward `target` at `speed` units per second over `dtMs`
   // milliseconds, never overshooting. Negative dt is ignored.
   function stepToward(value, target, dtMs, speed) {
@@ -100,6 +114,8 @@
     ease: ease,
     rng: rng,
     segment: segment,
+    smooth: smooth,
+    resolveTransition: resolveTransition,
     stepToward: stepToward,
     nextIndex: nextIndex,
     project: project,
