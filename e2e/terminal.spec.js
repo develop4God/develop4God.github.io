@@ -215,3 +215,80 @@ test('rapid language switches end on the last choice', async ({ page }) => {
   await expect(page.locator('#story-hero .verse')).toHaveText(EN_VERSE);
   expect(await page.evaluate(() => localStorage.getItem('develop4God_language'))).toBe('en');
 });
+
+test('auto: a resting mouse over the hero does not stop it advancing to the fork', async ({ page }) => {
+  test.setTimeout(45_000);
+  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.mouse.move(640, 360);
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 9500 });
+});
+
+test('auto: a tap on the hero does not freeze it (touch pointer stays "inside")', async ({ browser }) => {
+  test.setTimeout(45_000);
+  const ctx = await browser.newContext({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto('http://127.0.0.1:8791/terminal/', { waitUntil: 'networkidle' });
+  await page.locator('#story-hero .pin').tap({ position: { x: 40, y: 60 } });
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 9500 });
+  await ctx.close();
+});
+
+test('auto: hovering the hire story does not stop its scenes; the pause button does', async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.mouse.move(640, 400);
+  const panels = page.locator('#story-hire [data-panel]');
+  await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 10000 });
+  const pause = page.locator('#story-hire .pause');
+  await expect(pause).toHaveAttribute('aria-pressed', 'false');
+  await pause.click();
+  await expect(pause).toHaveAttribute('aria-pressed', 'true');
+  await page.waitForTimeout(8500);
+  await expect(panels.nth(1)).toHaveClass(/on/);
+  await pause.click();
+  await expect(panels.nth(2)).toHaveClass(/on/, { timeout: 10000 });
+});
+
+test('contact opens the mail app: a mailto link, no copy button', async ({ page }) => {
+  await page.goto('/terminal/#contact', { waitUntil: 'networkidle' });
+  const link = page.locator('#contact a.mailto');
+  await expect(link).toBeVisible();
+  expect(await link.getAttribute('href')).toMatch(/^mailto:develop4God@gmail\.com/);
+  await expect(page.locator('#contact #copy')).toHaveCount(0);
+  await page.locator('button[data-lang="es"]').click();
+  await expect(link).not.toHaveText('');
+});
+
+test('light theme: animation dots are dark and solid enough to read on the pale background', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'light'));
+  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2600);
+  const stats = await page.evaluate(() => {
+    const c = document.querySelector('#story-hero .scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let n = 0, lum = 0, alpha = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 0) { n++; alpha += d[i + 3]; lum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]); }
+    return { n, meanAlpha: alpha / n, meanLum: lum / n };
+  });
+  expect(stats.n).toBeGreaterThan(500);
+  expect(stats.meanAlpha).toBeGreaterThan(170);
+  expect(stats.meanLum).toBeLessThan(120);
+});
+
+for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
+  test(`fork spheres never reach the heading text at ${w}x${h}`, async ({ page }) => {
+    test.setTimeout(45_000);
+    await page.setViewportSize({ width: w, height: h });
+    await page.goto('/terminal/', { waitUntil: 'networkidle' });
+    await page.locator('#story-hero .dot').nth(1).click();
+    await page.waitForTimeout(4500);
+    const r = await page.evaluate(() => {
+      const c = document.querySelector('#story-hero .scene'), cr = c.getBoundingClientRect(), k = c.width / cr.width;
+      const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+      let lowest = 0;
+      for (let y = c.height - 1; y >= 0 && !lowest; y--) for (let x = 0; x < c.width; x += 2) if (d[(y * c.width + x) * 4 + 3] > 40) { lowest = y; break; }
+      const eyebrow = document.querySelector('#story-hero .doorpanel .eyebrow').getBoundingClientRect();
+      return { dotsBottom: lowest / k, textTop: eyebrow.top - cr.top };
+    });
+    expect(r.dotsBottom).toBeLessThanOrEqual(r.textTop + 2);
+  });
+}

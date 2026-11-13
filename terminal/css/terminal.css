@@ -41,10 +41,10 @@
   --surface: #fff;
   --navbg: rgba(245, 242, 251, 0.92);
   --vig: rgba(245, 242, 251, 0.85);
-  --ink: #2b2740;
-  --lime: #6f8f10;
-  --gold: #a8741a;
-  --violet: #6d4aa8;
+  --ink: #1c1730;
+  --lime: #4f6f00;
+  --gold: #8a5a00;
+  --violet: #5a389c;
   --dark: 0;
   --accent: #5d7a0c;
   --on-accent: #fff;
@@ -64,6 +64,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
   scroll-padding-top: calc(var(--bar-h) + 12px);
 }
 
@@ -180,6 +181,7 @@ a { color: inherit; }
 
 .seg {
   display: flex;
+  flex: none;
   border: 1px solid var(--line);
   border-radius: 999px;
   overflow: hidden;
@@ -217,6 +219,12 @@ a { color: inherit; }
   .nl[data-contact-link] { display: none; }
 }
 
+/* Narrow phones: keep the wordmark, language and theme; the paths are reached
+   from the doors and the switch links. */
+@media (width <= 480px) {
+  .nl { display: none; }
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -252,13 +260,29 @@ a { color: inherit; }
 }
 
 /* auto-playing stories */
-.story { position: relative; }
+.story {
+  position: relative;
+  scroll-snap-align: start;
+}
+
+
+.minband,
+.contact,
+.s,
+.switch {
+  scroll-snap-align: start;
+}
 
 .pin {
   position: relative;
-  height: calc(100svh - var(--bar-h));
+  display: grid;
+  min-height: max(calc(100svh - var(--bar-h)), var(--pin-min, 0px));
   overflow: hidden;
 }
+
+/* The hero needs room for the fork spheres above the door cards: on short
+   screens it grows past the viewport and the page scrolls a little. */
+#story-hero { --pin-min: 680px; }
 
 .scene {
   position: absolute;
@@ -294,19 +318,24 @@ a { color: inherit; }
   100% { transform: translate(0, 0); }
 }
 
+/* Panels share one grid cell, so the box is as tall as the tallest panel and
+   nothing is ever clipped, whatever the screen height. */
 .panel {
-  position: absolute;
-  inset: 50% 0 auto;
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  align-self: center;
+  padding-block: 40px 72px;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-40%);
+  transform: translateY(18px);
   transition: opacity 0.16s ease-out, transform 0.16s ease-out;
 }
 
 .panel.on {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-50%);
+  transform: none;
   transition: opacity 0.6s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -484,6 +513,40 @@ a { color: inherit; }
   transform: scale(1.7);
 }
 
+/* pause / play for the looping stories */
+.pause {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: 14px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--navbg);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pause::before {
+  content: "❚❚";
+  letter-spacing: -2px;
+}
+
+.pause[aria-pressed="true"]::before {
+  content: "▶";
+  letter-spacing: 0;
+}
+
+.pause:hover {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+.story.static .pause { display: none; }
+
 .cue {
   position: absolute;
   bottom: 22px;
@@ -524,18 +587,16 @@ a { color: inherit; }
 }
 
 .panel.doorpanel {
-  inset: auto 0 6svh;
-  transform: translateY(16px);
+  align-self: end;
+  padding-bottom: 6svh;
 }
-
-.panel.doorpanel.on { transform: none; }
 
 @media (width <= 820px) {
   .panel {
-    inset: auto 0 calc(9svh + env(safe-area-inset-bottom, 0px));
-    transform: translateY(24px);
+    align-self: end;
+    padding-bottom: calc(9svh + env(safe-area-inset-bottom, 0px));
   }
-  .panel.on { transform: none; }
+
   .panel p { font-size: 1rem; }
   .doors { grid-template-columns: 1fr; }
 
@@ -547,7 +608,8 @@ a { color: inherit; }
 
 .story.static .pin {
   position: relative;
-  height: auto;
+  display: block;
+  min-height: 0;
   padding-block: 48px;
 }
 
@@ -558,7 +620,6 @@ a { color: inherit; }
 
 .story.static .panel {
   position: relative;
-  inset: auto;
   padding-block: 18px;
   opacity: 1;
   pointer-events: auto;
@@ -927,25 +988,6 @@ a.case:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.mail code {
-  padding: 11px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--bg);
-  font: 500 14px var(--mono);
-  overflow-wrap: anywhere;
-}
-
-.mail button {
-  padding: 11px 18px;
-  border: 0;
-  border-radius: var(--radius-btn);
-  background: var(--accent);
-  color: var(--on-accent);
-  font: 600 14px var(--disp);
-  cursor: pointer;
 }
 
 .site-footer {

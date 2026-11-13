@@ -1,5 +1,5 @@
 // Small page interactions: typed terminal line, scroll reveal, the dot riding a
-// line, stat count-up and the copy button. Each respects reduced motion, and the
+// line and stat count-up. Each respects reduced motion, and the
 // final text is always in the DOM so nothing depends on the animation finishing.
 (function (window) {
   'use strict';
@@ -87,20 +87,5 @@
     els.forEach(function (el) { io.observe(el); });
   }
 
-  function copyButton(btn, source, labels) {
-    function select() {
-      var r = document.createRange();
-      r.selectNodeContents(source);
-      var s = window.getSelection();
-      s.removeAllRanges();
-      s.addRange(r);
-    }
-    btn.addEventListener('click', function () {
-      var done = function () { btn.textContent = labels().copied; setTimeout(function () { btn.textContent = labels().copy; }, 1600); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(source.textContent).then(done, select);
-      else select();
-    });
-  }
-
-  window.TerminalEffects = { typedLine: typedLine, reveal: reveal, rideLine: rideLine, countUp: countUp, copyButton: copyButton };
+  window.TerminalEffects = { typedLine: typedLine, reveal: reveal, rideLine: rideLine, countUp: countUp };
 })(window);

@@ -68,7 +68,9 @@
       "title": "Each one checked, every day.",
       "text": "Multi-stage pipelines where an independent critic verifies every AI-flagged finding verbatim against the source before it is trusted."
     },
-    "dot": "Scene"
+    "dot": "Scene",
+    "pause": "Pause animation",
+    "play": "Play animation"
   },
   "hire": {
     "switch": "← Looking for the ministry instead?",
@@ -215,7 +217,6 @@
   "contact": {
     "title": "Have a project in mind?",
     "text": "Tell me what you need: a role, a product, a website, a tool or a ministry project.",
-    "copy": "Copy",
-    "copied": "Copied"
+    "cta": "Write me an email"
   }
 }

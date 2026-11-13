@@ -1,7 +1,8 @@
 // Auto-playing story: shows one text panel at a time (the rest are inert so hidden
 // links can't take focus) while the canvas morphs to the matching scene. Scenes
 // advance on their own after a per-scene dwell, optionally looping; the dots are
-// buttons to jump, and the timer pauses on hover/focus and while off-screen.
+// buttons to jump, and the timer stops while off-screen or when the visitor presses
+// the pause control (hovering or focusing never freezes it).
 // Under reduced motion the story is static and never advances.
 (function (window) {
   'use strict';
@@ -53,16 +54,12 @@
     if (reduce) {
       story.classList.add('static');
       panels.forEach(function (p) { p.classList.add('on'); p.removeAttribute('inert'); p.setAttribute('aria-hidden', 'false'); });
-      return { getProgress: function () { return 0; }, goTo: function () {}, advance: function () {} };
+      return { getProgress: function () { return 0; }, goTo: function () {}, advance: function () {}, setPaused: function () {}, isPaused: function () { return false; } };
     }
 
     setActive(0);
     dots.forEach(function (d, k) { d.addEventListener('click', function () { goTo(k); }); });
     new IntersectionObserver(function (es) { visible = es[0].isIntersecting; schedule(); }).observe(story);
-    story.addEventListener('pointerenter', function () { paused = true; schedule(); });
-    story.addEventListener('pointerleave', function () { paused = false; schedule(); });
-    story.addEventListener('focusin', function () { paused = true; schedule(); });
-    story.addEventListener('focusout', function () { paused = false; schedule(); });
 
     return {
       // Called every frame by the canvas: eases the scene position toward the
@@ -74,6 +71,8 @@
         return count > 1 ? pos / (count - 1) : 0;
       },
       goTo: goTo,
+      setPaused: function (v) { paused = !!v; schedule(); },
+      isPaused: function () { return paused; },
       // Skips ahead one scene right away (used when the visitor scrolls, taps or presses a key).
       advance: function () { var n = M.nextIndex(current, count, false); if (n >= 0) goTo(n); }
     };

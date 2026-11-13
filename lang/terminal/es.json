@@ -68,7 +68,9 @@
       "title": "Cada uno revisado, todos los días.",
       "text": "Pipelines de varias etapas donde un crítico independiente verifica textualmente contra la fuente cada hallazgo señalado por la IA antes de confiar en él."
     },
-    "dot": "Escena"
+    "dot": "Escena",
+    "pause": "Pausar animación",
+    "play": "Reproducir animación"
   },
   "hire": {
     "switch": "← ¿Buscas el ministerio?",
@@ -215,7 +217,6 @@
   "contact": {
     "title": "¿Tienes un proyecto en mente?",
     "text": "Cuéntame qué necesitas: un puesto, un producto, un sitio web, una herramienta o un proyecto ministerial.",
-    "copy": "Copiar",
-    "copied": "Copiado"
+    "cta": "Escríbeme un correo"
   }
 }

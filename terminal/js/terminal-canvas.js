@@ -37,22 +37,28 @@
   // Where a scene sits on the canvas, as fractions of its size. On wide screens
   // text is on the left, so scenes sit right; the fork spheres sit top-centre
   // above the door cards. Large scenes (globe, language clusters) are scaled down.
-  function layout(id, wide) {
+  // `free` is the height in px above the fork text (0 when unknown); the fork
+  // spheres shrink and move up to fit inside it so they never run under the text.
+  function layout(id, wide, free, W, H) {
     var l = wide ? { x: 0.68, y: 0.5, s: 0.3 } : { x: 0.5, y: 0.3, s: 0.24 };
-    if (id === 'twin' && wide) return { x: 0.5, y: 0.25, s: 0.17 };
+    if (id === 'twin') {
+      var cap = wide ? { x: 0.5, y: 0.25, s: 0.17 } : { x: 0.5, y: 0.27, s: 0.2 };
+      if (!free) return cap;
+      return { x: 0.5, y: Math.min(cap.y, (free * 0.5) / H), s: Math.max(0.05, Math.min(cap.s, (free * 0.46) / Math.min(W, H))) };
+    }
     if (id === 'globe' || id === 'languages') l.s *= 0.85;
     if (id === 'logo') l.s *= 0.83;
     return l;
   }
 
-  // opts: { canvas, pin, story, sceneIds, getProgress, reduce, logoUrl? }
+  // opts: { canvas, pin, story, sceneIds, getProgress, reduce, logoUrl?, getFree? }
   function create(opts) {
     var cv = opts.canvas, cx = cv.getContext('2d'), pin = opts.pin, reduce = opts.reduce;
     var N = S.N, scenes = [], introCloud = null, stagger = [];
     var W = 0, H = 0, wide = true, dark = true, pal = ['#fff', '#b4d447', '#dea946', '#8f7fd0'];
     var yaw = 0, pitch = 0, lw = 0, driftAng = 0, globeAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     var t0 = performance.now(), running = false, raf = 0;
-    var buckets = [], out = { c: 0, a: 0 }, pr = {};
+    var buckets = [], out = { c: 0, a: 0 }, pr = {}, free = 0, freeAt = -1e9;
 
     var r2 = M.rng(99);
     for (var i = 0; i < N; i++) stagger.push(r2());
@@ -110,7 +116,8 @@
       if (!morphing && !reduce) {
         // The camera only moves once the points have settled into a scene.
         var cur = lt < 0.5 ? A : B, k = Math.min(1, dt * 0.004), ty, tp;
-        if (cur.id === 'logo') { ty = 0; tp = 0; lw += (1 - lw) * k; }
+        // The logo and the fork spheres face the front so they read clearly.
+        if (cur.id === 'logo' || cur.id === 'twin') { ty = 0; tp = cur.id === 'logo' ? 0 : 0.12; lw += (1 - lw) * k; }
         else {
           lw += (0 - lw) * k;
           if (cur.id === 'globe') { globeAng += dt * 0.0003; ty = -1.4 + globeAng; tp = 0.12; }
@@ -120,10 +127,12 @@
         pitch += (tp - pitch) * k;
       }
       var rot = M.rotation(yaw + (smx - 0.5) * 0.4 * (1 - lw * 0.6), pitch + (smy - 0.5) * 0.2);
-      var la = layout(A.id, wide), lb = layout(B.id, wide), le = M.ease(lt);
+      if (opts.getFree && t - freeAt > 400) { free = opts.getFree(); freeAt = t; }
+      var la = layout(A.id, wide, free, W, H), lb = layout(B.id, wide, free, W, H), le = M.ease(lt);
       var scale = Math.min(W, H) * (la.s + (lb.s - la.s) * le), ox = W * (la.x + (lb.x - la.x) * le), oy = H * (la.y + (lb.y - la.y) * le);
       var intro = reduce || !introCloud || a !== 0 ? 1 : M.ease(M.clamp((t - t0) / 1800, 0, 1));
-      var baseA = dark ? 0.22 : 0.4, spanA = dark ? 0.78 : 0.6, i, j, bk;
+      // On the pale light theme dots need more weight than on the dark one.
+      var baseA = dark ? 0.22 : 0.72, spanA = dark ? 0.78 : 0.28, i, j, bk;
 
       for (j = 0; j < buckets.length; j++) buckets[j].n = 0;
       for (i = 0; i < N; i++) {
@@ -137,11 +146,12 @@
         var sc = k2 > 0.5 ? B : A;
         S.paint(sc, i, t, out);
         var far = sc.id === 'globe' && pr.z > 0.1 ? 0.1 : 1;
-        var alpha = M.clamp((baseA + pr.d * spanA) * out.a * far * (intro < 1 ? 0.6 + 0.4 * intro : 1), 0, 1);
+        var sceneA = dark ? out.a : 0.55 + 0.45 * out.a;
+        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1), 0, 1);
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
-        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f;
+        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35);
         bk.n++;
       }
       cx.clearRect(0, 0, W, H);

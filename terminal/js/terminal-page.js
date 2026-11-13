@@ -54,7 +54,12 @@
     window.SiteFooter.renderSharedLines($('#page-footer'), { copyright: f.copyright.replace(/©\s*\d{4}/, '© ' + year), madeWith: f.madeWith });
   }
 
+  function labelPause(btn) {
+    btn.setAttribute('aria-label', I.get(dict, btn.getAttribute('aria-pressed') === 'true' ? 'story.play' : 'story.pause') || btn.getAttribute('aria-label'));
+  }
+
   function labelDots() {
+    $all('.pause').forEach(labelPause);
     var word = I.get(dict, 'story.dot') || '';
     $all('.sdots').forEach(function (group) {
       $all('.dot', group).forEach(function (d, i) { d.setAttribute('aria-label', word + ' ' + (i + 1)); });
@@ -84,6 +89,12 @@
     });
   }
 
+  // Height in px above the fork text, so the canvas can fit the spheres into it.
+  function freeAboveForkText(root) {
+    var panel = $('.doorpanel', root), inner = panel && $('.in', panel);
+    return inner ? Math.max(0, panel.offsetTop + inner.offsetTop - 20) : 0;
+  }
+
   function ensureStory(name) {
     if (stories[name]) return stories[name];
     var root = $('#story-' + name), pin = $('.pin', root);
@@ -93,8 +104,18 @@
     });
     window.TerminalCanvas.create({
       canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress,
-      sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null
+      sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null,
+      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null
     });
+    var pause = $('.pause', root);
+    if (pause) {
+      pause.addEventListener('click', function () {
+        var on = pause.getAttribute('aria-pressed') !== 'true';
+        pause.setAttribute('aria-pressed', on ? 'true' : 'false');
+        ctrl.setPaused(on);
+        labelPause(pause);
+      });
+    }
     stories[name] = ctrl;
     return ctrl;
   }
@@ -123,7 +144,7 @@
     showContact();
     ensureStory(name);
     history.replaceState(null, '', '#' + name);
-    if (!noScroll) scrollTo(document.getElementById(PATHS[name]));
+    if (!noScroll) scrollTo($('#story-' + name));
   }
 
   function bindControls() {
@@ -132,7 +153,6 @@
     $all('[data-path-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); choosePath(a.getAttribute('data-path-link')); }); });
     $all('[data-switch]').forEach(function (b) { b.addEventListener('click', function () { choosePath(b.getAttribute('data-switch')); }); });
     $all('[data-contact-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); scrollTo(showContact()); }); });
-    window.TerminalEffects.copyButton($('#copy'), $('#addr'), function () { return { copy: I.get(dict, 'contact.copy'), copied: I.get(dict, 'contact.copied') }; });
   }
 
   function init() {
