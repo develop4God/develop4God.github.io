@@ -292,3 +292,16 @@ for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
     expect(r.dotsBottom).toBeLessThanOrEqual(r.textTop + 2);
   });
 }
+
+test('ministry mission shows the Isaiah 55 text in each language, under "Built to serve"', async ({ page }) => {
+  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  const q = page.locator('#ministries .isaiah');
+  await expect(q).toBeVisible();
+  await expect(q.locator('p')).toContainText('my word');
+  await expect(q.locator('cite')).toContainText('Isaiah 55:10-11');
+  await page.locator('button[data-lang="es"]').click();
+  await expect(q.locator('p')).toContainText('mi palabra');
+  await expect(q.locator('cite')).toContainText('Isaías 55:10-11');
+  await expect(page.locator('#ministries .t')).toHaveText('Hecho para servir');
+  await expect(page.locator('#ministries .verse2')).toHaveText('Todo lo que construyo, lo construyo para Él.');
+});

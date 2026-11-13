@@ -896,6 +896,28 @@ a.case:hover {
   line-height: 1.3;
 }
 
+.isaiah {
+  max-width: 62ch;
+  margin: 0 0 32px;
+  padding-left: 18px;
+  border-left: 2px solid var(--accent2);
+}
+
+.isaiah p {
+  margin: 0 0 8px;
+  color: var(--minmuted);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.isaiah cite {
+  color: var(--accent2);
+  font: 500 12px var(--mono);
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
