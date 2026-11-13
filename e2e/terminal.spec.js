@@ -12,15 +12,6 @@ function trackErrors(page) {
 const EN_VERSE = 'And whatsoever ye do, do it heartily, as to the Lord, and not unto men.';
 const ES_VERSE = 'Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres.';
 
-async function scrollStory(page, id, fraction) {
-  await page.evaluate(([sid, f]) => {
-    const s = document.getElementById(sid);
-    const travel = s.offsetHeight - s.querySelector('.pin').offsetHeight;
-    window.scrollTo(0, s.offsetTop + travel * f);
-  }, [id, fraction]);
-  await page.waitForTimeout(250);
-}
-
 test('entry needs no input: verse shown, logo canvas painted, no console errors', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
@@ -40,21 +31,50 @@ test('entry needs no input: verse shown, logo canvas painted, no console errors'
   expect(errors).toEqual([]);
 });
 
-test('only the active hero panel is reachable: inactive panels are inert', async ({ page }) => {
+test('auto: with no input at all the hero moves on to the fork by itself and holds there', async ({ page }) => {
+  test.setTimeout(45_000);
+  const errors = trackErrors(page);
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
   const panels = page.locator('#story-hero [data-panel]');
-  await expect(panels.nth(0)).not.toHaveAttribute('inert', '');
+  await expect(panels.nth(0)).toHaveClass(/on/);
   await expect(panels.nth(1)).toHaveAttribute('inert', '');
-  await scrollStory(page, 'story-hero', 0.9);
-  await expect(panels.nth(1)).toHaveClass(/on/);
+  await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 9000 });
   await expect(panels.nth(1)).not.toHaveAttribute('inert', '');
   await expect(panels.nth(0)).toHaveAttribute('inert', '');
+  await page.waitForTimeout(8000);
+  await expect(panels.nth(1)).toHaveClass(/on/);
+  expect(errors).toEqual([]);
+});
+
+test('skip: wheel, key and tap each move the hero to the fork immediately', async ({ page }) => {
+  for (const act of [
+    (p) => p.mouse.wheel(0, 100),
+    (p) => p.keyboard.press('ArrowDown'),
+    (p) => p.evaluate(() => window.dispatchEvent(new Event('touchstart')))
+  ]) {
+    await page.goto('/terminal/', { waitUntil: 'networkidle' });
+    await expect(page.locator('#story-hero [data-panel]').nth(0)).toHaveClass(/on/);
+    await act(page);
+    await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 1500 });
+  }
+});
+
+test('dots are buttons with labels and jump to their scene', async ({ page }) => {
+  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  const dots = page.locator('#story-hire .dot');
+  await expect(dots).toHaveCount(3);
+  await expect(dots.nth(0)).toHaveAttribute('aria-label', 'Scene 1');
+  await dots.nth(2).click();
+  await expect(page.locator('#story-hire [data-panel]').nth(2)).toHaveClass(/on/);
+  await expect(dots.nth(2)).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('#story-hire [data-panel]').nth(0)).toHaveAttribute('inert', '');
 });
 
 test('choosing Hire me reveals only that path; switch link flips to Ministry', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
-  await scrollStory(page, 'story-hero', 0.9);
+  await page.mouse.wheel(0, 100);
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/);
   await page.locator('a.door.hire').click();
   await expect(page.locator('#path-hire')).toBeVisible();
   await expect(page.locator('#path-ministry')).toBeHidden();
@@ -118,16 +138,17 @@ test('theme: toggle flips light/dark, persists, and the canvas palette follows',
   expect(bg).toBe(await theme() === 'light' ? 'rgb(245, 242, 251)' : 'rgb(10, 11, 10)');
 });
 
-test('hire path: pipeline typed line runs and the story advances through its panels', async ({ page }) => {
+test('auto: the hire path advances through its scenes on its own and loops', async ({ page }) => {
+  test.setTimeout(45_000);
   const errors = trackErrors(page);
   await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
-  await scrollStory(page, 'story-hire', 0.05);
-  await page.waitForTimeout(1200);
+  const panels = page.locator('#story-hire [data-panel]');
+  await expect(panels.nth(0)).toHaveClass(/on/);
+  await page.waitForTimeout(1500);
   expect((await page.locator('#story-hire [data-typed-text]').textContent()).length).toBeGreaterThan(0);
-  await scrollStory(page, 'story-hire', 0.5);
-  await expect(page.locator('#story-hire [data-panel]').nth(1)).toHaveClass(/on/);
-  await scrollStory(page, 'story-hire', 1);
-  await expect(page.locator('#story-hire [data-panel]').nth(2)).toHaveClass(/on/);
+  await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 9000 });
+  await expect(panels.nth(2)).toHaveClass(/on/, { timeout: 9000 });
+  await expect(panels.nth(0)).toHaveClass(/on/, { timeout: 9000 });
   expect(errors).toEqual([]);
 });
 

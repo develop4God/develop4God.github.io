@@ -1,4 +1,4 @@
-/* Layout: sticky nav, three pinned canvas stories (hero, hire, ministry) each with
+/* Layout: sticky nav, three auto-playing canvas stories (hero, hire, ministry) each with
    one text panel at a time, then the content for the chosen path. Colours come
    from the tokens below; the canvas reads --ink/--lime/--gold/--violet/--dark. */
 :root {
@@ -251,17 +251,11 @@ a { color: inherit; }
   color: var(--fg);
 }
 
-/* pinned stories */
-.story {
-  position: relative;
-  height: 360vh;
-}
-#story-hero { height: 320vh; }
-#story-ministry { height: 300vh; }
+/* auto-playing stories */
+.story { position: relative; }
 
 .pin {
-  position: sticky;
-  top: var(--bar-h);
+  position: relative;
   height: calc(100svh - var(--bar-h));
   overflow: hidden;
 }
@@ -455,26 +449,37 @@ a { color: inherit; }
 .door.min .go { color: var(--accent2); }
 .door.min:hover { border-color: var(--accent2); }
 
+/* scene dots: buttons so the visitor can jump, with a larger hit area than the dot */
 .sdots {
   position: absolute;
   top: 50%;
-  right: max(16px, env(safe-area-inset-right, 0px));
+  right: max(8px, env(safe-area-inset-right, 0px));
   z-index: 5;
   display: grid;
-  gap: 10px;
+  gap: 2px;
   transform: translateY(-50%);
 }
 
-.sdots i {
-  display: block;
-  width: 6px;
-  height: 6px;
+.dot {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: 9px;
   border-radius: 50%;
   background: var(--line);
   transition: background 0.3s, transform 0.3s;
 }
 
-.sdots i.on {
+.dot.on::after {
   background: var(--accent);
   transform: scale(1.7);
 }
@@ -536,11 +541,9 @@ a { color: inherit; }
 
   .door p,
   .cue,
-  .sdots,
   .grain { display: none; }
 }
 
-.story.static { height: auto; }
 
 .story.static .pin {
   position: relative;

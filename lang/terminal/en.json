@@ -67,7 +67,8 @@
       "eyebrow": "Ten languages",
       "title": "Each one checked, every day.",
       "text": "Multi-stage pipelines where an independent critic verifies every AI-flagged finding verbatim against the source before it is trusted."
-    }
+    },
+    "dot": "Scene"
   },
   "hire": {
     "switch": "← Looking for the ministry instead?",

@@ -48,11 +48,20 @@ test('segment with fewer than two scenes never morphs', () => {
   assert.deepStrictEqual(M.segment(0.9, 0), { a: 0, lt: 0, active: 0 });
 });
 
-test('pinProgress reaches 1 at 85% of travel and survives zero travel', () => {
-  assert.strictEqual(M.pinProgress(56, 56, 1000), 0);
-  assert.strictEqual(M.pinProgress(56, 56 - 850, 1000), 1);
-  assert.strictEqual(M.pinProgress(56, 56 + 300, 1000), 0);
-  assert.strictEqual(M.pinProgress(56, -5000, 0), 1);
+test('stepToward moves at a fixed speed in units per second, never overshoots, and ignores bad dt', () => {
+  assert.strictEqual(M.stepToward(0, 1, 500, 1), 0.5);
+  assert.strictEqual(M.stepToward(0.9, 1, 500, 1), 1);
+  assert.strictEqual(M.stepToward(1, 0, 250, 1), 0.75);
+  assert.strictEqual(M.stepToward(0.3, 0.3, 500, 1), 0.3);
+  assert.strictEqual(M.stepToward(0, 1, -50, 1), 0);
+});
+
+test('nextIndex advances, loops when asked, and stops at the end otherwise', () => {
+  assert.strictEqual(M.nextIndex(0, 3, false), 1);
+  assert.strictEqual(M.nextIndex(2, 3, true), 0);
+  assert.strictEqual(M.nextIndex(2, 3, false), -1);
+  assert.strictEqual(M.nextIndex(0, 1, true), -1);
+  assert.strictEqual(M.nextIndex(0, 0, true), -1);
 });
 
 test('project: centre point is unscaled; nearer points are larger than farther ones', () => {

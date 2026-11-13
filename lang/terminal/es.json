@@ -67,7 +67,8 @@
       "eyebrow": "Diez idiomas",
       "title": "Cada uno revisado, todos los días.",
       "text": "Pipelines de varias etapas donde un crítico independiente verifica textualmente contra la fuente cada hallazgo señalado por la IA antes de confiar en él."
-    }
+    },
+    "dot": "Escena"
   },
   "hire": {
     "switch": "← ¿Buscas el ministerio?",
@@ -197,7 +198,7 @@
       "languages": "Idiomas"
     },
     "own": {
-      "title": "Mi propio ministerio",
+      "title": "Nuestro ministerio",
       "text": "Devocionales Cristianos es una app y lector de devocionales diarios, gratis, en 10 idiomas, con versiones de la Biblia, audio, favoritos y para compartir. Habitus+Faith ayuda a formar hábitos de fe.",
       "read": "Leer el devocional de hoy",
       "habitus": "Habitus+Faith"

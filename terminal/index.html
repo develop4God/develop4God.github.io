@@ -31,7 +31,7 @@
 
 <main id="main">
   <!-- Hero story: logo + verse, then the fork. Plays on its own; one scroll reveals the doors. -->
-  <div class="story" id="story-hero" data-scenes="logo,twin">
+  <div class="story" id="story-hero" data-scenes="logo,twin" data-dwell="6500,Infinity">
     <div class="pin">
       <canvas class="scene" aria-hidden="true"></canvas>
       <div class="vig"></div><div class="grain" aria-hidden="true"></div>
@@ -57,15 +57,14 @@
         </div></div>
       </div>
 
-      <div class="sdots" aria-hidden="true"><i class="on"></i><i></i></div>
-      <div class="cue" aria-hidden="true"><i></i><span data-i18n="hero.cue">Scroll</span></div>
+      <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button></div>
     </div>
   </div>
 
   <!-- Path: Hire me -->
   <section class="path" id="path-hire" hidden>
     <div class="wrap switch"><button type="button" class="link" data-switch="ministry" data-i18n="hire.switch">← Looking for the ministry instead?</button></div>
-    <div class="story" id="story-hire" data-scenes="pipeline,lattice,device">
+    <div class="story" id="story-hire" data-scenes="pipeline,lattice,device" data-dwell="7000" data-loop>
       <div class="pin">
         <canvas class="scene" aria-hidden="true"></canvas>
         <div class="vig"></div>
@@ -88,7 +87,7 @@
           <p data-i18n="story.mobile.text">Flutter with BLoC and dependency injection, including Arabic right-to-left and Hindi.</p>
           <div class="tags"><span>Flutter</span><span>BLoC</span><span>Firebase</span></div>
         </div></div></div>
-        <div class="sdots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+        <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button><button type="button" class="dot" aria-label="Scene 3"></button></div>
         <div class="cue" aria-hidden="true"><i></i><span data-i18n="hero.cue">Scroll</span></div>
       </div>
     </div>
@@ -127,7 +126,7 @@
   <!-- Path: Ministry -->
   <section class="path" id="path-ministry" hidden>
     <div class="wrap switch"><button type="button" class="link" data-switch="hire" data-i18n="min.switch">← Looking to hire me instead?</button></div>
-    <div class="story" id="story-ministry" data-scenes="globe,languages">
+    <div class="story" id="story-ministry" data-scenes="globe,languages" data-dwell="7000" data-loop>
       <div class="pin">
         <canvas class="scene" aria-hidden="true"></canvas>
         <div class="vig"></div>
@@ -141,7 +140,7 @@
           <h2 data-i18n="story.languages.title">Each one checked, every day.</h2>
           <p data-i18n="story.languages.text">Multi-stage pipelines where an independent critic verifies every AI-flagged finding verbatim against the source before it is trusted.</p>
         </div></div></div>
-        <div class="sdots" aria-hidden="true"><i class="on"></i><i></i></div>
+        <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button></div>
         <div class="cue" aria-hidden="true"><i></i><span data-i18n="hero.cue">Scroll</span></div>
       </div>
     </div>

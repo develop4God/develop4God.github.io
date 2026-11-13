@@ -35,11 +35,20 @@
     return { a: a, lt: seg - a, active: Math.round(seg) };
   }
 
-  // Scroll progress through a pinned story. `top` is the pin's sticky offset,
-  // `rectTop` the story's viewport top, `travel` the scrollable distance.
-  // The last scene is reached at 85% so it holds before the pin releases.
-  function pinProgress(top, rectTop, travel) {
-    return clamp((top - rectTop) / Math.max(travel, 1) / 0.85, 0, 1);
+  // Moves `value` toward `target` at `speed` units per second over `dtMs`
+  // milliseconds, never overshooting. Negative dt is ignored.
+  function stepToward(value, target, dtMs, speed) {
+    var step = (Math.max(0, dtMs) / 1000) * speed;
+    if (value < target) return Math.min(target, value + step);
+    return Math.max(target, value - step);
+  }
+
+  // Index of the scene after `current`: wraps when `loop`, otherwise -1 at the end
+  // (and -1 when there is nothing to advance to).
+  function nextIndex(current, count, loop) {
+    if (count < 2) return -1;
+    if (current + 1 < count) return current + 1;
+    return loop ? 0 : -1;
   }
 
   // Projects a 3D point with a precomputed rotation. Returns screen factors in
@@ -91,7 +100,8 @@
     ease: ease,
     rng: rng,
     segment: segment,
-    pinProgress: pinProgress,
+    stepToward: stepToward,
+    nextIndex: nextIndex,
     project: project,
     rotation: rotation,
     parseStat: parseStat,

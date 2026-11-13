@@ -54,10 +54,18 @@
     window.SiteFooter.renderSharedLines($('#page-footer'), { copyright: f.copyright.replace(/©\s*\d{4}/, '© ' + year), madeWith: f.madeWith });
   }
 
+  function labelDots() {
+    var word = I.get(dict, 'story.dot') || '';
+    $all('.sdots').forEach(function (group) {
+      $all('.dot', group).forEach(function (d, i) { d.setAttribute('aria-label', word + ' ' + (i + 1)); });
+    });
+  }
+
   function applyLanguage(l) {
     dict = dicts[l];
     I.apply(document, dict, l);
     $all('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
+    labelDots();
     renderCases();
     renderFooter();
     if (typed) typed.restart();
@@ -77,14 +85,28 @@
   }
 
   function ensureStory(name) {
-    if (stories[name]) return;
+    if (stories[name]) return stories[name];
     var root = $('#story-' + name), pin = $('.pin', root);
-    var ctrl = window.TerminalStory.create({ story: root, pin: pin, panels: $all('[data-panel]', root), dots: $all('.sdots i', root), reduce: reduce });
+    var dwell = (root.getAttribute('data-dwell') || '').split(',').filter(Boolean).map(Number);
+    var ctrl = window.TerminalStory.create({
+      story: root, panels: $all('[data-panel]', root), dots: $all('.sdots .dot', root), reduce: reduce, dwell: dwell, loop: root.hasAttribute('data-loop')
+    });
     window.TerminalCanvas.create({
       canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress,
       sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null
     });
-    stories[name] = true;
+    stories[name] = ctrl;
+    return ctrl;
+  }
+
+  // Any scroll, tap or navigation key skips the hero ahead to the fork right away.
+  function skipHeroOnInput(hero) {
+    var keys = { ArrowDown: 1, PageDown: 1, ' ': 1, Enter: 1 };
+    function skip(e) {
+      if (e.type === 'keydown' && !keys[e.key]) return;
+      hero.advance();
+    }
+    ['wheel', 'touchstart', 'keydown'].forEach(function (type) { window.addEventListener(type, skip, { passive: true, once: false }); });
   }
 
   function showContact() {
@@ -118,7 +140,7 @@
     try { saved = localStorage.getItem(I.STORAGE_KEY); } catch (e) { /* storage unavailable */ }
     var l = I.resolveLanguage({ param: param, saved: saved, browser: navigator.language });
     bindControls();
-    ensureStory('hero');
+    skipHeroOnInput(ensureStory('hero'));
     var ride = $('#ride');
     window.TerminalEffects.rideLine(ride);
     reveal.observe($all('.rv'));
