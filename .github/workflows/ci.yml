@@ -71,7 +71,7 @@ jobs:
         # real source directories explicitly instead of a recursive glob,
         # so generated artifacts (e.g. e2e/playwright-report/) are never
         # scanned in the first place.
-        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html"
+        run: html-validate "*.html" "devocionales/*.html" "habitus/*.html" "terminal/*.html"
 
       - name: Validate CSS
         run: stylelint "**/*.css" --allow-empty-input

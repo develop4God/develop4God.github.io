@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "title": "develop4God — Ingeniero de IA y arquitecto full-stack",
+    "description": "Ingeniero de IA y arquitecto full-stack. Contrátame para pipelines de LLM, SaaS y apps, o construyamos juntos para tu ministerio."
+  },
+  "nav": {
+    "hire": "Contrátame",
+    "ministry": "Ministerio",
+    "contact": "Contacto",
+    "language": "Idioma",
+    "theme": "Cambiar tema"
+  },
+  "hero": {
+    "eyebrow": "Ingeniero de IA · Arquitecto full-stack",
+    "verse": "Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres.",
+    "ref": "Colosenses 3:23",
+    "version": "Reina-Valera 1909, dominio público",
+    "cue": "Desliza"
+  },
+  "fork": {
+    "eyebrow": "Elige un camino",
+    "title": "Dos formas de construir juntos.",
+    "hint": "Elige una para continuar.",
+    "hire": {
+      "k": "Empresas y equipos",
+      "title": "Contrátame",
+      "desc": "Ingeniería de IA en producción y desarrollo full-stack: SaaS, sitios web, apps y herramientas a medida.",
+      "go": "Ver el trabajo →"
+    },
+    "min": {
+      "k": "Ministerios y equipos con misión",
+      "title": "Ministerio",
+      "desc": "Apps, sitios y automatización para tu misión, del desarrollador detrás de Devocionales Cristianos.",
+      "go": "Ver el ministerio →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "Pipelines de LLM",
+      "title": "Construyo pipelines de LLM y los productos a su alrededor.",
+      "typed": "$ construyendo",
+      "phrases": [
+        "pipelines de LLM auditados",
+        "SaaS multi-tenant",
+        "sitios web que cargan rápido",
+        "herramientas y automatizaciones a medida",
+        "apps Flutter en Google Play"
+      ],
+      "text": "Cada llamada a un modelo deja un rastro de auditoría. Pipelines por lotes independientes del proveedor, con ejecuciones reanudables por checkpoints y un modo de simulación que muestra el costo antes de enviar nada."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, sitios web y herramientas a medida",
+      "title": "Una plataforma, cada cliente aislado.",
+      "text": "Una plataforma multi-tenant en producción para firmas de abogados, aislada mediante un claim JWT y seguridad por filas de Postgres. El mismo enfoque full-stack construye sitios web y herramientas a medida."
+    },
+    "mobile": {
+      "eyebrow": "Apps móviles",
+      "title": "En producción en Google Play, en 10 idiomas.",
+      "text": "Flutter con BLoC e inyección de dependencias, incluyendo árabe de derecha a izquierda e hindi."
+    },
+    "world": {
+      "eyebrow": "Devocionales Cristianos",
+      "title": "Leído en países de todo el mundo.",
+      "text": "Una app y lector de devocionales diarios, gratis, hecha para Su gloria y compartida con creyentes en todas partes."
+    },
+    "languages": {
+      "eyebrow": "Diez idiomas",
+      "title": "Cada uno revisado, todos los días.",
+      "text": "Pipelines de varias etapas donde un crítico independiente verifica textualmente contra la fuente cada hallazgo señalado por la IA antes de confiar en él."
+    }
+  },
+  "hire": {
+    "switch": "← ¿Buscas el ministerio?",
+    "build": {
+      "title": "Lo que construyo",
+      "sub": "Full-stack, de la base de datos a la pantalla. Seis tipos de trabajo, cada uno entregado a usuarios reales."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS y apps web",
+        "text": "Plataformas multi-tenant construidas de punta a punta: API, interfaz, base de datos y despliegue."
+      },
+      "k2": {
+        "title": "Sitios web",
+        "text": "Rápidos, bilingües y fáciles de mantener. Catálogos, páginas de aterrizaje y sitios de ministerios, con pedidos por WhatsApp cuando ayuda."
+      },
+      "k3": {
+        "title": "Herramientas a medida",
+        "text": "Herramientas internas, automatizaciones, integraciones y apps de escritorio hechas según cómo trabaja tu equipo."
+      },
+      "k4": {
+        "title": "Pipelines de LLM",
+        "text": "Pipelines por lotes independientes del proveedor, con ejecuciones por checkpoints, auditoría y estimación de costos."
+      },
+      "k5": {
+        "title": "Sistemas de contenido",
+        "text": "Generación, traducción y validación de grandes volúmenes de contenido con revisión crítica independiente."
+      },
+      "k6": {
+        "title": "Apps móviles",
+        "text": "Apps Flutter en producción con arquitectura limpia, incluyendo idiomas de derecha a izquierda."
+      }
+    },
+    "ask": {
+      "title": "¿No lo ves aquí? Pregunta.",
+      "text": "Soy full-stack, así que casi todo lo que el software puede hacer está sobre la mesa. Cuéntame qué necesitas y te diré con franqueza si soy la persona indicada.",
+      "cta": "Cuéntame qué necesitas"
+    },
+    "cases": {
+      "title": "Trabajo seleccionado",
+      "sub": "Qué es cada proyecto y cómo está construido. Los marcadores son para completar."
+    },
+    "how": {
+      "title": "Cómo trabajo",
+      "sub": "El mismo ciclo en cada cambio, sea el cliente una firma o una iglesia."
+    },
+    "steps": {
+      "s1": {
+        "title": "Planificar",
+        "text": "Verificaciones y entregables escritos antes del código."
+      },
+      "s2": {
+        "title": "Pruebas primero",
+        "text": "Cada prueba falla por la razón correcta y luego pasa."
+      },
+      "s3": {
+        "title": "Construir",
+        "text": "El diseño más simple que funciona. SOLID, sin deuda técnica."
+      },
+      "s4": {
+        "title": "Revisión independiente",
+        "text": "Nunca reviso mi propio código como última barrera. El CI está en verde antes de integrar."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "En vivo",
+      "desc": "Plataforma multi-tenant para firmas de abogados: un cotizador con marca por cliente y PDF imprimibles, formularios KYC generados por firma, una matriz de riesgo y verificación de sanciones OFAC/ONU.",
+      "facts": [
+        "Aislamiento por tenant mediante un claim JWT y seguridad por filas de Postgres",
+        "Cada cliente tiene su propia marca, catálogo y campos de formulario",
+        "Resultado a indicar: [marcador: firmas, volumen o tiempo ahorrado]"
+      ],
+      "note": "Repositorio privado. Demostración bajo petición."
+    },
+    "play-store-mcp": {
+      "chip": "Código abierto",
+      "desc": "Un servidor MCP que permite a agentes de IA subir y promover versiones de Android en Google Play, construido alrededor de un modelo de seguridad.",
+      "facts": [
+        "Toda escritura es una simulación salvo que se confirme",
+        "Producción solo guarda un borrador: una persona lo envía a revisión",
+        "Un fork mantenido de un proyecto MIT, con el original acreditado"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Pipeline por lotes multi-proveedor que genera el corpus de devocionales, con ejecuciones reanudables por checkpoints.",
+      "facts": [
+        "El modo de simulación muestra una estimación de costo antes de cualquier llamada",
+        "Cada operación con un LLM deja un rastro de auditoría",
+        "Se reanuda desde el último checkpoint tras un fallo"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "Pipeline LangGraph para traducción, detección de errores, revisión crítica independiente, corrección automática y validación.",
+      "facts": [
+        "Cada hallazgo señalado por la IA se verifica textualmente contra la fuente",
+        "Un crítico separado revisa la salida del corrector"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Verificación automatizada de listas SDN/OFAC para profesionales de cumplimiento, como app web y de escritorio.",
+      "facts": [
+        "Un mismo código se entrega como app web y como app de escritorio"
+      ]
+    },
+    "florist": {
+      "name": "Sitio de catálogo para una floristería",
+      "chip": "Sitio de cliente",
+      "desc": "Un catálogo bilingüe con fotos, precios y un botón de pedido por WhatsApp prellenado para cada producto.",
+      "facts": [
+        "Español e inglés, con una elección de idioma que se conserva",
+        "Sin dependencias ni paso de compilación, por lo que es fácil de mantener",
+        "Nombre del cliente con permiso: [marcador]"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← ¿Buscas contratarme?",
+    "title": "Hecho para servir",
+    "verse": "Todo lo que construyo, lo construyo para Él.",
+    "stats": {
+      "downloads": "Descargas",
+      "countries": "Países",
+      "active": "Usuarios activos",
+      "rating": "Valoración",
+      "languages": "Idiomas"
+    },
+    "own": {
+      "title": "Mi propio ministerio",
+      "text": "Devocionales Cristianos es una app y lector de devocionales diarios, gratis, en 10 idiomas, con versiones de la Biblia, audio, favoritos y para compartir. Habitus+Faith ayuda a formar hábitos de fe.",
+      "read": "Leer el devocional de hoy",
+      "habitus": "Habitus+Faith"
+    },
+    "build": {
+      "title": "Lo que puedo construir para tu ministerio",
+      "i1": "Una app móvil o sitio web para tu iglesia u organización",
+      "i2": "Generación de contenido, traducción y soporte multi-idioma",
+      "i3": "Paneles, integraciones y sistemas de back-end",
+      "i4": "Automatización que ahorra tiempo a tu equipo",
+      "cta": "Cuéntame sobre tu proyecto"
+    }
+  },
+  "contact": {
+    "title": "¿Tienes un proyecto en mente?",
+    "text": "Cuéntame qué necesitas: un puesto, un producto, un sitio web, una herramienta o un proyecto ministerial.",
+    "copy": "Copiar",
+    "copied": "Copiado"
+  }
+}
