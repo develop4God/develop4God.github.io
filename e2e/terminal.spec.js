@@ -150,3 +150,47 @@ test('mobile 390x844: no horizontal overflow on hero, hire and ministry', async 
     expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), hash).toBe(false);
   }
 });
+
+test('deep link #ministry scrolls to the ministry path, and hashchange opens the other path', async ({ page }) => {
+  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(1200);
+  expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
+  const top = await page.evaluate(() => document.getElementById('path-ministry').getBoundingClientRect().top);
+  expect(Math.abs(top)).toBeLessThan(120);
+  await page.evaluate(() => { window.location.hash = '#hire'; });
+  await expect(page.locator('#path-hire')).toBeVisible();
+  await expect(page.locator('#path-ministry')).toBeHidden();
+});
+
+test('reduced motion: canvas bitmap keeps the aspect ratio of its box (no squashed shapes)', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  const ratio = await page.evaluate(() => {
+    const c = document.querySelector('#story-hero .scene'), r = c.getBoundingClientRect();
+    return { box: r.width / r.height, bitmap: c.width / c.height };
+  });
+  expect(Math.abs(ratio.box - ratio.bitmap)).toBeLessThan(0.02);
+});
+
+test('switching language keeps already revealed case rows visible', async ({ page }) => {
+  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.locator('#cases').scrollIntoViewIfNeeded();
+  await page.waitForTimeout(900);
+  const before = await page.locator('#cases .case.in').count();
+  expect(before).toBeGreaterThan(0);
+  await page.locator('button[data-lang="es"]').click();
+  await expect(page.locator('#cases .case h3').first()).not.toHaveText('');
+  expect(await page.locator('#cases .case.in').count()).toBe(before);
+});
+
+test('rapid language switches end on the last choice', async ({ page }) => {
+  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.evaluate(() => {
+    document.querySelector('button[data-lang="es"]').click();
+    document.querySelector('button[data-lang="en"]').click();
+  });
+  await page.waitForTimeout(800);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('#story-hero .verse')).toHaveText(EN_VERSE);
+  expect(await page.evaluate(() => localStorage.getItem('develop4God_language'))).toBe('en');
+});

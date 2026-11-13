@@ -95,6 +95,44 @@ test('English fallback text in terminal/index.html matches en.json (no-JS and SE
   });
 });
 
+function mockFetch(routes) {
+  global.fetch = async (url) => {
+    const body = routes[url];
+    return { ok: body !== undefined, json: async () => body };
+  };
+}
+const TERM = (l) => ({ meta: { title: l }, hero: { verse: `verse-${l}` } });
+const HOME = (l) => ({ footer: { copyright: `c-${l}`, madeWith: `m-${l}`, contact: `k-${l}` } });
+
+test('load returns the requested language with merged footer when both files load', async () => {
+  mockFetch({ '/lang/terminal/es.json': TERM('es'), '/lang/home/es.json': HOME('es') });
+  const r = await I.load('es');
+  assert.strictEqual(r.lang, 'es');
+  assert.strictEqual(r.dict.hero.verse, 'verse-es');
+  assert.strictEqual(r.dict.footer.copyright, 'c-es');
+});
+
+test('load keeps the page copy when only the shared footer file fails', async () => {
+  mockFetch({ '/lang/terminal/es.json': TERM('es') });
+  const r = await I.load('es');
+  assert.strictEqual(r.lang, 'es');
+  assert.strictEqual(r.dict.hero.verse, 'verse-es');
+  assert.strictEqual(r.dict.footer, undefined);
+});
+
+test('load falls back to English and reports English when the page copy fails', async () => {
+  mockFetch({ '/lang/terminal/en.json': TERM('en'), '/lang/home/en.json': HOME('en') });
+  const r = await I.load('es');
+  assert.strictEqual(r.lang, 'en');
+  assert.strictEqual(r.dict.hero.verse, 'verse-en');
+});
+
+test('load resolves to an empty English dictionary when everything fails', async () => {
+  mockFetch({});
+  const r = await I.load('en');
+  assert.deepStrictEqual(r, { lang: 'en', dict: {} });
+});
+
 test('resolveTheme honours saved light/dark, ignores junk, falls back to system preference', () => {
   assert.strictEqual(T.resolveTheme('light', true), 'light');
   assert.strictEqual(T.resolveTheme('dark', false), 'dark');

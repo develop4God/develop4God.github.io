@@ -7,7 +7,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LOGO_URL = '/img/logo_vector_512x512.png';
   var PATHS = { hire: 'path-hire', ministry: 'path-ministry' };
-  var dict = {}, dicts = {}, stories = {}, typed = null;
+  var dict = {}, dicts = {}, stories = {}, typed = null, langSeq = 0;
   var reveal = window.TerminalEffects.reveal();
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -23,10 +23,12 @@
 
   function renderCases() {
     var host = $('#cases');
+    // Rows already revealed stay revealed when the language changes.
+    var shown = $all('.case', host).map(function (r) { return r.classList.contains('in'); });
     host.textContent = '';
-    window.TerminalCases.forEach(function (c) {
+    window.TerminalCases.forEach(function (c, idx) {
       var t = (dict.cases && dict.cases[c.id]) || {};
-      var row = el(c.href ? 'a' : 'div', 'case rv');
+      var row = el(c.href ? 'a' : 'div', 'case rv' + (shown[idx] ? ' in' : ''));
       if (c.href) { row.href = c.href; row.target = '_blank'; row.rel = 'noopener'; }
       var left = el('div'), h = el('h3', '', t.name || c.name);
       if (t.chip) h.appendChild(el('span', 'chip', t.chip));
@@ -42,7 +44,7 @@
       row.appendChild(facts);
       host.appendChild(row);
     });
-    reveal.observe($all('.case', host));
+    reveal.observe($all('.case:not(.in)', host));
   }
 
   function renderFooter() {
@@ -61,11 +63,16 @@
     if (typed) typed.restart();
   }
 
+  // Loads and applies a language. Only the most recent call wins, and the
+  // choice is persisted only when that language was actually loaded.
   function setLanguage(l, persist) {
-    var ready = dicts[l] ? Promise.resolve() : I.load(l).then(function (d) { dicts[l] = d; });
-    return ready.then(function () {
-      if (persist) { try { localStorage.setItem(I.STORAGE_KEY, l); } catch (e) { /* storage unavailable */ } }
-      applyLanguage(l);
+    var seq = ++langSeq;
+    var ready = dicts[l] ? Promise.resolve({ lang: l, dict: dicts[l] }) : I.load(l);
+    return ready.then(function (res) {
+      if (seq !== langSeq) return;
+      dicts[res.lang] = res.dict;
+      if (persist && res.lang === l) { try { localStorage.setItem(I.STORAGE_KEY, l); } catch (e) { /* storage unavailable */ } }
+      applyLanguage(res.lang);
     });
   }
 
@@ -119,11 +126,19 @@
     setLanguage(l, false).then(function () {
       typed = window.TerminalEffects.typedLine($('[data-typed-text]'), function () { return I.get(dict, 'story.pipeline.phrases'); }, reduce);
       typed.restart();
-      var hash = window.location.hash.slice(1);
-      if (PATHS[hash]) choosePath(hash, true);
-      else if (hash === 'contact') scrollTo(showContact());
+      openHash();
     });
-    if (window.AppStats) window.AppStats.fetchStats().then(window.AppStats.applyStats).catch(function () { /* AppStats already logs */ });
+    window.addEventListener('hashchange', openHash);
+    // The pinned stories and canvases are built once for the current motion
+    // preference, so a change at runtime needs a fresh load.
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', function () { window.location.reload(); });
+  }
+
+  // Opens the path or section named by the URL hash, scrolling to it.
+  function openHash() {
+    var hash = window.location.hash.slice(1);
+    if (PATHS[hash]) choosePath(hash);
+    else if (hash === 'contact') scrollTo(showContact());
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

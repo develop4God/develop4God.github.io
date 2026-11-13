@@ -45,18 +45,21 @@
     });
   }
 
-  // Loads page copy plus the shared footer strings; falls back to English once.
+  // Loads page copy (required) and the shared footer strings (optional) and
+  // resolves { lang, dict } where lang is the language actually loaded: if the
+  // page copy fails, English is loaded once and reported as such.
   function load(lang) {
-    return Promise.all([fetchJson('/lang/terminal/' + lang + '.json'), fetchJson('/lang/home/' + lang + '.json')])
-      .then(function (parts) {
-        var dict = parts[0];
-        dict.footer = parts[1].footer;
-        return dict;
+    return fetchJson('/lang/terminal/' + lang + '.json')
+      .then(function (dict) {
+        return fetchJson('/lang/home/' + lang + '.json')
+          .then(function (home) { dict.footer = home.footer; })
+          .catch(function (error) { console.error('TerminalI18n: footer strings unavailable for ' + lang, error); })
+          .then(function () { return { lang: lang, dict: dict }; });
       })
       .catch(function (error) {
         console.error('TerminalI18n: failed to load ' + lang, error);
         if (lang !== DEFAULT_LANGUAGE) return load(DEFAULT_LANGUAGE);
-        return {};
+        return { lang: DEFAULT_LANGUAGE, dict: {} };
       });
   }
 

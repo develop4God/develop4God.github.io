@@ -76,6 +76,7 @@
           redraw();
         } catch (e) { console.error('TerminalCanvas: logo sampling failed', e); }
       };
+      img.onerror = function () { console.error('TerminalCanvas: logo image failed to load', opts.logoUrl); };
       img.src = opts.logoUrl;
     }
 
@@ -86,7 +87,7 @@
     }
 
     function size() {
-      var r = pin.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+      var r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
       if (!r.width || !r.height) return;
       W = r.width;
       H = r.height;
@@ -99,7 +100,7 @@
 
     function frame(t) {
       if (!W || !scenes.length) return;
-      var dt = last ? Math.min(50, t - last) : 16;
+      var dt = last ? M.clamp(t - last, 0, 50) : 16;
       last = t;
       var p = reduce ? 0 : opts.getProgress(), sg = M.segment(p, scenes.length), a = sg.a, lt = sg.lt;
       var A = scenes[a], B = scenes[Math.min(a + 1, scenes.length - 1)], morphing = scenes.length > 1 && lt > 0.02 && lt < 0.98;
@@ -164,7 +165,7 @@
       cancelAnimationFrame(raf);
       if (running && !reduce) raf = requestAnimationFrame(loop);
     }).observe(opts.story);
-    new ResizeObserver(function () { size(); redraw(); }).observe(pin);
+    new ResizeObserver(function () { size(); redraw(); }).observe(cv);
     pin.addEventListener('pointermove', function (e) {
       var r = pin.getBoundingClientRect();
       mx = (e.clientX - r.left) / r.width;
