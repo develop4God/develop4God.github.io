@@ -1000,10 +1000,38 @@ a.case:hover {
   border-radius: 14px;
 }
 
-.btn.store {
+/* The Google Play logo has a white background, so it sits on a white tile in both themes. */
+.store {
+  position: relative;
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--minline);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.store img {
+  display: block;
+  width: auto;
+  height: 52px;
+}
+
+/* The visually hidden label becomes a tooltip while the logo is hovered or focused. */
+.store:hover .sr,
+.store:focus-visible .sr {
+  bottom: calc(100% + 8px);
+  left: 50%;
+  width: auto;
+  height: auto;
+  padding: 6px 10px;
+  overflow: visible;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #fff;
+  clip: auto;
+  font: 500 12px var(--mono);
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 
 .minbuild { margin-top: 24px; }

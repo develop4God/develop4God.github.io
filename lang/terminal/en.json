@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "develop4God — We develop for God",
-    "description": "A ministry that builds software as unto the Lord: Devocionales Cristianos and systems for ministries."
+    "description": "A ministry that builds software as unto the Lord: Christian Devotionals and systems for ministries."
   },
   "nav": {
     "hire": "Developments",
@@ -60,7 +60,7 @@
       "text": "Flutter with BLoC and dependency injection, including Arabic right-to-left and Hindi."
     },
     "world": {
-      "eyebrow": "Devocionales Cristianos",
+      "eyebrow": "Christian Devotionals",
       "title": "Read in countries around the world.",
       "text": "A free daily devotional app and reader, built for His glory and shared with believers everywhere."
     },
@@ -202,7 +202,7 @@
     },
     "apps": {
       "dev": {
-        "title": "Devocionales Cristianos",
+        "title": "Christian Devotionals",
         "text": "Your daily devotional, free and in 10 languages: verse, reflection and prayer, with audio, favorites and sharing.",
         "store": "Get it on Google Play",
         "go": "Read today's devotional"
