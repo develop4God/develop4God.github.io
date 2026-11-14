@@ -386,3 +386,12 @@ test('language counts keep a number-free text when app-stats.json cannot load', 
   await page.goto('/terminal/?lang=en#ministry', { waitUntil: 'networkidle' });
   await expect(page.locator('[data-i18n="story.languages.title"]')).toHaveText('Multiple languages, with systems that review them.');
 });
+
+test('the saas-tools case opens our live platform in a new tab and says it is our platform', async ({ page }) => {
+  await page.goto('/terminal/?lang=en#hire', { waitUntil: 'networkidle' });
+  const row = page.locator('#cases a.case', { hasText: 'saas-tools' });
+  await expect(row).toHaveAttribute('href', 'https://saas-tools-web.onrender.com/');
+  await expect(row).toHaveAttribute('target', '_blank');
+  await expect(row).toHaveAttribute('rel', /noopener/);
+  await expect(row.locator('.note')).toContainText('Our platform');
+});

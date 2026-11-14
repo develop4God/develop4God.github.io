@@ -143,10 +143,9 @@
       "desc": "Plataforma multi-tenant para firmas de abogados: un cotizador con marca por cliente y PDF imprimibles, formularios KYC generados por firma, una matriz de riesgo y verificación de sanciones OFAC/ONU.",
       "facts": [
         "Aislamiento por tenant mediante un claim JWT y seguridad por filas de Postgres",
-        "Cada cliente tiene su propia marca, catálogo y campos de formulario",
-        "Resultado a indicar: [marcador: firmas, volumen o tiempo ahorrado]"
+        "Cada cliente tiene su propia marca, catálogo y campos de formulario"
       ],
-      "note": "Repositorio privado. Demostración bajo petición."
+      "note": "Nuestra plataforma. Repositorio privado, demostración bajo petición."
     },
     "play-store-mcp": {
       "chip": "Código abierto",
@@ -184,8 +183,7 @@
       "desc": "Un catálogo bilingüe con fotos, precios y un botón de pedido por WhatsApp prellenado para cada producto.",
       "facts": [
         "Español e inglés, con una elección de idioma que se conserva",
-        "Sin dependencias ni paso de compilación, por lo que es fácil de mantener",
-        "Nombre del cliente con permiso: [marcador]"
+        "Sin dependencias ni paso de compilación, por lo que es fácil de mantener"
       ]
     }
   },

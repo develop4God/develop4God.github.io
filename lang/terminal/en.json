@@ -143,10 +143,9 @@
       "desc": "Multi-tenant platform for law firms: a quoter with per-client branding and printable PDFs, KYC forms generated per firm, a risk matrix and OFAC/UN sanctions screening.",
       "facts": [
         "Tenant isolation through a JWT claim and Postgres row-level security",
-        "Each client gets their own branding, catalog and form fields",
-        "Result to state: [placeholder: firms, volume or time saved]"
+        "Each client gets their own branding, catalog and form fields"
       ],
-      "note": "Private repo. Walkthrough on request."
+      "note": "Our platform. Private repo, walkthrough on request."
     },
     "play-store-mcp": {
       "chip": "Open source",
@@ -184,8 +183,7 @@
       "desc": "A bilingual catalogue with photos, prices and a prefilled WhatsApp order button for each product.",
       "facts": [
         "Spanish and English, with a language choice that persists",
-        "No dependencies and no build step, so it stays easy to maintain",
-        "Client name shown with permission: [placeholder]"
+        "No dependencies and no build step, so it stays easy to maintain"
       ]
     }
   },
