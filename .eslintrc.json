@@ -35,6 +35,7 @@
     "TerminalCanvas": "readonly",
     "TerminalLogoImage": "readonly",
     "TerminalTwinLife": "readonly",
+    "TerminalArcs": "readonly",
     "TerminalStory": "readonly",
     "TerminalEffects": "readonly"
   },

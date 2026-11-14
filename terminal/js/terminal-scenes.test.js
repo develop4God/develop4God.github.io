@@ -11,6 +11,7 @@ function load(file) {
 }
 load('terminal-math.js');
 load('terminal-world-mask.js');
+load('terminal-arcs.js');
 load('terminal-scenes.js');
 const S = global.window.TerminalScenes;
 
@@ -126,4 +127,34 @@ test('fork spheres are mostly the shared violet, each with its own accent (lime 
 test('fork sphere colours are stable over time (no flicker)', () => {
   const sc = S.make('twin'), a = { c: 0, a: 0 }, b = { c: 0, a: 0 };
   for (let i = 0; i < S.N; i += 7) { S.paint(sc, i, 0, a); S.paint(sc, i, 5000, b); assert.strictEqual(a.c, b.c); }
+});
+
+test('globe: land dots are group 0 and every connection arc owns a group of lifted dots', () => {
+  const sc = S.make('globe'), A = global.window.TerminalArcs, groups = new Set(sc.grp);
+  assert.strictEqual(sc.pts.length, S.N);
+  assert.ok(sc.grp.some((g) => g === 0), 'has land');
+  for (let a = 1; a <= A.LINKS.length; a++) assert.ok(groups.has(a), 'arc group ' + a);
+  assert.ok(![...groups].some((g) => g > A.LINKS.length), 'no stray group');
+  sc.pts.forEach((p, i) => {
+    const r = Math.hypot(p[0], p[1], p[2]);
+    if (sc.grp[i] === 0) assert.ok(Math.abs(r - 1.25) < 1e-6, 'land on the globe');
+    else assert.ok(r >= 1.25 - 1e-6 && r <= 1.25 * 1.31, 'arc at or above the globe');
+  });
+});
+
+test('globe paint: arc dots flash gold under a pulse and stay a dim lime otherwise; land is unchanged', () => {
+  const sc = S.make('globe'), out = {};
+  let gold = 0, dim = 0;
+  for (let t = 0; t < 4000; t += 200) {
+    sc.grp.forEach((g, i) => {
+      if (!g) return;
+      S.paint(sc, i, t, out);
+      assert.ok(out.a >= 0 && out.a <= 1);
+      if (out.c === 2) gold++; else { dim++; assert.strictEqual(out.c, 1); }
+    });
+  }
+  assert.ok(gold > 0 && dim > 0);
+  const land = sc.grp.findIndex((g) => g === 0);
+  S.paint(sc, land, 0, out);
+  assert.ok(out.c === 2 || out.c === 3);
 });

@@ -136,7 +136,7 @@
 
     function colors() {
       var s = getComputedStyle(document.documentElement), v = function (n, f) { return s.getPropertyValue(n).trim() || f; };
-      pal = [v('--ink', '#fff'), v('--lime', '#b4d447'), v('--gold', '#dea946'), v('--violet', '#8f7fd0')];
+      pal = [v('--ink', '#fff'), v('--dot-lime', v('--lime', '#b4d447')), v('--dot-gold', v('--gold', '#dea946')), v('--violet', '#8f7fd0')];
       dark = v('--dark', '1') === '1';
       if (logoImg) rebuildLogo();
     }
@@ -221,7 +221,7 @@
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
-        bk.r[bk.n] = 0.6 + 1.4 * pr.f + (dark ? 0 : 0.35) + 0.8 * gl;
+        bk.r[bk.n] = 0.6 + 1.4 * pr.f + (dark ? 0 : 0.6) + 0.8 * gl;
         bk.n++;
       }
       cx.clearRect(0, 0, W, H);

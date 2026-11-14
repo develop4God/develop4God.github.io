@@ -1,6 +1,6 @@
 /* Layout: sticky nav, three auto-playing canvas stories (hero, hire, ministry) each with
    one text panel at a time, then the content for the chosen path. Colours come
-   from the tokens below; the canvas reads --ink/--lime/--gold/--violet/--dark. */
+   from the tokens below; the canvas reads --ink/--lime/--gold/--violet/--dark (and --dot-lime/--dot-gold when set). */
 :root {
   --bg: #0a0b0a;
   --fg: #eef0ea;
@@ -45,6 +45,10 @@
   --lime: #4f6f00;
   --gold: #8a5a00;
   --violet: #5a389c;
+
+  /* Brighter than the text tokens above: dots are not read as text, and the dark ones look flat on pale. */
+  --dot-lime: #6a9a00;
+  --dot-gold: #c98200;
   --dark: 0;
   --accent: #5d7a0c;
   --on-accent: #fff;
