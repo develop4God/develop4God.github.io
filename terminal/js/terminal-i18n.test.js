@@ -91,7 +91,10 @@ test('English fallback text in terminal/index.html matches en.json (no-JS and SE
   found.forEach((m) => {
     const key = m[2];
     if (key.startsWith('footer.')) return; // supplied by lang/home at runtime
-    assert.strictEqual(decode(m[3]), I.get(en, key), `fallback for ${key}`);
+    // A {token} in en.json is filled from app-stats.json at runtime, so the fallback may say anything there.
+    const expected = I.get(en, key);
+    const pattern = new RegExp('^' + expected.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\w+\}/g, '.+') + '$');
+    assert.match(decode(m[3]), pattern, `fallback for ${key}`);
   });
 });
 
@@ -145,4 +148,38 @@ test('nextTheme flips between light and dark', () => {
   assert.strictEqual(T.nextTheme('dark'), 'light');
   assert.strictEqual(T.nextTheme('light'), 'dark');
   assert.strictEqual(T.nextTheme('weird'), 'light');
+});
+
+test('interpolate fills known {tokens} and leaves unknown ones visible', () => {
+  assert.strictEqual(I.interpolate('in {languages} languages', { languages: '10' }), 'in 10 languages');
+  assert.strictEqual(I.interpolate('{a} and {b}', { a: 'x', b: 'y' }), 'x and y');
+  assert.strictEqual(I.interpolate('{languages} idiomas', {}), '{languages} idiomas');
+  assert.strictEqual(I.interpolate('no tokens', { languages: '10' }), 'no tokens');
+  assert.strictEqual(I.interpolate('{languages}', { languages: '$&' }), '$&');
+  assert.strictEqual(I.interpolate('{toString}', {}), '{toString}');
+  assert.strictEqual(I.interpolate('{languages}'), '{languages}');
+  assert.strictEqual(I.interpolate(undefined, { languages: '10' }), undefined);
+});
+
+function fakeRoot(entries) {
+  const els = entries.map(([key, text]) => ({ text, getAttribute: () => key, set textContent(v) { this.text = v; }, get textContent() { return this.text; } }));
+  return { els, querySelectorAll: (sel) => (sel === '[data-i18n]' ? els : []) };
+}
+
+test('apply fills {tokens} from stats and keeps the current text when a stat is missing', () => {
+  global.document = { title: '', documentElement: { setAttribute() {} } };
+  const dict = { a: { t: '{languages} languages' }, b: { t: 'ok' } };
+  const withStats = fakeRoot([['a.t', 'several languages'], ['b.t', 'x']]);
+  I.apply(withStats, dict, 'en', { languages: '10' });
+  assert.deepStrictEqual(withStats.els.map((e) => e.text), ['10 languages', 'ok']);
+  const withoutStats = fakeRoot([['a.t', 'several languages']]);
+  I.apply(withoutStats, dict, 'en', {});
+  assert.strictEqual(withoutStats.els[0].text, 'several languages');
+});
+
+test('no language count is written by hand in the terminal strings (it comes from app-stats.json)', () => {
+  ['en', 'es'].forEach((lang) => {
+    const raw = fs.readFileSync(path.join(LANG_DIR, `${lang}.json`), 'utf8');
+    assert.doesNotMatch(raw, /\b(10|ten|diez)\s+(languages|idiomas)/i, `${lang}: hardcoded language count`);
+  });
 });

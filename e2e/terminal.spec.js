@@ -370,3 +370,19 @@ test('fork spheres: the sphere of the hovered door grows (hire = green, ministry
   expect(min.gold / base.gold).toBeGreaterThan(1.01);
   expect(min.green / base.green).toBeLessThan(1.01);
 });
+
+test('language counts in the text come from app-stats.json, so a changed stat changes the text', async ({ page }) => {
+  const stats = { downloads: '22K+', rating: '4.9', ratingDisplay: '4.9 ★', countries: '100+', activeUsers: '7,800+', languages: '12' };
+  await page.route('**/data/app-stats.json', (route) => route.fulfill({ json: stats }));
+  await page.goto('/terminal/?lang=en#ministry', { waitUntil: 'networkidle' });
+  await expect(page.locator('[data-i18n="min.apps.dev.text"]')).toContainText('in 12 languages');
+  await expect(page.locator('[data-i18n="story.languages.title"]')).toHaveText('12 languages, with systems that review them.');
+  await page.goto('/terminal/?lang=es#ministry', { waitUntil: 'networkidle' });
+  await expect(page.locator('[data-i18n="min.apps.dev.text"]')).toContainText('en 12 idiomas');
+});
+
+test('language counts keep a number-free text when app-stats.json cannot load', async ({ page }) => {
+  await page.route('**/data/app-stats.json', (route) => route.abort());
+  await page.goto('/terminal/?lang=en#ministry', { waitUntil: 'networkidle' });
+  await expect(page.locator('[data-i18n="story.languages.title"]')).toHaveText('Multiple languages, with systems that review them.');
+});

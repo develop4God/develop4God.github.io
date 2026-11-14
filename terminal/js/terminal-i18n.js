@@ -63,12 +63,27 @@
       });
   }
 
+  var TOKEN = /\{(\w+)\}/g;
+
+  // Fills {name} placeholders from a values object (the app stats). A placeholder
+  // without a value stays visible so callers can tell the string is unresolved.
+  function interpolate(value, tokens) {
+    if (typeof value !== 'string') return value;
+    return value.replace(TOKEN, function (whole, name) {
+      return tokens && Object.prototype.hasOwnProperty.call(tokens, name) ? String(tokens[name]) : whole;
+    });
+  }
+
+  function isResolved(value) { return !/\{\w+\}/.test(value); }
+
   // Applies a dictionary to the DOM: data-i18n (text), data-i18n-aria (aria-label),
   // data-i18n-content (content attribute, for meta tags), plus <html lang> and title.
-  function apply(root, dict, lang) {
+  // {name} placeholders are filled from `tokens`; a string that cannot be fully
+  // resolved is skipped, so the page keeps its safe fallback text.
+  function apply(root, dict, lang, tokens) {
     root.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var value = get(dict, el.getAttribute('data-i18n'));
-      if (typeof value === 'string') el.textContent = value;
+      var value = interpolate(get(dict, el.getAttribute('data-i18n')), tokens);
+      if (typeof value === 'string' && isResolved(value)) el.textContent = value;
     });
     root.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
       var value = get(dict, el.getAttribute('data-i18n-aria'));
@@ -88,6 +103,7 @@
     STORAGE_KEY: STORAGE_KEY,
     resolveLanguage: resolveLanguage,
     get: get,
+    interpolate: interpolate,
     load: load,
     apply: apply
   };

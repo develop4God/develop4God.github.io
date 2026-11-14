@@ -7,7 +7,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LOGO_URL = '/img/logo_vector_512x512.png';
   var PATHS = { hire: 'path-hire', ministry: 'path-ministry' };
-  var dict = {}, dicts = {}, stories = {}, typed = null, langSeq = 0;
+  var dict = {}, dicts = {}, stories = {}, typed = null, langSeq = 0, tokens = {}, currentLang = null;
   var reveal = window.TerminalEffects.reveal();
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -68,7 +68,8 @@
 
   function applyLanguage(l) {
     dict = dicts[l];
-    I.apply(document, dict, l);
+    currentLang = l;
+    I.apply(document, dict, l, tokens);
     $all('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
     labelDots();
     renderCases();
@@ -87,6 +88,17 @@
       if (persist && res.lang === l) { try { localStorage.setItem(I.STORAGE_KEY, l); } catch (e) { /* storage unavailable */ } }
       applyLanguage(res.lang);
     });
+  }
+
+  // Strings like "{languages} idiomas" take their numbers from app-stats.json, so the
+  // text never needs editing when a stat changes. If the stats cannot load, the
+  // page keeps the number-free fallback text.
+  function loadTokens() {
+    if (!window.AppStats) return;
+    window.AppStats.fetchStats().then(function (stats) {
+      tokens = stats;
+      if (currentLang) I.apply(document, dict, currentLang, tokens);
+    }).catch(function () { /* the fallback text stays */ });
   }
 
   // Height in px above the fork text, so the canvas can fit the spheres into it.
@@ -184,6 +196,7 @@
     try { saved = localStorage.getItem(I.STORAGE_KEY); } catch (e) { /* storage unavailable */ }
     var l = I.resolveLanguage({ param: param, saved: saved, browser: navigator.language });
     bindControls();
+    loadTokens();
     skipHeroOnInput(ensureStory('hero'));
     var ride = $('#ride');
     window.TerminalEffects.rideLine(ride);

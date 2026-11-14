@@ -56,7 +56,7 @@
     },
     "mobile": {
       "eyebrow": "Mobile apps",
-      "title": "In production on Google Play, in 10 languages.",
+      "title": "In production on Google Play, in {languages} languages.",
       "text": "Flutter with BLoC and dependency injection, including Arabic right-to-left and Hindi."
     },
     "world": {
@@ -65,9 +65,9 @@
       "text": "A free daily devotional app and reader, built for His glory and shared with believers everywhere."
     },
     "languages": {
-      "eyebrow": "Ten languages",
-      "title": "Each one checked, every day.",
-      "text": "Multi-stage pipelines where an independent critic verifies every AI-flagged finding verbatim against the source before it is trusted."
+      "eyebrow": "Multiple languages",
+      "title": "{languages} languages, with systems that review them.",
+      "text": "To ensure content quality in every language, we build AI-integrated validation tools for review and translation."
     },
     "dot": "Scene",
     "pause": "Pause animation",
@@ -203,7 +203,7 @@
     "apps": {
       "dev": {
         "title": "Christian Devotionals",
-        "text": "Your daily devotional, free and in 10 languages: verse, reflection and prayer, with audio, favorites and sharing.",
+        "text": "Your daily devotional, free and in {languages} languages: verse, reflection and prayer, with audio, favorites and sharing.",
         "store": "Get it on Google Play",
         "go": "Read today's devotional"
       },
@@ -215,12 +215,12 @@
       }
     },
     "build": {
-      "title": "What I can build for your ministry",
+      "title": "What we can build for your ministry",
       "i1": "A mobile app or website for your church or organization",
       "i2": "Content generation, translation and multi-language support",
       "i3": "Dashboards, integrations and back-end systems",
       "i4": "Automation that saves your team time",
-      "cta": "Tell me about your project"
+      "cta": "Tell us about your project"
     },
     "how": {
       "title": "How we build our ministry",
