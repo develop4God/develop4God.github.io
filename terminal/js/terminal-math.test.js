@@ -102,3 +102,13 @@ test('formatStat round-trips the final value and keeps the shape mid-animation',
   assert.strictEqual(M.formatStat(3950, M.parseStat('7,900+')), '3,950+');
   assert.strictEqual(M.formatStat(0, M.parseStat('22K+')), '0K+');
 });
+
+test('wrapPi folds any angle into [-PI, PI] and keeps whole turns equal', () => {
+  assert.strictEqual(M.wrapPi(0), 0);
+  [0.3, -0.3, 3, -3].forEach((a) => assert.ok(Math.abs(M.wrapPi(a) - a) < 1e-12));
+  [7, -7, 100, 1e6, -1e6].forEach((a) => {
+    const w = M.wrapPi(a);
+    assert.ok(Math.abs(w) <= Math.PI + 1e-9);
+    assert.ok(Math.abs(Math.sin(w) - Math.sin(a)) < 1e-6 && Math.abs(Math.cos(w) - Math.cos(a)) < 1e-6);
+  });
+});

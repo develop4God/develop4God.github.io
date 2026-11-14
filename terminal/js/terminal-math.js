@@ -74,6 +74,11 @@
     return out;
   }
 
+  // Folds any angle into [-PI, PI]; whole turns do not change the direction it points.
+  function wrapPi(a) {
+    return a - TAU * Math.round(a / TAU);
+  }
+
   function rotation(yaw, pitch) {
     return { cy: Math.cos(yaw), sy: Math.sin(yaw), cp: Math.cos(pitch), sp: Math.sin(pitch) };
   }
@@ -103,6 +108,7 @@
 
   window.TerminalMath = {
     TAU: TAU,
+    wrapPi: wrapPi,
     clamp: clamp,
     ease: ease,
     rng: rng,

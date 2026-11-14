@@ -112,6 +112,18 @@ test('the twin scene sits its two spheres at +/- TWIN_CENTER_X, which the canvas
   assert.ok(Math.abs(mean(1) - S.TWIN_CENTER_X) < 0.01);
 });
 
+test('twinCenter gives the left centre for sphere 0 and the right one for sphere 1', () => {
+  assert.strictEqual(S.twinCenter(0), -S.TWIN_CENTER_X);
+  assert.strictEqual(S.twinCenter(1), S.TWIN_CENTER_X);
+});
+
+test('the two fork spheres keep a clear gap: at least 40% of a sphere width apart, and never overlapping', () => {
+  const sc = S.make('twin'), reach = [0, 0];
+  sc.pts.forEach((p, i) => { const g = sc.grp[i]; reach[g] = Math.max(reach[g], Math.abs(p[0] - (g ? 1 : -1) * S.TWIN_CENTER_X)); });
+  const gap = 2 * S.TWIN_CENTER_X - reach[0] - reach[1];
+  assert.ok(gap >= 0.4 * 2 * Math.max(reach[0], reach[1]), `gap ${gap.toFixed(2)}`);
+});
+
 test('fork spheres are mostly the shared violet, each with its own accent (lime = hire, gold = ministry)', () => {
   const sc = S.make('twin'), out = { c: 0, a: 0 }, seen = [{}, {}];
   for (let i = 0; i < S.N; i++) { S.paint(sc, i, 0, out); seen[sc.grp[i]][out.c] = (seen[sc.grp[i]][out.c] || 0) + 1; }

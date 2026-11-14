@@ -9,15 +9,12 @@
   var S = window.TerminalScenes;
   var LI = window.TerminalLogoImage;
   var TL = window.TerminalTwinLife;
+  var SP = window.TerminalSpin;
   var LEVELS = 8;
   var LOGO_TEXT_SHARE = 0.38;
   var LOGO_TEXT_TOP = 0.64;
   // The real logo is rebuilt from one dot per DENSE_STEP source pixels, in its own colours.
   var DENSE_STEP = 2;
-
-  function wrapPi(a) {
-    return a - M.TAU * Math.round(a / M.TAU);
-  }
 
   // Samples the logo image into classified world-space pixels, split into the
   // shield and the wordmark below it.
@@ -62,10 +59,10 @@
     var cv = opts.canvas, cx = cv.getContext('2d'), pin = opts.pin, reduce = opts.reduce;
     var N = S.N, scenes = [], stagger = [];
     var W = 0, H = 0, wide = true, dark = true, pal = ['#fff', '#b4d447', '#dea946', '#8f7fd0'];
-    var yaw = 0, pitch = 0, lw = 0, driftAng = 0, globeAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
+    var yaw = 0, pitch = 0, lw = 0, driftAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     var t0 = performance.now(), running = false, raf = 0;
     var buckets = [], out = { c: 0, a: 0 }, pr = {}, pr2 = {}, free = 0, freeAt = -1e9;
-    var logoImg = null, logoBmp = null, logoDots = [], dotBuckets = [], logoTint = '', hintTarget = -1, hints = [0, 0], moBuf = [{}, {}], logoPending = false, twinPt = { x: 0, y: 0, z: 0 };
+    var logoImg = null, logoBmp = null, logoDots = [], dotBuckets = [], logoTint = '', hintTarget = -1, hints = [0, 0], moBuf = [{}, {}], spinBuf = [{}, {}], logoPending = false, twinPt = { x: 0, y: 0, z: 0 };
 
     var r2 = M.rng(99);
     for (var i = 0; i < N; i++) stagger.push(r2());
@@ -168,13 +165,13 @@
         // The camera only moves once the points have settled into a scene.
         var cur = lt < 0.5 ? A : B, k = Math.min(1, dt * 0.004), ty, tp;
         // The logo and the fork spheres face the front so they read clearly.
-        if (cur.id === 'logo' || cur.id === 'twin') { ty = 0; tp = cur.id === 'logo' ? 0 : 0.12; lw += (1 - lw) * k; }
+        if (cur.id === 'logo' || cur.id === 'twin') { ty = 0; tp = cur.id === 'logo' ? 0 : SP.TILT; lw += (1 - lw) * k; }
         else {
           lw += (0 - lw) * k;
-          if (cur.id === 'globe') { globeAng += dt * 0.0003; ty = -1.4 + globeAng; tp = 0.12; }
+          if (cur.id === 'globe') { ty = -1.4 + SP.angle(t, 0); tp = SP.TILT; }
           else { driftAng += dt * 0.00018; ty = driftAng; tp = 0.35; }
         }
-        yaw += wrapPi(ty - yaw) * k;
+        yaw += M.wrapPi(ty - yaw) * k;
         pitch += (tp - pitch) * k;
       }
       var rot = M.rotation(yaw + (smx - 0.5) * 0.4 * (1 - lw * 0.6), pitch + (smy - 0.5) * 0.2);
@@ -191,6 +188,14 @@
       var twinSc = A.id === 'twin' ? A : B.id === 'twin' ? B : null, tw = twinSc && !reduce ? TL.twinSettle(lt, A.id === 'twin', B.id === 'twin') : 0, mo = null, g, m, gl, dw;
       // A hint only counts while the spheres are settled on screen (the doors are hidden otherwise).
       for (g = 0; g < 2; g++) hints[g] = TL.stepHint(hints[g], tw > 0 && hintTarget === g ? 1 : 0, dt);
+      // The spheres turn whenever they are on screen (settled or not), so a dot flying in lands on a moving target.
+      if (twinSc) {
+        for (g = 0; g < 2; g++) {
+          TL.twinSpin(t, g, spinBuf[g]);
+          // With reduced motion the spheres stay at rest, not at the spin's starting angle.
+          if (reduce) { spinBuf[g].cos = 1; spinBuf[g].sin = 0; }
+        }
+      }
       if (tw > 0) {
         for (g = 0; g < 2; g++) TL.twinMotion(t, g, tw, Math.max(hints[g], TL.idleHint(t, g)), moBuf[g]);
         mo = moBuf;
@@ -198,15 +203,21 @@
 
       for (j = 0; j < buckets.length; j++) buckets[j].n = 0;
       for (i = 0; i < N && pm >= 0.03; i++) {
-        var k2 = M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
-        var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2;
+        var k2 = M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], pz = pa[2], qx = pb[0], qz = pb[2];
+        if (twinSc) {
+          // The end of the flight that lies in a fork sphere is that sphere's dot, turned with it.
+          g = twinSc.grp[i];
+          if (A === twinSc) { TL.spinPoint(px, pa[1], pz, S.twinCenter(g), spinBuf[g], twinPt); px = twinPt.x; pz = twinPt.z; }
+          if (B === twinSc) { TL.spinPoint(qx, pb[1], qz, S.twinCenter(g), spinBuf[g], twinPt); qx = twinPt.x; qz = twinPt.z; }
+        }
+        var py = pa[1], x = px + (qx - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (qz - pz) * k2;
         gl = 0;
         if (mo) {
           // A dot takes on the sphere's motion only as it lands in (or while it has not yet left) the sphere.
           g = twinSc.grp[i];
           m = mo[g];
           dw = twinSc === B ? k2 : 1 - k2;
-          TL.twinPoint(x, y, z, g ? S.TWIN_CENTER_X : -S.TWIN_CENTER_X, m, dw, twinPt);
+          TL.twinPoint(x, y, z, S.twinCenter(g), m, dw, twinPt);
           x = twinPt.x;
           y = twinPt.y;
           z = twinPt.z;

@@ -11,8 +11,8 @@
   var TAU = M.TAU;
   // Palette indices; the canvas maps them to theme colours.
   var INK = 0, LIME = 1, GOLD = 2, VIOLET = 3;
-  // Distance of each fork sphere's centre from the middle (the canvas pivots the sway on it).
-  var TWIN_CENTER_X = 0.9;
+  // Distance of each fork sphere's centre from the middle (the canvas pivots the spin on it).
+  var TWIN_CENTER_X = 1.3;
   var GLOBE_RADIUS = 1.25;
   // Dots per connection arc, and how far the middle of an arc floats above the land (fraction of the radius).
   var ARC_DOTS = 40;
@@ -191,8 +191,13 @@
     return sc;
   }
 
+  // Centre x of fork sphere g (0 = hire, on the left; 1 = ministry, on the right).
+  function twinCenter(g) {
+    return g ? TWIN_CENTER_X : -TWIN_CENTER_X;
+  }
+
   window.TerminalScenes = {
-    N: N, TWIN_CENTER_X: TWIN_CENTER_X, 0.8: 0.8, GLOBE_RADIUS: GLOBE_RADIUS, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
+    N: N, TWIN_CENTER_X: TWIN_CENTER_X, twinCenter: twinCenter, 0.8: 0.8, GLOBE_RADIUS: GLOBE_RADIUS, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
     make: make, paint: paint,
     classifyLogoPixel: classifyLogoPixel, logoScene: logoScene
   };

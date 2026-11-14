@@ -10,6 +10,7 @@ function load(file) {
   vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
 load('terminal-math.js');
+load('terminal-spin.js');
 load('terminal-twin-life.js');
 const T = global.window.TerminalTwinLife;
 
@@ -25,35 +26,80 @@ test('twinSettle: full only while the twin scene is settled, never mid-morph or 
 test('twinMotion: no movement at all when the scene is not settled', () => {
   [0, 1].forEach((g) => {
     const m = T.twinMotion(12345, g, 0, 1);
-    assert.deepStrictEqual([m.angle, m.bob, m.scale, m.glow], [0, 0, 1, 0]);
+    assert.deepStrictEqual([m.bob, m.scale, m.glow], [0, 1, 0]);
   });
 });
 
-test('twinMotion: bounded, finite and always moving when settled and idle', () => {
-  let moved = false;
+test('twinMotion: bounded and finite when settled and idle', () => {
   for (let t = 0; t < 20000; t += 137) {
     [0, 1].forEach((g) => {
       const m = T.twinMotion(t, g, 1, 0);
-      assert.ok(Number.isFinite(m.angle) && Math.abs(m.angle) <= 0.36);
-      assert.ok(Math.abs(m.bob) <= 0.06);
+      assert.ok(Number.isFinite(m.bob) && Math.abs(m.bob) <= 0.06);
       assert.ok(m.scale > 0.9 && m.scale < 1.1);
-      if (Math.abs(m.angle) > 0.05) moved = true;
     });
   }
-  assert.ok(moved, 'the spheres sway');
 });
 
-test('twinMotion: the two spheres move out of phase', () => {
-  const a = T.twinMotion(1000, 0, 1, 0), b = T.twinMotion(1000, 1, 1, 0);
-  assert.notStrictEqual(a.angle, b.angle);
-  assert.ok(Math.abs(a.angle + b.angle) < 1e-9, 'opposite swing');
-});
-
-test('twinMotion: a hinted sphere grows, glows and sways harder than an idle one', () => {
+test('twinMotion: a hinted sphere grows and glows more than an idle one', () => {
   const idle = T.twinMotion(1000, 0, 1, 0), hot = T.twinMotion(1000, 0, 1, 1);
   assert.ok(hot.scale > idle.scale + 0.1);
   assert.ok(hot.glow > idle.glow && hot.glow === 1);
-  assert.ok(Math.abs(hot.angle) > Math.abs(idle.angle));
+});
+
+test('twinMotion fills a caller-owned object and returns it', () => {
+  const out = {};
+  assert.strictEqual(T.twinMotion(1000, 0, 1, 0.5, out), out);
+  assert.deepStrictEqual(T.twinMotion(1000, 0, 1, 0.5), out);
+});
+
+test('twinSpin: turns at the shared TerminalSpin rate, from a different start for each sphere', () => {
+  const S = global.window.TerminalSpin;
+  const a = T.twinSpin(1000, 0), b = T.twinSpin(2000, 0);
+  assert.ok(Math.abs(b.angle - a.angle - S.RATE * 1000) < 1e-9);
+  assert.notStrictEqual(T.twinSpin(1000, 0).angle, T.twinSpin(1000, 1).angle);
+});
+
+test('twinSpin: never gated by anything else, always finite, and cos and sin match the angle; fills a caller-owned object', () => {
+  const out = {};
+  for (let t = 0; t < 60000; t += 997) {
+    [0, 1].forEach((g) => {
+      const s = T.twinSpin(t, g, out);
+      assert.strictEqual(s, out);
+      assert.ok(Number.isFinite(s.angle) && Math.abs(s.angle) <= Math.PI + 1e-9);
+      assert.ok(Math.abs(s.cos - Math.cos(s.angle)) < 1e-12 && Math.abs(s.sin - Math.sin(s.angle)) < 1e-12);
+    });
+  }
+});
+
+test('spinPoint: turns a point about its sphere centre, keeps its height and its distance from the axis', () => {
+  const out = { x: 0, y: 0, z: 0 };
+  const none = { cos: 1, sin: 0 }, quarter = { cos: 0, sin: 1 };
+  T.spinPoint(1.2, 0.3, 0.1, 0.9, none, out);
+  assert.deepStrictEqual([out.x, out.y, out.z], [1.2, 0.3, 0.1]);
+  T.spinPoint(0.9, 0.5, 0, 0.9, quarter, out);
+  assert.ok(Math.abs(out.x - 0.9) < 1e-12 && Math.abs(out.y - 0.5) < 1e-12 && Math.abs(out.z) < 1e-12, 'a point on the axis stays put');
+  T.spinPoint(1.5, 0.2, 0.3, 0.9, quarter, out);
+  assert.ok(Math.abs(Math.hypot(out.x - 0.9, out.z) - Math.hypot(0.6, 0.3)) < 1e-12);
+  assert.strictEqual(out.y, 0.2);
+  // a quarter turn takes (dx, z) to (z, -dx): the same direction the camera yaw turns the globe
+  assert.ok(Math.abs(out.x - (0.9 + 0.3)) < 1e-12 && Math.abs(out.z - -0.6) < 1e-12);
+});
+
+test('spinPoint turns points the same way the camera yaw turns the globe (same handedness as TerminalMath.project)', () => {
+  const M = global.window.TerminalMath, out = { x: 0, y: 0, z: 0 }, pr = {};
+  [-2.5, -0.7, 0.4, 1.9, 3].forEach((a) => {
+    T.spinPoint(1.4, 0.2, 0.6, 0, { cos: Math.cos(a), sin: Math.sin(a) }, out);
+    M.project(1.4, 0.2, 0.6, M.rotation(a, 0), pr);
+    assert.ok(Math.abs(out.z - pr.z) < 1e-12, `angle ${a}`);
+    assert.ok(Math.abs(out.x - 1.4 * Math.cos(a) - 0.6 * Math.sin(a)) < 1e-12);
+  });
+});
+
+test('spinPoint stays continuous across the wrap: an angle of PI and of -PI give the same point', () => {
+  const a = { x: 0, y: 0, z: 0 }, b = { x: 0, y: 0, z: 0 };
+  T.spinPoint(1.5, 0.2, 0.3, 0.9, { cos: Math.cos(Math.PI), sin: Math.sin(Math.PI) }, a);
+  T.spinPoint(1.5, 0.2, 0.3, 0.9, { cos: Math.cos(-Math.PI), sin: Math.sin(-Math.PI) }, b);
+  assert.ok(Math.abs(a.x - b.x) < 1e-9 && Math.abs(a.z - b.z) < 1e-9);
 });
 
 test('stepHint: eases toward the target without overshooting, and holds at dt = 0', () => {
@@ -85,31 +131,21 @@ test('hintFor: maps a door path to its sphere and ignores unknown doors', () => 
   assert.strictEqual(T.hintFor('__proto__'), -1);
 });
 
-test('twinMotion fills a caller-owned object and returns it, with cos and sin matching the angle', () => {
-  const out = {};
-  const r = T.twinMotion(1000, 0, 1, 0.5, out);
-  assert.strictEqual(r, out);
-  assert.ok(Math.abs(out.cos - Math.cos(out.angle)) < 1e-12 && Math.abs(out.sin - Math.sin(out.angle)) < 1e-12);
-  const fresh = T.twinMotion(1000, 0, 1, 0.5);
-  assert.deepStrictEqual(fresh, out);
-});
-
-test('twinPoint: identity at rest, swings about the sphere centre, and a weight of 0 leaves the point alone', () => {
-  const rest = { angle: 0, bob: 0, scale: 1, glow: 0, cos: 1, sin: 0 }, out = { x: 0, y: 0, z: 0 };
+test('twinPoint: identity at rest, scales about the sphere centre, and a weight of 0 leaves the point alone', () => {
+  const rest = { bob: 0, scale: 1, glow: 0 }, out = { x: 0, y: 0, z: 0 };
   T.twinPoint(1.2, 0.3, 0.1, 0.9, rest, 1, out);
   assert.deepStrictEqual([out.x, out.y, out.z], [1.2, 0.3, 0.1]);
-  const moving = { angle: 0.3, bob: 0.04, scale: 1.1, glow: 0.5, cos: Math.cos(0.3), sin: Math.sin(0.3) };
-  T.twinPoint(1.2, 0.3, 0.1, 0.9, moving, 0, out);
+  const breathing = { bob: 0.04, scale: 1.1, glow: 0.5 };
+  T.twinPoint(1.2, 0.3, 0.1, 0.9, breathing, 0, out);
   assert.deepStrictEqual([out.x, out.y, out.z], [1.2, 0.3, 0.1]);
-  T.twinPoint(0.9, 0, 0, 0.9, moving, 1, out);
-  assert.ok(Math.abs(out.x - 0.9) < 1e-9, 'the centre stays on its pivot');
-  assert.ok(Math.abs(out.y - moving.bob) < 1e-9);
-  T.twinPoint(1.7, 0, 0, 0.9, moving, 1, out);
-  assert.ok(Math.hypot(out.x - 0.9, out.z) > 0.8 * 1.05, 'scaled about the centre');
+  T.twinPoint(0.9, 0, 0, 0.9, breathing, 1, out);
+  assert.ok(Math.abs(out.x - 0.9) < 1e-9 && Math.abs(out.y - breathing.bob) < 1e-9, 'the centre only bobs');
+  T.twinPoint(1.7, 0, 0, 0.9, breathing, 1, out);
+  assert.ok(Math.abs(Math.hypot(out.x - 0.9, out.z) - 0.8 * 1.1) < 1e-9, 'scaled about the centre');
 });
 
-test('twinPoint: a half weight lands halfway between the plain and the moved point', () => {
-  const m = { angle: 0.3, bob: 0.04, scale: 1.1, glow: 0, cos: Math.cos(0.3), sin: Math.sin(0.3) };
+test('twinPoint: a half weight lands halfway between the plain and the full point', () => {
+  const m = { bob: 0.04, scale: 1.1, glow: 0 };
   const full = { x: 0, y: 0, z: 0 }, half = { x: 0, y: 0, z: 0 };
   T.twinPoint(1.5, 0.2, 0.3, -0.9, m, 1, full);
   T.twinPoint(1.5, 0.2, 0.3, -0.9, m, 0.5, half);
