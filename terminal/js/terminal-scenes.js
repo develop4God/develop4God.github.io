@@ -1,6 +1,6 @@
 // Scene geometry and colouring for the /terminal/ point-cloud engine.
 // A scene is { id, pts:[x,y,z], grp, frac, seed } as parallel arrays of length N.
-// grp/frac/seed carry what paint() needs, so points can be re-ordered (align)
+// grp/frac/seed carry what paint() needs, so points can be re-ordered
 // without breaking colouring. y grows downward on screen.
 (function (window) {
   'use strict';
@@ -10,6 +10,9 @@
   var TAU = M.TAU;
   // Palette indices; the canvas maps them to theme colours.
   var INK = 0, LIME = 1, GOLD = 2, VIOLET = 3;
+  var LOGO_CANDIDATES = 8;
+  // Sampling weight per palette class for the logo (indexed by INK, LIME, GOLD, VIOLET).
+  var LOGO_WEIGHT = [1, 1, 1, 0.35];
 
   function blank() {
     return { pts: [], grp: [], frac: [], seed: [] };
@@ -94,57 +97,6 @@
     return sc;
   }
 
-  function widestAxis(pts, idx) {
-    var lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity], k, i;
-    for (i = 0; i < idx.length; i++) for (k = 0; k < 3; k++) {
-      var v = pts[idx[i]][k];
-      if (v < lo[k]) lo[k] = v;
-      if (v > hi[k]) hi[k] = v;
-    }
-    var best = 0;
-    for (k = 1; k < 3; k++) if (hi[k] - lo[k] > hi[best] - lo[best]) best = k;
-    return best;
-  }
-
-  // Pairs two equal-size index sets by recursive median bisection along the
-  // widest axis: each half of `from` is matched with the same-position half of
-  // `to`, so neighbours stay neighbours and paths do not cross.
-  function pairUp(fromPts, toPts, from, to, map) {
-    if (from.length === 1) { map[from[0]] = to[0]; return; }
-    var axis = widestAxis(fromPts, from);
-    function byAxis(pts) { return function (p, q) { return pts[p][axis] - pts[q][axis]; }; }
-    from = from.slice().sort(byAxis(fromPts));
-    to = to.slice().sort(byAxis(toPts));
-    var h = from.length >> 1;
-    pairUp(fromPts, toPts, from.slice(0, h), to.slice(0, h), map);
-    pairUp(fromPts, toPts, from.slice(h), to.slice(h), map);
-  }
-
-  // Re-orders `next` so point i travels to its spatial partner in `prev`:
-  // short, uncrossed paths instead of a swirl.
-  function align(prev, next) {
-    var all = [], map = [], out = blank(), i;
-    for (i = 0; i < prev.pts.length; i++) all.push(i);
-    pairUp(prev.pts, next.pts, all, all, map);
-    out.id = next.id;
-    if (next.cls) out.cls = [];
-    for (i = 0; i < prev.pts.length; i++) {
-      var src = map[i];
-      out.pts[i] = next.pts[src];
-      out.grp[i] = next.grp[src];
-      out.frac[i] = next.frac[src];
-      out.seed[i] = next.seed[src];
-      if (next.cls) out.cls[i] = next.cls[src];
-    }
-    return out;
-  }
-
-  function alignChain(scenes) {
-    var res = [];
-    scenes.forEach(function (sc, i) { res.push(i === 0 ? sc : align(res[i - 1], sc)); });
-    return res;
-  }
-
   // Colours one point of a scene at time t (ms). Writes out.c (palette index)
   // and out.a (0..1) so the render loop allocates nothing per point.
   function paint(sc, i, t, out) {
@@ -190,11 +142,27 @@
     var r = M.rng(5), sc = blank(), nText = pixels.text.length ? Math.round(N * textShare) : 0, nShield = N - nText;
     sc.id = 'logo';
     sc.cls = [];
+    // Best-candidate (blue-noise) sampling: each point is the best of a few
+    // random candidates, scored by distance from those already chosen times the
+    // class weight. Coverage stays even rather than clumpy, and the thin gold
+    // circuit and outline keep more dots than the large violet fill.
     function take(src, n, grp) {
+      var chosen = [];
       for (var i = 0; i < n; i++) {
-        var p = src[Math.floor(r() * src.length)];
-        push(sc, p[0], p[1], (r() - 0.5) * 0.06, grp, 0);
-        sc.cls.push(p[2]);
+        var best = null, bd = -1;
+        for (var k = 0; k < LOGO_CANDIDATES; k++) {
+          var c = src[Math.floor(r() * src.length)], d = Infinity;
+          for (var j = 0; j < chosen.length; j++) {
+            var dx = c[0] - chosen[j][0], dy = c[1] - chosen[j][1];
+            d = Math.min(d, dx * dx + dy * dy);
+          }
+          d = (d === Infinity ? 1e9 : d) * LOGO_WEIGHT[c[2]];
+          if (d > bd) { bd = d; best = c; }
+        }
+        chosen.push(best);
+        push(sc, best[0], best[1], (r() - 0.5) * 0.06, grp, 0);
+        // The grey wordmark takes the violet used by every other scene.
+        sc.cls.push(best[2] === INK ? VIOLET : best[2]);
       }
     }
     if (nShield) take(pixels.shield.length ? pixels.shield : pixels.text, nShield, 0);
@@ -204,7 +172,7 @@
 
   window.TerminalScenes = {
     N: N, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
-    make: make, align: align, alignChain: alignChain, paint: paint,
+    make: make, paint: paint,
     classifyLogoPixel: classifyLogoPixel, logoScene: logoScene
   };
 })(window);

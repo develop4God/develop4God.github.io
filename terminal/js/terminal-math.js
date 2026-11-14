@@ -42,13 +42,6 @@
     return t * t * (3 - 2 * t);
   }
 
-  var TRANSITIONS = ['paired', 'catalog', 'flow'];
-
-  // Known transition mode, or 'paired' for anything else.
-  function resolveTransition(name) {
-    return TRANSITIONS.indexOf(name) >= 0 ? name : 'paired';
-  }
-
   // Moves `value` toward `target` at `speed` units per second over `dtMs`
   // milliseconds, never overshooting. Negative dt is ignored.
   function stepToward(value, target, dtMs, speed) {
@@ -115,7 +108,6 @@
     rng: rng,
     segment: segment,
     smooth: smooth,
-    resolveTransition: resolveTransition,
     stepToward: stepToward,
     nextIndex: nextIndex,
     project: project,

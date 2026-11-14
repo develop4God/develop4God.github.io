@@ -41,29 +41,6 @@ test('scene group counts match what each scene paints', () => {
   assert.strictEqual(Object.keys(count(S.make('lattice'))).length, 3);
 });
 
-test('align keeps the same point set (a permutation) and never loses metadata pairing', () => {
-  const a = S.make('twin'), b = S.make('pipeline');
-  const aligned = S.align(a, b);
-  assert.strictEqual(aligned.id, 'pipeline');
-  const key = (sc, i) => sc.pts[i].join(',') + '|' + sc.grp[i] + '|' + sc.seed[i];
-  const before = Array.from({ length: S.N }, (_, i) => key(b, i)).sort();
-  const after = Array.from({ length: S.N }, (_, i) => key(aligned, i)).sort();
-  assert.deepStrictEqual(after, before);
-});
-
-test('align shortens total travel compared with the unaligned pairing (no tornado)', () => {
-  const a = S.make('cloud'), b = S.make('twin');
-  const travel = (x, y) => x.pts.reduce((s, p, i) => s + Math.hypot(p[0] - y.pts[i][0], p[1] - y.pts[i][1], p[2] - y.pts[i][2]), 0);
-  assert.ok(travel(a, S.align(a, b)) < travel(a, b) * 0.8);
-});
-
-test('alignChain aligns each scene to its predecessor and returns the same length', () => {
-  const chain = S.alignChain([S.make('twin'), S.make('pipeline'), S.make('lattice')]);
-  assert.strictEqual(chain.length, 3);
-  assert.deepStrictEqual(chain.map((s) => s.id), ['twin', 'pipeline', 'lattice']);
-  assert.deepStrictEqual(S.alignChain([]), []);
-});
-
 test('paint writes a palette index in range and alpha in [0,1] for every scene', () => {
   const out = { c: -1, a: -1 };
   IDS.forEach((id) => {
@@ -101,4 +78,28 @@ test('classifyLogoPixel maps ink, lime, violet and gold, and drops transparent o
   assert.strictEqual(S.classifyLogoPixel(220, 170, 60, 255), S.GOLD);
   assert.strictEqual(S.classifyLogoPixel(60, 60, 60, 20), -1);
   assert.strictEqual(S.classifyLogoPixel(250, 250, 250, 255), -1);
+});
+
+test('logoScene spreads points evenly: no two share a pixel on a field with room for all of them', () => {
+  const px = [];
+  for (let y = 0; y < 100; y++) for (let x = 0; x < 100; x++) px.push([x, y, S.VIOLET]);
+  const sc = S.logoScene({ shield: px, text: [] }, 0);
+  const seen = new Set(sc.pts.map((p) => p[0] + ',' + p[1]));
+  assert.strictEqual(seen.size, S.N);
+});
+
+test('logoScene favours gold detail over the large violet fill', () => {
+  const px = [];
+  for (let y = 0; y < 100; y++) for (let x = 0; x < 100; x++) px.push([x, y, x < 50 ? S.GOLD : S.VIOLET]);
+  const sc = S.logoScene({ shield: px, text: [] }, 0);
+  const gold = sc.cls.filter((c) => c === S.GOLD).length;
+  assert.ok(gold / S.N > 0.6, 'gold share ' + gold / S.N);
+});
+
+test('logoScene paints the grey wordmark in the shared violet, never in ink', () => {
+  const px = [];
+  for (let i = 0; i < 200; i++) px.push([i, i % 7, i % 4]);
+  const sc = S.logoScene({ shield: px.slice(0, 100), text: px.slice(100) }, 0.4);
+  assert.ok(!sc.cls.includes(S.INK));
+  assert.ok(sc.cls.includes(S.VIOLET) && sc.cls.includes(S.GOLD) && sc.cls.includes(S.LIME));
 });

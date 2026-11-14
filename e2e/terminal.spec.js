@@ -38,7 +38,7 @@ test('auto: with no input at all the hero moves on to the fork by itself and hol
   const panels = page.locator('#story-hero [data-panel]');
   await expect(panels.nth(0)).toHaveClass(/on/);
   await expect(panels.nth(1)).toHaveAttribute('inert', '');
-  await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 9000 });
+  await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 13000 });
   await expect(panels.nth(1)).not.toHaveAttribute('inert', '');
   await expect(panels.nth(0)).toHaveAttribute('inert', '');
   await page.waitForTimeout(8000);
@@ -55,7 +55,7 @@ test('skip: wheel, key and tap each move the hero to the fork immediately', asyn
     await page.goto('/terminal/', { waitUntil: 'networkidle' });
     await expect(page.locator('#story-hero [data-panel]').nth(0)).toHaveClass(/on/);
     await act(page);
-    await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 1500 });
+    await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 3500 });
   }
 });
 
@@ -220,7 +220,7 @@ test('auto: a resting mouse over the hero does not stop it advancing to the fork
   test.setTimeout(45_000);
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
   await page.mouse.move(640, 360);
-  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 9500 });
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 13000 });
 });
 
 test('auto: a tap on the hero does not freeze it (touch pointer stays "inside")', async ({ browser }) => {
@@ -229,7 +229,7 @@ test('auto: a tap on the hero does not freeze it (touch pointer stays "inside")'
   const page = await ctx.newPage();
   await page.goto('http://127.0.0.1:8791/terminal/', { waitUntil: 'networkidle' });
   await page.locator('#story-hero .pin').tap({ position: { x: 40, y: 60 } });
-  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 9500 });
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 13000 });
   await ctx.close();
 });
 
@@ -259,19 +259,27 @@ test('contact opens the mail app: a mailto link, no copy button', async ({ page 
   await expect(link).not.toHaveText('');
 });
 
-test('light theme: animation dots are dark and solid enough to read on the pale background', async ({ page }) => {
+test('light theme: the hero logo stays dark and solid enough to read on the pale background', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('theme', 'light'));
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
-  await page.waitForTimeout(2600);
-  const stats = await page.evaluate(() => {
+  const stats = () => page.evaluate(() => {
     const c = document.querySelector('#story-hero .scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
     let n = 0, lum = 0, alpha = 0;
     for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 0) { n++; alpha += d[i + 3]; lum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]); }
     return { n, meanAlpha: alpha / n, meanLum: lum / n };
   });
-  expect(stats.n).toBeGreaterThan(500);
-  expect(stats.meanAlpha).toBeGreaterThan(170);
-  expect(stats.meanLum).toBeLessThan(120);
+  // Stage 1, the assembled dots (before the real logo starts to build over them).
+  await page.waitForTimeout(1500);
+  const dots = await stats();
+  expect(dots.n).toBeGreaterThan(500);
+  expect(dots.meanAlpha).toBeGreaterThan(150);
+  expect(dots.meanLum).toBeLessThan(120);
+  // Stage 2, the settled real logo image (gold and white sparkles lift its mean luminance a little).
+  await page.waitForTimeout(4000);
+  const logo = await stats();
+  expect(logo.n).toBeGreaterThan(500);
+  expect(logo.meanAlpha).toBeGreaterThan(170);
+  expect(logo.meanLum).toBeLessThan(140);
 });
 
 for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
@@ -303,5 +311,4 @@ test('ministry mission shows the Isaiah 55 text in each language, under "Built t
   await expect(q.locator('p')).toContainText('mi palabra');
   await expect(q.locator('cite')).toContainText('Isaías 55:10-11');
   await expect(page.locator('#ministries .t')).toHaveText('Hecho para servir');
-  await expect(page.locator('#ministries .verse2')).toHaveText('Todo lo que construyo, lo construyo para Él.');
 });

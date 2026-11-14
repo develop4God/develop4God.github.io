@@ -7,9 +7,12 @@
 
   var M = window.TerminalMath;
   var S = window.TerminalScenes;
+  var LI = window.TerminalLogoImage;
   var LEVELS = 8;
-  var LOGO_TEXT_SHARE = 0.5;
+  var LOGO_TEXT_SHARE = 0.38;
   var LOGO_TEXT_TOP = 0.64;
+  // The real logo is rebuilt from one dot per DENSE_STEP source pixels, in its own colours.
+  var DENSE_STEP = 2;
 
   function wrapPi(a) {
     return a - M.TAU * Math.round(a / M.TAU);
@@ -51,32 +54,26 @@
     return l;
   }
 
-  // opts: { canvas, pin, story, sceneIds, getProgress, reduce, logoUrl?, getFree?, transition? }
-  // transition: 'paired' (position-paired straight paths), 'catalog' (random pairing with
-  // per-dot stagger) or 'flow' (arcing paths, overlapping windows and a glow in transit).
+  // opts: { canvas, pin, story, sceneIds, getProgress, getTarget, reduce, logoUrl?, getFree? }
+  // Dots move between scenes like dust: each keeps its own point order (random pairing) and
+  // starts at its own moment (per-dot stagger), so the scene gathers and disperses unevenly.
   function create(opts) {
     var cv = opts.canvas, cx = cv.getContext('2d'), pin = opts.pin, reduce = opts.reduce;
-    var N = S.N, scenes = [], introCloud = null, stagger = [], wob = [], perp = [];
-    var mode = M.resolveTransition(opts.transition);
+    var N = S.N, scenes = [], introCloud = null, stagger = [];
     var W = 0, H = 0, wide = true, dark = true, pal = ['#fff', '#b4d447', '#dea946', '#8f7fd0'];
     var yaw = 0, pitch = 0, lw = 0, driftAng = 0, globeAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     var t0 = performance.now(), running = false, raf = 0;
-    var buckets = [], out = { c: 0, a: 0 }, pr = {}, free = 0, freeAt = -1e9;
+    var buckets = [], out = { c: 0, a: 0 }, pr = {}, pr2 = {}, free = 0, freeAt = -1e9;
+    var logoImg = null, logoBmp = null, logoDots = [], dotBuckets = [], logoTint = '';
 
     var r2 = M.rng(99);
-    var r3 = M.rng(1234);
-    for (var i = 0; i < N; i++) {
-      stagger.push(r2());
-      wob.push(0.4 + r3() * 0.6);
-      var vx = r3() - 0.5, vy = r3() - 0.5, vz = r3() - 0.5, vl = Math.hypot(vx, vy, vz) || 1;
-      perp.push([vx / vl, vy / vl, vz / vl]);
-    }
+    for (var i = 0; i < N; i++) stagger.push(r2());
     for (var b = 0; b < pal.length * LEVELS; b++) buckets.push({ x: [], y: [], r: [], n: 0 });
+    for (var kb = 0; kb < LI.COLOR_KEYS; kb++) dotBuckets.push({ x: [], y: [], n: 0, fill: 'rgb(' + LI.keyRgb(kb).join(',') + ')' });
 
     function setScenes(list, cloud) {
-      // 'catalog' keeps the scenes' own point order (random pairing), the others pair by position.
-      scenes = mode === 'catalog' ? list : S.alignChain(list);
-      introCloud = cloud ? (mode === 'catalog' ? cloud : S.align(scenes[0], cloud)) : null;
+      scenes = list;
+      introCloud = cloud || null;
     }
 
     var ids = opts.sceneIds.slice(), hasLogo = ids[0] === 'logo';
@@ -87,6 +84,8 @@
       img.onload = function () {
         try {
           var logo = S.logoScene(sampleLogo(img), LOGO_TEXT_SHARE);
+          logoImg = img;
+          rebuildLogo();
           t0 = performance.now();
           setScenes([logo].concat(ids.slice(1).map(S.make)), S.make('cloud'));
           redraw();
@@ -96,10 +95,48 @@
       img.src = opts.logoUrl;
     }
 
+    var tintCx = null;
+    function cssRgb(css) {
+      tintCx = tintCx || document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+      tintCx.clearRect(0, 0, 1, 1);
+      tintCx.fillStyle = css;
+      tintCx.fillRect(0, 0, 1, 1);
+      return Array.prototype.slice.call(tintCx.getImageData(0, 0, 1, 1).data, 0, 3);
+    }
+
+    // The real logo with its grey wordmark tinted to the shared violet so it matches the dots.
+    function buildLogoBitmap(tint) {
+      var w = logoImg.naturalWidth, h = logoImg.naturalHeight, bmp = document.createElement('canvas'), bx = bmp.getContext('2d', { willReadFrequently: true });
+      bmp.width = w;
+      bmp.height = h;
+      bx.drawImage(logoImg, 0, 0);
+      var id = bx.getImageData(0, 0, w, h);
+      LI.tintWordmark(id.data, w, h, Math.round(h * LOGO_TEXT_TOP), tint);
+      bx.putImageData(id, 0, 0);
+      logoBmp = bmp;
+      logoDots = LI.densePoints(id.data, w, h, DENSE_STEP, M.rng(11));
+    }
+
+    // Rebuilds the logo bitmap and dot field only when the tint colour actually changed (a theme
+    // switch), not on every resize. A failure leaves the plain dot logo in place.
+    function rebuildLogo() {
+      try {
+        var tint = cssRgb(pal[S.VIOLET]), key = tint.join(',');
+        if (key === logoTint) return;
+        buildLogoBitmap(tint);
+        logoTint = key;
+      } catch (e) {
+        logoBmp = null;
+        logoDots = [];
+        console.error('TerminalCanvas: logo bitmap failed', e);
+      }
+    }
+
     function colors() {
       var s = getComputedStyle(document.documentElement), v = function (n, f) { return s.getPropertyValue(n).trim() || f; };
       pal = [v('--ink', '#fff'), v('--lime', '#b4d447'), v('--gold', '#dea946'), v('--violet', '#8f7fd0')];
       dark = v('--dark', '1') === '1';
+      if (logoImg) rebuildLogo();
     }
 
     function size() {
@@ -118,7 +155,9 @@
       if (!W || !scenes.length) return;
       var dt = last ? M.clamp(t - last, 0, 50) : 16;
       last = t;
-      var p = reduce ? 0 : opts.getProgress(), sg = M.segment(p, scenes.length), a = sg.a, lt = sg.lt;
+      var p = reduce ? 0 : opts.getProgress(), sg = M.segment(p, scenes.length), a = sg.a, rawLt = sg.lt;
+      // While the real logo is up, the dots hold still until it has dissolved into them.
+      var lt = logoBmp && a === 0 && !reduce ? LI.morphProgress(rawLt) : rawLt;
       var A = scenes[a], B = scenes[Math.min(a + 1, scenes.length - 1)], morphing = scenes.length > 1 && lt > 0.02 && lt < 0.98;
 
       smx += (mx - smx) * Math.min(1, dt * 0.006);
@@ -143,31 +182,30 @@
       var intro = reduce || !introCloud || a !== 0 ? 1 : M.ease(M.clamp((t - t0) / 1800, 0, 1));
       // On the pale light theme dots need more weight than on the dark one.
       var baseA = dark ? 0.22 : 0.72, spanA = dark ? 0.78 : 0.28, i, j, bk;
+      // Once the dots have assembled the logo it turns into the real image through denser dot layers
+      // (always the real image under reduced motion).
+      // What to show of the real logo; heading back to it after its first build-up just fades the
+      // image in once the dots are home, the dense dots only fly in on the first visit and when leaving.
+      var onLogo = logoBmp && a === 0, vs = onLogo ? LI.viewState(t - t0, rawLt, opts.getTarget() === 0, reduce) : null, pm = vs ? vs.pm : 1;
 
       for (j = 0; j < buckets.length; j++) buckets[j].n = 0;
-      for (i = 0; i < N; i++) {
-        var k2 = mode === 'flow' ? M.ease(M.smooth(stagger[i] * 0.4, stagger[i] * 0.4 + 0.6, lt)) : M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
+      for (i = 0; i < N && pm >= 0.03; i++) {
+        var k2 = M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
         if (intro < 1) {
           var cp = introCloud.pts[i], e = M.ease(M.clamp(intro * 1.4 - stagger[i] * 0.4, 0, 1));
           px = cp[0] + (px - cp[0]) * e; py = cp[1] + (py - cp[1]) * e; pz = cp[2] + (pz - cp[2]) * e;
         }
-        var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2, glow = 0;
-        if (mode === 'flow') {
-          // Dots travel on arcs and brighten while in transit, like a flowing stream.
-          glow = Math.sin(Math.PI * k2);
-          var arc = glow * 0.55 * wob[i];
-          x += perp[i][0] * arc; y += perp[i][1] * arc; z += perp[i][2] * arc;
-        }
+        var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2;
         M.project(x, y, z, rot, pr);
         var sc = k2 > 0.5 ? B : A;
         S.paint(sc, i, t, out);
         var far = sc.id === 'globe' && pr.z > 0.1 ? 0.1 : 1;
         var sceneA = dark ? out.a : 0.55 + 0.45 * out.a;
-        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1) * (1 + 0.5 * glow), 0, 1);
+        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1) * pm, 0, 1);
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
-        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35) + 0.8 * glow;
+        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35);
         bk.n++;
       }
       cx.clearRect(0, 0, W, H);
@@ -179,6 +217,37 @@
         cx.beginPath();
         for (i = 0; i < bk.n; i++) { cx.moveTo(bk.x[i] + bk.r[i], bk.y[i]); cx.arc(bk.x[i], bk.y[i], bk.r[i], 0, M.TAU); }
         cx.fill();
+      }
+      if (vs && (vs.dense || vs.pngA > 0.01)) {
+        var hh = (1.5 * logoBmp.height) / logoBmp.width;
+        M.project(-1.5, -hh, 0, rot, pr);
+        M.project(1.5, hh, 0, rot, pr2);
+        var lx0 = ox + pr.x * scale, ly0 = oy + pr.y * scale, lw0 = (pr2.x - pr.x) * scale, lh0 = (pr2.y - pr.y) * scale;
+        var sk = lw0 / logoBmp.width, ds = Math.max(1.4, DENSE_STEP * sk), pngA = vs.pngA, nb, ph;
+        if (vs.dense) {
+          // Dense true-colour dots fly home from random places; more of them are on screen as r grows.
+          for (nb = 0; nb < LI.COLOR_KEYS; nb++) dotBuckets[nb].n = 0;
+          logoDots.forEach(function (d) {
+            ph = LI.dotPhase(vs.rv, d.dl);
+            if (ph <= 0) return;
+            var bb = dotBuckets[d.key];
+            bb.x[bb.n] = lx0 + (d.sx + (d.tx - d.sx) * ph) * sk;
+            bb.y[bb.n] = ly0 + (d.sy + (d.ty - d.sy) * ph) * sk;
+            bb.n++;
+          });
+          cx.globalAlpha = 1;
+          dotBuckets.forEach(function (bb) {
+            if (!bb.n) return;
+            cx.fillStyle = bb.fill;
+            cx.beginPath();
+            for (var q = 0; q < bb.n; q++) cx.rect(bb.x[q], bb.y[q], ds, ds);
+            cx.fill();
+          });
+        }
+        if (pngA > 0.01) {
+          cx.globalAlpha = pngA;
+          cx.drawImage(logoBmp, lx0, ly0, lw0, lh0);
+        }
       }
       cx.globalAlpha = 1;
     }

@@ -95,8 +95,8 @@
     return inner ? Math.max(0, panel.offsetTop + inner.offsetTop - 20) : 0;
   }
 
-  // Transition style for the point-cloud morphs; ?t=paired|catalog|flow (default paired).
-  var TRANSITION = window.TerminalMath.resolveTransition(new URLSearchParams(window.location.search).get('t'));
+  // The hero morphs slower than the other stories so the logo has time to dissolve.
+  var HERO_MORPH_SPEED = 0.5;
 
   function ensureStory(name) {
     if (stories[name]) return stories[name];
@@ -104,13 +104,14 @@
     var dwell = (root.getAttribute('data-dwell') || '').split(',').filter(Boolean).map(Number);
     var ctrl = window.TerminalStory.create({
       story: root, panels: $all('[data-panel]', root), dots: $all('.sdots .dot', root), reduce: reduce, dwell: dwell, loop: root.hasAttribute('data-loop'),
-      morphSpeed: TRANSITION === 'flow' ? 0.5 : 0.75
+      morphSpeed: name === 'hero' ? HERO_MORPH_SPEED : 0.75,
+      // The door cards wait for the hero's logo to dissolve into the dots.
+      panelDelay: name === 'hero' ? window.TerminalLogoImage.leaveMs(HERO_MORPH_SPEED) : 0
     });
     window.TerminalCanvas.create({
-      canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress,
+      canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress, getTarget: ctrl.getTarget,
       sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null,
-      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null,
-      transition: TRANSITION
+      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null
     });
     var pause = $('.pause', root);
     if (pause) {

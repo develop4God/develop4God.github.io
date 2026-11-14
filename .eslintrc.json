@@ -33,6 +33,7 @@
     "TerminalTheme": "readonly",
     "TerminalCases": "readonly",
     "TerminalCanvas": "readonly",
+    "TerminalLogoImage": "readonly",
     "TerminalStory": "readonly",
     "TerminalEffects": "readonly"
   },

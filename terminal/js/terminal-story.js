@@ -2,20 +2,21 @@
 // links can't take focus) while the canvas morphs to the matching scene. Scenes
 // advance on their own after a per-scene dwell, optionally looping; the dots are
 // buttons to jump, and the timer stops while off-screen or when the visitor presses
-// the pause control (hovering or focusing never freezes it).
+// the pause control (hovering or focusing never freezes it). An optional panelDelay holds
+// back the text swap when moving forward, so the old scene can clear the canvas first.
 // Under reduced motion the story is static and never advances.
 (function (window) {
   'use strict';
 
   var M = window.TerminalMath;
 
-  // opts: { story, panels, dots, reduce, dwell:[ms per scene], loop, morphSpeed (scenes per second, default 0.75) }
+  // opts: { story, panels, dots, reduce, dwell:[ms per scene], loop, morphSpeed (scenes per second, default 0.75), panelDelay (ms, default 0) }
   function create(opts) {
     var story = opts.story, panels = opts.panels, dots = opts.dots, reduce = opts.reduce;
-    var count = panels.length, current = 0, pos = 0, lastT = 0, timer = 0, visible = false, paused = false;
+    var count = panels.length, current = 0, pos = 0, lastT = 0, timer = 0, swapTimer = 0, visible = false, paused = false;
 
-    function setActive(i) {
-      current = i;
+    // Panels and dots change together, so what the nav reports is what is shown and focusable.
+    function showPanel(i) {
       panels.forEach(function (p, k) {
         var on = k === i;
         p.classList.toggle('on', on);
@@ -26,6 +27,12 @@
         d.classList.toggle('on', k === i);
         d.setAttribute('aria-current', k === i ? 'true' : 'false');
       });
+    }
+
+    function setActive(i, delay) {
+      current = i;
+      clearTimeout(swapTimer);
+      if (delay > 0) swapTimer = setTimeout(function () { showPanel(i); }, delay); else showPanel(i);
     }
 
     function dwellFor(i) {
@@ -46,14 +53,14 @@
 
     function goTo(i) {
       if (i < 0 || i >= count) return;
-      setActive(i);
+      setActive(i, i > current ? opts.panelDelay || 0 : 0);
       schedule();
     }
 
     if (reduce) {
       story.classList.add('static');
       panels.forEach(function (p) { p.classList.add('on'); p.removeAttribute('inert'); p.setAttribute('aria-hidden', 'false'); });
-      return { getProgress: function () { return 0; }, goTo: function () {}, advance: function () {}, setPaused: function () {}, isPaused: function () { return false; } };
+      return { getProgress: function () { return 0; }, getTarget: function () { return 0; }, goTo: function () {}, advance: function () {}, setPaused: function () {}, isPaused: function () { return false; } };
     }
 
     setActive(0);
@@ -70,6 +77,8 @@
         return count > 1 ? pos / (count - 1) : 0;
       },
       goTo: goTo,
+      // The scene index the story is heading for (the canvas uses it to tell leaving from returning).
+      getTarget: function () { return current; },
       setPaused: function (v) { paused = !!v; schedule(); },
       isPaused: function () { return paused; },
       // Skips ahead one scene right away (used when the visitor scrolls, taps or presses a key).

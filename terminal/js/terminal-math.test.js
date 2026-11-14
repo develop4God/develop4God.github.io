@@ -72,15 +72,6 @@ test('smooth is a clamped smoothstep: 0 before, 1 after, 0.5 at the middle', () 
   assert.strictEqual(M.smooth(0.5, 0.5, 0.6), 1);
 });
 
-test('resolveTransition accepts known modes and falls back to paired for anything else', () => {
-  assert.strictEqual(M.resolveTransition('flow'), 'flow');
-  assert.strictEqual(M.resolveTransition('catalog'), 'catalog');
-  assert.strictEqual(M.resolveTransition('paired'), 'paired');
-  assert.strictEqual(M.resolveTransition('nope'), 'paired');
-  assert.strictEqual(M.resolveTransition(null), 'paired');
-  assert.strictEqual(M.resolveTransition('__proto__'), 'paired');
-});
-
 test('project: centre point is unscaled; nearer points are larger than farther ones', () => {
   const out = {};
   const rot = M.rotation(0, 0);
