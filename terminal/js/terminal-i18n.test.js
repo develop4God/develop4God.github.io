@@ -70,8 +70,8 @@ test('hero verse is present with a reference and version in each language', () =
   });
 });
 
-test('every data-i18n key used in terminal/index.html exists in every language file', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+test('every data-i18n key used in the root index.html exists in every language file', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '..', 'index.html'), 'utf8');
   const keys = [...html.matchAll(/data-i18n(?:-aria|-content)?="([^"]+)"/g)].map((m) => m[1]);
   assert.ok(keys.length > 20);
   I.SUPPORTED.forEach((lang) => {
@@ -80,8 +80,8 @@ test('every data-i18n key used in terminal/index.html exists in every language f
   });
 });
 
-test('English fallback text in terminal/index.html matches en.json (no-JS and SEO safe)', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+test('English fallback text in the root index.html matches en.json (no-JS and SEO safe)', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '..', 'index.html'), 'utf8');
   const en = JSON.parse(fs.readFileSync(path.join(LANG_DIR, 'en.json'), 'utf8'));
   const decode = (s) => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
   const found = [...html.matchAll(/<(\w+)[^>]*\sdata-i18n="([^"]+)"[^>]*>([^<]*)<\/\1>/g)];

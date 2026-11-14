@@ -1,4 +1,4 @@
-// Coverage for the /terminal/ preview: entry behaviour, path choice, languages,
+// Coverage for the root terminal page: entry behaviour, path choice, languages,
 // themes, stats wiring, reduced motion and mobile layout.
 const { test, expect } = require('/tmp/pw-tools/node_modules/@playwright/test');
 
@@ -14,7 +14,7 @@ const ES_VERSE = 'Y todo lo que hagáis, hacedlo de corazón, como para el Seño
 
 test('entry needs no input: verse shown, logo canvas painted, no console errors', async ({ page }) => {
   const errors = trackErrors(page);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await expect(page.locator('.hero-verse, #story-hero .verse')).toHaveText(EN_VERSE);
   await expect(page.locator('#story-hero [data-i18n="hero.ref"]')).toContainText('Colossians 3:23');
   await page.waitForTimeout(2200);
@@ -34,7 +34,7 @@ test('entry needs no input: verse shown, logo canvas painted, no console errors'
 test('auto: with no input at all the hero moves on to the fork by itself and holds there', async ({ page }) => {
   test.setTimeout(45_000);
   const errors = trackErrors(page);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   const panels = page.locator('#story-hero [data-panel]');
   await expect(panels.nth(0)).toHaveClass(/on/);
   await expect(panels.nth(1)).toHaveAttribute('inert', '');
@@ -52,7 +52,7 @@ test('skip: wheel, key and tap each move the hero to the fork immediately', asyn
     (p) => p.keyboard.press('ArrowDown'),
     (p) => p.evaluate(() => window.dispatchEvent(new Event('touchstart')))
   ]) {
-    await page.goto('/terminal/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'networkidle' });
     await expect(page.locator('#story-hero [data-panel]').nth(0)).toHaveClass(/on/);
     await act(page);
     await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 3500 });
@@ -60,7 +60,7 @@ test('skip: wheel, key and tap each move the hero to the fork immediately', asyn
 });
 
 test('dots are buttons with labels and jump to their scene', async ({ page }) => {
-  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.goto('/#hire', { waitUntil: 'networkidle' });
   const dots = page.locator('#story-hire .dot');
   await expect(dots).toHaveCount(3);
   await expect(dots.nth(0)).toHaveAttribute('aria-label', 'Scene 1');
@@ -72,7 +72,7 @@ test('dots are buttons with labels and jump to their scene', async ({ page }) =>
 
 test('choosing Hire me reveals only that path; switch link flips to Ministry', async ({ page }) => {
   const errors = trackErrors(page);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await page.mouse.wheel(0, 100);
   await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/);
   await page.locator('a.door.hire').click();
@@ -91,7 +91,7 @@ test('choosing Hire me reveals only that path; switch link flips to Ministry', a
 test('deep link #ministry opens the ministry path; stats come from app-stats.json', async ({ page, request }) => {
   const errors = trackErrors(page);
   const stats = await (await request.get('/data/app-stats.json')).json();
-  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/#ministry', { waitUntil: 'networkidle' });
   await expect(page.locator('#path-ministry')).toBeVisible();
   await page.locator('.stats').scrollIntoViewIfNeeded();
   await page.waitForTimeout(1600);
@@ -103,7 +103,7 @@ test('deep link #ministry opens the ministry path; stats come from app-stats.jso
 
 test('language: ES switch changes verse and copy, persists the shared key, survives reload', async ({ page }) => {
   const errors = trackErrors(page);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await page.locator('button[data-lang="es"]').click();
   await expect(page.locator('#story-hero .verse')).toHaveText(ES_VERSE);
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
@@ -115,15 +115,15 @@ test('language: ES switch changes verse and copy, persists the shared key, survi
 });
 
 test('language: ?lang=es applies without persisting; unsupported falls back to English', async ({ page }) => {
-  await page.goto('/terminal/?lang=es', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=es', { waitUntil: 'networkidle' });
   await expect(page.locator('#story-hero .verse')).toHaveText(ES_VERSE);
   expect(await page.evaluate(() => localStorage.getItem('develop4God_language'))).toBeNull();
-  await page.goto('/terminal/?lang=xx', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=xx', { waitUntil: 'networkidle' });
   await expect(page.locator('#story-hero .verse')).toHaveText(EN_VERSE);
 });
 
 test('theme: toggle flips light/dark, persists, and the canvas palette follows', async ({ page }) => {
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   const theme = () => page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   const lime = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--lime').trim());
   const start = await theme();
@@ -141,7 +141,7 @@ test('theme: toggle flips light/dark, persists, and the canvas palette follows',
 test('auto: the hire path advances through its scenes on its own and loops', async ({ page }) => {
   test.setTimeout(45_000);
   const errors = trackErrors(page);
-  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.goto('/#hire', { waitUntil: 'networkidle' });
   const panels = page.locator('#story-hire [data-panel]');
   await expect(panels.nth(0)).toHaveClass(/on/);
   await page.waitForTimeout(1500);
@@ -155,7 +155,7 @@ test('auto: the hire path advances through its scenes on its own and loops', asy
 test('reduced motion: stories are static and every panel is readable', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const errors = trackErrors(page);
-  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.goto('/#hire', { waitUntil: 'networkidle' });
   await expect(page.locator('#story-hero')).toHaveClass(/static/);
   await expect(page.locator('#story-hire')).toHaveClass(/static/);
   const inert = await page.locator('#story-hire [data-panel][inert]').count();
@@ -167,7 +167,7 @@ test('reduced motion: stories are static and every panel is readable', async ({ 
 test('mobile 390x844: no horizontal overflow on hero, hire and ministry', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   for (const hash of ['', '#hire', '#ministry']) {
-    await page.goto('/terminal/' + hash, { waitUntil: 'networkidle' });
+    await page.goto('/' + hash, { waitUntil: 'networkidle' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), hash).toBe(false);
   }
 });
@@ -175,7 +175,7 @@ test('mobile 390x844: no horizontal overflow on hero, hire and ministry', async 
 test('ministry stats count up from zero even when app-stats.json arrives after they are visible, and replay on click', async ({ page, request }) => {
   const stats = await (await request.get('/data/app-stats.json')).json();
   await page.route('**/data/app-stats.json', async (route) => { await new Promise((r) => setTimeout(r, 700)); await route.continue(); });
-  await page.goto('/terminal/#ministry', { waitUntil: 'domcontentloaded' });
+  await page.goto('/#ministry', { waitUntil: 'domcontentloaded' });
   const el = page.locator('[data-app-stat="activeUsers"]');
   await expect(el).toHaveText(/^\d/, { timeout: 5000 });
   const seen = [];
@@ -189,7 +189,7 @@ test('ministry stats count up from zero even when app-stats.json arrives after t
 });
 
 test('deep link #ministry scrolls to the ministry path, and hashchange opens the other path', async ({ page }) => {
-  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/#ministry', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
   const top = await page.evaluate(() => document.getElementById('path-ministry').getBoundingClientRect().top);
@@ -201,7 +201,7 @@ test('deep link #ministry scrolls to the ministry path, and hashchange opens the
 
 test('reduced motion: canvas bitmap keeps the aspect ratio of its box (no squashed shapes)', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   const ratio = await page.evaluate(() => {
     const c = document.querySelector('#story-hero .scene'), r = c.getBoundingClientRect();
     return { box: r.width / r.height, bitmap: c.width / c.height };
@@ -210,7 +210,7 @@ test('reduced motion: canvas bitmap keeps the aspect ratio of its box (no squash
 });
 
 test('switching language keeps already revealed case rows visible', async ({ page }) => {
-  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.goto('/#hire', { waitUntil: 'networkidle' });
   await page.locator('#cases').scrollIntoViewIfNeeded();
   await page.waitForTimeout(900);
   const before = await page.locator('#cases .case.in').count();
@@ -221,7 +221,7 @@ test('switching language keeps already revealed case rows visible', async ({ pag
 });
 
 test('rapid language switches end on the last choice', async ({ page }) => {
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await page.evaluate(() => {
     document.querySelector('button[data-lang="es"]').click();
     document.querySelector('button[data-lang="en"]').click();
@@ -234,7 +234,7 @@ test('rapid language switches end on the last choice', async ({ page }) => {
 
 test('auto: a resting mouse over the hero does not stop it advancing to the fork', async ({ page }) => {
   test.setTimeout(45_000);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await page.mouse.move(640, 360);
   await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 13000 });
 });
@@ -243,7 +243,7 @@ test('auto: a tap on the hero does not freeze it (touch pointer stays "inside")'
   test.setTimeout(45_000);
   const ctx = await browser.newContext({ hasTouch: true, viewport: { width: 390, height: 844 } });
   const page = await ctx.newPage();
-  await page.goto('http://127.0.0.1:8791/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('http://127.0.0.1:8791/', { waitUntil: 'networkidle' });
   await page.locator('#story-hero .pin').tap({ position: { x: 40, y: 60 } });
   await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 13000 });
   await ctx.close();
@@ -251,7 +251,7 @@ test('auto: a tap on the hero does not freeze it (touch pointer stays "inside")'
 
 test('auto: hovering the hire story does not stop its scenes; the pause button does', async ({ page }) => {
   test.setTimeout(60_000);
-  await page.goto('/terminal/#hire', { waitUntil: 'networkidle' });
+  await page.goto('/#hire', { waitUntil: 'networkidle' });
   await page.mouse.move(640, 400);
   const panels = page.locator('#story-hire [data-panel]');
   await expect(panels.nth(1)).toHaveClass(/on/, { timeout: 10000 });
@@ -266,7 +266,7 @@ test('auto: hovering the hire story does not stop its scenes; the pause button d
 });
 
 test('contact opens the mail app: a mailto link, no copy button', async ({ page }) => {
-  await page.goto('/terminal/#contact', { waitUntil: 'networkidle' });
+  await page.goto('/#contact', { waitUntil: 'networkidle' });
   const link = page.locator('#contact a.mailto');
   await expect(link).toBeVisible();
   expect(await link.getAttribute('href')).toMatch(/^mailto:develop4God@gmail\.com/);
@@ -277,7 +277,7 @@ test('contact opens the mail app: a mailto link, no copy button', async ({ page 
 
 test('light theme: the hero logo stays dark and solid enough to read on the pale background', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('theme', 'light'));
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   const stats = () => page.evaluate(() => {
     const c = document.querySelector('#story-hero .scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
     let n = 0, lum = 0, alpha = 0;
@@ -302,7 +302,7 @@ for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
   test(`fork spheres never reach the heading text at ${w}x${h}`, async ({ page }) => {
     test.setTimeout(45_000);
     await page.setViewportSize({ width: w, height: h });
-    await page.goto('/terminal/', { waitUntil: 'networkidle' });
+    await page.goto('/', { waitUntil: 'networkidle' });
     await page.locator('#story-hero .dot').nth(1).click();
     await page.waitForTimeout(4500);
     const r = await page.evaluate(() => {
@@ -318,7 +318,7 @@ for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
 }
 
 test('ministry mission shows the Isaiah 55 text in each language, under the mission title', async ({ page }) => {
-  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/#ministry', { waitUntil: 'networkidle' });
   const q = page.locator('#ministries .isaiah');
   await expect(q).toBeVisible();
   await expect(q.locator('p')).toContainText('my word');
@@ -331,7 +331,7 @@ test('ministry mission shows the Isaiah 55 text in each language, under the miss
 
 test('fork spheres: the sphere of the hovered door grows (hire = green, ministry = gold)', async ({ page }) => {
   test.setTimeout(45_000);
-  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.goto('/', { waitUntil: 'networkidle' });
   await page.keyboard.press('ArrowDown');
   await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 5000 });
   await page.waitForTimeout(3500);
@@ -374,21 +374,21 @@ test('fork spheres: the sphere of the hovered door grows (hire = green, ministry
 test('language counts in the text come from app-stats.json, so a changed stat changes the text', async ({ page }) => {
   const stats = { downloads: '22K+', rating: '4.9', ratingDisplay: '4.9 ★', countries: '100+', activeUsers: '7,800+', languages: '12' };
   await page.route('**/data/app-stats.json', (route) => route.fulfill({ json: stats }));
-  await page.goto('/terminal/?lang=en#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=en#ministry', { waitUntil: 'networkidle' });
   await expect(page.locator('[data-i18n="min.apps.dev.text"]')).toContainText('in 12 languages');
   await expect(page.locator('[data-i18n="story.languages.title"]')).toHaveText('12 languages, with systems that review them.');
-  await page.goto('/terminal/?lang=es#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=es#ministry', { waitUntil: 'networkidle' });
   await expect(page.locator('[data-i18n="min.apps.dev.text"]')).toContainText('en 12 idiomas');
 });
 
 test('language counts keep a number-free text when app-stats.json cannot load', async ({ page }) => {
   await page.route('**/data/app-stats.json', (route) => route.abort());
-  await page.goto('/terminal/?lang=en#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=en#ministry', { waitUntil: 'networkidle' });
   await expect(page.locator('[data-i18n="story.languages.title"]')).toHaveText('Multiple languages, with systems that review them.');
 });
 
 test('the saas-tools case opens our live platform in a new tab and says it is our platform', async ({ page }) => {
-  await page.goto('/terminal/?lang=en#hire', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=en#hire', { waitUntil: 'networkidle' });
   const row = page.locator('#cases a.case', { hasText: 'saas-tools' });
   await expect(row).toHaveAttribute('href', 'https://saas-tools-web.onrender.com/');
   await expect(row).toHaveAttribute('target', '_blank');
@@ -397,18 +397,18 @@ test('the saas-tools case opens our live platform in a new tab and says it is ou
 });
 
 test('selected work ends with one link to the GitHub profile instead of a second project list', async ({ page }) => {
-  await page.goto('/terminal/?lang=en#hire', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=en#hire', { waitUntil: 'networkidle' });
   const more = page.locator('#work a[data-i18n="hire.cases.more"]');
   await expect(more).toHaveAttribute('href', 'https://github.com/develop4God');
   await expect(more).toHaveAttribute('target', '_blank');
   await expect(more).toHaveText('More projects on GitHub →');
-  await page.goto('/terminal/?lang=es#hire', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=es#hire', { waitUntil: 'networkidle' });
   await expect(more).toHaveText('Más proyectos en GitHub →');
 });
 
 test('footer matches the saas-tools one: copyright with the colored brand, rights line and a mail icon', async ({ page }) => {
   const year = new Date().getFullYear();
-  await page.goto('/terminal/?lang=en', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=en', { waitUntil: 'networkidle' });
   const footer = page.locator('#page-footer');
   await expect(footer).toContainText(`© ${year} Develop4God. All rights reserved.`);
   await expect(footer).not.toContainText('Made with');
@@ -416,7 +416,7 @@ test('footer matches the saas-tools one: copyright with the colored brand, right
   await expect(mail).toHaveAttribute('aria-label', 'Email Develop4God');
   await expect(mail.locator('svg')).toBeVisible();
   await expect(footer.locator('.foot-4')).toHaveText('4');
-  await page.goto('/terminal/?lang=es', { waitUntil: 'networkidle' });
+  await page.goto('/?lang=es', { waitUntil: 'networkidle' });
   await expect(footer).toContainText(`© ${year} Develop4God. Todos los derechos reservados.`);
   await expect(mail).toHaveAttribute('aria-label', 'Escribir a Develop4God');
 });
@@ -426,7 +426,7 @@ test('footer matches the saas-tools one: copyright with the colored brand, right
 async function paintedGlobe(page, theme) {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
-  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  await page.goto('/#ministry', { waitUntil: 'networkidle' });
   const read = () => page.evaluate(() => {
     const cv = document.querySelector('#story-ministry canvas.scene');
     const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;

@@ -1,316 +1,211 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en" data-theme="dark">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KBGE96RQML');
-  </script>
-
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>develop4God - Recursos Espirituales</title>
-  <meta name="description" content="Plataforma cristiana con devocionales diarios y herramientas para construir hábitos de fe.">
-  <link rel="canonical" href="https://develop4god.github.io/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>develop4God</title>
+  <meta name="description" content="develop4God" data-i18n-content="meta.description">
+  <meta name="color-scheme" content="dark light">
+  <link rel="icon" href="/img/logo_vector_512x512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  <link rel="stylesheet" href="/devocionales/css/modern.css">
-  <link rel="stylesheet" href="/devocionales/css/language-selector.css">
-  <script>
-    (function () {
-      const saved = localStorage.getItem('theme');
-      if (saved) document.documentElement.setAttribute('data-theme', saved);
-    })();
-  </script>
-
-  <style>
-    :root {
-      --bg: #f5f2fb;
-      --surface: #ffffff;
-      --text: #1c1730;
-      --text-muted: #6b6280;
-      --border: #ded4ef;
-      --accent: #6d4aa8;
-      --accent-soft: #ece5f7;
-      --highlight: #a8461c;
-    }
-    :root[data-theme="dark"] {
-      --bg: #0b0b0a;
-      --surface: #151412;
-      --text: #f2f0ea;
-      --text-muted: #a39e91;
-      --border: #2a2822;
-      --accent: #5fb8ae;
-      --accent-soft: #16302d;
-      --highlight: #e08a5c;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #0b0b0a;
-        --surface: #151412;
-        --text: #f2f0ea;
-        --text-muted: #a39e91;
-        --border: #2a2822;
-        --accent: #5fb8ae;
-        --accent-soft: #16302d;
-        --highlight: #e08a5c;
-      }
-    }
-
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
-
-    .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
-    .site-nav a:not(.btn-primary) {
-      color: var(--text-muted);
-      font-weight: 500;
-      padding: 0.5rem 0;
-      border-bottom: 2px solid transparent;
-    }
-    .site-nav a:not(.btn-primary):hover { color: var(--text); }
-    .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
-
-    .theme-switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      cursor: pointer;
-      user-select: none;
-    }
-    .theme-switch input { display: none; }
-    .theme-switch .theme-switch-icon {
-      width: 1.25rem;
-      height: 1.25rem;
-      color: var(--text-muted);
-      transition: color .15s ease;
-    }
-    .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
-    .theme-switch-track {
-      position: relative;
-      width: 2.25rem;
-      height: 1.25rem;
-      border-radius: 9999px;
-      background: var(--border);
-      transition: background .15s ease;
-    }
-    .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
-    .theme-switch-dot {
-      position: absolute;
-      top: 0.15rem;
-      left: 0.15rem;
-      width: 0.95rem;
-      height: 0.95rem;
-      border-radius: 50%;
-      background: var(--surface);
-      transition: transform .15s ease;
-    }
-    .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
-
-    /* Neutralize the shared language-selector's hardcoded purple */
-    .language-selector-button.bg-purple-700 {
-      background-color: var(--surface) !important;
-      border-color: var(--border) !important;
-      color: var(--text) !important;
-    }
-    .language-selector-button.bg-purple-700:hover {
-      background-color: var(--accent-soft) !important;
-    }
-
-    .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
-
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-      border-radius: 0.25rem;
-      font-weight: 600;
-      transition: opacity .15s ease;
-    }
-    .btn-primary:hover { opacity: 0.85; }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 0.25rem;
-      font-weight: 600;
-    }
-    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-
-    .service-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-    }
-    .service-card-icon {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 0.5rem;
-      background: var(--accent-soft);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/terminal/css/terminal.css">
+  <script src="/terminal/js/terminal-theme.js"></script>
 </head>
 <body>
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a class="brand wm" href="/" aria-label="develop4God"><span class="d">develop</span><span class="f">4</span><span class="g">God</span></a>
+    <a class="nl" href="#hire" data-path-link="hire" data-i18n="nav.hire">Developments</a>
+    <a class="nl min" href="#ministry" data-path-link="ministry" data-i18n="nav.ministry">Ministry</a>
+    <a class="nl" href="#contact" data-contact-link data-i18n="nav.contact">Contact</a>
+    <div class="seg" role="group" data-i18n-aria="nav.language" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+    <button type="button" class="theme" id="theme" data-i18n-aria="nav.theme" aria-label="Switch theme"><span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span></button>
+  </div>
+</nav>
 
-  <header class="site-nav">
-    <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
-      <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
-      <nav aria-label="Navegación principal">
-        <ul class="flex items-center gap-6 text-sm">
-          <li><a href="#our-vision" data-i18n="tab.vision">Nuestra Visión</a></li>
-          <li><a href="/devocionales/" data-i18n="tab.devotionals">Devocionales</a></li>
-          <li><a href="/habitus/" data-i18n="tab.habitus">Habitus+Faith</a></li>
-          <li><a href="/work-with-me/" data-i18n="tab.workWithMe">Trabaja Conmigo</a></li>
-        </ul>
-      </nav>
-      <div class="flex items-center gap-3">
-        <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" class="btn-primary px-5 py-2 flex items-center gap-2">
-          <i data-lucide="heart" class="w-4 h-4" fill="currentColor"></i>
-          <span data-i18n="tab.donate">Donar</span>
-        </a>
-        <div id="language-selector"></div>
-        <!-- label wraps its own input; for attribute kept for clarity -->
-        <!-- [html-validate-disable-next no-redundant-for] -->
-        <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
-          <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
-          <input type="checkbox" id="theme-toggle">
-          <span class="theme-switch-track">
-            <span class="theme-switch-dot"></span>
-          </span>
-          <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
-        </label>
+<main id="main">
+  <!-- Hero story: logo + verse, then the fork. Plays on its own; one scroll reveals the doors. -->
+  <div class="story" id="story-hero" data-scenes="logo,twin" data-dwell="7500,Infinity">
+    <div class="pin">
+      <canvas class="scene" aria-hidden="true"></canvas>
+      <div class="vig"></div><div class="grain" aria-hidden="true"></div>
+
+      <div class="panel on" data-panel>
+        <div class="wrap"><div class="in">
+          <h1 class="sr">develop4God</h1>
+          <div class="versebox">
+            <div class="eyebrow" data-i18n="hero.eyebrow">develop4God · We develop for God</div>
+            <p class="verse" data-i18n="hero.verse">And whatsoever ye do, do it heartily, as to the Lord, and not unto men.</p>
+            <div class="refline" data-i18n="hero.ref">Colossians 3:23</div>
+            <div class="refline version" data-i18n="hero.version">KJV</div>
+            <p class="why" data-i18n="hero.why">That is where our name comes from.</p>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="panel doorpanel" data-panel>
+        <div class="wrap"><div class="in">
+          <div class="eyebrow" data-i18n="fork.eyebrow">Choose a path</div>
+          <h2 data-i18n="fork.title">Learn more.</h2>
+          <div class="doors">
+            <a class="door hire" href="#hire" data-path-link="hire"><span class="k" data-i18n="fork.hire.k">Businesses and people with a need</span><h3 data-i18n="fork.hire.title">Our developments</h3><p data-i18n="fork.hire.desc">See what we have built and how we can support your business or need.</p><span class="go" data-i18n="fork.hire.go">See the developments →</span></a>
+            <a class="door min" href="#ministry" data-path-link="ministry"><span class="k" data-i18n="fork.min.k">Our beloved users and ministries</span><h3 data-i18n="fork.min.title">Our ministry</h3><p data-i18n="fork.min.desc">See how God has allowed us to serve you, and how we can support your ministry.</p><span class="go" data-i18n="fork.min.go">See the ministry →</span></a>
+          </div>
+          <p class="hint" data-i18n="fork.hint">Pick one to continue.</p>
+        </div></div>
+      </div>
+
+      <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button></div>
+    </div>
+  </div>
+
+  <!-- Path: Developments -->
+  <section class="path" id="path-hire" hidden>
+    <div class="wrap switch" data-landing><button type="button" class="link" data-switch="ministry" data-i18n="hire.switch">← Looking for the ministry instead?</button></div>
+    <div class="story" id="story-hire" data-scenes="pipeline,lattice,device" data-dwell="7000" data-loop>
+      <div class="pin">
+        <canvas class="scene" aria-hidden="true"></canvas>
+        <div class="vig"></div>
+        <div class="panel on" data-panel><div class="wrap"><div class="in">
+          <div class="eyebrow" data-i18n="story.pipeline.eyebrow">LLM pipelines</div>
+          <h2 data-i18n="story.pipeline.title">I build LLM pipelines and the products around them.</h2>
+          <div class="typed" aria-hidden="true"><span data-typed-prefix data-i18n="story.pipeline.typed">$ building</span> <span data-typed-text></span><span class="caret"></span></div>
+          <p data-i18n="story.pipeline.text">Every model call leaves an audit trail. Provider-agnostic batch pipelines with checkpointed, resumable runs, and a dry-run mode that prints the cost before anything is sent.</p>
+          <div class="tags"><span>Anthropic</span><span>Gemini</span><span>Fireworks</span><span>DashScope</span><span>Ollama</span></div>
+        </div></div></div>
+        <div class="panel" data-panel><div class="wrap"><div class="in">
+          <div class="eyebrow" data-i18n="story.tenants.eyebrow">SaaS, websites and custom tools</div>
+          <h2 data-i18n="story.tenants.title">One platform, every client isolated.</h2>
+          <p data-i18n="story.tenants.text">A live multi-tenant platform for law firms, isolated by a JWT claim and Postgres row-level security. The same full-stack approach builds websites and custom tools.</p>
+          <div class="tags"><span>FastAPI</span><span>React</span><span>PostgreSQL</span><span>Render</span></div>
+        </div></div></div>
+        <div class="panel" data-panel><div class="wrap"><div class="in">
+          <div class="eyebrow" data-i18n="story.mobile.eyebrow">Mobile apps</div>
+          <h2 data-i18n="story.mobile.title">In production on Google Play, in several languages.</h2>
+          <p data-i18n="story.mobile.text">Flutter with BLoC and dependency injection, including Arabic right-to-left and Hindi.</p>
+          <div class="tags"><span>Flutter</span><span>BLoC</span><span>Firebase</span></div>
+        </div></div></div>
+        <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button><button type="button" class="dot" aria-label="Scene 3"></button></div>
+        <div class="cue" aria-hidden="true"><i></i><span data-i18n="hero.cue">Scroll</span></div>
+        <button type="button" class="pause" aria-pressed="false" aria-label="Pause animation"></button>
       </div>
     </div>
-  </header>
 
-  <main class="max-w-5xl mx-auto px-4 py-12">
-
-    <!-- Hero -->
-    <section class="text-center max-w-3xl mx-auto mb-16">
-      <img src="/img/logo_vector_512x512.png" alt="develop4God logo" style="height:6rem;width:auto;margin:0 auto 1.5rem;display:block;">
-      <h1 class="text-3xl sm:text-4xl font-extrabold mb-4" style="color: var(--text);" data-i18n="hero.subtitle">Herramientas para Fortalecer tu Fe y Caminar con Dios</h1>
-      <p class="text-lg" style="color: var(--text-muted);" data-i18n="hero.description">Recursos espirituales para tu crecimiento diario en Cristo</p>
-    </section>
-
-    <!-- Work With Me CTA -->
-    <a href="/work-with-me/" class="service-card mb-16 flex-row items-center justify-between gap-4" style="flex-direction: row; flex-wrap: wrap; text-decoration: none;">
-      <span style="color: var(--text);" data-i18n="workWithMeCta.question">¿Eres un ministerio, negocio o persona que necesita programas, apps o herramientas?</span>
-      <span class="btn-primary px-4 py-2 inline-flex items-center gap-2" style="white-space: nowrap;">
-        <span data-i18n="workWithMeCta.button">Trabaja Conmigo</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-      </span>
-    </a>
-
-    <!-- Projects -->
-    <section class="mb-16">
-      <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--text);" data-i18n="projects.title">Nuestros Proyectos</h2>
-      <div class="grid md:grid-cols-3 gap-6">
-        <a href="/devocionales/" class="service-card" style="text-decoration: none;">
-          <div class="service-card-icon"><i data-lucide="book-open" class="w-5 h-5"></i></div>
-          <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.devocionales.title">Devocionales Cristianos</h3>
-          <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.devocionales.description">Tu refugio diario en la Palabra de Dios con devocionales en audio</p>
-          <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.devocionales.button">
-            Explorar Devocionales
-          </span>
-        </a>
-
-        <a href="/habitus/" class="service-card" style="text-decoration: none;">
-          <div class="service-card-icon"><i data-lucide="sparkles" class="w-5 h-5"></i></div>
-          <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.habitus.title">Habitus+Faith</h3>
-          <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.habitus.description">Construye hábitos piadosos a través de la fe y la disciplina espiritual</p>
-          <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.habitus.button">
-            Descubrir Habitus
-          </span>
-        </a>
-
-        <a href="/work-with-me/" class="service-card" style="text-decoration: none;">
-          <div class="service-card-icon"><i data-lucide="bot" class="w-5 h-5"></i></div>
-          <h3 class="font-bold mb-2" style="color: var(--text);" data-i18n="projects.aiAutomation.title">IA y Automatización de Datos</h3>
-          <p class="mb-4 flex-1" style="color: var(--text-muted);" data-i18n="projects.aiAutomation.description">Generación, revisión y automatización de datos con Inteligencia Artificial</p>
-          <span class="btn-secondary px-4 py-2 inline-flex items-center gap-2 self-start" data-i18n="projects.aiAutomation.button">
-            Conocer Más
-          </span>
-        </a>
+    <section class="s" id="build"><div class="wrap">
+      <h2 class="t rv" data-i18n="hire.build.title">What we have built</h2><p class="sub rv" data-i18n="hire.build.sub">From the database to the screen. Six kinds of work, each shipped to real users.</p>
+      <div class="kinds">
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k1.title">SaaS and web apps</h3><p data-i18n="hire.kinds.k1.text">Multi-tenant platforms built end to end: API, UI, database, deployment.</p><div class="ex">FastAPI · React · PostgreSQL</div></div>
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k2.title">Websites</h3><p data-i18n="hire.kinds.k2.text">Fast, bilingual, easy to maintain. Catalogues, landing pages and ministry sites, with ordering by WhatsApp when it helps.</p><div class="ex">HTML · CSS · JS · SEO</div></div>
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k3.title">Custom tools</h3><p data-i18n="hire.kinds.k3.text">Internal tools, automations, integrations and desktop apps built around how your team actually works.</p><div class="ex">Python · Node · Electron</div></div>
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k4.title">LLM pipelines</h3><p data-i18n="hire.kinds.k4.text">Provider-agnostic batch pipelines with checkpointed runs, audit trails and cost estimates.</p><div class="ex">Anthropic · Gemini · LangGraph</div></div>
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k5.title">Content systems</h3><p data-i18n="hire.kinds.k5.text">Generating, translating and validating large content sets with independent critic review.</p><div class="ex">LangGraph · CI</div></div>
+        <div class="kind rv"><h3 data-i18n="hire.kinds.k6.title">Mobile apps</h3><p data-i18n="hire.kinds.k6.text">Production Flutter apps with clean architecture, including right-to-left languages.</p><div class="ex">Flutter · BLoC · Google Play</div></div>
       </div>
-    </section>
+    </div></section>
 
-    <!-- Nuestra Visión -->
-    <section id="our-vision" class="text-center max-w-2xl mx-auto mb-16">
-      <h2 class="text-2xl font-bold mb-4" style="color: var(--text);" data-i18n="vision.title">Nuestra Visión</h2>
-      <p style="color: var(--text-muted);" data-i18n="vision.description">
-        develop4God es una iniciativa digital que busca crear herramientas para ayudar a los creyentes a crecer en su fe, mantener disciplinas espirituales y caminar más cerca de Dios cada día. Creemos que la tecnología puede servir al reino de Dios, brindando recursos accesibles y de calidad para fortalecer tu vida espiritual.
-      </p>
-    </section>
+    <section class="s"><div class="wrap"><div class="ask rv">
+      <div><h2 data-i18n="hire.ask.title">Have another need? Let's talk.</h2><p data-i18n="hire.ask.text">Whether it is a development, a small idea or an automation that saves time: write to us. By God's grace and our work with AI, we can guide you on almost any need today.</p></div>
+      <div><a class="btn a" href="#contact" data-contact-link data-i18n="hire.ask.cta">Tell us what you need</a></div>
+    </div></div></section>
 
-    <!-- Donación -->
-    <section id="donacion" class="text-center max-w-2xl mx-auto">
-      <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" style="color: var(--highlight);" aria-label="Donar en PayPal">
-        <i data-lucide="heart" class="w-8 h-8 mx-auto mb-4" fill="currentColor"></i>
-      </a>
-      <h2 class="text-2xl font-bold mb-3" style="color: var(--text);" data-i18n="support.title">Apoya el Ministerio</h2>
-      <p class="mb-6" style="color: var(--text-muted);" data-i18n="support.description">
-        Tu apoyo nos permite seguir desarrollando recursos gratuitos y de calidad para la comunidad cristiana. ¡Gracias por ser parte de esta misión!
-      </p>
-      <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" class="btn-primary px-6 py-3 inline-flex items-center gap-2">
-        <i data-lucide="gift" class="w-4 h-4"></i>
-        <span data-i18n="support.title">Apoyar el Ministerio</span>
-      </a>
-    </section>
+    <section class="s" id="work"><div class="wrap">
+      <h2 class="t rv" data-i18n="hire.cases.title">Selected work</h2><p class="sub rv" data-i18n="hire.cases.sub">What each project is and how it's built.</p>
+      <div id="cases"></div>
+      <p class="more rv"><a href="https://github.com/develop4God" target="_blank" rel="noopener" data-i18n="hire.cases.more">More projects on GitHub →</a></p>
+      <h2 class="t rv how" data-i18n="hire.how.title">How we work</h2><p class="sub rv" data-i18n="hire.how.sub">The same loop on every change, whether the client is a firm or a church.</p>
+      <div class="ride" id="ride">
+        <div class="rline"><div class="rfill"></div><div class="rdot"></div></div>
+        <div class="step"><b data-i18n="hire.steps.s1.title">Plan</b><span data-i18n="hire.steps.s1.text">Checks and deliverables written before code.</span></div>
+        <div class="step"><b data-i18n="hire.steps.s2.title">Tests first</b><span data-i18n="hire.steps.s2.text">Each test fails for the right reason, then passes.</span></div>
+        <div class="step"><b data-i18n="hire.steps.s3.title">Build</b><span data-i18n="hire.steps.s3.text">The simplest design that works. SOLID, no tech debt.</span></div>
+        <div class="step"><b data-i18n="hire.steps.s4.title">Independent review</b><span data-i18n="hire.steps.s4.text">We never review our own code as the last gate. CI is green before merge.</span></div>
+      </div>
+    </div></section>
+  </section>
 
-  </main>
+  <!-- Path: Ministry -->
+  <section class="path" id="path-ministry" hidden>
+    <div class="wrap switch" data-landing><button type="button" class="link" data-switch="hire" data-i18n="min.switch">← Looking for the developments instead?</button></div>
+    <section class="minband" id="ministries"><div class="wrap">
+      <h2 class="t rv" data-i18n="min.title">Our mission</h2>
+      <p class="sub rv" data-i18n="min.sub">To carry the word of God</p>
+      <blockquote class="isaiah rv"><p data-i18n="min.isaiah.text">For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.</p><cite data-i18n="min.isaiah.ref">Isaiah 55:10-11 · KJV</cite></blockquote>
+      <div class="stats rv" role="group" data-i18n-aria="min.apps.dev.title" aria-label="Christian Devotionals">
+        <div class="stat"><b data-app-stat="downloads" data-countup>—</b><span data-i18n="min.stats.downloads">Downloads</span></div>
+        <div class="stat"><b data-app-stat="countries" data-countup>—</b><span data-i18n="min.stats.countries">Countries</span></div>
+        <div class="stat"><b data-app-stat="activeUsers" data-countup>—</b><span data-i18n="min.stats.active">Active users</span></div>
+        <div class="stat"><b data-app-stat="ratingDisplay" data-countup>—</b><span data-i18n="min.stats.rating">Rating</span></div>
+        <div class="stat"><b data-app-stat="languages" data-countup>—</b><span data-i18n="min.stats.languages">Languages</span></div>
+      </div>
+      <div class="minsplit">
+        <div class="offer app rv"><div class="apphead"><a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img class="appicon" src="/terminal/img/devocionales-icon.png" alt="" width="64" height="64" loading="lazy"></a>
+            <a class="store" href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo" target="_blank" rel="noopener"><img src="/terminal/img/google-play.png" alt="" width="54" height="60" loading="lazy"><span class="sr" data-i18n="min.apps.dev.store">Get it on Google Play</span></a></div>
+          <h3 data-i18n="min.apps.dev.title">Christian Devotionals</h3><p data-i18n="min.apps.dev.text">Your daily devotional, free and in several languages: verse, reflection and prayer, with audio, favorites and sharing.</p>
+          <div class="row"><a class="btn m" href="/devocionales/" data-i18n="min.apps.dev.go">Read today's devotional</a></div></div>
+        <div class="offer app rv"><div class="apphead"><a href="https://play.google.com/store/apps/details?id=com.develop4God.habitus_faith" target="_blank" rel="noopener" tabindex="-1" aria-hidden="true"><img class="appicon" src="/terminal/img/habitus-icon.png" alt="" width="64" height="64" loading="lazy"></a>
+            <a class="store" href="https://play.google.com/store/apps/details?id=com.develop4God.habitus_faith" target="_blank" rel="noopener"><img src="/terminal/img/google-play.png" alt="" width="54" height="60" loading="lazy"><span class="sr" data-i18n="min.apps.hab.store">Get it on Google Play</span></a></div>
+          <h3 data-i18n="min.apps.hab.title">Habitus+Faith</h3><p data-i18n="min.apps.hab.text">Turn faith into a daily habit: suggested micro-habits, streaks and verses, with the Bible inside the app.</p>
+          <div class="row"><a class="btn m" href="/habitus/" data-i18n="min.apps.hab.go">Get to know Habitus+Faith</a></div></div>
+      </div>
+      <div class="offer minbuild rv"><h3 data-i18n="min.build.title">What we can build for your ministry</h3>
+          <ul><li data-i18n="min.build.i1">A mobile app or website for your church or organization</li><li data-i18n="min.build.i2">Content generation, translation and multi-language support</li><li data-i18n="min.build.i3">Dashboards, integrations and back-end systems</li><li data-i18n="min.build.i4">Automation that saves your team time</li></ul>
+          <a class="btn m" href="#contact" data-contact-link data-i18n="min.build.cta">Tell us about your project</a></div>
+    </div></section>
+    <section class="s minhow"><div class="wrap">
+      <h2 class="t rv" data-i18n="min.how.title">How we build our ministry</h2><p class="sub rv" data-i18n="min.how.sub">A look at how God lets us reach readers in so many countries and languages.</p>
+    </div></section>
+    <div class="story" id="story-ministry" data-scenes="globe,languages" data-dwell="7000" data-loop>
+      <div class="pin">
+        <canvas class="scene" aria-hidden="true"></canvas>
+        <div class="vig"></div>
+        <div class="panel on" data-panel><div class="wrap"><div class="in">
+          <div class="eyebrow gold" data-i18n="story.world.eyebrow">Christian Devotionals</div>
+          <h2 data-i18n="story.world.title">Read in countries around the world.</h2>
+          <p data-i18n="story.world.text">A free daily devotional app and reader, built for His glory and shared with believers everywhere.</p>
+        </div></div></div>
+        <div class="panel" data-panel><div class="wrap"><div class="in">
+          <div class="eyebrow gold" data-i18n="story.languages.eyebrow">Multiple languages</div>
+          <h2 data-i18n="story.languages.title">Multiple languages, with systems that review them.</h2>
+          <p data-i18n="story.languages.text">To ensure content quality in every language, we build AI-integrated validation tools for review and translation.</p>
+        </div></div></div>
+        <div class="sdots"><button type="button" class="dot on" aria-label="Scene 1"></button><button type="button" class="dot" aria-label="Scene 2"></button></div>
+        <div class="cue" aria-hidden="true"><i></i><span data-i18n="hero.cue">Scroll</span></div>
+        <button type="button" class="pause" aria-pressed="false" aria-label="Pause animation"></button>
+      </div>
+    </div>
+  </section>
 
-  <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
-    <p><a href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="mail" class="w-4 h-4"></i><span data-i18n="footer.contact">Contacto</span></a></p>
-  </footer>
+  <section class="contact" id="contact" hidden><div class="wrap"><div class="box rv">
+    <div><h2 data-i18n="contact.title">If you made it this far, let's talk.</h2><p class="muted" data-i18n="contact.text">Tell us what you need: a product, a website, a tool or a project for your ministry.</p></div>
+    <div class="mail"><a class="btn a mailto" href="mailto:develop4God@gmail.com" data-i18n="contact.cta">Write us an email</a></div>
+  </div></div></section>
+</main>
 
-  <script src="/js/site-footer.js"></script>
-  <script src="/js/rtl-helper.js"></script>
-  <script src="/js/home.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.lucide && lucide.createIcons) lucide.createIcons();
-    });
+<footer id="page-footer" class="site-footer">
+  <span>© <span data-year>2026</span> <span class="foot-brand"><span class="foot-dev">Develop</span><span class="foot-4">4</span><span class="foot-god">God</span></span>. <span data-i18n="foot.rights">All rights reserved.</span></span>
+  <a class="foot-mail" href="mailto:develop4God@gmail.com" data-i18n-aria="foot.email" aria-label="Email Develop4God" title="develop4God@gmail.com"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></a>
+</footer>
 
-    (function () {
-      const toggle = document.getElementById('theme-toggle');
-      const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
-      const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
-
-      function currentTheme() {
-        const attr = document.documentElement.getAttribute('data-theme');
-        if (attr) return attr;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      }
-
-      function syncSwitch() {
-        const isDark = currentTheme() === 'dark';
-        toggle.checked = isDark;
-        iconDark.classList.toggle('is-active', isDark);
-        iconLight.classList.toggle('is-active', !isDark);
-      }
-
-      toggle.addEventListener('change', () => {
-        const next = toggle.checked ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        syncSwitch();
-      });
-
-      syncSwitch();
-    })();
-  </script>
+<script src="/js/app-stats.js"></script>
+<script src="/terminal/js/terminal-math.js"></script>
+<script src="/terminal/js/terminal-world-mask.js"></script>
+<script src="/terminal/js/terminal-globe.js"></script>
+<script src="/terminal/js/terminal-globe-layer.js"></script>
+<script src="/terminal/js/terminal-scenes.js"></script>
+<script src="/terminal/js/terminal-layout.js"></script>
+<script src="/terminal/js/terminal-i18n.js"></script>
+<script src="/terminal/js/terminal-cases.js"></script>
+<script src="/terminal/js/terminal-logo-image.js"></script>
+<script src="/terminal/js/terminal-spin.js"></script>
+<script src="/terminal/js/terminal-twin-life.js"></script>
+<script src="/terminal/js/terminal-canvas.js"></script>
+<script src="/terminal/js/terminal-story.js"></script>
+<script src="/terminal/js/terminal-effects.js"></script>
+<script src="/terminal/js/terminal-page.js"></script>
 </body>
 </html>
