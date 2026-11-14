@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "develop4God — AI engineer and full-stack architect",
-    "description": "AI engineer and full-stack architect. Hire me for LLM pipelines, SaaS and apps, or build with me for your ministry."
+    "title": "develop4God — We develop for God",
+    "description": "A ministry that builds software as unto the Lord: Devocionales Cristianos and systems for ministries."
   },
   "nav": {
     "hire": "Hire me",
@@ -11,10 +11,11 @@
     "theme": "Switch theme"
   },
   "hero": {
-    "eyebrow": "AI engineer · Full-stack architect",
+    "eyebrow": "develop4God · We develop for God",
     "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
     "ref": "Colossians 3:23",
-    "version": "King James Version, public domain",
+    "why": "That is where our name comes from.",
+    "version": "KJV",
     "cue": "Scroll"
   },
   "fork": {

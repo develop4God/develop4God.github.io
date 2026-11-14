@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "develop4God — Ingeniero de IA y arquitecto full-stack",
-    "description": "Ingeniero de IA y arquitecto full-stack. Contrátame para pipelines de LLM, SaaS y apps, o construyamos juntos para tu ministerio."
+    "title": "develop4God — Desarrollamos para Dios",
+    "description": "Un ministerio que construye software como para el Señor: Devocionales Cristianos y sistemas para ministerios."
   },
   "nav": {
     "hire": "Contrátame",
@@ -11,10 +11,11 @@
     "theme": "Cambiar tema"
   },
   "hero": {
-    "eyebrow": "Ingeniero de IA · Arquitecto full-stack",
+    "eyebrow": "develop4God · Desarrollamos para Dios",
     "verse": "Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres.",
     "ref": "Colosenses 3:23",
-    "version": "Reina-Valera 1909, dominio público",
+    "why": "De ahí viene nuestro nombre.",
+    "version": "RVR1909",
     "cue": "Desliza"
   },
   "fork": {
