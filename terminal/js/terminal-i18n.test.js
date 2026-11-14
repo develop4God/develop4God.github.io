@@ -76,8 +76,6 @@ test('every data-i18n key used in terminal/index.html exists in every language f
   assert.ok(keys.length > 20);
   I.SUPPORTED.forEach((lang) => {
     const d = JSON.parse(fs.readFileSync(path.join(LANG_DIR, `${lang}.json`), 'utf8'));
-    // At runtime TerminalI18n.load merges the shared footer strings from lang/home.
-    d.footer = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'lang', 'home', `${lang}.json`), 'utf8')).footer;
     keys.forEach((k) => assert.notStrictEqual(I.get(d, k), undefined, `${lang}: missing ${k}`));
   });
 });
@@ -90,7 +88,6 @@ test('English fallback text in terminal/index.html matches en.json (no-JS and SE
   assert.ok(found.length > 40);
   found.forEach((m) => {
     const key = m[2];
-    if (key.startsWith('footer.')) return; // supplied by lang/home at runtime
     // A {token} in en.json is filled from app-stats.json at runtime, so the fallback may say anything there.
     const expected = I.get(en, key);
     const pattern = new RegExp('^' + expected.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\w+\}/g, '.+') + '$');
@@ -98,33 +95,28 @@ test('English fallback text in terminal/index.html matches en.json (no-JS and SE
   });
 });
 
+let fetched = [];
 function mockFetch(routes) {
+  fetched = [];
   global.fetch = async (url) => {
+    fetched.push(url);
     const body = routes[url];
     return { ok: body !== undefined, json: async () => body };
   };
 }
 const TERM = (l) => ({ meta: { title: l }, hero: { verse: `verse-${l}` } });
-const HOME = (l) => ({ footer: { copyright: `c-${l}`, madeWith: `m-${l}`, contact: `k-${l}` } });
 
-test('load returns the requested language with merged footer when both files load', async () => {
-  mockFetch({ '/lang/terminal/es.json': TERM('es'), '/lang/home/es.json': HOME('es') });
-  const r = await I.load('es');
-  assert.strictEqual(r.lang, 'es');
-  assert.strictEqual(r.dict.hero.verse, 'verse-es');
-  assert.strictEqual(r.dict.footer.copyright, 'c-es');
-});
-
-test('load keeps the page copy when only the shared footer file fails', async () => {
-  mockFetch({ '/lang/terminal/es.json': TERM('es') });
+test('load returns the requested language from the terminal file only (no shared home footer)', async () => {
+  mockFetch({ '/lang/terminal/es.json': TERM('es'), '/lang/home/es.json': { footer: { copyright: 'c-es' } } });
   const r = await I.load('es');
   assert.strictEqual(r.lang, 'es');
   assert.strictEqual(r.dict.hero.verse, 'verse-es');
   assert.strictEqual(r.dict.footer, undefined);
+  assert.deepStrictEqual(fetched, ['/lang/terminal/es.json']);
 });
 
 test('load falls back to English and reports English when the page copy fails', async () => {
-  mockFetch({ '/lang/terminal/en.json': TERM('en'), '/lang/home/en.json': HOME('en') });
+  mockFetch({ '/lang/terminal/en.json': TERM('en') });
   const r = await I.load('es');
   assert.strictEqual(r.lang, 'en');
   assert.strictEqual(r.dict.hero.verse, 'verse-en');

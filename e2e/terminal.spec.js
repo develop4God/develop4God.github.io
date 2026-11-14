@@ -405,3 +405,18 @@ test('selected work ends with one link to the GitHub profile instead of a second
   await page.goto('/terminal/?lang=es#hire', { waitUntil: 'networkidle' });
   await expect(more).toHaveText('Más proyectos en GitHub →');
 });
+
+test('footer matches the saas-tools one: copyright with the colored brand, rights line and a mail icon', async ({ page }) => {
+  const year = new Date().getFullYear();
+  await page.goto('/terminal/?lang=en', { waitUntil: 'networkidle' });
+  const footer = page.locator('#page-footer');
+  await expect(footer).toContainText(`© ${year} Develop4God. All rights reserved.`);
+  await expect(footer).not.toContainText('Made with');
+  const mail = footer.locator('a[href^="mailto:"]');
+  await expect(mail).toHaveAttribute('aria-label', 'Email Develop4God');
+  await expect(mail.locator('svg')).toBeVisible();
+  await expect(footer.locator('.foot-4')).toHaveText('4');
+  await page.goto('/terminal/?lang=es', { waitUntil: 'networkidle' });
+  await expect(footer).toContainText(`© ${year} Develop4God. Todos los derechos reservados.`);
+  await expect(mail).toHaveAttribute('aria-label', 'Escribir a Develop4God');
+});

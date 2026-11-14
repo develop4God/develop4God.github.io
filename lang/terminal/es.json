@@ -234,5 +234,9 @@
     "title": "Si llegaste hasta aquí, hablemos.",
     "text": "Cuéntanos qué necesitas: un producto, un sitio web, una herramienta o un proyecto para tu ministerio.",
     "cta": "Escríbenos un correo"
+  },
+  "foot": {
+    "rights": "Todos los derechos reservados.",
+    "email": "Escribir a Develop4God"
   }
 }

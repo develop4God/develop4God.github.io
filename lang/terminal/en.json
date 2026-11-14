@@ -234,5 +234,9 @@
     "title": "If you made it this far, let's talk.",
     "text": "Tell us what you need: a product, a website, a tool or a project for your ministry.",
     "cta": "Write us an email"
+  },
+  "foot": {
+    "rights": "All rights reserved.",
+    "email": "Email Develop4God"
   }
 }

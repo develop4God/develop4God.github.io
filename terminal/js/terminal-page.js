@@ -1,5 +1,5 @@
 // Page wiring for /terminal/: language and theme controls, path choice (Hire me /
-// Ministry), lazy story creation, the cases list and shared footer.
+// Ministry), lazy story creation, the cases list and the footer year.
 (function (window) {
   'use strict';
 
@@ -47,13 +47,6 @@
     reveal.observe($all('.case:not(.in)', host));
   }
 
-  function renderFooter() {
-    var f = dict.footer;
-    if (!f || !window.SiteFooter) return;
-    var year = new Date().getFullYear();
-    window.SiteFooter.renderSharedLines($('#page-footer'), { copyright: f.copyright.replace(/©\s*\d{4}/, '© ' + year), madeWith: f.madeWith });
-  }
-
   function labelPause(btn) {
     btn.setAttribute('aria-label', I.get(dict, btn.getAttribute('aria-pressed') === 'true' ? 'story.play' : 'story.pause') || btn.getAttribute('aria-label'));
   }
@@ -73,7 +66,6 @@
     $all('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
     labelDots();
     renderCases();
-    renderFooter();
     if (typed) typed.restart();
   }
 
@@ -196,6 +188,7 @@
     try { saved = localStorage.getItem(I.STORAGE_KEY); } catch (e) { /* storage unavailable */ }
     var l = I.resolveLanguage({ param: param, saved: saved, browser: navigator.language });
     bindControls();
+    $('[data-year]').textContent = new Date().getFullYear();
     loadTokens();
     skipHeroOnInput(ensureStory('hero'));
     var ride = $('#ride');
