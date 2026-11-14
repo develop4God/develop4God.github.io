@@ -1,16 +1,18 @@
 // Language handling for the root page. Reuses the site-wide `develop4God_language`
-// storage key; all page copy lives in `/lang/terminal/{lang}.json`. v1 supports en and es; add a language by adding
-// its code to SUPPORTED and a matching JSON file (a unit test enforces key parity).
+// storage key; all page copy lives in `/lang/terminal/{lang}.json`. It supports the
+// same 10 languages as the rest of the site; add a language by adding its code to
+// SUPPORTED and a matching JSON file (a unit test enforces key parity).
 (function (window) {
   'use strict';
 
-  var SUPPORTED = ['en', 'es'];
+  var SUPPORTED = ['en', 'es', 'pt', 'fr', 'de', 'zh', 'ja', 'hi', 'ar', 'fil'];
   var DEFAULT_LANGUAGE = 'en';
   var STORAGE_KEY = 'develop4God_language';
 
   function normalize(value) {
     if (typeof value !== 'string') return null;
     var short = value.split('-')[0].toLowerCase();
+    if (short === 'tl') short = 'fil';
     return SUPPORTED.indexOf(short) >= 0 ? short : null;
   }
 
@@ -87,7 +89,7 @@
       if (typeof value === 'string') el.setAttribute('content', value);
     });
     if (dict.meta && dict.meta.title) document.title = dict.meta.title;
-    document.documentElement.setAttribute('lang', lang);
+    window.RtlHelper.applyDirection(lang);
   }
 
   window.TerminalI18n = {

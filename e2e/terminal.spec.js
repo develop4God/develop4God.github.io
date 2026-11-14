@@ -104,13 +104,13 @@ test('deep link #ministry opens the ministry path; stats come from app-stats.jso
 test('language: ES switch changes verse and copy, persists the shared key, survives reload', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/', { waitUntil: 'networkidle' });
-  await page.locator('button[data-lang="es"]').click();
+  await page.locator('#lang').selectOption('es');
   await expect(page.locator('#story-hero .verse')).toHaveText(ES_VERSE);
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   expect(await page.evaluate(() => localStorage.getItem('develop4God_language'))).toBe('es');
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.locator('#story-hero .verse')).toHaveText(ES_VERSE);
-  await expect(page.locator('button[data-lang="es"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#lang')).toHaveValue('es');
   expect(errors).toEqual([]);
 });
 
@@ -215,7 +215,7 @@ test('switching language keeps already revealed case rows visible', async ({ pag
   await page.waitForTimeout(900);
   const before = await page.locator('#cases .case.in').count();
   expect(before).toBeGreaterThan(0);
-  await page.locator('button[data-lang="es"]').click();
+  await page.locator('#lang').selectOption('es');
   await expect(page.locator('#cases .case h3').first()).not.toHaveText('');
   expect(await page.locator('#cases .case.in').count()).toBe(before);
 });
@@ -223,8 +223,9 @@ test('switching language keeps already revealed case rows visible', async ({ pag
 test('rapid language switches end on the last choice', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
   await page.evaluate(() => {
-    document.querySelector('button[data-lang="es"]').click();
-    document.querySelector('button[data-lang="en"]').click();
+    const sel = document.querySelector('#lang');
+    sel.value = 'es'; sel.dispatchEvent(new Event('change'));
+    sel.value = 'en'; sel.dispatchEvent(new Event('change'));
   });
   await page.waitForTimeout(800);
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
@@ -271,7 +272,7 @@ test('contact opens the mail app: a mailto link, no copy button', async ({ page 
   await expect(link).toBeVisible();
   expect(await link.getAttribute('href')).toMatch(/^mailto:develop4God@gmail\.com/);
   await expect(page.locator('#contact #copy')).toHaveCount(0);
-  await page.locator('button[data-lang="es"]').click();
+  await page.locator('#lang').selectOption('es');
   await expect(link).not.toHaveText('');
 });
 
@@ -323,7 +324,7 @@ test('ministry mission shows the Isaiah 55 text in each language, under the miss
   await expect(q).toBeVisible();
   await expect(q.locator('p')).toContainText('my word');
   await expect(q.locator('cite')).toContainText('Isaiah 55:10-11');
-  await page.locator('button[data-lang="es"]').click();
+  await page.locator('#lang').selectOption('es');
   await expect(q.locator('p')).toContainText('mi palabra');
   await expect(q.locator('cite')).toContainText('Isaías 55:10-11');
   await expect(page.locator('#ministries .t')).toHaveText('Nuestra misión');
@@ -495,7 +496,7 @@ test('root keeps the site analytics tag and a canonical URL', async ({ page }) =
 test('keyboard: Enter on a focused control does not skip the hero; Enter on the page does', async ({ page }) => {
   await page.goto('/', { waitUntil: 'networkidle' });
   const second = page.locator('#story-hero [data-panel]').nth(1);
-  await page.locator('[data-lang="en"]').first().focus();
+  await page.locator('#lang').focus();
   await page.keyboard.press('Enter');
   await page.waitForTimeout(4000);
   await expect(second).not.toHaveClass(/on/);
@@ -512,4 +513,41 @@ test('contact link puts #contact in the URL, so a reload keeps the section open'
   expect(page.url()).toContain('#contact');
   await page.reload({ waitUntil: 'networkidle' });
   await expect(page.locator('#contact')).toBeVisible();
+});
+
+test('language selector lists the 10 site languages and every choice loads without errors', async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const codes = await page.locator('#lang option').evaluateAll((os) => os.map((o) => o.value));
+  expect(codes).toEqual(['en', 'es', 'pt', 'fr', 'de', 'zh', 'ja', 'hi', 'ar', 'fil']);
+  for (const code of codes) {
+    await page.locator('#lang').selectOption(code);
+    await expect(page.locator('html')).toHaveAttribute('lang', code);
+    await expect(page.locator('html')).toHaveAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
+    expect(await page.evaluate(() => localStorage.getItem('develop4God_language'))).toBe(code);
+  }
+  expect(errors).toEqual([]);
+});
+
+for (const [label, size] of [['phone', { width: 375, height: 667 }], ['tablet', { width: 768, height: 1024 }]]) {
+  test(`Arabic (RTL) has no horizontal overflow at ${label} width, on every path`, async ({ page }) => {
+    await page.setViewportSize(size);
+    for (const hash of ['', '#hire', '#ministry', '#contact']) {
+      await page.goto('/?lang=ar' + hash, { waitUntil: 'networkidle' });
+      await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), hash).toBe(false);
+    }
+  });
+}
+
+test('Arabic (RTL) mirrors the ride timeline and quote indents to the right edge', async ({ page }) => {
+  await page.goto('/?lang=ar#ministry', { waitUntil: 'networkidle' });
+  const read = (sel) => page.evaluate((s) => {
+    const el = document.querySelector(s);
+    const cs = getComputedStyle(el);
+    return { pl: cs.paddingLeft, pr: cs.paddingRight };
+  }, sel);
+  expect(await read('.ride')).toEqual({ pl: '0px', pr: '44px' });
+  await page.goto('/?lang=en#ministry', { waitUntil: 'networkidle' });
+  expect(await read('.ride')).toEqual({ pl: '44px', pr: '0px' });
 });

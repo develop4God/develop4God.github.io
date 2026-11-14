@@ -63,7 +63,7 @@
     dict = dicts[l];
     currentLang = l;
     I.apply(document, dict, l, tokens);
-    $all('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lang') === l ? 'true' : 'false'); });
+    $('#lang').value = l;
     labelDots();
     renderCases();
     if (typed) typed.restart();
@@ -182,7 +182,7 @@
   }
 
   function bindControls() {
-    $all('[data-lang]').forEach(function (b) { b.addEventListener('click', function () { setLanguage(b.getAttribute('data-lang'), true); }); });
+    $('#lang').addEventListener('change', function (e) { setLanguage(e.target.value, true); });
     $('#theme').addEventListener('click', function () { window.TerminalTheme.set(window.TerminalTheme.nextTheme(window.TerminalTheme.current())); });
     $all('[data-path-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); choosePath(a.getAttribute('data-path-link')); }); });
     $all('[data-switch]').forEach(function (b) { b.addEventListener('click', function () { choosePath(b.getAttribute('data-switch')); }); });
@@ -194,6 +194,7 @@
     try { saved = localStorage.getItem(I.STORAGE_KEY); } catch (e) { /* storage unavailable */ }
     var l = I.resolveLanguage({ param: param, saved: saved, browser: navigator.language });
     bindControls();
+    $('#lang').value = l;
     $('[data-year]').textContent = new Date().getFullYear();
     loadTokens();
     skipHeroOnInput(ensureStory('hero'));

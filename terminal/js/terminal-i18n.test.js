@@ -9,6 +9,7 @@ function load(file) {
   const filename = path.join(__dirname, file);
   vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
+load(path.join('..', '..', 'js', 'rtl-helper.js'));
 load('terminal-i18n.js');
 load('terminal-theme.js');
 const I = global.window.TerminalI18n;
@@ -23,7 +24,9 @@ test('resolveLanguage prefers URL param, then saved, then browser, then English'
 });
 
 test('resolveLanguage ignores unsupported, empty and malformed values', () => {
-  assert.strictEqual(I.resolveLanguage({ param: 'pt', saved: 'xx', browser: 'fr-FR' }), 'en');
+  assert.strictEqual(I.resolveLanguage({ param: 'xx', saved: 'yy', browser: 'it-IT' }), 'en');
+  assert.strictEqual(I.resolveLanguage({ param: 'xx', saved: 'ar', browser: 'fr-FR' }), 'ar');
+  assert.strictEqual(I.resolveLanguage({ param: 'xx', saved: null, browser: 'fil-PH' }), 'fil');
   assert.strictEqual(I.resolveLanguage({ param: '', saved: null, browser: undefined }), 'en');
   assert.strictEqual(I.resolveLanguage({ param: 'ES' }), 'es');
   assert.strictEqual(I.resolveLanguage({ param: '__proto__' }), 'en');
@@ -174,4 +177,18 @@ test('no language count is written by hand in the terminal strings (it comes fro
     const raw = fs.readFileSync(path.join(LANG_DIR, `${lang}.json`), 'utf8');
     assert.doesNotMatch(raw, /\b(10|ten|diez)\s+(languages|idiomas)/i, `${lang}: hardcoded language count`);
   });
+});
+
+test('Filipino is also found under its legacy browser code tl', () => {
+  assert.strictEqual(I.resolveLanguage({ browser: 'tl-PH' }), 'fil');
+  assert.strictEqual(I.resolveLanguage({ param: 'tl' }), 'fil');
+});
+
+test('apply sets lang and dir: rtl for Arabic, ltr again when switching back', () => {
+  const root = { querySelectorAll: () => [] };
+  global.document = { documentElement: { lang: '', dir: '' }, title: '' };
+  I.apply(root, {}, 'ar', {});
+  assert.deepStrictEqual([document.documentElement.lang, document.documentElement.dir], ['ar', 'rtl']);
+  I.apply(root, {}, 'en', {});
+  assert.deepStrictEqual([document.documentElement.lang, document.documentElement.dir], ['en', 'ltr']);
 });

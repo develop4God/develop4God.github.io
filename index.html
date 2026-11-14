@@ -29,10 +29,18 @@
     <a class="nl" href="#hire" data-path-link="hire" data-i18n="nav.hire">Developments</a>
     <a class="nl min" href="#ministry" data-path-link="ministry" data-i18n="nav.ministry">Ministry</a>
     <a class="nl" href="#contact" data-contact-link data-i18n="nav.contact">Contact</a>
-    <div class="seg" role="group" data-i18n-aria="nav.language" aria-label="Language">
-      <button type="button" data-lang="en" aria-pressed="true">EN</button>
-      <button type="button" data-lang="es" aria-pressed="false">ES</button>
-    </div>
+    <select class="langsel" id="lang" data-i18n-aria="nav.language" aria-label="Language">
+      <option value="en">English</option>
+      <option value="es">Español</option>
+      <option value="pt">Português</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="hi">हिन्दी</option>
+      <option value="ar">العربية</option>
+      <option value="fil">Filipino</option>
+    </select>
     <button type="button" class="theme" id="theme" data-i18n-aria="nav.theme" aria-label="Switch theme"><span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span></button>
   </div>
 </nav>
@@ -207,6 +215,7 @@
 <script src="/terminal/js/terminal-globe-layer.js"></script>
 <script src="/terminal/js/terminal-scenes.js"></script>
 <script src="/terminal/js/terminal-layout.js"></script>
+<script src="/js/rtl-helper.js"></script>
 <script src="/terminal/js/terminal-i18n.js"></script>
 <script src="/terminal/js/terminal-cases.js"></script>
 <script src="/terminal/js/terminal-logo-image.js"></script>

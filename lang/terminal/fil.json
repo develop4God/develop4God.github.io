@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "develop4God — Nagde-develop kami para sa Diyos",
+    "description": "Isang ministeryong gumagawa ng software na para sa Panginoon: Christian Devotionals at mga sistema para sa mga ministeryo."
+  },
+  "nav": {
+    "hire": "Mga Development",
+    "ministry": "Ministeryo",
+    "contact": "Makipag-ugnayan",
+    "language": "Wika",
+    "theme": "Palitan ang tema"
+  },
+  "hero": {
+    "eyebrow": "develop4God · Nagde-develop kami para sa Diyos",
+    "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
+    "ref": "Colossians 3:23",
+    "why": "Doon nagmula ang aming pangalan.",
+    "version": "KJV",
+    "cue": "Mag-scroll"
+  },
+  "fork": {
+    "eyebrow": "Pumili ng landas",
+    "title": "Alamin pa.",
+    "hint": "Pumili ng isa para magpatuloy.",
+    "hire": {
+      "k": "Mga negosyo at taong may pangangailangan",
+      "title": "Aming mga development",
+      "desc": "Tingnan ang aming mga nagawa at kung paano namin masusuportahan ang inyong negosyo o pangangailangan.",
+      "go": "Tingnan ang mga development →"
+    },
+    "min": {
+      "k": "Aming mga minamahal na user at ministeryo",
+      "title": "Aming ministeryo",
+      "desc": "Tingnan kung paano kami hinayaan ng Diyos na paglingkuran kayo, at kung paano namin masusuportahan ang inyong ministeryo.",
+      "go": "Tingnan ang ministeryo →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "Mga LLM pipeline",
+      "title": "Gumagawa ako ng mga LLM pipeline at ng mga produktong nakapalibot dito.",
+      "typed": "$ ginagawa",
+      "phrases": [
+        "mga LLM pipeline na may audit",
+        "multi-tenant na SaaS",
+        "mga website na mabilis mag-load",
+        "mga custom na tool at automation",
+        "mga Flutter app sa Google Play"
+      ],
+      "text": "Bawat tawag sa modelo ay nag-iiwan ng bakas para sa audit. Mga batch pipeline na hindi nakatali sa provider, may mga takbong maipagpapatuloy mula sa checkpoint, at may dry-run mode na nagpapakita ng gastos bago magpadala ng anuman."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, mga website at mga custom na tool",
+      "title": "Isang platform, bawat kliyente ay hiwalay.",
+      "text": "Isang gumaganang multi-tenant na platform para sa mga law firm, na pinaghihiwalay sa pamamagitan ng JWT claim at row-level security ng Postgres. Ang parehong full-stack na paraan ay gumagawa ng mga website at custom na tool."
+    },
+    "mobile": {
+      "eyebrow": "Mga mobile app",
+      "title": "Gumagana na sa Google Play, sa {languages} wika.",
+      "text": "Flutter na may BLoC at dependency injection, kasama ang Arabic na mula kanan pakaliwa at Hindi."
+    },
+    "world": {
+      "eyebrow": "Christian Devotionals",
+      "title": "Binabasa sa mga bansa sa buong mundo.",
+      "text": "Isang libreng app at reader ng pang-araw-araw na debosyonal, ginawa para sa Kanyang kaluwalhatian at ibinabahagi sa mga mananampalataya saanman."
+    },
+    "languages": {
+      "eyebrow": "Maraming wika",
+      "title": "{languages} wika, na may mga sistemang sumusuri sa mga ito.",
+      "text": "Upang matiyak ang kalidad ng nilalaman sa bawat wika, gumagawa kami ng mga tool sa pagpapatunay na may AI para sa pagsusuri at pagsasalin."
+    },
+    "dot": "Eksena",
+    "pause": "I-pause ang animation",
+    "play": "I-play ang animation"
+  },
+  "hire": {
+    "switch": "← Ministeryo ba ang hanap ninyo?",
+    "build": {
+      "title": "Ang aming mga nagawa",
+      "sub": "Mula sa database hanggang sa screen. Anim na uri ng gawain, bawat isa ay naihatid sa mga totoong user."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS at mga web app",
+        "text": "Mga multi-tenant na platform na binuo mula simula hanggang wakas: API, interface, database at deployment."
+      },
+      "k2": {
+        "title": "Mga website",
+        "text": "Mabilis, dalawang wika, at madaling panatilihin. Mga catalog, landing page at website ng mga ministeryo, na may pag-oorder sa WhatsApp kapag makakatulong."
+      },
+      "k3": {
+        "title": "Mga custom na tool",
+        "text": "Mga panloob na tool, automation, integrasyon at desktop app na hinubog ayon sa tunay na paraan ng paggawa ng inyong koponan."
+      },
+      "k4": {
+        "title": "Mga LLM pipeline",
+        "text": "Mga batch pipeline na hindi nakatali sa provider, may mga takbong may checkpoint, audit trail at pagtataya ng gastos."
+      },
+      "k5": {
+        "title": "Mga content system",
+        "text": "Paglikha, pagsasalin at pagpapatunay ng malalaking dami ng nilalaman, na may hiwalay at independiyenteng pagsusuri."
+      },
+      "k6": {
+        "title": "Mga mobile app",
+        "text": "Mga Flutter app na gumagana na, na may malinis na arkitektura, kasama ang mga wikang mula kanan pakaliwa."
+      }
+    },
+    "ask": {
+      "title": "May iba pa bang pangangailangan? Mag-usap tayo.",
+      "text": "Maging development man, maliit na ideya o automation na nakakatipid ng oras: sumulat kayo sa amin. Sa biyaya ng Diyos at sa aming gawain kasama ang AI, magagabayan ka namin ngayon sa halos anumang pangangailangan.",
+      "cta": "Sabihin ninyo sa amin ang kailangan ninyo"
+    },
+    "cases": {
+      "title": "Mga piling gawa",
+      "sub": "Kung ano ang bawat proyekto at kung paano ito binuo.",
+      "more": "Higit pang proyekto sa GitHub →"
+    },
+    "how": {
+      "title": "Paano kami gumagawa",
+      "sub": "Parehong ikot sa bawat pagbabago, kliyente man ay isang firm o isang simbahan."
+    },
+    "steps": {
+      "s1": {
+        "title": "Magplano",
+        "text": "Mga pagsusuri at ihahatid na gawa, nakasulat bago ang code."
+      },
+      "s2": {
+        "title": "Mga test muna",
+        "text": "Bawat test ay pumapalpak sa tamang dahilan, saka papasa."
+      },
+      "s3": {
+        "title": "Bumuo",
+        "text": "Ang pinakasimpleng disenyong gumagana. SOLID, walang tech debt."
+      },
+      "s4": {
+        "title": "Independiyenteng pagsusuri",
+        "text": "Hindi namin kailanman ginagawang huling hadlang ang pagsusuri sa sarili naming code. Berde ang CI bago mag-merge."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "Live",
+      "desc": "Multi-tenant na platform para sa mga law firm: isang quoter na may branding ng bawat kliyente at mga PDF na maipi-print, mga KYC form na nililikha para sa bawat firm, isang risk matrix, at pagsusuri sa mga listahan ng sanction ng OFAC/UN.",
+      "facts": [
+        "Paghihiwalay ng tenant sa pamamagitan ng JWT claim at row-level security ng Postgres",
+        "Bawat kliyente ay may sariling branding, catalog at mga field ng form"
+      ],
+      "note": "Aming sariling platform. Pribadong repo, may walkthrough kapag hiniling."
+    },
+    "play-store-mcp": {
+      "chip": "Open source",
+      "desc": "Isang MCP server na nagpapahintulot sa mga AI agent na mag-upload at mag-promote ng mga Android release sa Google Play, na binuo sa paligid ng isang modelong pangkaligtasan.",
+      "facts": [
+        "Ang bawat pagsulat ay dry run maliban kung kumpirmado",
+        "Sa production, draft lang ang nase-save: tao ang magpapadala nito para sa review",
+        "Isang pinapanatiling fork ng isang MIT na proyekto, na may kredito sa orihinal"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Multi-provider na batch pipeline na lumilikha ng koleksyon ng mga debosyonal, na may mga takbong maipagpapatuloy mula sa checkpoint.",
+      "facts": [
+        "Ipinapakita ng dry-run mode ang pagtataya ng gastos bago ang anumang tawag",
+        "Bawat operasyon ng LLM ay nag-iiwan ng audit trail",
+        "Nagpapatuloy mula sa huling checkpoint matapos ang pagkabigo"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "LangGraph pipeline para sa pagsasalin, pagtukoy ng error, independiyenteng pagsusuri ng kritiko, awtomatikong pag-aayos at pagpapatunay.",
+      "facts": [
+        "Bawat natuklasang ibinandera ng AI ay sinusuri nang salita-por-salita laban sa pinagmulan",
+        "Isang hiwalay na kritiko ang sumusuri sa output ng taga-ayos"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Awtomatikong pagsusuri sa SDN/OFAC para sa mga propesyonal sa compliance, bilang web at desktop app.",
+      "facts": [
+        "Iisang code na inihahatid bilang web app at bilang desktop app"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← Mga development ba ang hanap ninyo?",
+    "title": "Aming misyon",
+    "sub": "Dalhin ang salita ng Diyos",
+    "stats": {
+      "downloads": "Mga download",
+      "countries": "Mga bansa",
+      "active": "Mga aktibong user",
+      "rating": "Rating",
+      "languages": "Mga wika"
+    },
+    "apps": {
+      "dev": {
+        "title": "Christian Devotionals",
+        "text": "Ang inyong pang-araw-araw na debosyonal, libre at sa {languages} wika: talata, repleksyon at panalangin, may audio, mga paborito at pagbabahagi.",
+        "store": "Kunin sa Google Play",
+        "go": "Basahin ang debosyonal ngayon"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Gawing pang-araw-araw na gawi ang pananampalataya: mga iminumungkahing micro-habit, streak at mga talata, kasama ang Biblia sa loob ng app.",
+        "store": "Kunin sa Google Play",
+        "go": "Kilalanin ang Habitus+Faith"
+      }
+    },
+    "build": {
+      "title": "Ano ang kaya naming buuin para sa inyong ministeryo",
+      "i1": "Isang mobile app o website para sa inyong simbahan o organisasyon",
+      "i2": "Paglikha ng nilalaman, pagsasalin at suporta sa maraming wika",
+      "i3": "Mga dashboard, integrasyon at back-end na sistema",
+      "i4": "Automation na nakakatipid ng oras ng inyong koponan",
+      "cta": "Ikuwento ninyo ang inyong proyekto"
+    },
+    "how": {
+      "title": "Paano namin binubuo ang aming ministeryo",
+      "sub": "Isang sulyap kung paano kami hinahayaan ng Diyos na maabot ang mga mambabasa sa napakaraming bansa at wika."
+    },
+    "isaiah": {
+      "text": "For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.",
+      "ref": "Isaiah 55:10-11 · KJV"
+    }
+  },
+  "contact": {
+    "title": "Kung nakarating kayo hanggang dito, mag-usap tayo.",
+    "text": "Sabihin ninyo sa amin ang kailangan ninyo: isang produkto, isang website, isang tool o isang proyekto para sa inyong ministeryo.",
+    "cta": "Sumulat sa amin sa email"
+  },
+  "foot": {
+    "rights": "Lahat ng karapatan ay nakalaan.",
+    "email": "Mag-email sa Develop4God"
+  }
+}
