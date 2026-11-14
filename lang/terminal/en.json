@@ -76,8 +76,8 @@
   "hire": {
     "switch": "← Looking for the ministry instead?",
     "build": {
-      "title": "What I build",
-      "sub": "Full stack, from the database to the screen. Six kinds of work, each shipped to real users."
+      "title": "What we have built",
+      "sub": "From the database to the screen. Six kinds of work, each shipped to real users."
     },
     "kinds": {
       "k1": {
@@ -106,16 +106,16 @@
       }
     },
     "ask": {
-      "title": "Don't see it here? Ask.",
-      "text": "I'm full stack, so most things software can do are on the table. Tell me what you need and I'll tell you straight whether I'm the right fit.",
-      "cta": "Tell me what you need"
+      "title": "Have another need? Let's talk.",
+      "text": "Whether it is a development, a small idea or an automation that saves time: write to us. By God's grace and our work with AI, we can guide you on almost any need today.",
+      "cta": "Tell us what you need"
     },
     "cases": {
       "title": "Selected work",
-      "sub": "What each project is and how it's built. Placeholders are for you to fill in."
+      "sub": "What each project is and how it's built."
     },
     "how": {
-      "title": "How I work",
+      "title": "How we work",
       "sub": "The same loop on every change, whether the client is a firm or a church."
     },
     "steps": {
@@ -133,7 +133,7 @@
       },
       "s4": {
         "title": "Independent review",
-        "text": "I never review my own code as the last gate. CI is green before merge."
+        "text": "We never review our own code as the last gate. CI is green before merge."
       }
     }
   },
@@ -232,8 +232,8 @@
     }
   },
   "contact": {
-    "title": "Have a project in mind?",
-    "text": "Tell me what you need: a role, a product, a website, a tool or a ministry project.",
-    "cta": "Write me an email"
+    "title": "If you made it this far, let's talk.",
+    "text": "Tell us what you need: a product, a website, a tool or a project for your ministry.",
+    "cta": "Write us an email"
   }
 }

@@ -76,8 +76,8 @@
   "hire": {
     "switch": "← ¿Buscas el ministerio?",
     "build": {
-      "title": "Lo que construyo",
-      "sub": "Full-stack, de la base de datos a la pantalla. Seis tipos de trabajo, cada uno entregado a usuarios reales."
+      "title": "Lo que hemos construido",
+      "sub": "De la base de datos a la pantalla. Seis tipos de trabajo, cada uno entregado a usuarios reales."
     },
     "kinds": {
       "k1": {
@@ -106,16 +106,16 @@
       }
     },
     "ask": {
-      "title": "¿No lo ves aquí? Pregunta.",
-      "text": "Soy full-stack, así que casi todo lo que el software puede hacer está sobre la mesa. Cuéntame qué necesitas y te diré con franqueza si soy la persona indicada.",
-      "cta": "Cuéntame qué necesitas"
+      "title": "¿Tienes otra necesidad? Hablemos.",
+      "text": "Sea un desarrollo, una idea pequeña o una automatización que ahorre tiempo: escríbenos. Gracias a Dios y al trabajo con IA, hoy podemos orientarte en casi cualquier necesidad.",
+      "cta": "Cuéntanos qué necesitas"
     },
     "cases": {
       "title": "Trabajo seleccionado",
-      "sub": "Qué es cada proyecto y cómo está construido. Los marcadores son para completar."
+      "sub": "Qué es cada proyecto y cómo está construido."
     },
     "how": {
-      "title": "Cómo trabajo",
+      "title": "Cómo trabajamos",
       "sub": "El mismo ciclo en cada cambio, sea el cliente una firma o una iglesia."
     },
     "steps": {
@@ -133,7 +133,7 @@
       },
       "s4": {
         "title": "Revisión independiente",
-        "text": "Nunca reviso mi propio código como última barrera. El CI está en verde antes de integrar."
+        "text": "Nunca revisamos nuestro propio código como última barrera. El CI está en verde antes de integrar."
       }
     }
   },
@@ -232,8 +232,8 @@
     }
   },
   "contact": {
-    "title": "¿Tienes un proyecto en mente?",
-    "text": "Cuéntame qué necesitas: un puesto, un producto, un sitio web, una herramienta o un proyecto ministerial.",
-    "cta": "Escríbeme un correo"
+    "title": "Si llegaste hasta aquí, hablemos.",
+    "text": "Cuéntanos qué necesitas: un producto, un sitio web, una herramienta o un proyecto para tu ministerio.",
+    "cta": "Escríbenos un correo"
   }
 }
