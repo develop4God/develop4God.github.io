@@ -985,11 +985,25 @@ a.case:hover {
   align-items: flex-start;
 }
 
+.apphead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
 .appicon {
+  display: block;
   width: 64px;
   height: 64px;
-  margin-bottom: 14px;
   border-radius: 14px;
+}
+
+.btn.store {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .minbuild { margin-top: 24px; }

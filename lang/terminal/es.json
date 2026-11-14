@@ -204,11 +204,13 @@
       "dev": {
         "title": "Devocionales Cristianos",
         "text": "Tu devocional diario, gratis y en 10 idiomas: versículo, reflexión y oración, con audio, favoritos y para compartir.",
+        "store": "Descargar en Google Play",
         "go": "Leer el devocional de hoy"
       },
       "hab": {
         "title": "Habitus+Faith",
         "text": "Convierte la fe en hábito diario: micro-hábitos sugeridos, rachas y versículos, con la Biblia dentro de la app.",
+        "store": "Descargar en Google Play",
         "go": "Conocer Habitus+Faith"
       }
     },
