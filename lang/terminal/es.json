@@ -177,15 +177,6 @@
       "facts": [
         "Un mismo código se entrega como app web y como app de escritorio"
       ]
-    },
-    "florist": {
-      "name": "Sitio de catálogo para una floristería",
-      "chip": "Sitio de cliente",
-      "desc": "Un catálogo bilingüe con fotos, precios y un botón de pedido por WhatsApp prellenado para cada producto.",
-      "facts": [
-        "Español e inglés, con una elección de idioma que se conserva",
-        "Sin dependencias ni paso de compilación, por lo que es fácil de mantener"
-      ]
     }
   },
   "min": {

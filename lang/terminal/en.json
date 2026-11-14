@@ -177,15 +177,6 @@
       "facts": [
         "One codebase ships as a web app and a desktop app"
       ]
-    },
-    "florist": {
-      "name": "Catalogue site for a florist",
-      "chip": "Client site",
-      "desc": "A bilingual catalogue with photos, prices and a prefilled WhatsApp order button for each product.",
-      "facts": [
-        "Spanish and English, with a language choice that persists",
-        "No dependencies and no build step, so it stays easy to maintain"
-      ]
     }
   },
   "min": {
