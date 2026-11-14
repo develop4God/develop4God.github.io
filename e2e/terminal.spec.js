@@ -491,3 +491,25 @@ test('root keeps the site analytics tag and a canonical URL', async ({ page }) =
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://develop4god.github.io/');
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
+
+test('keyboard: Enter on a focused control does not skip the hero; Enter on the page does', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  const second = page.locator('#story-hero [data-panel]').nth(1);
+  await page.locator('[data-lang="en"]').first().focus();
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(4000);
+  await expect(second).not.toHaveClass(/on/);
+  await page.locator('body').evaluate((b) => b.blur());
+  await page.evaluate(() => document.activeElement && document.activeElement.blur());
+  await page.keyboard.press('Enter');
+  await expect(second).toHaveClass(/on/);
+});
+
+test('contact link puts #contact in the URL, so a reload keeps the section open', async ({ page }) => {
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.locator('[data-contact-link]').first().click();
+  await expect(page.locator('#contact')).toBeVisible();
+  expect(page.url()).toContain('#contact');
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(page.locator('#contact')).toBeVisible();
+});

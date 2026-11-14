@@ -1,6 +1,5 @@
-// Language handling for /terminal/. Reuses the site-wide `develop4God_language`
-// storage key and the `/lang/home/{lang}.json` footer strings; page copy lives in
-// `/lang/terminal/{lang}.json`. v1 supports en and es; add a language by adding
+// Language handling for the root page. Reuses the site-wide `develop4God_language`
+// storage key; all page copy lives in `/lang/terminal/{lang}.json`. v1 supports en and es; add a language by adding
 // its code to SUPPORTED and a matching JSON file (a unit test enforces key parity).
 (function (window) {
   'use strict';

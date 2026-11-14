@@ -1,4 +1,4 @@
-// Page wiring for /terminal/: language and theme controls, path choice (Hire me /
+// Page wiring for the root page: language and theme controls, path choice (Developments /
 // Ministry), lazy story creation, the cases list and the footer year.
 (function (window) {
   'use strict';
@@ -154,10 +154,11 @@
   }
 
   // Any scroll, tap or navigation key skips the hero ahead to the fork right away.
+  // A key pressed on a focused control belongs to that control, so it never skips.
   function skipHeroOnInput(hero) {
     var keys = { ArrowDown: 1, PageDown: 1, ' ': 1, Enter: 1 };
     function skip(e) {
-      if (e.type === 'keydown' && !keys[e.key]) return;
+      if (e.type === 'keydown' && (!keys[e.key] || (e.target.closest && e.target.closest('a,button,input,select,textarea')))) return;
       hero.advance();
     }
     ['wheel', 'touchstart', 'keydown'].forEach(function (type) { window.addEventListener(type, skip, { passive: true, once: false }); });
@@ -185,7 +186,7 @@
     $('#theme').addEventListener('click', function () { window.TerminalTheme.set(window.TerminalTheme.nextTheme(window.TerminalTheme.current())); });
     $all('[data-path-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); choosePath(a.getAttribute('data-path-link')); }); });
     $all('[data-switch]').forEach(function (b) { b.addEventListener('click', function () { choosePath(b.getAttribute('data-switch')); }); });
-    $all('[data-contact-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); scrollTo(showContact()); }); });
+    $all('[data-contact-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); history.replaceState(null, '', '#contact'); scrollTo(showContact()); }); });
   }
 
   function init() {
