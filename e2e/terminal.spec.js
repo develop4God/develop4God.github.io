@@ -493,7 +493,7 @@ for (const theme of ['dark', 'light']) {
 test('root keeps the site analytics tag and a canonical URL', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('script[src*="googletagmanager.com/gtag/js?id=G-KBGE96RQML"]')).toHaveCount(1);
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://develop4god.github.io/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://develop4god.com/');
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
 });
 
