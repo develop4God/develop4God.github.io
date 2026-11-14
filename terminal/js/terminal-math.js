@@ -4,6 +4,8 @@
   'use strict';
 
   var TAU = Math.PI * 2;
+  // Distance of the camera from the scene centre; shared so the globe's silhouette can be computed.
+  var CAMERA = 3.4;
 
   function clamp(v, lo, hi) {
     return Math.min(hi, Math.max(lo, v));
@@ -60,12 +62,14 @@
 
   // Projects a 3D point with a precomputed rotation. Returns screen factors in
   // `out` to avoid per-point allocation: x, y (unscaled), f (perspective), d (depth 0..1), z.
-  function project(x, y, z, rot, out) {
+  // `cam` is the camera distance (default CAMERA); a very large one makes the view orthographic.
+  function project(x, y, z, rot, out, cam) {
+    var c = cam || CAMERA;
     var x1 = x * rot.cy + z * rot.sy;
     var z1 = -x * rot.sy + z * rot.cy;
     var y1 = y * rot.cp - z1 * rot.sp;
     var z2 = y * rot.sp + z1 * rot.cp;
-    var f = 3.4 / (3.4 + z2);
+    var f = c / (c + z2);
     out.x = x1 * f;
     out.y = y1 * f;
     out.f = f;
@@ -116,6 +120,7 @@
     smooth: smooth,
     stepToward: stepToward,
     nextIndex: nextIndex,
+    CAMERA: CAMERA,
     project: project,
     rotation: rotation,
     parseStat: parseStat,

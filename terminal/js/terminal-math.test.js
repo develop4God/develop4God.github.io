@@ -112,3 +112,13 @@ test('wrapPi folds any angle into [-PI, PI] and keeps whole turns equal', () => 
     assert.ok(Math.abs(Math.sin(w) - Math.sin(a)) < 1e-6 && Math.abs(Math.cos(w) - Math.cos(a)) < 1e-6);
   });
 });
+
+test('project takes an optional camera distance: a far camera is orthographic and the default is unchanged', () => {
+  const rot = M.rotation(0, 0), a = {}, b = {}, c = {};
+  M.project(1, 0, -1, rot, a);
+  M.project(1, 0, -1, rot, b, M.CAMERA);
+  assert.deepStrictEqual(a, b);
+  M.project(1, 0, -1, rot, c, 1e6);
+  assert.ok(Math.abs(c.x - 1) < 1e-4 && Math.abs(c.f - 1) < 1e-4);
+  assert.ok(a.f > 1, 'a near point is magnified by the default camera');
+});

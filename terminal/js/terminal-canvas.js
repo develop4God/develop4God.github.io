@@ -10,6 +10,8 @@
   var LI = window.TerminalLogoImage;
   var TL = window.TerminalTwinLife;
   var SP = window.TerminalSpin;
+  var G = window.TerminalGlobe;
+  var GL = window.TerminalGlobeLayer;
   var LEVELS = 8;
   var LOGO_TEXT_SHARE = 0.38;
   var LOGO_TEXT_TOP = 0.64;
@@ -70,6 +72,13 @@
     for (var kb = 0; kb < LI.COLOR_KEYS; kb++) dotBuckets.push({ x: [], y: [], n: 0, fill: 'rgb(' + LI.keyRgb(kb).join(',') + ')' });
 
     var ids = opts.sceneIds.slice(), hasLogo = ids[0] === 'logo';
+    // The globe's extra land, ocean and ring live in their own layer; it is built while the browser is idle.
+    var globe = ids.indexOf('globe') >= 0 ? GL.create({ radius: S.GLOBE_RADIUS, colours: S.GLOBE_COLOURS, violet: S.VIOLET, sceneDots: N, litDark: S.GLOBE_ALPHA }) : null;
+    var globeFrame = { ox: 0, oy: 0, scale: 1, dark: true, fade: 0, cam: M.CAMERA };
+    if (globe) {
+      if (window.requestIdleCallback) window.requestIdleCallback(globe.build, { timeout: 1500 });
+      else window.setTimeout(globe.build, 200);
+    }
     // The logo scene starts as a loose cloud of placeholder dots; it stays hidden while the logo
     // image loads (logoPending) and is only shown if the image never arrives.
     scenes = ids.map(function (id) { return S.make(id === 'logo' ? 'cloud' : id); });
@@ -168,7 +177,7 @@
         if (cur.id === 'logo' || cur.id === 'twin') { ty = 0; tp = cur.id === 'logo' ? 0 : SP.TILT; lw += (1 - lw) * k; }
         else {
           lw += (0 - lw) * k;
-          if (cur.id === 'globe') { ty = -1.4 + SP.angle(t, 0); tp = SP.TILT; }
+          if (cur.id === 'globe') { ty = G.VIEW_YAW - SP.angle(t, 0); tp = -SP.TILT; }
           else { driftAng += dt * 0.00018; ty = driftAng; tp = 0.35; }
         }
         yaw += M.wrapPi(ty - yaw) * k;
@@ -183,6 +192,17 @@
       // What to show of the real logo; heading back to it after its first build-up just fades the
       // image in once the dots are home, the dense dots only fly in on the first visit and when leaving.
       var onLogo = logoBmp && a === 0, vs = onLogo ? LI.viewState(t - t0, rawLt, opts.getTarget() === 0, reduce) : null, pm = vs ? vs.pm : logoPending && a === 0 && !reduce ? 0 : 1;
+      // The globe is drawn without perspective: the camera backs away as it takes over from another scene.
+      var gw = G.globeWeight(A.id, B.id, le), cam = G.cameraFor(gw);
+      if (globe) {
+        globeFrame.ox = ox;
+        globeFrame.oy = oy;
+        globeFrame.scale = scale;
+        globeFrame.dark = dark;
+        globeFrame.fade = gw * pm;
+        globeFrame.cam = cam;
+        globe.begin(globeFrame);
+      }
 
       // Settled fork spheres sway and breathe, and the one a door points at grows and glows.
       var twinSc = A.id === 'twin' ? A : B.id === 'twin' ? B : null, tw = twinSc && !reduce ? TL.twinSettle(lt, A.id === 'twin', B.id === 'twin') : 0, mo = null, g, m, gl, dw;
@@ -223,19 +243,24 @@
           z = twinPt.z;
           gl = m.glow * dw;
         }
-        M.project(x, y, z, rot, pr);
+        M.project(x, y, z, rot, pr, cam);
         var sc = k2 > 0.5 ? B : A;
+        if (sc.id === 'globe') {
+          globe.addDot(sc.grp[i], pr.z, ox + pr.x * scale, oy + pr.y * scale);
+          continue;
+        }
         S.paint(sc, i, t, out);
-        var far = sc.id === 'globe' && pr.z > 0.1 ? 0.1 : 1;
         var sceneA = dark ? out.a : 0.55 + 0.45 * out.a;
-        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * pm * (1 + 0.5 * gl), 0, 1);
+        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * pm * (1 + 0.5 * gl), 0, 1);
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
         bk.r[bk.n] = 0.6 + 1.4 * pr.f + (dark ? 0 : 0.6) + 0.8 * gl;
         bk.n++;
       }
+      if (globe && globe.shows() && globe.build()) globe.addExtras(rot);
       cx.clearRect(0, 0, W, H);
+      if (globe) globe.draw(cx, pal);
       for (j = 0; j < buckets.length; j++) {
         bk = buckets[j];
         if (!bk.n) continue;

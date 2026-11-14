@@ -36,7 +36,8 @@
     "TerminalLogoImage": "readonly",
     "TerminalTwinLife": "readonly",
     "TerminalSpin": "readonly",
-    "TerminalArcs": "readonly",
+    "TerminalGlobe": "readonly",
+    "TerminalGlobeLayer": "readonly",
     "TerminalStory": "readonly",
     "TerminalEffects": "readonly"
   },

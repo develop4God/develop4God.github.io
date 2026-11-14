@@ -6,7 +6,7 @@
   'use strict';
 
   var M = window.TerminalMath;
-  var AR = window.TerminalArcs;
+  var G = window.TerminalGlobe;
   var N = 1800;
   var TAU = M.TAU;
   // Palette indices; the canvas maps them to theme colours.
@@ -14,9 +14,10 @@
   // Distance of each fork sphere's centre from the middle (the canvas pivots the spin on it).
   var TWIN_CENTER_X = 1.3;
   var GLOBE_RADIUS = 1.25;
-  // Dots per connection arc, and how far the middle of an arc floats above the land (fraction of the radius).
-  var ARC_DOTS = 40;
-  var ARC_LIFT = 0.3;
+  // Palette index of each globe continent band (see TerminalGlobe.continent).
+  var GLOBE_COLOURS = [VIOLET, LIME, GOLD];
+  // Opacity of a lit globe land dot on the dark theme, shared by the scene dots and the canvas's extra land.
+  var GLOBE_ALPHA = 0.95;
   var LOGO_CANDIDATES = 8;
   // Sampling weight per palette class for the logo (indexed by INK, LIME, GOLD, VIOLET).
   var LOGO_WEIGHT = [1, 1, 1, 0.35];
@@ -78,30 +79,12 @@
         push(sc, (ix - 8.5) * 0.075, (iy - 49.5) * 0.026, Math.sin(iy * 0.3) * 0.02, 0, iy / 100);
       }
     },
-    // Land cells of a 2-degree map, sampled evenly by area onto a sphere, then one dotted
-    // great-circle arc per link (group 1..n, frac = position along the arc) floating above it.
+    // The first N land cells of a 2-degree map, sampled evenly by area onto a sphere and grouped by
+    // continent (0 Americas, 1 Europe and Africa, 2 Asia and Oceania). The canvas adds more land and
+    // the ocean as a layer of its own.
     globe: function (sc) {
-      var bin = atob(window.TerminalWorldMask), cells = [], r = M.rng(33), x, y, land = N - AR.LINKS.length * ARC_DOTS, p = {};
-      for (y = 0; y < 90; y++) for (x = 0; x < 180; x++) {
-        var b = y * 180 + x;
-        if ((bin.charCodeAt(b >> 3) >> (b & 7)) & 1) {
-          var w = Math.cos(((90 - (y + 0.5) * 2) * Math.PI) / 180);
-          cells.push({ x: x, y: y, k: Math.pow(r(), 1 / Math.max(w, 0.05)) });
-        }
-      }
-      if (cells.length < land) throw new Error('Globe mask has fewer land cells than the ' + land + ' dots reserved for land');
-      cells.sort(function (p, q) { return q.k - p.k; });
-      cells.slice(0, land).forEach(function (c) {
-        AR.surface((c.x + r()) * 2 - 180, 90 - (c.y + r()) * 2, GLOBE_RADIUS, p);
-        push(sc, p.x, p.y, p.z, 0, 0);
-      });
-      AR.LINKS.forEach(function (link, a) {
-        for (var i = 0; i < ARC_DOTS; i++) {
-          var f = (i + 0.5) / ARC_DOTS;
-          AR.arcPoint(link, f, ARC_LIFT, GLOBE_RADIUS, p);
-          push(sc, p.x, p.y, p.z, a + 1, f);
-        }
-      });
+      var land = G.land(N, 0, GLOBE_RADIUS);
+      for (var i = 0; i < N; i++) push(sc, land.pts[i * 3], land.pts[i * 3 + 1], land.pts[i * 3 + 2], land.cls[i], 0);
     }
   };
 
@@ -131,13 +114,9 @@
       case 'device': // a screen refresh scanning down the device
         b = M.clamp(1 - Math.abs(f - ((t * 0.0005) % 1.3 - 0.15)) * 7, 0, 1);
         out.c = b > 0.3 ? LIME : VIOLET; out.a = 0.35 + 0.65 * b; break;
-      case 'globe': // readers around the world light up one by one; pulses fly along the arcs between them
-        if (g) {
-          b = AR.pulse(f, g - 1, t);
-          out.c = b > 0.3 ? GOLD : LIME; out.a = 0.25 + 0.75 * b; break;
-        }
-        out.c = (sc.seed[i] * 7919 + Math.floor(t / 350)) % 13 === 0 ? GOLD : VIOLET;
-        out.a = out.c === GOLD ? 1 : 0.9; break;
+      case 'globe': // continents in the three palette colours
+        out.c = GLOBE_COLOURS[g]; // opacity and size come from TerminalGlobe.landDot
+        break;
       case 'twin': // violet like the other scenes, with a third of the dots in the sphere's own accent
         out.c = (sc.seed[i] * 7919) % 3 === 0 ? (g === 0 ? LIME : GOLD) : VIOLET; out.a = 1; break;
       default: break;
@@ -197,7 +176,7 @@
   }
 
   window.TerminalScenes = {
-    N: N, TWIN_CENTER_X: TWIN_CENTER_X, twinCenter: twinCenter, 0.8: 0.8, GLOBE_RADIUS: GLOBE_RADIUS, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
+    N: N, TWIN_CENTER_X: TWIN_CENTER_X, twinCenter: twinCenter, 0.8: 0.8, GLOBE_RADIUS: GLOBE_RADIUS, GLOBE_COLOURS: GLOBE_COLOURS, GLOBE_ALPHA: GLOBE_ALPHA, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
     make: make, paint: paint,
     classifyLogoPixel: classifyLogoPixel, logoScene: logoScene
   };

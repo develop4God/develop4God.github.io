@@ -420,3 +420,67 @@ test('footer matches the saas-tools one: copyright with the colored brand, right
   await expect(footer).toContainText(`© ${year} Develop4God. Todos los derechos reservados.`);
   await expect(mail).toHaveAttribute('aria-label', 'Escribir a Develop4God');
 });
+
+// Globe scene. With reduced motion the camera is fixed (Africa and Asia face the viewer), so the
+// pixels are deterministic: no screenshots, no timing, only facts about what is painted.
+async function paintedGlobe(page, theme) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+  await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
+  const read = () => page.evaluate(() => {
+    const cv = document.querySelector('#story-ministry canvas.scene');
+    const px = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+    const css = getComputedStyle(document.documentElement);
+    const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    // Same lookup as the canvas: the dot colour when the theme defines one, else the token.
+    const rgb = (name, dot) => {
+      probe.clearRect(0, 0, 1, 1);
+      probe.fillStyle = (dot && css.getPropertyValue(dot).trim()) || css.getPropertyValue(name).trim();
+      probe.fillRect(0, 0, 1, 1);
+      return Array.from(probe.getImageData(0, 0, 1, 1).data.slice(0, 3));
+    };
+    const pal = { lime: rgb('--lime', '--dot-lime'), gold: rgb('--gold', '--dot-gold'), violet: rgb('--violet') };
+    const stat = { lime: { n: 0, a: 0, sx: 0, solid: 0 }, gold: { n: 0, a: 0, sx: 0, solid: 0 }, violet: { n: 0, a: 0, sx: 0, solid: 0 }, painted: 0 };
+    for (let i = 0; i < px.length; i += 4) {
+      const a = px[i + 3];
+      if (a < 10) continue;
+      stat.painted++;
+      for (const k of ['lime', 'gold', 'violet']) {
+        const d = (px[i] - pal[k][0]) ** 2 + (px[i + 1] - pal[k][1]) ** 2 + (px[i + 2] - pal[k][2]) ** 2;
+        if (d < 30 * 30) {
+          const s = stat[k];
+          s.n++;
+          s.a += a;
+          if (a >= 200) s.solid++;
+          s.sx += (i / 4) % cv.width;
+          break;
+        }
+      }
+    }
+    return stat;
+  });
+  await expect.poll(async () => (await read()).painted, { timeout: 8000 }).toBeGreaterThan(5000);
+  return read();
+}
+
+for (const theme of ['dark', 'light']) {
+  test(`globe (${theme}): faces the right way, land is brighter than the ocean, three colours, no errors`, async ({ page }) => {
+    const errors = trackErrors(page);
+    const s = await paintedGlobe(page, theme);
+    // Three palette colours are all painted.
+    for (const k of ['lime', 'gold', 'violet']) expect(s[k].n, k).toBeGreaterThan(200);
+    // Not mirrored: Africa (lime) lies west of Asia (gold).
+    expect(s.lime.sx / s.lime.n, 'lime is left of gold').toBeLessThan(s.gold.sx / s.gold.n);
+    // Land (lime, gold) is brighter than the ocean (violet), so continents read. Measured gap is about 59
+    // of 255; the shading bug this guards against made it negative, so 30 leaves room on both sides.
+    const mean = (k) => s[k].a / s[k].n;
+    expect(Math.min(mean('lime'), mean('gold')) - mean('violet'), 'land minus ocean opacity').toBeGreaterThan(30);
+    // The ocean's total opacity next to the land's: measured 0.14, stable across runs. The band is wide on
+    // purpose (it tolerates renderer differences) and only guards the extremes: an ocean as bright as the
+    // land (about 0.26) or one that has vanished. The exact opacities are pinned by unit tests.
+    const ocean = s.violet.a / (s.lime.a + s.gold.a);
+    expect(ocean, 'ocean opacity relative to land').toBeGreaterThan(0.07);
+    expect(ocean, 'ocean opacity relative to land').toBeLessThan(0.22);
+    expect(errors).toEqual([]);
+  });
+}
