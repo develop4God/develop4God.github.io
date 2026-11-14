@@ -191,7 +191,8 @@
   },
   "min": {
     "switch": "← Looking for the developments instead?",
-    "title": "Built to serve",
+    "title": "Our mission",
+    "sub": "To carry the word of God",
     "stats": {
       "downloads": "Downloads",
       "countries": "Countries",
@@ -199,11 +200,17 @@
       "rating": "Rating",
       "languages": "Languages"
     },
-    "own": {
-      "title": "Our ministry",
-      "text": "Devocionales Cristianos is a free daily devotional app and reader in 10 languages, with Bible versions, audio, favorites and sharing. Habitus+Faith helps people build habits of faith.",
-      "read": "Read today's devotional",
-      "habitus": "Habitus+Faith"
+    "apps": {
+      "dev": {
+        "title": "Devocionales Cristianos",
+        "text": "Your daily devotional, free and in 10 languages: verse, reflection and prayer, with audio, favorites and sharing.",
+        "go": "Read today's devotional"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Turn faith into a daily habit: suggested micro-habits, streaks and verses, with the Bible inside the app.",
+        "go": "Get to know Habitus+Faith"
+      }
     },
     "build": {
       "title": "What I can build for your ministry",

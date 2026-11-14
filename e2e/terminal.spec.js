@@ -172,6 +172,22 @@ test('mobile 390x844: no horizontal overflow on hero, hire and ministry', async 
   }
 });
 
+test('ministry stats count up from zero even when app-stats.json arrives after they are visible, and replay on click', async ({ page, request }) => {
+  const stats = await (await request.get('/data/app-stats.json')).json();
+  await page.route('**/data/app-stats.json', async (route) => { await new Promise((r) => setTimeout(r, 700)); await route.continue(); });
+  await page.goto('/terminal/#ministry', { waitUntil: 'domcontentloaded' });
+  const el = page.locator('[data-app-stat="activeUsers"]');
+  await expect(el).toHaveText(/^\d/, { timeout: 5000 });
+  const seen = [];
+  for (let i = 0; i < 12; i++) { seen.push(await el.textContent()); await page.waitForTimeout(80); }
+  expect(seen.some((v) => v !== stats.activeUsers), `never animated, saw ${seen.join(' | ')}`).toBe(true);
+  await expect(el).toHaveText(stats.activeUsers, { timeout: 3000 });
+  await page.locator('.stats').click();
+  await page.waitForTimeout(250);
+  expect(await el.textContent()).not.toBe(stats.activeUsers);
+  await expect(el).toHaveText(stats.activeUsers, { timeout: 3000 });
+});
+
 test('deep link #ministry scrolls to the ministry path, and hashchange opens the other path', async ({ page }) => {
   await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
   await page.waitForTimeout(1200);
@@ -301,7 +317,7 @@ for (const [w, h] of [[1234, 590], [1280, 720], [390, 844], [844, 390]]) {
   });
 }
 
-test('ministry mission shows the Isaiah 55 text in each language, under "Built to serve"', async ({ page }) => {
+test('ministry mission shows the Isaiah 55 text in each language, under the mission title', async ({ page }) => {
   await page.goto('/terminal/#ministry', { waitUntil: 'networkidle' });
   const q = page.locator('#ministries .isaiah');
   await expect(q).toBeVisible();
@@ -310,7 +326,7 @@ test('ministry mission shows the Isaiah 55 text in each language, under "Built t
   await page.locator('button[data-lang="es"]').click();
   await expect(q.locator('p')).toContainText('mi palabra');
   await expect(q.locator('cite')).toContainText('Isaías 55:10-11');
-  await expect(page.locator('#ministries .t')).toHaveText('Hecho para servir');
+  await expect(page.locator('#ministries .t')).toHaveText('Nuestra misión');
 });
 
 test('fork spheres: the sphere of the hovered door grows (hire = green, ministry = gold)', async ({ page }) => {

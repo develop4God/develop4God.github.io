@@ -68,23 +68,48 @@
   }
 
   // Counts [data-countup] elements up from zero once visible. The element text at
-  // that moment (set by AppStats) is the final value; non-numeric text is left alone.
+  // that moment (set by AppStats) is the final value. AppStats fills the numbers
+  // asynchronously, so an element that is visible before its number arrives waits
+  // for it instead of being skipped. Clicking the stats replays the count.
   function countUp(els, reduce) {
     if (reduce) return;
+    var finals = new Map();
+
+    function play(el) {
+      var parsed = finals.get(el), start = performance.now();
+      (function tick(t) {
+        var k = Math.min(1, (t - start) / 1100);
+        el.textContent = M.formatStat(parsed.value * (1 - Math.pow(1 - k, 3)), parsed);
+        if (k < 1) requestAnimationFrame(tick);
+      })(start);
+    }
+
+    function whenNumeric(el, done) {
+      var parsed = M.parseStat(el.textContent);
+      if (parsed) { done(parsed); return; }
+      var mo = new MutationObserver(function () {
+        var p = M.parseStat(el.textContent);
+        if (!p) return;
+        mo.disconnect();
+        done(p);
+      });
+      mo.observe(el, { childList: true, characterData: true, subtree: true });
+    }
+
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
         if (!e.isIntersecting) return;
         io.unobserve(e.target);
-        var el = e.target, parsed = M.parseStat(el.textContent), start = performance.now();
-        if (!parsed) return;
-        (function tick(t) {
-          var k = Math.min(1, (t - start) / 1100);
-          el.textContent = M.formatStat(parsed.value * (1 - Math.pow(1 - k, 3)), parsed);
-          if (k < 1) requestAnimationFrame(tick);
-        })(start);
+        var el = e.target;
+        whenNumeric(el, function (parsed) { finals.set(el, parsed); play(el); });
       });
     }, { threshold: 0.6 });
-    els.forEach(function (el) { io.observe(el); });
+
+    els.forEach(function (el) {
+      io.observe(el);
+      var group = el.closest('.stats') || el;
+      group.addEventListener('click', function () { if (finals.has(el)) play(el); });
+    });
   }
 
   window.TerminalEffects = { typedLine: typedLine, reveal: reveal, rideLine: rideLine, countUp: countUp };
