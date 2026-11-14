@@ -38,7 +38,7 @@
   "story": {
     "pipeline": {
       "eyebrow": "LLM pipelines",
-      "title": "I build LLM pipelines and the products around them.",
+      "title": "Building LLM pipelines and the products around them.",
       "typed": "$ building",
       "phrases": [
         "audited LLM pipelines",

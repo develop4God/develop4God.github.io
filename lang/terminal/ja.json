@@ -38,7 +38,7 @@
   "story": {
     "pipeline": {
       "eyebrow": "LLMパイプライン",
-      "title": "LLMパイプラインと、その周りのプロダクトを作っています。",
+      "title": "LLMパイプラインと、その周りのプロダクトを作る。",
       "typed": "$ 構築中",
       "phrases": [
         "監査可能なLLMパイプライン",

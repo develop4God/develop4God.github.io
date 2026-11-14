@@ -38,7 +38,7 @@
   "story": {
     "pipeline": {
       "eyebrow": "Mga LLM pipeline",
-      "title": "Gumagawa ako ng mga LLM pipeline at ng mga produktong nakapalibot dito.",
+      "title": "Pagbuo ng mga LLM pipeline at ng mga produktong nakapalibot dito.",
       "typed": "$ ginagawa",
       "phrases": [
         "mga LLM pipeline na may audit",

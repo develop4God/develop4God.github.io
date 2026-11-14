@@ -38,7 +38,7 @@
   "story": {
     "pipeline": {
       "eyebrow": "LLM-Pipelines",
-      "title": "Ich baue LLM-Pipelines und die Produkte drumherum.",
+      "title": "LLM-Pipelines bauen – und die Produkte drumherum.",
       "typed": "$ in Arbeit",
       "phrases": [
         "nachvollziehbare LLM-Pipelines",

@@ -38,7 +38,7 @@
   "story": {
     "pipeline": {
       "eyebrow": "LLM 流水线",
-      "title": "我构建 LLM 流水线，以及围绕它们的产品。",
+      "title": "构建 LLM 流水线，以及围绕它们的产品。",
       "typed": "$ 构建中",
       "phrases": [
         "可审计的 LLM 流水线",
