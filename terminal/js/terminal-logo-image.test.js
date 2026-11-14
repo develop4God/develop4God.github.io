@@ -13,19 +13,19 @@ load('terminal-math.js');
 load('terminal-logo-image.js');
 const L = global.window.TerminalLogoImage;
 
-test('revealProgress: nothing while the particles are still assembling', () => {
+test('revealProgress: nothing before the build-up starts', () => {
   assert.strictEqual(L.revealProgress(0, 0), 0);
-  assert.strictEqual(L.revealProgress(L.REVEAL_DELAY - 1, 0), 0);
+  assert.strictEqual(L.revealProgress(-1, 0), 0);
 });
 
 test('revealProgress: fades in monotonically to exactly 1 and holds', () => {
   let prev = 0;
-  for (let t = L.REVEAL_DELAY; t <= L.REVEAL_DELAY + L.REVEAL_FADE; t += 50) {
+  for (let t = 0; t <= L.REVEAL_FADE; t += 50) {
     const a = L.revealProgress(t, 0);
     assert.ok(a >= prev, 'monotonic at ' + t);
     prev = a;
   }
-  assert.strictEqual(L.revealProgress(L.REVEAL_DELAY + L.REVEAL_FADE, 0), 1);
+  assert.strictEqual(L.revealProgress(L.REVEAL_FADE, 0), 1);
   assert.strictEqual(L.revealProgress(1e7, 0), 1);
 });
 
@@ -109,12 +109,6 @@ test('pngAlpha: the crisp image only appears once the dot field is complete', ()
   assert.strictEqual(L.pngAlpha(1), 1);
 });
 
-test('dotsAlpha: full while the sparse dots are alone, gone once the dense field is complete', () => {
-  assert.strictEqual(L.dotsAlpha(0), 1);
-  assert.strictEqual(L.dotsAlpha(1), 0);
-  assert.ok(L.dotsAlpha(0.5) > 0 && L.dotsAlpha(0.5) < 1);
-});
-
 test('colorKey / keyRgb: 4096 buckets, and a bucket colour stays close to the colour that made it', () => {
   assert.strictEqual(L.colorKey(0, 0, 0), 0);
   assert.strictEqual(L.colorKey(255, 255, 255), L.COLOR_KEYS - 1);
@@ -156,8 +150,8 @@ test('the image is solid again exactly when the dots are back in place', () => {
 
 test('isRevealed: only after the first build-up has finished', () => {
   assert.strictEqual(L.isRevealed(0), false);
-  assert.strictEqual(L.isRevealed(L.REVEAL_DELAY + L.REVEAL_FADE - 1), false);
-  assert.strictEqual(L.isRevealed(L.REVEAL_DELAY + L.REVEAL_FADE), true);
+  assert.strictEqual(L.isRevealed(L.REVEAL_FADE - 1), false);
+  assert.strictEqual(L.isRevealed(L.REVEAL_FADE), true);
   assert.strictEqual(L.isRevealed(NaN), false);
 });
 
@@ -166,16 +160,25 @@ test('viewState: reduced motion shows the real image alone', () => {
   assert.deepStrictEqual([v.pngA, v.pm, v.dense, v.back], [1, 0, false, false]);
 });
 
-test('viewState: first visit goes sparse dots, then dense dots filling in, then the solid image', () => {
-  const early = L.viewState(100, 0, false, false), mid = L.viewState(L.REVEAL_DELAY + L.REVEAL_FADE / 2, 0, false, false), done = L.viewState(1e7, 0, false, false);
-  assert.deepStrictEqual([early.pm, early.pngA, early.dense], [1, 0, false]);
-  assert.ok(mid.dense && mid.pm < 1 && mid.pngA === 0);
+test('viewState: first visit is one build-up, the dense dots filling in, then the solid image; no sparse-dot stage', () => {
+  const start = L.viewState(0, 0, false, false), mid = L.viewState(L.REVEAL_FADE / 2, 0, false, false), done = L.viewState(1e7, 0, false, false);
+  assert.deepStrictEqual([start.pm, start.pngA, start.dense], [0, 0, false]);
+  assert.ok(mid.dense && mid.pm === 0 && mid.pngA === 0);
   assert.deepStrictEqual([done.pm, done.pngA, done.dense], [0, 1, false]);
 });
 
-test('viewState: leaving scatters the dense dots again', () => {
+test('viewState: leaving scatters the dense dots while the sparse dots fade in underneath', () => {
   const v = L.viewState(1e7, L.LEAVE_SPAN / 2, false, false);
   assert.ok(v.dense && !v.back && v.pngA < 1);
+  assert.ok(v.pm > 0 && v.pm < 1);
+  assert.strictEqual(L.viewState(1e7, 0, false, false).pm, 0);
+  assert.strictEqual(L.viewState(1e7, L.LEAVE_SPAN, false, false).pm, 1);
+});
+
+test('viewState: skipping ahead mid-build does not make the sparse dots pop in', () => {
+  const t = L.REVEAL_FADE / 2;
+  assert.strictEqual(L.viewState(t, 0, false, false).pm, 0);
+  assert.ok(L.viewState(t, 0.01, false, false).pm < 0.05);
 });
 
 test('viewState: heading back after the first build-up fades the image in with no dense dots', () => {
@@ -186,13 +189,13 @@ test('viewState: heading back after the first build-up fades the image in with n
 });
 
 test('viewState: heading back before the first build-up has finished uses the normal path; at rest it is solid', () => {
-  assert.strictEqual(L.viewState(L.REVEAL_DELAY + 10, 0.2, true, false).back, false);
+  assert.strictEqual(L.viewState(10, 0.2, true, false).back, false);
   const rest = L.viewState(1e7, 0, true, false);
   assert.deepStrictEqual([rest.back, rest.pngA, rest.pm], [false, 1, 0]);
 });
 
 test('viewState exposes the reveal progress that drives each dense dot', () => {
-  const v = L.viewState(L.REVEAL_DELAY + L.REVEAL_FADE / 2, 0, false, false);
+  const v = L.viewState(L.REVEAL_FADE / 2, 0, false, false);
   assert.ok(v.rv > 0 && v.rv < 1);
   assert.strictEqual(L.viewState(1e7, 0.9, true, false).rv, 0);
 });

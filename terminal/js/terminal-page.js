@@ -98,6 +98,23 @@
   // The hero morphs slower than the other stories so the logo has time to dissolve.
   var HERO_MORPH_SPEED = 0.5;
 
+  // The sphere matching a door reacts while the door is hovered with a mouse or keyboard-focused.
+  // Touch never hovers, so a tap cannot leave a sphere stuck; it only sees the idle pulse.
+  function wireDoorHints(canvas) {
+    var TL = window.TerminalTwinLife;
+    // The fork doors and the matching links in the header.
+    var doors = $all('.door[data-path-link], .nl[data-path-link]').map(function (el) {
+      return { el: el, sphere: TL.hintFor(el.getAttribute('data-path-link')), hover: false, focus: false };
+    });
+    function update() { canvas.setHint(TL.hotSphere(doors)); }
+    doors.forEach(function (d) {
+      d.el.addEventListener('pointerenter', function (e) { d.hover = TL.isMouse(e.pointerType); update(); });
+      d.el.addEventListener('pointerleave', function () { d.hover = false; update(); });
+      d.el.addEventListener('focus', function () { d.focus = d.el.matches(':focus-visible'); update(); });
+      d.el.addEventListener('blur', function () { d.focus = false; update(); });
+    });
+  }
+
   function ensureStory(name) {
     if (stories[name]) return stories[name];
     var root = $('#story-' + name), pin = $('.pin', root);
@@ -108,11 +125,12 @@
       // The door cards wait for the hero's logo to dissolve into the dots.
       panelDelay: name === 'hero' ? window.TerminalLogoImage.leaveMs(HERO_MORPH_SPEED) : 0
     });
-    window.TerminalCanvas.create({
+    var canvas = window.TerminalCanvas.create({
       canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress, getTarget: ctrl.getTarget,
       sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null,
       getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null
     });
+    if (name === 'hero') wireDoorHints(canvas);
     var pause = $('.pause', root);
     if (pause) {
       pause.addEventListener('click', function () {

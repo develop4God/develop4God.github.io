@@ -268,12 +268,12 @@ test('light theme: the hero logo stays dark and solid enough to read on the pale
     for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 0) { n++; alpha += d[i + 3]; lum += (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]); }
     return { n, meanAlpha: alpha / n, meanLum: lum / n };
   });
-  // Stage 1, the assembled dots (before the real logo starts to build over them).
+  // Stage 1, mid build-up: the dense true-colour dots flying in (the same colours as the logo).
   await page.waitForTimeout(1500);
   const dots = await stats();
   expect(dots.n).toBeGreaterThan(500);
   expect(dots.meanAlpha).toBeGreaterThan(150);
-  expect(dots.meanLum).toBeLessThan(120);
+  expect(dots.meanLum).toBeLessThan(140);
   // Stage 2, the settled real logo image (gold and white sparkles lift its mean luminance a little).
   await page.waitForTimeout(4000);
   const logo = await stats();
@@ -311,4 +311,46 @@ test('ministry mission shows the Isaiah 55 text in each language, under "Built t
   await expect(q.locator('p')).toContainText('mi palabra');
   await expect(q.locator('cite')).toContainText('Isaías 55:10-11');
   await expect(page.locator('#ministries .t')).toHaveText('Hecho para servir');
+});
+
+test('fork spheres: the sphere of the hovered door grows (hire = green, ministry = gold)', async ({ page }) => {
+  test.setTimeout(45_000);
+  await page.goto('/terminal/', { waitUntil: 'networkidle' });
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#story-hero [data-panel]').nth(1)).toHaveClass(/on/, { timeout: 5000 });
+  await page.waitForTimeout(3500);
+  const widths = () => page.evaluate(() => {
+    const c = document.querySelector('#story-hero .scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, w = c.width;
+    const box = { green: [1e9, -1e9], gold: [1e9, -1e9] };
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] < 120) continue;
+      const k = d[i + 1] > d[i] + 8 && d[i + 1] > d[i + 2] + 8 ? 'green' : d[i] > d[i + 1] + 20 && d[i] > d[i + 2] + 20 ? 'gold' : null;
+      if (!k) continue;
+      const x = (i / 4) % w;
+      if (x < box[k][0]) box[k][0] = x;
+      if (x > box[k][1]) box[k][1] = x;
+    }
+    return { green: box.green[1] - box.green[0], gold: box.gold[1] - box.gold[0] };
+  });
+  await page.mouse.move(5, 5);
+  await page.waitForTimeout(900);
+  // The idle sway and breathing change the size over about 6 s, so the baseline is the largest
+  // width over a full cycle; a hovered sphere must beat even that.
+  const base = { green: 0, gold: 0 };
+  for (let i = 0; i < 9; i++) {
+    const w = await widths();
+    base.green = Math.max(base.green, w.green);
+    base.gold = Math.max(base.gold, w.gold);
+    await page.waitForTimeout(700);
+  }
+  await page.hover('#story-hero .door.hire');
+  await page.waitForTimeout(1000);
+  const hire = await widths();
+  await page.hover('#story-hero .door.min');
+  await page.waitForTimeout(1000);
+  const min = await widths();
+  expect(hire.green / base.green).toBeGreaterThan(1.01);
+  expect(hire.gold / base.gold).toBeLessThan(1.01);
+  expect(min.gold / base.gold).toBeGreaterThan(1.01);
+  expect(min.green / base.green).toBeLessThan(1.01);
 });

@@ -10,6 +10,8 @@
   var TAU = M.TAU;
   // Palette indices; the canvas maps them to theme colours.
   var INK = 0, LIME = 1, GOLD = 2, VIOLET = 3;
+  // Distance of each fork sphere's centre from the middle (the canvas pivots the sway on it).
+  var TWIN_CENTER_X = 0.9;
   var LOGO_CANDIDATES = 8;
   // Sampling weight per palette class for the logo (indexed by INK, LIME, GOLD, VIOLET).
   var LOGO_WEIGHT = [1, 1, 1, 0.35];
@@ -47,8 +49,8 @@
       }
     },
     twin: function (sc) {
-      sphere(sc, N / 2, -0.9, 0, 0, 0.8, function () { return 0; });
-      sphere(sc, N / 2, 0.9, 0, 0, 0.8, function () { return 1; });
+      sphere(sc, N / 2, -TWIN_CENTER_X, 0, 0, 0.8, function () { return 0; });
+      sphere(sc, N / 2, TWIN_CENTER_X, 0, 0, 0.8, function () { return 1; });
     },
     pipeline: function (sc) {
       var per = N / 5;
@@ -118,7 +120,8 @@
       case 'globe': // readers around the world light up one by one
         out.c = (sc.seed[i] * 7919 + Math.floor(t / 350)) % 13 === 0 ? GOLD : VIOLET;
         out.a = out.c === GOLD ? 1 : 0.9; break;
-      case 'twin': out.c = g === 0 ? LIME : GOLD; out.a = 1; break;
+      case 'twin': // violet like the other scenes, with a third of the dots in the sphere's own accent
+        out.c = (sc.seed[i] * 7919) % 3 === 0 ? (g === 0 ? LIME : GOLD) : VIOLET; out.a = 1; break;
       default: break;
     }
     return out;
@@ -171,7 +174,7 @@
   }
 
   window.TerminalScenes = {
-    N: N, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
+    N: N, TWIN_CENTER_X: TWIN_CENTER_X, INK: INK, LIME: LIME, GOLD: GOLD, VIOLET: VIOLET,
     make: make, paint: paint,
     classifyLogoPixel: classifyLogoPixel, logoScene: logoScene
   };

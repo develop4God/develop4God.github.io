@@ -8,6 +8,7 @@
   var M = window.TerminalMath;
   var S = window.TerminalScenes;
   var LI = window.TerminalLogoImage;
+  var TL = window.TerminalTwinLife;
   var LEVELS = 8;
   var LOGO_TEXT_SHARE = 0.38;
   var LOGO_TEXT_TOP = 0.64;
@@ -59,39 +60,40 @@
   // starts at its own moment (per-dot stagger), so the scene gathers and disperses unevenly.
   function create(opts) {
     var cv = opts.canvas, cx = cv.getContext('2d'), pin = opts.pin, reduce = opts.reduce;
-    var N = S.N, scenes = [], introCloud = null, stagger = [];
+    var N = S.N, scenes = [], stagger = [];
     var W = 0, H = 0, wide = true, dark = true, pal = ['#fff', '#b4d447', '#dea946', '#8f7fd0'];
     var yaw = 0, pitch = 0, lw = 0, driftAng = 0, globeAng = 0, last = 0, mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     var t0 = performance.now(), running = false, raf = 0;
     var buckets = [], out = { c: 0, a: 0 }, pr = {}, pr2 = {}, free = 0, freeAt = -1e9;
-    var logoImg = null, logoBmp = null, logoDots = [], dotBuckets = [], logoTint = '';
+    var logoImg = null, logoBmp = null, logoDots = [], dotBuckets = [], logoTint = '', hintTarget = -1, hints = [0, 0], moBuf = [{}, {}], logoPending = false, twinPt = { x: 0, y: 0, z: 0 };
 
     var r2 = M.rng(99);
     for (var i = 0; i < N; i++) stagger.push(r2());
     for (var b = 0; b < pal.length * LEVELS; b++) buckets.push({ x: [], y: [], r: [], n: 0 });
     for (var kb = 0; kb < LI.COLOR_KEYS; kb++) dotBuckets.push({ x: [], y: [], n: 0, fill: 'rgb(' + LI.keyRgb(kb).join(',') + ')' });
 
-    function setScenes(list, cloud) {
-      scenes = list;
-      introCloud = cloud || null;
-    }
-
     var ids = opts.sceneIds.slice(), hasLogo = ids[0] === 'logo';
-    // Until the logo image is sampled, a loose cloud stands in for it.
-    setScenes(ids.map(function (id) { return S.make(id === 'logo' ? 'cloud' : id); }));
+    // The logo scene starts as a loose cloud of placeholder dots; it stays hidden while the logo
+    // image loads (logoPending) and is only shown if the image never arrives.
+    scenes = ids.map(function (id) { return S.make(id === 'logo' ? 'cloud' : id); });
     if (hasLogo && opts.logoUrl) {
+      logoPending = true;
+      // If the logo is very slow, show the placeholder dots rather than a blank hero.
+      var pendingTimer = setTimeout(function () { logoPending = false; }, 4000);
       var img = new Image();
       img.onload = function () {
         try {
           var logo = S.logoScene(sampleLogo(img), LOGO_TEXT_SHARE);
           logoImg = img;
           rebuildLogo();
+          logoPending = false;
+          clearTimeout(pendingTimer);
           t0 = performance.now();
-          setScenes([logo].concat(ids.slice(1).map(S.make)), S.make('cloud'));
+          scenes = [logo].concat(ids.slice(1).map(S.make));
           redraw();
-        } catch (e) { console.error('TerminalCanvas: logo sampling failed', e); }
+        } catch (e) { logoPending = false; console.error('TerminalCanvas: logo sampling failed', e); }
       };
-      img.onerror = function () { console.error('TerminalCanvas: logo image failed to load', opts.logoUrl); };
+      img.onerror = function () { logoPending = false; console.error('TerminalCanvas: logo image failed to load', opts.logoUrl); };
       img.src = opts.logoUrl;
     }
 
@@ -179,33 +181,47 @@
       if (opts.getFree && t - freeAt > 400) { free = opts.getFree(); freeAt = t; }
       var la = layout(A.id, wide, free, W, H), lb = layout(B.id, wide, free, W, H), le = M.ease(lt);
       var scale = Math.min(W, H) * (la.s + (lb.s - la.s) * le), ox = W * (la.x + (lb.x - la.x) * le), oy = H * (la.y + (lb.y - la.y) * le);
-      var intro = reduce || !introCloud || a !== 0 ? 1 : M.ease(M.clamp((t - t0) / 1800, 0, 1));
       // On the pale light theme dots need more weight than on the dark one.
       var baseA = dark ? 0.22 : 0.72, spanA = dark ? 0.78 : 0.28, i, j, bk;
-      // Once the dots have assembled the logo it turns into the real image through denser dot layers
-      // (always the real image under reduced motion).
       // What to show of the real logo; heading back to it after its first build-up just fades the
       // image in once the dots are home, the dense dots only fly in on the first visit and when leaving.
-      var onLogo = logoBmp && a === 0, vs = onLogo ? LI.viewState(t - t0, rawLt, opts.getTarget() === 0, reduce) : null, pm = vs ? vs.pm : 1;
+      var onLogo = logoBmp && a === 0, vs = onLogo ? LI.viewState(t - t0, rawLt, opts.getTarget() === 0, reduce) : null, pm = vs ? vs.pm : logoPending && a === 0 && !reduce ? 0 : 1;
+
+      // Settled fork spheres sway and breathe, and the one a door points at grows and glows.
+      var twinSc = A.id === 'twin' ? A : B.id === 'twin' ? B : null, tw = twinSc && !reduce ? TL.twinSettle(lt, A.id === 'twin', B.id === 'twin') : 0, mo = null, g, m, gl, dw;
+      // A hint only counts while the spheres are settled on screen (the doors are hidden otherwise).
+      for (g = 0; g < 2; g++) hints[g] = TL.stepHint(hints[g], tw > 0 && hintTarget === g ? 1 : 0, dt);
+      if (tw > 0) {
+        for (g = 0; g < 2; g++) TL.twinMotion(t, g, tw, Math.max(hints[g], TL.idleHint(t, g)), moBuf[g]);
+        mo = moBuf;
+      }
 
       for (j = 0; j < buckets.length; j++) buckets[j].n = 0;
       for (i = 0; i < N && pm >= 0.03; i++) {
         var k2 = M.ease(M.clamp(lt * 1.5 - stagger[i] * 0.5, 0, 1)), pa = A.pts[i], pb = B.pts[i], px = pa[0], py = pa[1], pz = pa[2];
-        if (intro < 1) {
-          var cp = introCloud.pts[i], e = M.ease(M.clamp(intro * 1.4 - stagger[i] * 0.4, 0, 1));
-          px = cp[0] + (px - cp[0]) * e; py = cp[1] + (py - cp[1]) * e; pz = cp[2] + (pz - cp[2]) * e;
-        }
         var x = px + (pb[0] - px) * k2, y = py + (pb[1] - py) * k2, z = pz + (pb[2] - pz) * k2;
+        gl = 0;
+        if (mo) {
+          // A dot takes on the sphere's motion only as it lands in (or while it has not yet left) the sphere.
+          g = twinSc.grp[i];
+          m = mo[g];
+          dw = twinSc === B ? k2 : 1 - k2;
+          TL.twinPoint(x, y, z, g ? S.TWIN_CENTER_X : -S.TWIN_CENTER_X, m, dw, twinPt);
+          x = twinPt.x;
+          y = twinPt.y;
+          z = twinPt.z;
+          gl = m.glow * dw;
+        }
         M.project(x, y, z, rot, pr);
         var sc = k2 > 0.5 ? B : A;
         S.paint(sc, i, t, out);
         var far = sc.id === 'globe' && pr.z > 0.1 ? 0.1 : 1;
         var sceneA = dark ? out.a : 0.55 + 0.45 * out.a;
-        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * (intro < 1 ? 0.6 + 0.4 * intro : 1) * pm, 0, 1);
+        var alpha = M.clamp((baseA + pr.d * spanA) * sceneA * far * pm * (1 + 0.5 * gl), 0, 1);
         bk = buckets[out.c * LEVELS + Math.min(LEVELS - 1, Math.floor(alpha * LEVELS))];
         bk.x[bk.n] = ox + pr.x * scale;
         bk.y[bk.n] = oy + pr.y * scale;
-        bk.r[bk.n] = (intro < 1 ? 1 : 0.6) + 1.4 * pr.f + (dark ? 0 : 0.35);
+        bk.r[bk.n] = 0.6 + 1.4 * pr.f + (dark ? 0 : 0.35) + 0.8 * gl;
         bk.n++;
       }
       cx.clearRect(0, 0, W, H);
@@ -269,7 +285,8 @@
     new MutationObserver(function () { colors(); redraw(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     size();
     redraw();
-    return { redraw: redraw };
+    // The fork door under the pointer or focus, as the sphere it stands for (-1 for none).
+    return { redraw: redraw, setHint: function (sphere) { hintTarget = sphere; } };
   }
 
   window.TerminalCanvas = { create: create };

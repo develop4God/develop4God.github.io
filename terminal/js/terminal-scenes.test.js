@@ -103,3 +103,27 @@ test('logoScene paints the grey wordmark in the shared violet, never in ink', ()
   assert.ok(!sc.cls.includes(S.INK));
   assert.ok(sc.cls.includes(S.VIOLET) && sc.cls.includes(S.GOLD) && sc.cls.includes(S.LIME));
 });
+
+test('the twin scene sits its two spheres at +/- TWIN_CENTER_X, which the canvas pivots on', () => {
+  const sc = S.make('twin');
+  const mean = (g) => { let s = 0, n = 0; sc.pts.forEach((p, i) => { if (sc.grp[i] === g) { s += p[0]; n++; } }); return s / n; };
+  assert.ok(Math.abs(mean(0) + S.TWIN_CENTER_X) < 0.01);
+  assert.ok(Math.abs(mean(1) - S.TWIN_CENTER_X) < 0.01);
+});
+
+test('fork spheres are mostly the shared violet, each with its own accent (lime = hire, gold = ministry)', () => {
+  const sc = S.make('twin'), out = { c: 0, a: 0 }, seen = [{}, {}];
+  for (let i = 0; i < S.N; i++) { S.paint(sc, i, 0, out); seen[sc.grp[i]][out.c] = (seen[sc.grp[i]][out.c] || 0) + 1; }
+  assert.deepStrictEqual(Object.keys(seen[0]).map(Number).sort(), [S.LIME, S.VIOLET].sort());
+  assert.deepStrictEqual(Object.keys(seen[1]).map(Number).sort(), [S.GOLD, S.VIOLET].sort());
+  [[0, S.LIME], [1, S.GOLD]].forEach(([g, accent]) => {
+    const total = seen[g][S.VIOLET] + seen[g][accent];
+    assert.ok(seen[g][S.VIOLET] / total > 0.55, 'violet is the majority');
+    assert.ok(seen[g][accent] / total > 0.15, 'the accent is clearly visible');
+  });
+});
+
+test('fork sphere colours are stable over time (no flicker)', () => {
+  const sc = S.make('twin'), a = { c: 0, a: 0 }, b = { c: 0, a: 0 };
+  for (let i = 0; i < S.N; i += 7) { S.paint(sc, i, 0, a); S.paint(sc, i, 5000, b); assert.strictEqual(a.c, b.c); }
+});

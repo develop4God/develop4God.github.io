@@ -34,6 +34,7 @@
     "TerminalCases": "readonly",
     "TerminalCanvas": "readonly",
     "TerminalLogoImage": "readonly",
+    "TerminalTwinLife": "readonly",
     "TerminalStory": "readonly",
     "TerminalEffects": "readonly"
   },

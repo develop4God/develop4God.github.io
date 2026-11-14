@@ -1,28 +1,28 @@
-// The real logo image shown over the hero's point cloud once the dots have fully
-// assembled it. More and more tiny true-colour dots fly in from random places until the whole
-// image is filled in, then the crisp image replaces them; the same happens in reverse
-// when the story moves on, after which the sparse dots morph to the next scene. The logo
-// never reads as incomplete.
+// The hero logo, shown as the real image. At the start, more and more tiny true-colour dots
+// fly in from random places until the whole image is filled in, then the crisp image replaces
+// them. When the story moves on the same happens in reverse and the scene's sparse dots take
+// over to morph on to the next scene. The sparse dots are never shown building the logo, so
+// the start is one animation, not two.
 (function (window) {
   'use strict';
 
   var M = window.TerminalMath;
-  // The dots take about 1800 ms to assemble the logo; the image only starts after that.
-  var REVEAL_DELAY = 2000;
+  // How long the dense dots take to fill the logo in, starting straight away: the build-up is
+  // the only start animation.
   var REVEAL_FADE = 2800;
   // The image dissolves into the still-assembled dots over this share of the way to the
   // next scene; only after that do the dots start to morph (see morphProgress).
   var LEAVE_SPAN = 0.5;
 
-  // How far the dots have turned into the real logo, 0..1. elapsed: ms since the logo dots began assembling.
+  // How far the dots have turned into the real logo, 0..1. elapsed: ms since the logo build-up began.
   // lt: 0..1 progress of the morph away from the logo scene.
   function revealProgress(elapsed, lt) {
-    if (!(elapsed > REVEAL_DELAY)) return 0;
-    var enter = M.ease(M.clamp((elapsed - REVEAL_DELAY) / REVEAL_FADE, 0, 1));
+    if (!(elapsed > 0)) return 0;
+    var enter = M.ease(M.clamp(elapsed / REVEAL_FADE, 0, 1));
     return enter * (1 - M.ease(M.clamp(lt / LEAVE_SPAN, 0, 1)));
   }
 
-  // Morph progress of the dots: they hold the assembled logo while the image dissolves.
+  // Morph progress of the sparse dots: they hold the logo shape while the image dissolves.
   function morphProgress(lt) {
     return M.clamp((lt - LEAVE_SPAN) / (1 - LEAVE_SPAN), 0, 1);
   }
@@ -35,14 +35,9 @@
     return M.ease(M.clamp((RETURN_SPAN - lt) / RETURN_SPAN, 0, 1));
   }
 
-  // True once the first build-up has finished (elapsed ms since the logo dots began assembling).
+  // True once the first build-up has finished (elapsed ms since the logo build-up began).
   function isRevealed(elapsed) {
-    return elapsed >= REVEAL_DELAY + REVEAL_FADE;
-  }
-
-  // Opacity of the assembled sparse dots: they give way as the dense dot field fills in.
-  function dotsAlpha(r) {
-    return 1 - M.ease(M.clamp((r - 0.15) / 0.7, 0, 1));
+    return elapsed >= REVEAL_FADE;
   }
 
   // Opacity of the crisp image: it replaces the dot field only once that is complete.
@@ -74,7 +69,7 @@
     return pts;
   }
 
-  // What the canvas shows of the real logo. elapsed: ms since the logo dots began assembling;
+  // What the canvas shows of the real logo. elapsed: ms since the logo build-up began;
   // rawLt: 0..1 progress away from the logo scene; towardLogo: the story is heading back to it.
   // Returns { rv: reveal progress (drives dotPhase), pm: opacity of the sparse dots, pngA: opacity of the crisp image, dense: draw the
   // dense dot field, back: returning (image fades in, no dense fly-in) }.
@@ -84,8 +79,9 @@
       var a = returnAlpha(rawLt);
       return { rv: 0, pm: 1 - a, pngA: a, dense: false, back: true };
     }
-    var rv = revealProgress(elapsed, rawLt), p = pngAlpha(rv);
-    return { rv: rv, pm: dotsAlpha(rv), pngA: p, dense: rv > 0 && p < 1, back: false };
+    // The sparse dots only appear as the logo dissolves, to carry it on to the next scene.
+    var rv = revealProgress(elapsed, rawLt), p = pngAlpha(rv), pm = M.ease(M.clamp(rawLt / LEAVE_SPAN, 0, 1));
+    return { rv: rv, pm: pm, pngA: p, dense: rv > 0 && p < 1, back: false };
   }
 
   // Colours are bucketed (4 bits per channel) so a frame of dots draws in a few batches, with
@@ -120,9 +116,9 @@
   }
 
   window.TerminalLogoImage = {
-    REVEAL_DELAY: REVEAL_DELAY, REVEAL_FADE: REVEAL_FADE, LEAVE_SPAN: LEAVE_SPAN, RETURN_SPAN: RETURN_SPAN,
+    REVEAL_FADE: REVEAL_FADE, LEAVE_SPAN: LEAVE_SPAN, RETURN_SPAN: RETURN_SPAN,
     returnAlpha: returnAlpha, isRevealed: isRevealed,
-    revealProgress: revealProgress, morphProgress: morphProgress, dotsAlpha: dotsAlpha, pngAlpha: pngAlpha,
+    revealProgress: revealProgress, morphProgress: morphProgress, pngAlpha: pngAlpha,
     dotPhase: dotPhase, viewState: viewState, COLOR_KEYS: COLOR_KEYS, leaveMs: leaveMs, densePoints: densePoints, colorKey: colorKey, keyRgb: keyRgb, tintWordmark: tintWordmark
   };
 })(window);
