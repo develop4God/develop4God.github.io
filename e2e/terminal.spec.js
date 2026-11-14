@@ -80,7 +80,7 @@ test('choosing Hire me reveals only that path; switch link flips to Ministry', a
   await expect(page.locator('#path-ministry')).toBeHidden();
   await expect(page.locator('#contact')).toBeVisible();
   expect(page.url()).toContain('#hire');
-  await expect(page.locator('#cases .case')).toHaveCount(6);
+  await expect(page.locator('#cases .case')).toHaveCount(5);
   await page.locator('[data-switch="ministry"]').click();
   await expect(page.locator('#path-ministry')).toBeVisible();
   await expect(page.locator('#path-hire')).toBeHidden();
