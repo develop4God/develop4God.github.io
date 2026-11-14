@@ -12,10 +12,10 @@
   },
   "hero": {
     "eyebrow": "develop4God · 神のために開発します",
-    "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
-    "ref": "Colossians 3:23",
+    "verse": "何をするにも、人に対してではなく、主に対してするように、心からしなさい。",
+    "ref": "コロサイ人への手紙 3:23",
     "why": "それが私たちの名前の由来です。",
-    "version": "KJV",
+    "version": "新改訳2003",
     "cue": "スクロール"
   },
   "fork": {
@@ -217,8 +217,8 @@
       "sub": "神が、これほど多くの国と言語の読者のもとへ私たちを遣わしてくださる、その歩みをご紹介します。"
     },
     "isaiah": {
-      "text": "For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.",
-      "ref": "Isaiah 55:10-11 · KJV"
+      "text": "雨や雪が天から降ってもとに戻らず、必ず地を潤し、それに物を生えさせ、芽を出させ、種蒔く者には種を与え、食べる者にはパンを与える。 そのように、わたしの口から出るわたしのことばも、むなしく、わたしのところに帰っては来ない。 必ず、わたしの望む事を成し遂げ、わたしの言い送った事を成功させる。",
+      "ref": "イザヤ書 55:10-11 · 新改訳2003"
     }
   },
   "contact": {

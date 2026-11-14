@@ -12,10 +12,10 @@
   },
   "hero": {
     "eyebrow": "develop4God · Nagde-develop kami para sa Diyos",
-    "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
-    "ref": "Colossians 3:23",
+    "verse": "Anuman ang inyong ginagawa, gawin ninyo nang buong puso na parang sa Panginoon kayo naglilingkod at hindi sa tao.",
+    "ref": "Mga Taga-Colosas 3:23",
     "why": "Doon nagmula ang aming pangalan.",
-    "version": "KJV",
+    "version": "MBB05",
     "cue": "Mag-scroll"
   },
   "fork": {
@@ -217,8 +217,8 @@
       "sub": "Isang sulyap kung paano kami hinahayaan ng Diyos na maabot ang mga mambabasa sa napakaraming bansa at wika."
     },
     "isaiah": {
-      "text": "For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.",
-      "ref": "Isaiah 55:10-11 · KJV"
+      "text": "Ang ulan at yelo na bumabagsak mula sa langit ay hindi na nagbabalik, kundi dinidilig nito ang lupa, kaya lumalago ang mga halaman at namumunga at nagbibigay ng butil na panghasik, at tinapay upang maging pagkain. Gayundin naman ang mga salita na lumalabas sa aking bibig, ang mga ito'y hindi babalik sa akin na walang katuturan. Tutuparin nito ang aking mga balak, at gagawin nito ang aking ninanais.",
+      "ref": "Isaias 55:10-11 · MBB05"
     }
   },
   "contact": {

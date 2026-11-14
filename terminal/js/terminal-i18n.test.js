@@ -192,3 +192,14 @@ test('apply sets lang and dir: rtl for Arabic, ltr again when switching back', (
   I.apply(root, {}, 'en', {});
   assert.deepStrictEqual([document.documentElement.lang, document.documentElement.dir], ['en', 'ltr']);
 });
+
+test('every non-English file carries its own verse and Isaiah passage (no English fallback)', () => {
+  const en = JSON.parse(fs.readFileSync(path.join(LANG_DIR, 'en.json'), 'utf8'));
+  I.SUPPORTED.filter((lang) => lang !== 'en').forEach((lang) => {
+    const d = JSON.parse(fs.readFileSync(path.join(LANG_DIR, `${lang}.json`), 'utf8'));
+    assert.notStrictEqual(d.hero.verse, en.hero.verse, `${lang}: hero.verse is still English`);
+    assert.notStrictEqual(d.hero.ref, en.hero.ref, `${lang}: hero.ref is still English`);
+    assert.notStrictEqual(d.min.isaiah.text, en.min.isaiah.text, `${lang}: min.isaiah.text is still English`);
+    assert.notStrictEqual(d.min.isaiah.ref, en.min.isaiah.ref, `${lang}: min.isaiah.ref is still English`);
+  });
+});

@@ -12,10 +12,10 @@
   },
   "hero": {
     "eyebrow": "develop4God · Desenvolvemos para Deus",
-    "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
-    "ref": "Colossians 3:23",
+    "verse": "E, tudo quanto fizerdes, fazei-o de todo o coração, como ao Senhor e não aos homens.",
+    "ref": "Colossenses 3:23",
     "why": "É daí que vem o nosso nome.",
-    "version": "KJV",
+    "version": "ARC",
     "cue": "Role"
   },
   "fork": {
@@ -217,8 +217,8 @@
       "sub": "Um olhar sobre como Deus nos permite alcançar leitores em tantos países e idiomas."
     },
     "isaiah": {
-      "text": "For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.",
-      "ref": "Isaiah 55:10-11 · KJV"
+      "text": "Porque, assim como descem a chuva e a neve dos céus e para lá não tornam, mas regam a terra e a fazem produzir, e brotar, e dar semente ao semeador, e pão ao que come, assim será a palavra que sair da minha boca; ela não voltará para mim vazia; antes, fará o que me apraz e prosperará naquilo para que a enviei.",
+      "ref": "Isaías 55:10-11 · ARC"
     }
   },
   "contact": {
