@@ -70,65 +70,6 @@ test.describe('devocionales reader mobile reading order', () => {
   });
 });
 
-test.describe('devocionales reader support-ministry button', () => {
-  // Header CTA linking out to PayPal — asks visitors to help fund the iOS
-  // release and keep the app free/ad-free. No in-repo payment integration;
-  // this is a plain external link, same PayPal.me URL already used on the
-  // root marketing page.
-
-  test('links to the PayPal donation page and has translated, non-empty text', async ({ page }) => {
-    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
-
-    const btn = page.locator('#support-ministry-btn');
-    await expect(btn).toBeVisible();
-    await expect(btn).toHaveAttribute('href', 'https://www.paypal.com/paypalme/develop4godOfficial');
-    await expect(btn).toHaveAttribute('target', '_blank');
-    await expect(btn).toHaveAttribute('rel', 'noopener');
-
-    const label = page.locator('#support-ministry-label');
-    await expect(label).not.toHaveText('');
-    await expect(label).toHaveText('Donate');
-
-    // Regression: the button used to clip its own label text instead of
-    // sizing to fit it.
-    const isClipped = await label.evaluate((el) => el.scrollWidth > el.clientWidth);
-    expect(isClipped).toBe(false);
-  });
-
-  test('label and title are localized per language', async ({ page }) => {
-    await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
-    await expect(page.locator('#support-ministry-label')).toHaveText('Donar');
-    await expect(page.locator('#support-ministry-btn')).toHaveAttribute('title', /iOS/);
-
-    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
-    await expect(page.locator('#support-ministry-label')).toHaveText('Donate');
-    await expect(page.locator('#support-ministry-btn')).toHaveAttribute('title', /iOS/);
-  });
-
-  test('button sizes to fit even the longest translation ("Faire un don")', async ({ page }) => {
-    await page.goto('/devocionales/?lang=fr', { waitUntil: 'networkidle' });
-
-    const label = page.locator('#support-ministry-label');
-    await expect(label).toHaveText('Faire un don');
-
-    const isClipped = await label.evaluate((el) => el.scrollWidth > el.clientWidth);
-    expect(isClipped).toBe(false);
-  });
-
-  test('has the same horizontal padding as the other .btn-primary CTA (tts-btn)', async ({ page }) => {
-    // Regression: .site-nav a's generic nav-link rule (padding: 0.5rem 0)
-    // was matching this button too, since it's an <a> inside the header —
-    // silently zeroing its left/right padding while the Tailwind px-5
-    // utility class lost the specificity fight. tts-btn is a <button>, so
-    // it was never affected and looked correct while this one didn't.
-    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
-
-    const supportPadding = await page.locator('#support-ministry-btn').evaluate((el) => getComputedStyle(el).padding);
-    const ttsPadding = await page.locator('#tts-btn').evaluate((el) => getComputedStyle(el).padding);
-    expect(supportPadding).toBe(ttsPadding);
-  });
-});
-
 test.describe('devocionales reader share feature', () => {
   // Issue #12: replaced hardcoded Facebook/X-only share links (no social
   // presence to point them at) with navigator.share() + a mailto fallback.

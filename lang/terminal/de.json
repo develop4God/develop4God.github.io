@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "develop4God — Wir entwickeln für Gott",
+    "description": "Ein Dienst, der Software baut wie für den Herrn: Christliche Andachten und Systeme für Gemeinden und Werke."
+  },
+  "nav": {
+    "hire": "Entwicklungen",
+    "ministry": "Dienst",
+    "contact": "Kontakt",
+    "language": "Sprache",
+    "theme": "Design wechseln"
+  },
+  "hero": {
+    "eyebrow": "develop4God · Wir entwickeln für Gott",
+    "verse": "Alles, was ihr tut, das tut von Herzen als dem Herrn und nicht den Menschen.",
+    "ref": "Kolosser 3:23",
+    "why": "Daher kommt unser Name.",
+    "version": "LU17",
+    "cue": "Scrollen"
+  },
+  "fork": {
+    "eyebrow": "Wähle einen Weg",
+    "title": "Mehr erfahren.",
+    "hint": "Wähle eines aus, um fortzufahren.",
+    "hire": {
+      "k": "Unternehmen und Menschen mit einem Anliegen",
+      "title": "Unsere Entwicklungen",
+      "desc": "Sieh, was wir gebaut haben und wie wir dein Unternehmen oder dein Anliegen unterstützen können.",
+      "go": "Die Entwicklungen ansehen →"
+    },
+    "min": {
+      "k": "Unsere lieben Nutzer und Dienste",
+      "title": "Unser Dienst",
+      "desc": "Sieh, wie Gott uns erlaubt hat, dir zu dienen, und wie wir deinen Dienst unterstützen können.",
+      "go": "Den Dienst ansehen →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "LLM-Pipelines",
+      "title": "LLM-Pipelines bauen – und die Produkte drumherum.",
+      "typed": "$ in Arbeit",
+      "phrases": [
+        "nachvollziehbare LLM-Pipelines",
+        "mandantenfähiges SaaS",
+        "Websites, die schnell laden",
+        "individuelle Werkzeuge und Automatisierungen",
+        "Flutter-Apps bei Google Play"
+      ],
+      "text": "Jeder Modellaufruf hinterlässt eine Prüfspur. Anbieterunabhängige Batch-Pipelines mit Checkpoints für fortsetzbare Läufe und ein Probelauf-Modus, der die Kosten anzeigt, bevor irgendetwas gesendet wird."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, Websites und individuelle Werkzeuge",
+      "title": "Eine Plattform, jeder Kunde getrennt.",
+      "text": "Eine produktive mandantenfähige Plattform für Anwaltskanzleien, getrennt über einen JWT-Claim und Postgres Row-Level-Security. Derselbe Full-Stack-Ansatz baut Websites und individuelle Werkzeuge."
+    },
+    "mobile": {
+      "eyebrow": "Mobile Apps",
+      "title": "Im Einsatz bei Google Play, in {languages} Sprachen.",
+      "text": "Flutter mit BLoC und Dependency Injection, einschließlich Arabisch von rechts nach links und Hindi."
+    },
+    "world": {
+      "eyebrow": "Christliche Andachten",
+      "title": "Gelesen in Ländern auf der ganzen Welt.",
+      "text": "Eine kostenlose App und ein Leser für tägliche Andachten, zu Seiner Ehre gebaut und mit Gläubigen überall geteilt."
+    },
+    "languages": {
+      "eyebrow": "Mehrere Sprachen",
+      "title": "{languages} Sprachen, mit Systemen, die sie prüfen.",
+      "text": "Um die Qualität der Inhalte in jeder Sprache zu sichern, bauen wir KI-gestützte Prüfwerkzeuge für Korrektur und Übersetzung."
+    },
+    "dot": "Szene",
+    "pause": "Animation pausieren",
+    "play": "Animation abspielen"
+  },
+  "hire": {
+    "switch": "← Suchst du stattdessen den Dienst?",
+    "build": {
+      "title": "Was wir gebaut haben",
+      "sub": "Von der Datenbank bis zum Bildschirm. Sechs Arten von Arbeit, jede bei echten Nutzern im Einsatz."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS und Web-Apps",
+        "text": "Mandantenfähige Plattformen, von Anfang bis Ende gebaut: API, Oberfläche, Datenbank und Bereitstellung."
+      },
+      "k2": {
+        "title": "Websites",
+        "text": "Schnell, zweisprachig und leicht zu pflegen. Kataloge, Landingpages und Websites für Gemeinden, bei Bedarf mit Bestellung über WhatsApp."
+      },
+      "k3": {
+        "title": "Individuelle Werkzeuge",
+        "text": "Interne Werkzeuge, Automatisierungen, Integrationen und Desktop-Apps, passend zur tatsächlichen Arbeitsweise deines Teams."
+      },
+      "k4": {
+        "title": "LLM-Pipelines",
+        "text": "Anbieterunabhängige Batch-Pipelines mit Checkpoint-Läufen, Prüfspuren und Kostenschätzungen."
+      },
+      "k5": {
+        "title": "Inhaltssysteme",
+        "text": "Erzeugen, Übersetzen und Prüfen großer Inhaltsmengen mit unabhängiger kritischer Durchsicht."
+      },
+      "k6": {
+        "title": "Mobile Apps",
+        "text": "Produktive Flutter-Apps mit sauberer Architektur, auch für Sprachen von rechts nach links."
+      }
+    },
+    "ask": {
+      "title": "Noch ein Anliegen? Lass uns reden.",
+      "text": "Ob eine Entwicklung, eine kleine Idee oder eine Automatisierung, die Zeit spart: Schreib uns. Durch Gottes Gnade und unsere Arbeit mit KI können wir dir heute bei fast jedem Anliegen weiterhelfen.",
+      "cta": "Sag uns, was du brauchst"
+    },
+    "cases": {
+      "title": "Ausgewählte Arbeiten",
+      "sub": "Was jedes Projekt ist und wie es gebaut wurde.",
+      "more": "Mehr Projekte auf GitHub →"
+    },
+    "how": {
+      "title": "Wie wir arbeiten",
+      "sub": "Derselbe Ablauf bei jeder Änderung, ob der Kunde eine Kanzlei oder eine Gemeinde ist."
+    },
+    "steps": {
+      "s1": {
+        "title": "Planen",
+        "text": "Prüfpunkte und Liefergegenstände werden vor dem Code festgehalten."
+      },
+      "s2": {
+        "title": "Tests zuerst",
+        "text": "Jeder Test schlägt aus dem richtigen Grund fehl und läuft dann durch."
+      },
+      "s3": {
+        "title": "Bauen",
+        "text": "Das einfachste Design, das funktioniert. SOLID, keine technischen Schulden."
+      },
+      "s4": {
+        "title": "Unabhängige Durchsicht",
+        "text": "Wir prüfen unseren eigenen Code nie als letzte Instanz. Die CI ist grün, bevor zusammengeführt wird."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "Live",
+      "desc": "Mandantenfähige Plattform für Anwaltskanzleien: ein Angebotsrechner mit Branding je Kunde und druckbaren PDFs, je Kanzlei erzeugte KYC-Formulare, eine Risikomatrix und Sanktionsprüfung gegen OFAC/UN-Listen.",
+      "facts": [
+        "Mandantentrennung über einen JWT-Claim und Postgres Row-Level-Security",
+        "Jeder Kunde hat sein eigenes Branding, seinen eigenen Katalog und eigene Formularfelder"
+      ],
+      "note": "Unsere Plattform. Privates Repository, Vorführung auf Anfrage."
+    },
+    "play-store-mcp": {
+      "chip": "Open Source",
+      "desc": "Ein MCP-Server, mit dem KI-Agenten Android-Releases bei Google Play hochladen und freigeben können, gebaut rund um ein Sicherheitsmodell.",
+      "facts": [
+        "Jeder Schreibzugriff ist ein Probelauf, solange er nicht bestätigt wird",
+        "Produktiv wird nur ein Entwurf gespeichert: Ein Mensch sendet ihn zur Prüfung",
+        "Ein gepflegter Fork eines MIT-Projekts, mit Nennung des Originals"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Batch-Pipeline für mehrere Anbieter, die den Andachtsbestand erzeugt, mit fortsetzbaren Läufen über Checkpoints.",
+      "facts": [
+        "Der Probelauf-Modus zeigt eine Kostenschätzung vor jedem Aufruf",
+        "Jede LLM-Operation hinterlässt eine Prüfspur",
+        "Setzt nach einem Fehler am letzten Checkpoint fort"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "LangGraph-Pipeline für Übersetzung, Fehlererkennung, unabhängige kritische Durchsicht, automatische Korrektur und Validierung.",
+      "facts": [
+        "Jeder von der KI gemeldete Befund wird wörtlich gegen die Quelle geprüft",
+        "Ein getrennter Kritiker prüft die Ausgabe des Korrektors"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Automatisierte SDN/OFAC-Prüfung für Compliance-Fachleute, als Web- und Desktop-App.",
+      "facts": [
+        "Ein Code, der als Web-App und als Desktop-App ausgeliefert wird"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← Suchst du stattdessen die Entwicklungen?",
+    "title": "Unser Auftrag",
+    "sub": "Das Wort Gottes weitertragen",
+    "stats": {
+      "downloads": "Downloads",
+      "countries": "Länder",
+      "active": "Aktive Nutzer",
+      "rating": "Bewertung",
+      "languages": "Sprachen"
+    },
+    "apps": {
+      "dev": {
+        "title": "Christliche Andachten",
+        "text": "Deine tägliche Andacht, kostenlos und in {languages} Sprachen: Vers, Besinnung und Gebet, mit Audio, Favoriten und Teilen.",
+        "store": "Bei Google Play herunterladen",
+        "go": "Die heutige Andacht lesen"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Mach den Glauben zur täglichen Gewohnheit: vorgeschlagene Mikro-Gewohnheiten, Serien und Verse, mit der Bibel in der App.",
+        "store": "Bei Google Play herunterladen",
+        "go": "Habitus+Faith kennenlernen"
+      }
+    },
+    "build": {
+      "title": "Was wir für deinen Dienst bauen können",
+      "i1": "Eine mobile App oder Website für deine Gemeinde oder Organisation",
+      "i2": "Inhaltserstellung, Übersetzung und Mehrsprachigkeit",
+      "i3": "Dashboards, Integrationen und Back-End-Systeme",
+      "i4": "Automatisierung, die deinem Team Zeit spart",
+      "cta": "Erzähl uns von deinem Projekt"
+    },
+    "how": {
+      "title": "Wie wir unseren Dienst aufbauen",
+      "sub": "Ein Blick darauf, wie Gott uns erlaubt, Leser in so vielen Ländern und Sprachen zu erreichen."
+    },
+    "isaiah": {
+      "text": "Denn gleichwie der Regen und Schnee vom Himmel fällt und nicht wieder dahin zurückkehrt, sondern feuchtet die Erde und macht sie fruchtbar und lässt wachsen, dass sie gibt Samen zu säen und Brot zu essen, so soll das Wort, das aus meinem Munde geht, auch sein: Es wird nicht wieder leer zu mir zurückkommen, sondern wird tun, was mir gefällt, und ihm wird gelingen, wozu ich es sende.",
+      "ref": "Jesaja 55:10-11 · LU17"
+    }
+  },
+  "contact": {
+    "title": "Wenn du bis hierher gekommen bist, lass uns reden.",
+    "text": "Sag uns, was du brauchst: ein Produkt, eine Website, ein Werkzeug oder ein Projekt für deinen Dienst.",
+    "cta": "Schreib uns eine E-Mail"
+  },
+  "foot": {
+    "rights": "Alle Rechte vorbehalten.",
+    "email": "E-Mail an Develop4God"
+  }
+}

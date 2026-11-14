@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "develop4God — Nous développons pour Dieu",
+    "description": "Un ministère qui construit des logiciels comme pour le Seigneur : Méditations Chrétiennes et systèmes pour les ministères."
+  },
+  "nav": {
+    "hire": "Réalisations",
+    "ministry": "Ministère",
+    "contact": "Contact",
+    "language": "Langue",
+    "theme": "Changer de thème"
+  },
+  "hero": {
+    "eyebrow": "develop4God · Nous développons pour Dieu",
+    "verse": "Tout ce que vous faites, faites-le de bon cœur, comme pour le Seigneur et non pour des hommes.",
+    "ref": "Colossiens 3:23",
+    "why": "C’est de là que vient notre nom.",
+    "version": "LSG1910",
+    "cue": "Défiler"
+  },
+  "fork": {
+    "eyebrow": "Choisissez un chemin",
+    "title": "En savoir plus.",
+    "hint": "Choisissez-en un pour continuer.",
+    "hire": {
+      "k": "Entreprises et personnes avec un besoin",
+      "title": "Nos réalisations",
+      "desc": "Découvrez ce que nous avons construit et comment nous pouvons soutenir votre entreprise ou votre besoin.",
+      "go": "Voir les réalisations →"
+    },
+    "min": {
+      "k": "Nos chers utilisateurs et ministères",
+      "title": "Notre ministère",
+      "desc": "Découvrez comment Dieu nous a permis de vous servir, et comment nous pouvons soutenir votre ministère.",
+      "go": "Voir le ministère →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "Pipelines LLM",
+      "title": "Construire des pipelines LLM et les produits qui les entourent.",
+      "typed": "$ en construction",
+      "phrases": [
+        "pipelines LLM audités",
+        "SaaS multi-tenant",
+        "sites web qui se chargent vite",
+        "outils et automatisations sur mesure",
+        "applications Flutter sur Google Play"
+      ],
+      "text": "Chaque appel à un modèle laisse une trace d’audit. Des pipelines par lots indépendants du fournisseur, avec des exécutions reprenables par points de contrôle et un mode simulation qui affiche le coût avant tout envoi."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, sites web et outils sur mesure",
+      "title": "Une plateforme, chaque client isolé.",
+      "text": "Une plateforme multi-tenant en production pour des cabinets d’avocats, isolée par une claim JWT et la sécurité au niveau des lignes de Postgres. La même approche full-stack construit des sites web et des outils sur mesure."
+    },
+    "mobile": {
+      "eyebrow": "Applications mobiles",
+      "title": "En production sur Google Play, en {languages} langues.",
+      "text": "Flutter avec BLoC et injection de dépendances, y compris l’arabe de droite à gauche et l’hindi."
+    },
+    "world": {
+      "eyebrow": "Méditations Chrétiennes",
+      "title": "Lu dans des pays du monde entier.",
+      "text": "Une application et un lecteur de dévotions quotidiennes, gratuit, conçu pour Sa gloire et partagé avec les croyants partout."
+    },
+    "languages": {
+      "eyebrow": "Plusieurs langues",
+      "title": "{languages} langues, avec des systèmes qui les relisent.",
+      "text": "Pour garantir la qualité du contenu dans chaque langue, nous construisons des outils de validation intégrant l’IA, pour la relecture et la traduction."
+    },
+    "dot": "Scène",
+    "pause": "Mettre l’animation en pause",
+    "play": "Lancer l’animation"
+  },
+  "hire": {
+    "switch": "← Vous cherchez plutôt le ministère ?",
+    "build": {
+      "title": "Ce que nous avons construit",
+      "sub": "De la base de données à l’écran. Six types de travaux, chacun livré à de vrais utilisateurs."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS et applications web",
+        "text": "Des plateformes multi-tenant construites de bout en bout : API, interface, base de données et déploiement."
+      },
+      "k2": {
+        "title": "Sites web",
+        "text": "Rapides, bilingues et faciles à maintenir. Catalogues, pages d’accueil et sites de ministères, avec commande par WhatsApp quand c’est utile."
+      },
+      "k3": {
+        "title": "Outils sur mesure",
+        "text": "Outils internes, automatisations, intégrations et applications de bureau conçus selon la façon dont votre équipe travaille vraiment."
+      },
+      "k4": {
+        "title": "Pipelines LLM",
+        "text": "Des pipelines par lots indépendants du fournisseur, avec exécutions par points de contrôle, traçabilité d’audit et estimation des coûts."
+      },
+      "k5": {
+        "title": "Systèmes de contenu",
+        "text": "Génération, traduction et validation de grands volumes de contenu avec relecture critique indépendante."
+      },
+      "k6": {
+        "title": "Applications mobiles",
+        "text": "Des applications Flutter en production avec une architecture propre, y compris les langues de droite à gauche."
+      }
+    },
+    "ask": {
+      "title": "Un autre besoin ? Parlons-en.",
+      "text": "Qu’il s’agisse d’un développement, d’une petite idée ou d’une automatisation qui fait gagner du temps : écrivez-nous. Par la grâce de Dieu et grâce à notre travail avec l’IA, nous pouvons aujourd’hui vous orienter pour presque tous les besoins.",
+      "cta": "Dites-nous ce qu’il vous faut"
+    },
+    "cases": {
+      "title": "Réalisations choisies",
+      "sub": "Ce qu’est chaque projet et comment il est construit.",
+      "more": "Plus de projets sur GitHub →"
+    },
+    "how": {
+      "title": "Notre façon de travailler",
+      "sub": "La même boucle à chaque changement, que le client soit un cabinet ou une église."
+    },
+    "steps": {
+      "s1": {
+        "title": "Planifier",
+        "text": "Vérifications et livrables écrits avant le code."
+      },
+      "s2": {
+        "title": "Les tests d’abord",
+        "text": "Chaque test échoue pour la bonne raison, puis réussit."
+      },
+      "s3": {
+        "title": "Construire",
+        "text": "La conception la plus simple qui fonctionne. SOLID, sans dette technique."
+      },
+      "s4": {
+        "title": "Relecture indépendante",
+        "text": "Nous ne relisons jamais notre propre code comme dernier filtre. La CI est au vert avant la fusion."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "En ligne",
+      "desc": "Plateforme multi-tenant pour cabinets d’avocats : un générateur de devis avec la marque de chaque client et des PDF imprimables, des formulaires KYC générés par cabinet, une matrice de risques et un contrôle des sanctions OFAC/ONU.",
+      "facts": [
+        "Isolation par tenant via une claim JWT et la sécurité au niveau des lignes de Postgres",
+        "Chaque client a sa propre marque, son propre catalogue et ses propres champs de formulaire"
+      ],
+      "note": "Notre plateforme. Dépôt privé, démonstration sur demande."
+    },
+    "play-store-mcp": {
+      "chip": "Open source",
+      "desc": "Un serveur MCP qui permet aux agents IA de téléverser et de promouvoir des versions Android sur Google Play, bâti autour d’un modèle de sécurité.",
+      "facts": [
+        "Toute écriture est une simulation sauf confirmation",
+        "La production n’enregistre qu’un brouillon : une personne l’envoie en revue",
+        "Un fork maintenu d’un projet MIT, avec l’original crédité"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Pipeline par lots multi-fournisseurs qui génère le corpus de dévotions, avec des exécutions reprenables par points de contrôle.",
+      "facts": [
+        "Le mode simulation affiche une estimation du coût avant tout appel",
+        "Chaque opération LLM laisse une trace d’audit",
+        "Reprend au dernier point de contrôle après une panne"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "Pipeline LangGraph pour la traduction, la détection d’erreurs, la relecture critique indépendante, la correction automatique et la validation.",
+      "facts": [
+        "Chaque constat signalé par l’IA est vérifié mot pour mot par rapport à la source",
+        "Un critique distinct relit la sortie du correcteur"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Contrôle automatisé des listes SDN/OFAC pour les professionnels de la conformité, en application web et de bureau.",
+      "facts": [
+        "Un même code est livré en application web et en application de bureau"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← Vous cherchez plutôt les réalisations ?",
+    "title": "Notre mission",
+    "sub": "Porter la parole de Dieu",
+    "stats": {
+      "downloads": "Téléchargements",
+      "countries": "Pays",
+      "active": "Utilisateurs actifs",
+      "rating": "Note",
+      "languages": "Langues"
+    },
+    "apps": {
+      "dev": {
+        "title": "Méditations Chrétiennes",
+        "text": "Votre dévotion quotidienne, gratuite et en {languages} langues : verset, réflexion et prière, avec audio, favoris et partage.",
+        "store": "Disponible sur Google Play",
+        "go": "Lire la dévotion du jour"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Faites de la foi une habitude quotidienne : micro-habitudes suggérées, séries et versets, avec la Bible dans l’application.",
+        "store": "Disponible sur Google Play",
+        "go": "Découvrir Habitus+Faith"
+      }
+    },
+    "build": {
+      "title": "Ce que nous pouvons construire pour votre ministère",
+      "i1": "Une application mobile ou un site web pour votre église ou votre organisation",
+      "i2": "Génération de contenu, traduction et prise en charge multilingue",
+      "i3": "Tableaux de bord, intégrations et systèmes back-end",
+      "i4": "Une automatisation qui fait gagner du temps à votre équipe",
+      "cta": "Parlez-nous de votre projet"
+    },
+    "how": {
+      "title": "Comment nous bâtissons notre ministère",
+      "sub": "Un aperçu de la manière dont Dieu nous permet de rejoindre des lecteurs dans tant de pays et de langues."
+    },
+    "isaiah": {
+      "text": "Comme la pluie et la neige descendent des cieux, et n’y retournent pas sans avoir arrosé, fécondé la terre, et fait germer les plantes, sans avoir donné de la semence au semeur et du pain à celui qui mange, ainsi en est-il de ma parole, qui sort de ma bouche : elle ne retourne point à moi sans effet, sans avoir exécuté ma volonté et accompli mes desseins.",
+      "ref": "Ésaïe 55:10-11 · LSG1910"
+    }
+  },
+  "contact": {
+    "title": "Si vous êtes arrivé jusqu’ici, parlons-en.",
+    "text": "Dites-nous ce qu’il vous faut : un produit, un site web, un outil ou un projet pour votre ministère.",
+    "cta": "Écrivez-nous un e-mail"
+  },
+  "foot": {
+    "rights": "Tous droits réservés.",
+    "email": "Écrire à Develop4God"
+  }
+}
