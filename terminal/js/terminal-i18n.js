@@ -5,7 +5,20 @@
 (function (window) {
   'use strict';
 
-  var SUPPORTED = ['en', 'es', 'pt', 'fr', 'de', 'zh', 'ja', 'hi', 'ar', 'fil'];
+  // Same names and flags as the language menu of the devotionals pages.
+  var LANGUAGES = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'pt', name: 'Português', flag: '🇧🇷' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'zh', name: '中文', flag: '🇨🇳' },
+    { code: 'ja', name: '日本語', flag: '🇯🇵' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+    { code: 'fil', name: 'Filipino', flag: '🇵🇭' }
+  ];
+  var SUPPORTED = LANGUAGES.map(function (language) { return language.code; });
   var DEFAULT_LANGUAGE = 'en';
   var STORAGE_KEY = 'develop4God_language';
 
@@ -93,6 +106,7 @@
   }
 
   window.TerminalI18n = {
+    LANGUAGES: LANGUAGES,
     SUPPORTED: SUPPORTED,
     DEFAULT_LANGUAGE: DEFAULT_LANGUAGE,
     STORAGE_KEY: STORAGE_KEY,

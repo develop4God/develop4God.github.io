@@ -7,7 +7,7 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LOGO_URL = '/img/logo_vector_512x512.png';
   var PATHS = { hire: 'path-hire', ministry: 'path-ministry' };
-  var dict = {}, dicts = {}, stories = {}, typed = null, langSeq = 0, tokens = {}, currentLang = null;
+  var dict = {}, dicts = {}, stories = {}, typed = null, langMenu = null, langSeq = 0, tokens = {}, currentLang = null;
   var reveal = window.TerminalEffects.reveal();
 
   function $(sel, root) { return (root || document).querySelector(sel); }
@@ -63,7 +63,8 @@
     dict = dicts[l];
     currentLang = l;
     I.apply(document, dict, l, tokens);
-    $('#lang').value = l;
+    langMenu.setValue(l);
+    langMenu.setLabel(I.get(dict, 'nav.language'));
     labelDots();
     renderCases();
     if (typed) typed.restart();
@@ -181,9 +182,13 @@
     if (!noScroll) scrollTo($('#path-' + name + ' [data-landing]') || $('#story-' + name));
   }
 
+  // The theme switch reads as "on" in the dark theme, like the one on the devotionals pages.
+  function syncThemeSwitch() {
+    $('#theme').setAttribute('aria-checked', window.TerminalTheme.current() === 'dark' ? 'true' : 'false');
+  }
+
   function bindControls() {
-    $('#lang').addEventListener('change', function (e) { setLanguage(e.target.value, true); });
-    $('#theme').addEventListener('click', function () { window.TerminalTheme.set(window.TerminalTheme.nextTheme(window.TerminalTheme.current())); });
+    $('#theme').addEventListener('click', function () { window.TerminalTheme.set(window.TerminalTheme.nextTheme(window.TerminalTheme.current())); syncThemeSwitch(); });
     $all('[data-path-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); choosePath(a.getAttribute('data-path-link')); }); });
     $all('[data-switch]').forEach(function (b) { b.addEventListener('click', function () { choosePath(b.getAttribute('data-switch')); }); });
     $all('[data-contact-link]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); history.replaceState(null, '', '#contact'); scrollTo(showContact()); }); });
@@ -194,7 +199,9 @@
     try { saved = localStorage.getItem(I.STORAGE_KEY); } catch (e) { /* storage unavailable */ }
     var l = I.resolveLanguage({ param: param, saved: saved, browser: navigator.language });
     bindControls();
-    $('#lang').value = l;
+    langMenu = window.TerminalLanguageMenu.create($('#lang'), I.LANGUAGES, function (code) { setLanguage(code, true); });
+    langMenu.setValue(l);
+    syncThemeSwitch();
     $('[data-year]').textContent = new Date().getFullYear();
     loadTokens();
     skipHeroOnInput(ensureStory('hero'));

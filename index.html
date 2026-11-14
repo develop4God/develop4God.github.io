@@ -29,19 +29,12 @@
     <a class="nl" href="#hire" data-path-link="hire" data-i18n="nav.hire">Developments</a>
     <a class="nl min" href="#ministry" data-path-link="ministry" data-i18n="nav.ministry">Ministry</a>
     <a class="nl" href="#contact" data-contact-link data-i18n="nav.contact">Contact</a>
-    <select class="langsel" id="lang" data-i18n-aria="nav.language" aria-label="Language">
-      <option value="en">English</option>
-      <option value="es">Español</option>
-      <option value="pt">Português</option>
-      <option value="fr">Français</option>
-      <option value="de">Deutsch</option>
-      <option value="zh">中文</option>
-      <option value="ja">日本語</option>
-      <option value="hi">हिन्दी</option>
-      <option value="ar">العربية</option>
-      <option value="fil">Filipino</option>
-    </select>
-    <button type="button" class="theme" id="theme" data-i18n-aria="nav.theme" aria-label="Switch theme"><span class="sun" aria-hidden="true">☀</span><span class="moon" aria-hidden="true">☾</span></button>
+    <div class="langmenu" id="lang"></div>
+    <button type="button" class="theme" id="theme" role="switch" aria-checked="true" data-i18n-aria="nav.theme" aria-label="Switch theme">
+      <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <span class="theme-track" aria-hidden="true"><span class="theme-dot"></span></span>
+      <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
   </div>
 </nav>
 
@@ -217,6 +210,7 @@
 <script src="/terminal/js/terminal-layout.js"></script>
 <script src="/js/rtl-helper.js"></script>
 <script src="/terminal/js/terminal-i18n.js"></script>
+<script src="/terminal/js/terminal-language-menu.js"></script>
 <script src="/terminal/js/terminal-cases.js"></script>
 <script src="/terminal/js/terminal-logo-image.js"></script>
 <script src="/terminal/js/terminal-spin.js"></script>

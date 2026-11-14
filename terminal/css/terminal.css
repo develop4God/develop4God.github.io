@@ -183,36 +183,138 @@ a { color: inherit; }
 .nl.min:hover,
 .nl.min[aria-current="true"] { border-color: var(--accent2); }
 
-.langsel,
-.theme {
+/* Language menu: flag + name button and a listbox, like the devotionals pages. */
+.langmenu {
+  position: relative;
+  flex: none;
+}
+
+.langbtn,
+.langopt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   border: 0;
   background: none;
-  color: var(--muted);
-  font: 500 12px var(--mono);
+  color: var(--fg);
+  font: 500 14px var(--disp);
   cursor: pointer;
 }
 
-.langsel {
-  flex: none;
-  max-width: 9.5em;
-  padding: 6px 10px;
+.langbtn {
+  padding: 7px 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 10px;
   background: var(--bg);
-  color: var(--muted);
-  font-family: var(--disp);
+  white-space: nowrap;
 }
 
-.theme {
-  padding: 6px 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-size: 14px;
-  line-height: 1;
+.langbtn:hover { border-color: var(--accent); }
+
+.langarrow {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s;
 }
-.theme .sun { display: none; }
-:root[data-theme="light"] .theme .moon { display: none; }
-:root[data-theme="light"] .theme .sun { display: inline; }
+
+.langbtn[aria-expanded="true"] .langarrow { transform: rotate(180deg); }
+
+.langlist {
+  position: absolute;
+  inset-block-start: calc(100% + 6px);
+  inset-inline-end: 0;
+  z-index: 60;
+  min-width: 180px;
+  margin: 0;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  list-style: none;
+}
+
+.langlist[hidden] { display: none; }
+
+.langopt {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  text-align: start;
+}
+
+.langopt:hover,
+.langopt:focus-visible { background: var(--surface); }
+
+.langopt[aria-selected="true"] {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.langcheck {
+  margin-inline-start: auto;
+  visibility: hidden;
+}
+
+.langopt[aria-selected="true"] .langcheck { visibility: visible; }
+
+/* Theme switch: sun, track and moon, like the devotionals pages. */
+.theme {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 2px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.theme-sun,
+.theme-moon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentcolor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: color 0.15s;
+}
+
+:root[data-theme="light"] .theme-sun,
+:root[data-theme="dark"] .theme-moon { color: var(--accent); }
+
+.theme-track {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background 0.15s;
+}
+
+:root[data-theme="dark"] .theme-track { background: var(--accent); }
+
+.theme-dot {
+  position: absolute;
+  inset-block-start: 2.4px;
+  inset-inline-start: 2.4px;
+  width: 15.2px;
+  height: 15.2px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: transform 0.15s;
+}
+
+:root[data-theme="dark"] .theme-dot { transform: translateX(16px); }
+[dir="rtl"][data-theme="dark"] .theme-dot { transform: translateX(-16px); }
 
 @media (width <= 640px) {
   .nav-in { gap: 10px; }
@@ -223,6 +325,7 @@ a { color: inherit; }
    from the doors and the switch links. */
 @media (width <= 480px) {
   .nl { display: none; }
+  .langbtn .langname { display: none; }
 }
 
 .btn {
