@@ -4,7 +4,7 @@
     "description": "A ministry that builds software as unto the Lord: Devocionales Cristianos and systems for ministries."
   },
   "nav": {
-    "hire": "Hire me",
+    "hire": "Developments",
     "ministry": "Ministry",
     "contact": "Contact",
     "language": "Language",
@@ -20,18 +20,18 @@
   },
   "fork": {
     "eyebrow": "Choose a path",
-    "title": "Two ways to build together.",
+    "title": "Learn more.",
     "hint": "Pick one to continue.",
     "hire": {
-      "k": "Companies and teams",
-      "title": "Hire me",
-      "desc": "Production AI engineering and full-stack delivery: SaaS, websites, apps and custom tools.",
-      "go": "See the work →"
+      "k": "Businesses and people with a need",
+      "title": "Our developments",
+      "desc": "See what we have built and how we can support your business or need.",
+      "go": "See the developments →"
     },
     "min": {
       "k": "Ministries and mission-driven teams",
-      "title": "Ministry",
-      "desc": "Apps, sites and automation for your mission, from the developer behind Devocionales Cristianos.",
+      "title": "Our ministry",
+      "desc": "See how God has allowed us to serve Him, and how we can support your ministry.",
       "go": "See the ministry →"
     }
   },
@@ -190,7 +190,7 @@
     }
   },
   "min": {
-    "switch": "← Looking to hire me instead?",
+    "switch": "← Looking for the developments instead?",
     "title": "Built to serve",
     "stats": {
       "downloads": "Downloads",

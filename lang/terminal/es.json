@@ -4,7 +4,7 @@
     "description": "Un ministerio que construye software como para el Señor: Devocionales Cristianos y sistemas para ministerios."
   },
   "nav": {
-    "hire": "Contrátame",
+    "hire": "Desarrollos",
     "ministry": "Ministerio",
     "contact": "Contacto",
     "language": "Idioma",
@@ -20,18 +20,18 @@
   },
   "fork": {
     "eyebrow": "Elige un camino",
-    "title": "Dos formas de construir juntos.",
+    "title": "Conoce más.",
     "hint": "Elige una para continuar.",
     "hire": {
-      "k": "Empresas y equipos",
-      "title": "Contrátame",
-      "desc": "Ingeniería de IA en producción y desarrollo full-stack: SaaS, sitios web, apps y herramientas a medida.",
-      "go": "Ver el trabajo →"
+      "k": "Negocios y personas con una necesidad",
+      "title": "Nuestros desarrollos",
+      "desc": "Mira nuestros desarrollos actuales y cómo podemos apoyar tu negocio o necesidad.",
+      "go": "Ver los desarrollos →"
     },
     "min": {
       "k": "Ministerios y equipos con misión",
-      "title": "Ministerio",
-      "desc": "Apps, sitios y automatización para tu misión, del desarrollador detrás de Devocionales Cristianos.",
+      "title": "Nuestro ministerio",
+      "desc": "Mira cómo Dios nos ha permitido servirle, y cómo podemos apoyar tu ministerio.",
       "go": "Ver el ministerio →"
     }
   },
@@ -190,7 +190,7 @@
     }
   },
   "min": {
-    "switch": "← ¿Buscas contratarme?",
+    "switch": "← ¿Buscas los desarrollos?",
     "title": "Hecho para servir",
     "stats": {
       "downloads": "Descargas",
