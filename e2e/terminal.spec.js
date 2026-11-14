@@ -16,7 +16,7 @@ test('entry needs no input: verse shown, logo canvas painted, no console errors'
   const errors = trackErrors(page);
   await page.goto('/terminal/', { waitUntil: 'networkidle' });
   await expect(page.locator('.hero-verse, #story-hero .verse')).toHaveText(EN_VERSE);
-  await expect(page.locator('#story-hero .refline')).toContainText('Colossians 3:23');
+  await expect(page.locator('#story-hero [data-i18n="hero.ref"]')).toContainText('Colossians 3:23');
   await page.waitForTimeout(2200);
   const painted = await page.evaluate(() => {
     const c = document.querySelector('#story-hero .scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;

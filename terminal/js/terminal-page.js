@@ -168,7 +168,7 @@
     showContact();
     ensureStory(name);
     history.replaceState(null, '', '#' + name);
-    if (!noScroll) scrollTo($('#story-' + name));
+    if (!noScroll) scrollTo($('#path-' + name + ' [data-landing]') || $('#story-' + name));
   }
 
   function bindControls() {
