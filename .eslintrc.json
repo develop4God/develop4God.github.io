@@ -25,7 +25,22 @@
     "SiteFooter": "readonly",
     "WorkWithMeI18n": "readonly",
     "HabitusI18n": "readonly",
-    "lucide": "readonly"
+    "lucide": "readonly",
+    "TerminalMath": "readonly",
+    "TerminalScenes": "readonly",
+    "TerminalLayout": "readonly",
+    "TerminalWorldMask": "readonly",
+    "TerminalI18n": "readonly",
+    "TerminalTheme": "readonly",
+    "TerminalCases": "readonly",
+    "TerminalCanvas": "readonly",
+    "TerminalLogoImage": "readonly",
+    "TerminalTwinLife": "readonly",
+    "TerminalSpin": "readonly",
+    "TerminalGlobe": "readonly",
+    "TerminalGlobeLayer": "readonly",
+    "TerminalStory": "readonly",
+    "TerminalEffects": "readonly"
   },
   "rules": {
     "no-unused-vars": "warn",

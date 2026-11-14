@@ -11,7 +11,7 @@ test('home page loads and is interactive', async ({ page }) => {
     if (m.type() === 'error') consoleErrors.push(m.text());
   });
 
-  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.goto('/legacy/', { waitUntil: 'networkidle' });
 
   const h1 = page.locator('h1').first();
   await expect(h1).not.toHaveText('');
@@ -36,7 +36,7 @@ test('home page loads and is interactive', async ({ page }) => {
 });
 
 test('home page language dropdown switches language', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.goto('/legacy/', { waitUntil: 'networkidle' });
 
   const button = page.locator('.language-selector-button');
   await expect(button).toBeVisible();
@@ -54,7 +54,7 @@ test('home page language dropdown switches language', async ({ page }) => {
 
 test('home page has no horizontal overflow on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 667 });
-  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.goto('/legacy/', { waitUntil: 'networkidle' });
 
   const hasOverflow = await page.evaluate(() => document.body.scrollWidth > window.innerWidth);
   expect(hasOverflow).toBe(false);

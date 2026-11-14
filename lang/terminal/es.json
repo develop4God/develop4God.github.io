@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "develop4God — Desarrollamos para Dios",
+    "description": "Un ministerio que construye software como para el Señor: Devocionales Cristianos y sistemas para ministerios."
+  },
+  "nav": {
+    "hire": "Desarrollos",
+    "ministry": "Ministerio",
+    "contact": "Contacto",
+    "language": "Idioma",
+    "theme": "Cambiar tema"
+  },
+  "hero": {
+    "eyebrow": "develop4God · Desarrollamos para Dios",
+    "verse": "Y todo lo que hagáis, hacedlo de corazón, como para el Señor y no para los hombres.",
+    "ref": "Colosenses 3:23",
+    "why": "De ahí viene nuestro nombre.",
+    "version": "RVR1909",
+    "cue": "Desliza"
+  },
+  "fork": {
+    "eyebrow": "Elige un camino",
+    "title": "Conoce más.",
+    "hint": "Elige una para continuar.",
+    "hire": {
+      "k": "Negocios y personas con una necesidad",
+      "title": "Nuestros desarrollos",
+      "desc": "Mira nuestros desarrollos actuales y cómo podemos apoyar tu negocio o necesidad.",
+      "go": "Ver los desarrollos →"
+    },
+    "min": {
+      "k": "Nuestros amados usuarios y ministerios",
+      "title": "Nuestro ministerio",
+      "desc": "Mira cómo Dios nos ha permitido servirte, y cómo podemos apoyar tu ministerio.",
+      "go": "Ver el ministerio →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "Pipelines de LLM",
+      "title": "Construyo pipelines de LLM y los productos a su alrededor.",
+      "typed": "$ construyendo",
+      "phrases": [
+        "pipelines de LLM auditados",
+        "SaaS multi-tenant",
+        "sitios web que cargan rápido",
+        "herramientas y automatizaciones a medida",
+        "apps Flutter en Google Play"
+      ],
+      "text": "Cada llamada a un modelo deja un rastro de auditoría. Pipelines por lotes independientes del proveedor, con ejecuciones reanudables por checkpoints y un modo de simulación que muestra el costo antes de enviar nada."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, sitios web y herramientas a medida",
+      "title": "Una plataforma, cada cliente aislado.",
+      "text": "Una plataforma multi-tenant en producción para firmas de abogados, aislada mediante un claim JWT y seguridad por filas de Postgres. El mismo enfoque full-stack construye sitios web y herramientas a medida."
+    },
+    "mobile": {
+      "eyebrow": "Apps móviles",
+      "title": "En producción en Google Play, en {languages} idiomas.",
+      "text": "Flutter con BLoC e inyección de dependencias, incluyendo árabe de derecha a izquierda e hindi."
+    },
+    "world": {
+      "eyebrow": "Devocionales Cristianos",
+      "title": "Leído en países de todo el mundo.",
+      "text": "Una app y lector de devocionales diarios, gratis, hecha para Su gloria y compartida con creyentes en todas partes."
+    },
+    "languages": {
+      "eyebrow": "Múltiples idiomas",
+      "title": "{languages} idiomas, con sistemas que los revisan.",
+      "text": "Para asegurar la calidad del contenido en cada idioma, construimos herramientas de validación integradas con IA, para revisión y traducción."
+    },
+    "dot": "Escena",
+    "pause": "Pausar animación",
+    "play": "Reproducir animación"
+  },
+  "hire": {
+    "switch": "← ¿Buscas el ministerio?",
+    "build": {
+      "title": "Lo que hemos construido",
+      "sub": "De la base de datos a la pantalla. Seis tipos de trabajo, cada uno entregado a usuarios reales."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS y apps web",
+        "text": "Plataformas multi-tenant construidas de punta a punta: API, interfaz, base de datos y despliegue."
+      },
+      "k2": {
+        "title": "Sitios web",
+        "text": "Rápidos, bilingües y fáciles de mantener. Catálogos, páginas de aterrizaje y sitios de ministerios, con pedidos por WhatsApp cuando ayuda."
+      },
+      "k3": {
+        "title": "Herramientas a medida",
+        "text": "Herramientas internas, automatizaciones, integraciones y apps de escritorio hechas según cómo trabaja tu equipo."
+      },
+      "k4": {
+        "title": "Pipelines de LLM",
+        "text": "Pipelines por lotes independientes del proveedor, con ejecuciones por checkpoints, auditoría y estimación de costos."
+      },
+      "k5": {
+        "title": "Sistemas de contenido",
+        "text": "Generación, traducción y validación de grandes volúmenes de contenido con revisión crítica independiente."
+      },
+      "k6": {
+        "title": "Apps móviles",
+        "text": "Apps Flutter en producción con arquitectura limpia, incluyendo idiomas de derecha a izquierda."
+      }
+    },
+    "ask": {
+      "title": "¿Tienes otra necesidad? Hablemos.",
+      "text": "Sea un desarrollo, una idea pequeña o una automatización que ahorre tiempo: escríbenos. Gracias a Dios y al trabajo con IA, hoy podemos orientarte en casi cualquier necesidad.",
+      "cta": "Cuéntanos qué necesitas"
+    },
+    "cases": {
+      "title": "Trabajo seleccionado",
+      "sub": "Qué es cada proyecto y cómo está construido.",
+      "more": "Más proyectos en GitHub →"
+    },
+    "how": {
+      "title": "Cómo trabajamos",
+      "sub": "El mismo ciclo en cada cambio, sea el cliente una firma o una iglesia."
+    },
+    "steps": {
+      "s1": {
+        "title": "Planificar",
+        "text": "Verificaciones y entregables escritos antes del código."
+      },
+      "s2": {
+        "title": "Pruebas primero",
+        "text": "Cada prueba falla por la razón correcta y luego pasa."
+      },
+      "s3": {
+        "title": "Construir",
+        "text": "El diseño más simple que funciona. SOLID, sin deuda técnica."
+      },
+      "s4": {
+        "title": "Revisión independiente",
+        "text": "Nunca revisamos nuestro propio código como última barrera. El CI está en verde antes de integrar."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "En vivo",
+      "desc": "Plataforma multi-tenant para firmas de abogados: un cotizador con marca por cliente y PDF imprimibles, formularios KYC generados por firma, una matriz de riesgo y verificación de sanciones OFAC/ONU.",
+      "facts": [
+        "Aislamiento por tenant mediante un claim JWT y seguridad por filas de Postgres",
+        "Cada cliente tiene su propia marca, catálogo y campos de formulario"
+      ],
+      "note": "Nuestra plataforma. Repositorio privado, demostración bajo petición."
+    },
+    "play-store-mcp": {
+      "chip": "Código abierto",
+      "desc": "Un servidor MCP que permite a agentes de IA subir y promover versiones de Android en Google Play, construido alrededor de un modelo de seguridad.",
+      "facts": [
+        "Toda escritura es una simulación salvo que se confirme",
+        "Producción solo guarda un borrador: una persona lo envía a revisión",
+        "Un fork mantenido de un proyecto MIT, con el original acreditado"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Pipeline por lotes multi-proveedor que genera el corpus de devocionales, con ejecuciones reanudables por checkpoints.",
+      "facts": [
+        "El modo de simulación muestra una estimación de costo antes de cualquier llamada",
+        "Cada operación con un LLM deja un rastro de auditoría",
+        "Se reanuda desde el último checkpoint tras un fallo"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "Pipeline LangGraph para traducción, detección de errores, revisión crítica independiente, corrección automática y validación.",
+      "facts": [
+        "Cada hallazgo señalado por la IA se verifica textualmente contra la fuente",
+        "Un crítico separado revisa la salida del corrector"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Verificación automatizada de listas SDN/OFAC para profesionales de cumplimiento, como app web y de escritorio.",
+      "facts": [
+        "Un mismo código se entrega como app web y como app de escritorio"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← ¿Buscas los desarrollos?",
+    "title": "Nuestra misión",
+    "sub": "Llevar la palabra de Dios",
+    "stats": {
+      "downloads": "Descargas",
+      "countries": "Países",
+      "active": "Usuarios activos",
+      "rating": "Valoración",
+      "languages": "Idiomas"
+    },
+    "apps": {
+      "dev": {
+        "title": "Devocionales Cristianos",
+        "text": "Tu devocional diario, gratis y en {languages} idiomas: versículo, reflexión y oración, con audio, favoritos y para compartir.",
+        "store": "Descargar en Google Play",
+        "go": "Leer el devocional de hoy"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Convierte la fe en hábito diario: micro-hábitos sugeridos, rachas y versículos, con la Biblia dentro de la app.",
+        "store": "Descargar en Google Play",
+        "go": "Conocer Habitus+Faith"
+      }
+    },
+    "build": {
+      "title": "Lo que podemos construir para tu ministerio",
+      "i1": "Una app móvil o sitio web para tu iglesia u organización",
+      "i2": "Generación de contenido, traducción y soporte multi-idioma",
+      "i3": "Paneles, integraciones y sistemas de back-end",
+      "i4": "Automatización que ahorra tiempo a tu equipo",
+      "cta": "Cuéntanos sobre tu proyecto"
+    },
+    "how": {
+      "title": "Cómo construimos nuestro ministerio",
+      "sub": "Un vistazo a cómo Dios nos permite llegar a lectores en tantos países e idiomas."
+    },
+    "isaiah": {
+      "text": "Porque como desciende de los cielos la lluvia y la nieve, y no vuelve allá, sino que riega la tierra, y la hace germinar y producir, y da semilla al que siembra, y pan al que come, así será mi palabra que sale de mi boca; no volverá a mí vacía, sino que hará lo que yo quiero, y será prosperada en aquello para que la envié.",
+      "ref": "Isaías 55:10-11 · RVR1909"
+    }
+  },
+  "contact": {
+    "title": "Si llegaste hasta aquí, hablemos.",
+    "text": "Cuéntanos qué necesitas: un producto, un sitio web, una herramienta o un proyecto para tu ministerio.",
+    "cta": "Escríbenos un correo"
+  },
+  "foot": {
+    "rights": "Todos los derechos reservados.",
+    "email": "Escribir a Develop4God"
+  }
+}

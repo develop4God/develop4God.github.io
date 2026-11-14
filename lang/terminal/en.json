@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "title": "develop4God — We develop for God",
+    "description": "A ministry that builds software as unto the Lord: Christian Devotionals and systems for ministries."
+  },
+  "nav": {
+    "hire": "Developments",
+    "ministry": "Ministry",
+    "contact": "Contact",
+    "language": "Language",
+    "theme": "Switch theme"
+  },
+  "hero": {
+    "eyebrow": "develop4God · We develop for God",
+    "verse": "And whatsoever ye do, do it heartily, as to the Lord, and not unto men.",
+    "ref": "Colossians 3:23",
+    "why": "That is where our name comes from.",
+    "version": "KJV",
+    "cue": "Scroll"
+  },
+  "fork": {
+    "eyebrow": "Choose a path",
+    "title": "Learn more.",
+    "hint": "Pick one to continue.",
+    "hire": {
+      "k": "Businesses and people with a need",
+      "title": "Our developments",
+      "desc": "See what we have built and how we can support your business or need.",
+      "go": "See the developments →"
+    },
+    "min": {
+      "k": "Our beloved users and ministries",
+      "title": "Our ministry",
+      "desc": "See how God has allowed us to serve you, and how we can support your ministry.",
+      "go": "See the ministry →"
+    }
+  },
+  "story": {
+    "pipeline": {
+      "eyebrow": "LLM pipelines",
+      "title": "I build LLM pipelines and the products around them.",
+      "typed": "$ building",
+      "phrases": [
+        "audited LLM pipelines",
+        "multi-tenant SaaS",
+        "websites that load fast",
+        "custom tools and automations",
+        "Flutter apps on Google Play"
+      ],
+      "text": "Every model call leaves an audit trail. Provider-agnostic batch pipelines with checkpointed, resumable runs, and a dry-run mode that prints the cost before anything is sent."
+    },
+    "tenants": {
+      "eyebrow": "SaaS, websites and custom tools",
+      "title": "One platform, every client isolated.",
+      "text": "A live multi-tenant platform for law firms, isolated by a JWT claim and Postgres row-level security. The same full-stack approach builds websites and custom tools."
+    },
+    "mobile": {
+      "eyebrow": "Mobile apps",
+      "title": "In production on Google Play, in {languages} languages.",
+      "text": "Flutter with BLoC and dependency injection, including Arabic right-to-left and Hindi."
+    },
+    "world": {
+      "eyebrow": "Christian Devotionals",
+      "title": "Read in countries around the world.",
+      "text": "A free daily devotional app and reader, built for His glory and shared with believers everywhere."
+    },
+    "languages": {
+      "eyebrow": "Multiple languages",
+      "title": "{languages} languages, with systems that review them.",
+      "text": "To ensure content quality in every language, we build AI-integrated validation tools for review and translation."
+    },
+    "dot": "Scene",
+    "pause": "Pause animation",
+    "play": "Play animation"
+  },
+  "hire": {
+    "switch": "← Looking for the ministry instead?",
+    "build": {
+      "title": "What we have built",
+      "sub": "From the database to the screen. Six kinds of work, each shipped to real users."
+    },
+    "kinds": {
+      "k1": {
+        "title": "SaaS and web apps",
+        "text": "Multi-tenant platforms built end to end: API, UI, database, deployment."
+      },
+      "k2": {
+        "title": "Websites",
+        "text": "Fast, bilingual, easy to maintain. Catalogues, landing pages and ministry sites, with ordering by WhatsApp when it helps."
+      },
+      "k3": {
+        "title": "Custom tools",
+        "text": "Internal tools, automations, integrations and desktop apps built around how your team actually works."
+      },
+      "k4": {
+        "title": "LLM pipelines",
+        "text": "Provider-agnostic batch pipelines with checkpointed runs, audit trails and cost estimates."
+      },
+      "k5": {
+        "title": "Content systems",
+        "text": "Generating, translating and validating large content sets with independent critic review."
+      },
+      "k6": {
+        "title": "Mobile apps",
+        "text": "Production Flutter apps with clean architecture, including right-to-left languages."
+      }
+    },
+    "ask": {
+      "title": "Have another need? Let's talk.",
+      "text": "Whether it is a development, a small idea or an automation that saves time: write to us. By God's grace and our work with AI, we can guide you on almost any need today.",
+      "cta": "Tell us what you need"
+    },
+    "cases": {
+      "title": "Selected work",
+      "sub": "What each project is and how it's built.",
+      "more": "More projects on GitHub →"
+    },
+    "how": {
+      "title": "How we work",
+      "sub": "The same loop on every change, whether the client is a firm or a church."
+    },
+    "steps": {
+      "s1": {
+        "title": "Plan",
+        "text": "Checks and deliverables written before code."
+      },
+      "s2": {
+        "title": "Tests first",
+        "text": "Each test fails for the right reason, then passes."
+      },
+      "s3": {
+        "title": "Build",
+        "text": "The simplest design that works. SOLID, no tech debt."
+      },
+      "s4": {
+        "title": "Independent review",
+        "text": "We never review our own code as the last gate. CI is green before merge."
+      }
+    }
+  },
+  "cases": {
+    "saas-tools": {
+      "chip": "Live",
+      "desc": "Multi-tenant platform for law firms: a quoter with per-client branding and printable PDFs, KYC forms generated per firm, a risk matrix and OFAC/UN sanctions screening.",
+      "facts": [
+        "Tenant isolation through a JWT claim and Postgres row-level security",
+        "Each client gets their own branding, catalog and form fields"
+      ],
+      "note": "Our platform. Private repo, walkthrough on request."
+    },
+    "play-store-mcp": {
+      "chip": "Open source",
+      "desc": "An MCP server that lets AI agents upload and promote Android releases on Google Play, built around a safety model.",
+      "facts": [
+        "Every write is a dry run unless confirmed",
+        "Production only saves a draft: a human sends it for review",
+        "A maintained fork of an MIT project, with the original credited"
+      ]
+    },
+    "DevocionalesAPI": {
+      "desc": "Multi-provider batch pipeline that generates the devotional corpus, with checkpointed, resumable runs.",
+      "facts": [
+        "Dry-run mode prints a cost estimate before any call",
+        "Every LLM operation leaves an audit trail",
+        "Resumes from the last checkpoint after a failure"
+      ]
+    },
+    "devocionales-ai-review": {
+      "desc": "LangGraph pipeline for translation, error detection, independent critic review, automated fixing and validation.",
+      "facts": [
+        "Every AI-flagged finding is verified verbatim against the source",
+        "A separate critic reviews the fixer output"
+      ]
+    },
+    "sanctions-check": {
+      "desc": "Automated SDN/OFAC screening for compliance professionals, as a web and desktop app.",
+      "facts": [
+        "One codebase ships as a web app and a desktop app"
+      ]
+    }
+  },
+  "min": {
+    "switch": "← Looking for the developments instead?",
+    "title": "Our mission",
+    "sub": "To carry the word of God",
+    "stats": {
+      "downloads": "Downloads",
+      "countries": "Countries",
+      "active": "Active users",
+      "rating": "Rating",
+      "languages": "Languages"
+    },
+    "apps": {
+      "dev": {
+        "title": "Christian Devotionals",
+        "text": "Your daily devotional, free and in {languages} languages: verse, reflection and prayer, with audio, favorites and sharing.",
+        "store": "Get it on Google Play",
+        "go": "Read today's devotional"
+      },
+      "hab": {
+        "title": "Habitus+Faith",
+        "text": "Turn faith into a daily habit: suggested micro-habits, streaks and verses, with the Bible inside the app.",
+        "store": "Get it on Google Play",
+        "go": "Get to know Habitus+Faith"
+      }
+    },
+    "build": {
+      "title": "What we can build for your ministry",
+      "i1": "A mobile app or website for your church or organization",
+      "i2": "Content generation, translation and multi-language support",
+      "i3": "Dashboards, integrations and back-end systems",
+      "i4": "Automation that saves your team time",
+      "cta": "Tell us about your project"
+    },
+    "how": {
+      "title": "How we build our ministry",
+      "sub": "A look at how God lets us reach readers in so many countries and languages."
+    },
+    "isaiah": {
+      "text": "For as the rain cometh down, and the snow from heaven, and returneth not thither, but watereth the earth, and maketh it bring forth and bud, that it may give seed to the sower, and bread to the eater: So shall my word be that goeth forth out of my mouth: it shall not return unto me void, but it shall accomplish that which I please, and it shall prosper in the thing whereto I sent it.",
+      "ref": "Isaiah 55:10-11 · KJV"
+    }
+  },
+  "contact": {
+    "title": "If you made it this far, let's talk.",
+    "text": "Tell us what you need: a product, a website, a tool or a project for your ministry.",
+    "cta": "Write us an email"
+  },
+  "foot": {
+    "rights": "All rights reserved.",
+    "email": "Email Develop4God"
+  }
+}
