@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "develop4God — Nagde-develop kami para sa Diyos",
-    "description": "Isang ministeryong gumagawa ng software na para sa Panginoon: Christian Devotionals at mga sistema para sa mga ministeryo."
+    "description": "Isang ministeryong gumagawa ng software na para sa Panginoon: Mga Debosyonal na Kristiyano at mga sistema para sa mga ministeryo."
   },
   "nav": {
     "hire": "Mga Development",
@@ -60,7 +60,7 @@
       "text": "Flutter na may BLoC at dependency injection, kasama ang Arabic na mula kanan pakaliwa at Hindi."
     },
     "world": {
-      "eyebrow": "Christian Devotionals",
+      "eyebrow": "Mga Debosyonal na Kristiyano",
       "title": "Binabasa sa mga bansa sa buong mundo.",
       "text": "Isang libreng app at reader ng pang-araw-araw na debosyonal, ginawa para sa Kanyang kaluwalhatian at ibinabahagi sa mga mananampalataya saanman."
     },
@@ -192,7 +192,7 @@
     },
     "apps": {
       "dev": {
-        "title": "Christian Devotionals",
+        "title": "Mga Debosyonal na Kristiyano",
         "text": "Ang inyong pang-araw-araw na debosyonal, libre at sa {languages} wika: talata, repleksyon at panalangin, may audio, mga paborito at pagbabahagi.",
         "store": "Kunin sa Google Play",
         "go": "Basahin ang debosyonal ngayon"

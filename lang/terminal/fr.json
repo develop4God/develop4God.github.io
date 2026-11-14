@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "develop4God — Nous développons pour Dieu",
-    "description": "Un ministère qui construit des logiciels comme pour le Seigneur : Dévotions Chrétiennes et systèmes pour les ministères."
+    "description": "Un ministère qui construit des logiciels comme pour le Seigneur : Méditations Chrétiennes et systèmes pour les ministères."
   },
   "nav": {
     "hire": "Réalisations",
@@ -60,7 +60,7 @@
       "text": "Flutter avec BLoC et injection de dépendances, y compris l’arabe de droite à gauche et l’hindi."
     },
     "world": {
-      "eyebrow": "Dévotions Chrétiennes",
+      "eyebrow": "Méditations Chrétiennes",
       "title": "Lu dans des pays du monde entier.",
       "text": "Une application et un lecteur de dévotions quotidiennes, gratuit, conçu pour Sa gloire et partagé avec les croyants partout."
     },
@@ -192,7 +192,7 @@
     },
     "apps": {
       "dev": {
-        "title": "Dévotions Chrétiennes",
+        "title": "Méditations Chrétiennes",
         "text": "Votre dévotion quotidienne, gratuite et en {languages} langues : verset, réflexion et prière, avec audio, favoris et partage.",
         "store": "Disponible sur Google Play",
         "go": "Lire la dévotion du jour"

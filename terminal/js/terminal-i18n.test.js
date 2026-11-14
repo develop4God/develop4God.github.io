@@ -203,3 +203,10 @@ test('every non-English file carries its own verse and Isaiah passage (no Englis
     assert.notStrictEqual(d.min.isaiah.ref, en.min.isaiah.ref, `${lang}: min.isaiah.ref is still English`);
   });
 });
+
+test('static <title> and meta description in index.html match en.json (what crawlers without JS read)', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', '..', 'index.html'), 'utf8');
+  const en = JSON.parse(fs.readFileSync(path.join(LANG_DIR, 'en.json'), 'utf8'));
+  assert.strictEqual(/<title>([^<]*)<\/title>/.exec(html)[1], en.meta.title);
+  assert.strictEqual(/<meta name="description" content="([^"]*)"/.exec(html)[1], en.meta.description);
+});
