@@ -683,6 +683,13 @@ h2.t {
 }
 h2.t.how { margin-top: 64px; }
 
+.more {
+  margin: 20px 0 0;
+  font: 500 14px var(--mono);
+}
+
+.more a { color: var(--accent); }
+
 .sub {
   max-width: 58ch;
   margin: 0 0 28px;

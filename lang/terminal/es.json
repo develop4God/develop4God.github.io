@@ -112,7 +112,8 @@
     },
     "cases": {
       "title": "Trabajo seleccionado",
-      "sub": "Qué es cada proyecto y cómo está construido."
+      "sub": "Qué es cada proyecto y cómo está construido.",
+      "more": "Más proyectos en GitHub →"
     },
     "how": {
       "title": "Cómo trabajamos",

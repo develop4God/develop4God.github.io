@@ -395,3 +395,13 @@ test('the saas-tools case opens our live platform in a new tab and says it is ou
   await expect(row).toHaveAttribute('rel', /noopener/);
   await expect(row.locator('.note')).toContainText('Our platform');
 });
+
+test('selected work ends with one link to the GitHub profile instead of a second project list', async ({ page }) => {
+  await page.goto('/terminal/?lang=en#hire', { waitUntil: 'networkidle' });
+  const more = page.locator('#work a[data-i18n="hire.cases.more"]');
+  await expect(more).toHaveAttribute('href', 'https://github.com/develop4God');
+  await expect(more).toHaveAttribute('target', '_blank');
+  await expect(more).toHaveText('More projects on GitHub →');
+  await page.goto('/terminal/?lang=es#hire', { waitUntil: 'networkidle' });
+  await expect(more).toHaveText('Más proyectos en GitHub →');
+});
