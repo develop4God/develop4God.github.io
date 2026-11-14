@@ -9,6 +9,7 @@
   var S = window.TerminalScenes;
   var LI = window.TerminalLogoImage;
   var TL = window.TerminalTwinLife;
+  var LO = window.TerminalLayout;
   var SP = window.TerminalSpin;
   var G = window.TerminalGlobe;
   var GL = window.TerminalGlobeLayer;
@@ -35,23 +36,6 @@
       (py >= textTop ? out.text : out.shield).push([(px - sw / 2) * scale, (py - sh / 2) * scale, cls]);
     }
     return out;
-  }
-
-  // Where a scene sits on the canvas, as fractions of its size. On wide screens
-  // text is on the left, so scenes sit right; the fork spheres sit top-centre
-  // above the door cards. Large scenes (globe, language clusters) are scaled down.
-  // `free` is the height in px above the fork text (0 when unknown); the fork
-  // spheres shrink and move up to fit inside it so they never run under the text.
-  function layout(id, wide, free, W, H) {
-    var l = wide ? { x: 0.68, y: 0.5, s: 0.3 } : { x: 0.5, y: 0.3, s: 0.24 };
-    if (id === 'twin') {
-      var cap = wide ? { x: 0.5, y: 0.25, s: 0.17 } : { x: 0.5, y: 0.27, s: 0.2 };
-      if (!free) return cap;
-      return { x: 0.5, y: Math.min(cap.y, (free * 0.5) / H), s: Math.max(0.05, Math.min(cap.s, (free * 0.46) / Math.min(W, H))) };
-    }
-    if (id === 'globe' || id === 'languages') l.s *= 0.85;
-    if (id === 'logo') l.s *= 0.83;
-    return l;
   }
 
   // opts: { canvas, pin, story, sceneIds, getProgress, getTarget, reduce, logoUrl?, getFree? }
@@ -185,7 +169,7 @@
       }
       var rot = M.rotation(yaw + (smx - 0.5) * 0.4 * (1 - lw * 0.6), pitch + (smy - 0.5) * 0.2);
       if (opts.getFree && t - freeAt > 400) { free = opts.getFree(); freeAt = t; }
-      var la = layout(A.id, wide, free, W, H), lb = layout(B.id, wide, free, W, H), le = M.ease(lt);
+      var la = LO.place(A.id, wide, free, W, H), lb = LO.place(B.id, wide, free, W, H), le = M.ease(lt);
       var scale = Math.min(W, H) * (la.s + (lb.s - la.s) * le), ox = W * (la.x + (lb.x - la.x) * le), oy = H * (la.y + (lb.y - la.y) * le);
       // On the pale light theme dots need more weight than on the dark one.
       var baseA = dark ? 0.22 : 0.72, spanA = dark ? 0.78 : 0.28, i, j, bk;

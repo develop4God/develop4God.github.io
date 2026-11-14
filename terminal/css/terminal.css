@@ -626,6 +626,14 @@ a { color: inherit; }
   }
 
   .panel p { font-size: 1rem; }
+
+  /* Room above the text for the scene, and a gutter so the scene dots never touch it.
+     On tall screens the panel already fits, so this only grows the box on short ones. */
+  .panel:not(.doorpanel) {
+    padding-top: 170px;
+  }
+
+  .panel:not(.doorpanel) .in { padding-right: 24px; }
   .doors { grid-template-columns: 1fr; }
 
   .door p,

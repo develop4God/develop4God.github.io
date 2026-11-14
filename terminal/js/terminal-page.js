@@ -93,10 +93,15 @@
     }).catch(function () { /* the fallback text stays */ });
   }
 
-  // Height in px above the fork text, so the canvas can fit the spheres into it.
-  function freeAboveForkText(root) {
-    var panel = $('.doorpanel', root), inner = panel && $('.in', panel);
+  // Height in px above a panel's text, so the canvas can fit the scene into it.
+  function freeAbove(panel) {
+    var inner = panel && $('.in', panel);
     return inner ? Math.max(0, panel.offsetTop + inner.offsetTop - 20) : 0;
+  }
+
+  // The hero measures its fork panel; the other stories measure the panel on show.
+  function freeAboveText(root, name) {
+    return freeAbove(name === 'hero' ? $('.doorpanel', root) : $('[data-panel].on', root));
   }
 
   // The hero morphs slower than the other stories so the logo has time to dissolve.
@@ -132,7 +137,7 @@
     var canvas = window.TerminalCanvas.create({
       canvas: $('.scene', root), pin: pin, story: root, reduce: reduce, getProgress: ctrl.getProgress, getTarget: ctrl.getTarget,
       sceneIds: root.getAttribute('data-scenes').split(','), logoUrl: name === 'hero' ? LOGO_URL : null,
-      getFree: name === 'hero' ? function () { return freeAboveForkText(root); } : null
+      getFree: function () { return freeAboveText(root, name); }
     });
     if (name === 'hero') wireDoorHints(canvas);
     var pause = $('.pause', root);

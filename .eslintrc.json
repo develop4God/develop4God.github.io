@@ -28,6 +28,7 @@
     "lucide": "readonly",
     "TerminalMath": "readonly",
     "TerminalScenes": "readonly",
+    "TerminalLayout": "readonly",
     "TerminalWorldMask": "readonly",
     "TerminalI18n": "readonly",
     "TerminalTheme": "readonly",
