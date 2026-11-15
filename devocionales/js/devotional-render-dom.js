@@ -101,8 +101,8 @@
             navigator.share(shareData).then(() => {
                 // Share gate: record that the user has shared so gated
                 // features (Android download button, app banner) can appear.
-                if (global.DevotionalShareGate) {
-                    global.DevotionalShareGate.markShared(localStorage);
+                if (global.DevotionalShareTracker) {
+                    global.DevotionalShareTracker.markShared(localStorage);
                 }
             }).catch(() => {});
         });
@@ -150,8 +150,8 @@
         if (localStorage.getItem('appBannerDismissed') !== '1'
             && global.DevotionalInstall
             && global.DevotionalInstall.isAndroid(global.navigator)
-            && global.DevotionalShareGate
-            && global.DevotionalShareGate.hasShared(localStorage)) {
+            && global.DevotionalShareTracker
+            && global.DevotionalShareTracker.hasShared(localStorage)) {
             document.getElementById('app-banner').classList.remove('hidden');
         }
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');

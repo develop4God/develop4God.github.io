@@ -1,10 +1,9 @@
 (function (global) {
     'use strict';
 
-    // Reusable share gate: a single localStorage flag that records whether the
-    // visitor has shared the app/devocional. Other sections can reuse this
-    // module to gate features (download buttons, banners, promo content) behind
-    // a share action.
+    // Reusable share tracker: records whether the visitor has shared the
+    // app/devocional in localStorage. Other modules consult the tracker to
+    // gate features (download buttons, banners, promo content) behind a share.
     const KEY = 'develop4God_shared';
 
     function hasShared(storage) {
@@ -31,5 +30,5 @@
         }
     }
 
-    global.DevotionalShareGate = { hasShared, markShared, resetShared, KEY };
+    global.DevotionalShareTracker = { hasShared, markShared, resetShared, KEY };
 })(window);

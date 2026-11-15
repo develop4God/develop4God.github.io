@@ -3,15 +3,15 @@ const assert = require('node:assert/strict');
 
 const { hasShared, markShared, resetShared, KEY } = (() => {
     const source = require('node:fs').readFileSync(
-        require('node:path').join(__dirname, 'devotional-share-gate.js'),
+        require('node:path').join(__dirname, 'devotional-share-tracker.js'),
         'utf8',
     );
     const win = {};
     require('node:vm').runInThisContext(
         `(function(window){${source}\n})`,
-        { filename: 'devotional-share-gate.js' },
+        { filename: 'devotional-share-tracker.js' },
     )(win);
-    return win.DevotionalShareGate;
+    return win.DevotionalShareTracker;
 })();
 
 function freshStorage() {
@@ -23,7 +23,7 @@ function freshStorage() {
     };
 }
 
-test('share gate key is "develop4God_shared"', () => {
+test('share tracker key is "develop4God_shared"', () => {
     assert.equal(KEY, 'develop4God_shared');
 });
 
