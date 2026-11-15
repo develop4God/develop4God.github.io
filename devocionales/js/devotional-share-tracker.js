@@ -22,13 +22,5 @@
         }
     }
 
-    function resetShared(storage) {
-        try {
-            storage.removeItem(KEY);
-        } catch (err) {
-            // silent no-op
-        }
-    }
-
-    global.DevotionalShareTracker = { hasShared, markShared, resetShared, KEY };
+    global.DevotionalShareTracker = { hasShared, markShared, KEY };
 })(window);

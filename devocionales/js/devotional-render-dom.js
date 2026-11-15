@@ -100,9 +100,12 @@
         nativeBtn.addEventListener('click', () => {
             navigator.share(shareData).then(() => {
                 // Share gate: record that the user has shared so gated
-                // features (Android download button, app banner) can appear.
-                if (global.DevotionalShareTracker) {
-                    global.DevotionalShareTracker.markShared(localStorage);
+                // features (the Android download button) can appear.
+                try {
+                    global.DevotionalShareTracker.markShared(global.localStorage);
+                    global.DevotionalInstall.refreshDownloadGate(document, global);
+                } catch (err) {
+                    // Blocked storage, or an older cached script without the gate: sharing still worked.
                 }
             }).catch(() => {});
         });
@@ -145,13 +148,10 @@
         }
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
-        // App download banner: only relevant on Android (native app via Google Play)
-        // and only after the user has shared (share gate).
-        if (localStorage.getItem('appBannerDismissed') !== '1'
-            && global.DevotionalInstall
+        // App banner: Android only (native app via Google Play); every other platform has the PWA.
+        if (global.DevotionalInstall
             && global.DevotionalInstall.isAndroid(global.navigator)
-            && global.DevotionalShareTracker
-            && global.DevotionalShareTracker.hasShared(localStorage)) {
+            && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');

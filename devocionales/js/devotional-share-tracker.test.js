@@ -1,7 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { hasShared, markShared, resetShared, KEY } = (() => {
+const { hasShared, markShared, KEY } = (() => {
     const source = require('node:fs').readFileSync(
         require('node:path').join(__dirname, 'devotional-share-tracker.js'),
         'utf8',
@@ -44,21 +44,11 @@ test('markShared then hasShared returns true', () => {
     assert.equal(hasShared(s), true);
 });
 
-test('resetShared clears the flag', () => {
-    const s = freshStorage();
-    markShared(s);
-    assert.equal(hasShared(s), true);
-    resetShared(s);
-    assert.equal(hasShared(s), false);
-});
-
 test('storage failures do not throw', () => {
     const boom = {
         getItem() { throw new Error('no storage'); },
         setItem() { throw new Error('no storage'); },
-        removeItem() { throw new Error('no storage'); },
     };
     assert.equal(hasShared(boom), false);
     assert.doesNotThrow(() => markShared(boom));
-    assert.doesNotThrow(() => resetShared(boom));
 });

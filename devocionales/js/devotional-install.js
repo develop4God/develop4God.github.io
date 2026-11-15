@@ -10,6 +10,30 @@
         return /Android/i.test(nav.userAgent || '');
     }
 
+    function reveal(element) {
+        if (!element) return;
+        element.classList.remove('hidden');
+        element.classList.add('inline-flex');
+    }
+
+    // Google Play download button: Android only (every other platform gets the PWA) and only once
+    // the visitor has shared (DevotionalShareTracker). A browser without Web Share can never earn
+    // that, so it gets the button straight away. Safe to call again after a share so the button
+    // appears without a reload.
+    function refreshDownloadGate(doc, win) {
+        const tracker = win.DevotionalShareTracker;
+        if (!tracker || !isAndroid(win.navigator)) return;
+        let unlocked = typeof win.navigator.share !== 'function';
+        if (!unlocked) {
+            try {
+                unlocked = tracker.hasShared(win.localStorage); // the accessor throws when site data is blocked
+            } catch (err) {
+                unlocked = false;
+            }
+        }
+        if (unlocked) reveal(doc.getElementById('download-app-android-btn'));
+    }
+
     // "Install app" button. It is hidden in the HTML and shown only once the browser reports that
     // the page is installable (`beforeinstallprompt`), so it never appears where installing is
     // impossible or after the app is already installed. A tap opens the browser's own prompt.
@@ -17,28 +41,18 @@
     // `installOnAndroid` true offers the web app on Android as well. Both default to the
     // behaviour described above when absent.
     function init(doc, win, config) {
+        // First, so nothing below (no install button, PWA switched off) can keep it from running.
+        refreshDownloadGate(doc, win);
         const button = doc.querySelector('[data-install]');
         if (!button) return;
         if (config && config.enabled === false) return;
         const withheld = isAndroid(win.navigator) && !(config && config.installOnAndroid === true);
         let deferred = null;
-        const show = () => {
-            button.classList.remove('hidden');
-            button.classList.add('inline-flex');
-        };
+        const show = () => reveal(button);
         const hide = () => {
             button.classList.add('hidden');
             button.classList.remove('inline-flex');
         };
-        // Android gets a direct Google Play download button instead of the PWA install prompt.
-        // Share gate: only reveal after the user has shared.
-        const androidDownloadBtn = doc.getElementById?.('download-app-android-btn');
-        if (androidDownloadBtn && isAndroid(win.navigator)
-            && global.DevotionalShareTracker
-            && global.DevotionalShareTracker.hasShared(localStorage)) {
-            androidDownloadBtn.classList.remove('hidden');
-            androidDownloadBtn.classList.add('inline-flex');
-        }
         win.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault(); // also keeps the browser's own banner off where it is withheld
             if (withheld) return;
@@ -66,5 +80,5 @@
         });
     }
 
-    global.DevotionalInstall = { init, isAndroid };
+    global.DevotionalInstall = { init, isAndroid, refreshDownloadGate };
 })(window);
