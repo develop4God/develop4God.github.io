@@ -12,7 +12,7 @@ function loadModule() {
     return win.DevotionalSwRegister;
 }
 
-const { register, start, disable } = loadModule();
+const { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, start, disable } = loadModule();
 
 function fakeNavigator({ controller = null, registerImpl } = {}) {
     const listeners = {};
@@ -23,7 +23,7 @@ function fakeNavigator({ controller = null, registerImpl } = {}) {
         serviceWorker: {
             controller,
             addEventListener: (type, handler) => { listeners[type] = handler; },
-            register: registerImpl || ((...args) => { calls.push(args); return Promise.resolve({ scope: args[1].scope }); }),
+            register: registerImpl || ((...args) => { calls.push(args); return Promise.resolve(fakeRegistration()); }),
         },
     };
 }
@@ -66,6 +66,51 @@ test('register: a synchronous throw from register is also contained', async () =
     assert.equal(await register(nav, '/devocionales/sw.js', '/devocionales/'), null);
 });
 
+test('reloadOnUpdate: the worker claiming a page that started without one is not an update', () => {
+    const nav = fakeNavigator({ controller: null });
+    const doc = fakeDocument('hidden');
+    let reloads = 0;
+    reloadOnUpdate(nav, doc, () => { reloads += 1; });
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 0);
+});
+
+test('reloadOnUpdate: a deploy never reloads under the reader\'s eyes, only once the tab is hidden', () => {
+    const nav = fakeNavigator({ controller: {} });
+    const doc = fakeDocument('visible');
+    let reloads = 0;
+    reloadOnUpdate(nav, doc, () => { reloads += 1; });
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 0);
+    doc.hide();
+    assert.equal(reloads, 1);
+});
+
+test('reloadOnUpdate: an update while the tab is already hidden reloads at once, and only once', () => {
+    const nav = fakeNavigator({ controller: {} });
+    const doc = fakeDocument('hidden');
+    let reloads = 0;
+    reloadOnUpdate(nav, doc, () => { reloads += 1; });
+    nav.listeners.controllerchange();
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 1);
+});
+
+test('reloadOnUpdate: the first claim is skipped but the next worker change is an update', () => {
+    const nav = fakeNavigator({ controller: null });
+    const doc = fakeDocument('hidden');
+    let reloads = 0;
+    reloadOnUpdate(nav, doc, () => { reloads += 1; });
+    nav.listeners.controllerchange();
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 1);
+});
+
+test('reloadOnUpdate: without service worker support it does nothing', () => {
+    assert.doesNotThrow(() => reloadOnUpdate({}, fakeDocument('visible'), () => {}));
+    assert.doesNotThrow(() => reloadOnUpdate(undefined, fakeDocument('visible'), () => {}));
+});
+
 test('start: registers at once when the page has already loaded', async () => {
     const nav = fakeNavigator();
     const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
@@ -89,23 +134,19 @@ test('start: waits for the load event so the worker never competes with first pa
 
 // ------------------------------------------------------------------ master switch (kill switch)
 
-function disableWindow({ registrations = [], cacheNames = [], controller = null, manifest = { removed: false, remove() { this.removed = true; } } } = {}) {
+function disableWindow({ registrations = [], cacheNames = [], manifest = { removed: false, remove() { this.removed = true; } } } = {}) {
     const unregistered = [];
     const deleted = [];
     const events = [];
-    const messages = [];
     return {
-        messages,
         unregistered,
         deleted,
         events,
         manifest,
         navigator: {
             serviceWorker: {
-                controller: controller && { postMessage: (message) => { messages.push(message); events.push(`controller ${message.type}`); } },
                 getRegistrations: async () => registrations.map((scope) => ({
                     scope,
-                    active: { postMessage: (message) => { messages.push(message); events.push(`message ${message.type}`); } },
                     unregister: async () => { unregistered.push(scope); events.push(`unregister ${scope}`); return true; },
                 })),
             },
@@ -168,25 +209,6 @@ test('disable: a registration alone, or a cache alone, is enough to run the swee
     assert.ok(cacheOnly.events.includes('open devocionales-disabled'));
 });
 
-test('disable: tells the running worker to stand down, before unregistering it', async () => {
-    const win = disableWindow({ registrations: ['https://x.test/devocionales/', 'https://x.test/habitus/'] });
-    await disable(win, '/devocionales/');
-    assert.deepEqual(win.messages, [{ type: 'devocionales-stand-down' }]); // only this scope's worker
-    assert.ok(win.events.indexOf('message devocionales-stand-down') < win.events.indexOf('unregister https://x.test/devocionales/'));
-});
-
-test('disable: a worker that refuses the message does not stop the sweep', async () => {
-    const win = disableWindow({ registrations: ['https://x.test/devocionales/'], cacheNames: ['devocionales-data'] });
-    const getRegistrations = win.navigator.serviceWorker.getRegistrations;
-    win.navigator.serviceWorker.getRegistrations = async () => (await getRegistrations()).map((registration) => ({
-        ...registration,
-        active: { postMessage: () => { throw new Error('gone'); } },
-    }));
-    await disable(win, '/devocionales/');
-    assert.deepEqual(win.unregistered, ['https://x.test/devocionales/']);
-    assert.deepEqual(win.deleted, ['devocionales-data']);
-});
-
 test('disable: browsers without service workers or the Cache API are fine', async () => {
     await assert.doesNotReject(disable({ navigator: {}, document: { querySelector: () => null } }, '/devocionales/'));
     await assert.doesNotReject(disable({ navigator: undefined, document: { querySelector: () => null } }, '/devocionales/'));
@@ -226,7 +248,7 @@ test('start: enabled, or no config at all, still registers', async () => {
 
 test('start: enabling removes a stale stand-down marker first, then registers', async () => {
     const order = [];
-    const nav = fakeNavigator({ registerImpl: () => { order.push('register'); return Promise.resolve({}); } });
+    const nav = fakeNavigator({ registerImpl: () => { order.push('register'); return Promise.resolve(fakeRegistration()); } });
     const win = {
         navigator: nav,
         document: fakeDocument('visible'),
@@ -255,20 +277,6 @@ test('start: a failing marker delete never stops registration', async () => {
     assert.equal(nav.calls.length, 1);
 });
 
-test('disable: a controlled page tells its controlling worker to stand down even when the registrations cannot be listed', async () => {
-    const win = disableWindow({ controller: true, cacheNames: [] });
-    win.navigator.serviceWorker.getRegistrations = async () => { throw new Error('denied'); };
-    await disable(win, '/devocionales/');
-    assert.deepEqual(win.messages, [{ type: 'devocionales-stand-down' }]);
-    assert.ok(win.events.includes('open devocionales-disabled'), 'the marker is left for a worker that misses the message');
-});
-
-test('disable: a worker that cannot be messaged through the controller does not stop the sweep', async () => {
-    const win = disableWindow({ controller: true, cacheNames: ['devocionales-data'] });
-    win.navigator.serviceWorker.controller.postMessage = () => { throw new Error('gone'); };
-    await disable(win, '/devocionales/');
-    assert.deepEqual(win.deleted, ['devocionales-data']);
-});
 
 test('start: enabling deletes the marker once; a delete that fails is not retried and does not stop registration', async () => {
     let attempts = 0;
@@ -285,4 +293,117 @@ test('start: enabling deletes the marker once; a delete that fails is not retrie
     await settle();
     assert.equal(attempts, 1);
     assert.equal(nav.calls.length, 1);
+});
+
+// ------------------------------------------------------------------ build question and updates
+
+function fakeRegistration({ waiting = null, installing = null } = {}) {
+    const listeners = {};
+    return {
+        waiting,
+        installing,
+        listeners,
+        addEventListener: (type, handler) => { listeners[type] = handler; },
+    };
+}
+const fakeWorker = () => {
+    const posted = [];
+    const listeners = {};
+    return { posted, listeners, state: 'installing', postMessage: (message) => posted.push(message), addEventListener: (type, handler) => { listeners[type] = handler; } };
+};
+
+test('answerBuildQueries: the page tells the worker which build it runs, over the port it was given', () => {
+    const nav = fakeNavigator();
+    let started = 0;
+    nav.serviceWorker.startMessages = () => { started += 1; };
+    answerBuildQueries(nav, { DevotionalBuild: { id: 'abc123def456' } });
+    const replies = [];
+    nav.listeners.message({ data: { type: 'devocionales-build?' }, ports: [{ postMessage: (id) => replies.push(id) }] });
+    assert.deepEqual(replies, ['abc123def456']);
+    assert.equal(started, 1);
+});
+
+test('answerBuildQueries: a page without a build stamp, or any other message, gets no answer', () => {
+    const replies = [];
+    const port = { postMessage: (id) => replies.push(id) };
+    const bare = fakeNavigator();
+    answerBuildQueries(bare, {});
+    bare.listeners.message({ data: { type: 'devocionales-build?' }, ports: [port] });
+    const stamped = fakeNavigator();
+    answerBuildQueries(stamped, { DevotionalBuild: { id: 'x' } });
+    for (const event of [{ data: { type: 'other' }, ports: [port] }, { data: null, ports: [port] }, { data: { type: 'devocionales-build?' }, ports: [] }]) stamped.listeners.message(event);
+    assert.deepEqual(replies, []);
+    assert.doesNotThrow(() => answerBuildQueries({}, {}));
+});
+
+test('deliverUpdates: a waiting worker is asked to take over only while the tab is hidden', () => {
+    const waiting = fakeWorker();
+    const nav = fakeNavigator({ controller: {} });
+    const doc = fakeDocument('visible');
+    deliverUpdates(nav, doc, fakeRegistration({ waiting }));
+    assert.deepEqual(waiting.posted, []);
+    doc.hide();
+    assert.deepEqual(waiting.posted, [{ type: 'devocionales-skip-waiting' }]);
+});
+
+test('deliverUpdates: a hidden tab asks at once, and asks again the next time it is hidden if the worker declined', () => {
+    const waiting = fakeWorker();
+    const doc = fakeDocument('hidden');
+    deliverUpdates(fakeNavigator({ controller: {} }), doc, fakeRegistration({ waiting }));
+    assert.equal(waiting.posted.length, 1);
+    doc.visibilityState = 'visible';
+    doc.listeners.visibilitychange();
+    doc.hide();
+    assert.equal(waiting.posted.length, 2);
+});
+
+test('deliverUpdates: the first worker (the page has no controller) is not an update', () => {
+    const waiting = fakeWorker();
+    deliverUpdates(fakeNavigator({ controller: null }), fakeDocument('hidden'), fakeRegistration({ waiting }));
+    assert.deepEqual(waiting.posted, []);
+});
+
+test('deliverUpdates: a worker that finishes installing later is offered the same way', () => {
+    const installing = fakeWorker();
+    const registration = fakeRegistration({ installing: null });
+    deliverUpdates(fakeNavigator({ controller: {} }), fakeDocument('hidden'), registration);
+    registration.installing = installing;
+    registration.listeners.updatefound();
+    installing.state = 'installed';
+    registration.waiting = installing;
+    installing.listeners.statechange();
+    assert.deepEqual(installing.posted, [{ type: 'devocionales-skip-waiting' }]);
+});
+
+test('deliverUpdates: a null registration (registration failed) or no worker support does nothing', () => {
+    assert.doesNotThrow(() => deliverUpdates(fakeNavigator(), fakeDocument('hidden'), null));
+    assert.doesNotThrow(() => deliverUpdates({}, fakeDocument('hidden'), fakeRegistration()));
+});
+
+test('start: wires the build answer, the update delivery and the reload together', async () => {
+    const waiting = fakeWorker();
+    const registration = fakeRegistration({ waiting });
+    const nav = fakeNavigator({ controller: {}, registerImpl: () => Promise.resolve(registration) });
+    const doc = fakeDocument('hidden');
+    doc.readyState = 'complete';
+    let reloads = 0;
+    const win = { navigator: nav, document: doc, location: { reload() { reloads += 1; } }, addEventListener() {}, DevotionalBuild: { id: 'b' } };
+    start(win, '/devocionales/sw.js', '/devocionales/', {});
+    await settle();
+    assert.equal(typeof nav.listeners.message, 'function');
+    assert.deepEqual(waiting.posted, [{ type: 'devocionales-skip-waiting' }]);
+    nav.listeners.controllerchange(); // the worker took over: reload, the tab is hidden
+    assert.equal(reloads, 1);
+});
+
+test('start: with the PWA disabled none of it is wired', async () => {
+    const nav = fakeNavigator();
+    const win = disableWindow();
+    win.navigator = { ...nav };
+    win.document.readyState = 'complete';
+    win.location = { reload() {} };
+    win.addEventListener = () => {};
+    start(win, '/devocionales/sw.js', '/devocionales/', { enabled: false });
+    await settle();
+    assert.deepEqual(Object.keys(nav.listeners), []);
 });

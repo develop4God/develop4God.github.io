@@ -24,6 +24,7 @@
     "DevotionalIosHint": "readonly",
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",
+    "DevotionalBuild": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",

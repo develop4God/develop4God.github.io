@@ -83,14 +83,15 @@ jobs:
         run: eslint "**/*.js" --ignore-pattern "node_modules/"
 
       - name: Generated files are up to date
-        # devocionales/vendor/tailwind.css and devocionales/sw.js are committed (GitHub Pages has no
-        # build step). Rebuild both, in this order because the worker's version hashes the
-        # stylesheet, and fail if either differs from what is committed. Uses `git status` rather
+        # devocionales/vendor/tailwind.css, devocionales/sw.js and the build stamp
+        # devocionales/js/devotional-build.js are committed (GitHub Pages has no build step).
+        # Rebuild them, in this order because the worker's version hashes the stylesheet, and fail
+        # if any differs from what is committed. Uses `git status` rather
         # than `git diff` so a file that was never committed fails too.
         run: |
           bash scripts/build-tailwind.sh
           node scripts/build-sw.js
-          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css devocionales/sw.js)"
+          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css devocionales/sw.js devocionales/js/devotional-build.js)"
           if [ -n "${changes}" ]; then
             echo "Generated files are stale or uncommitted. Run: bash scripts/build-tailwind.sh && node scripts/build-sw.js"
             echo "${changes}"

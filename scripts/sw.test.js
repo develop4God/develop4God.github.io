@@ -21,6 +21,7 @@ const ASSETS_URL = `https://${DATA_HOST}/develop4God/Devocionales-assets/main/im
 
 const CONFIG = {
     version: 'v1',
+    claimTimeoutMs: 30,
     timeoutMs: 40,
     freshTimeoutMs: 20, // the page blocks on the config script, so its wait is shorter than the data wait
     maxDataEntries: 3,
@@ -45,7 +46,13 @@ const CONFIG = {
         '/lang/devocionales/en.json',
     ],
 };
-const STAND_DOWN = { type: 'devocionales-stand-down' };
+const SKIP_WAITING = { type: 'devocionales-skip-waiting' };
+// What the page's kill switch (DevotionalSwRegister.disable) leaves behind: the marker, and every
+// other devocionales-* cache deleted.
+async function killSwitch(worker) {
+  await worker.caches.open('devocionales-disabled');
+  for (const name of await worker.caches.keys()) if (name !== 'devocionales-disabled' && name.startsWith('devocionales-')) await worker.caches.delete(name);
+}
 const JS = { type: 'basic', contentType: 'text/javascript' }; // how the site serves its own scripts
 const PRIVACY_URL = `${ORIGIN}/devocionales/privacy-policy.html`;
 const CONFIG_URL = `${ORIGIN}/devocionales/js/devotional-pwa-config.js`;
@@ -86,6 +93,7 @@ class FakeCaches {
         this.fetchImpl = fetchImpl;
     }
     async open(name) {
+        if (this.openDelayMs) await new Promise((resolve) => setTimeout(resolve, this.openDelayMs));
         if (!this.stores.has(name)) {
             const cache = new FakeCache();
             cache.fetch = this.fetchImpl;
@@ -96,6 +104,11 @@ class FakeCaches {
     }
     async has(name) {
         return this.stores.has(name);
+    }
+    // Like the real one with cacheName: it reads one cache and never creates it.
+    async match(request, options = {}) {
+        const store = this.stores.get(options.cacheName);
+        return store ? store.match(request, options) : undefined;
     }
     async keys() {
         return [...this.stores.keys()];
@@ -149,14 +162,18 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
     const realHas = caches.has.bind(caches);
     caches.has = (name) => { hasCalls.count += 1; return realHas(name); };
     const handlers = {};
+    const windows = [];
     const spies = { skipWaiting: 0, claim: 0 };
     const self = {
         location: new URL(`${ORIGIN}/devocionales/sw.js`),
         addEventListener: (type, handler) => { handlers[type] = handler; },
         skipWaiting: () => { spies.skipWaiting += 1; return Promise.resolve(); },
-        clients: { claim: () => { spies.claim += 1; return Promise.resolve(); } },
+        clients: {
+            claim: () => { spies.claim += 1; return Promise.resolve(); },
+            matchAll: async () => windows,
+        },
     };
-    const sandbox = { self, caches, fetch: fetchImpl, Request, Response, URL, Promise, setTimeout, clearTimeout, JSON, console };
+    const sandbox = { MessageChannel, self, caches, fetch: fetchImpl, Request, Response, URL, Promise, setTimeout, clearTimeout, JSON, console };
     vm.runInNewContext(renderSw(TEMPLATE, config), sandbox, { filename: TEMPLATE_PATH });
 
     const lifecycle = async (type) => {
@@ -171,8 +188,12 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
         handlers.fetch(event);
         return event;
     };
-    const message = (data) => handlers.message({ data });
-    return { caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls };
+    const message = async (data) => {
+        const waits = [];
+        handlers.message({ data, waitUntil: (promise) => waits.push(promise) });
+        await Promise.all(waits);
+    };
+    return { caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls, windows };
 }
 
 const ALL_ROUTES = () => ({
@@ -223,7 +244,6 @@ test('activate deletes older build caches but keeps the current build, the data 
     for (const name of ['devocionales-v0', 'devocionales-data', 'devocionales-images', 'other-app-cache']) await worker.caches.open(name);
     await worker.lifecycle('activate');
     assert.deepEqual((await worker.caches.keys()).sort(), ['devocionales-data', 'devocionales-images', 'devocionales-v1', 'other-app-cache']);
-    assert.equal(worker.spies.claim, 0);
 });
 
 // ------------------------------------------------------------------------------- shell + assets
@@ -381,10 +401,9 @@ for (const [name, url] of DATA_URLS) {
     });
 }
 
-test('a worker told to stand down (the PWA kill switch left its marker) goes network-only and creates no cache', async () => {
+test('after the kill switch the worker serves from the network and creates no cache', async () => {
     const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
-    await worker.caches.open('devocionales-disabled'); // what DevotionalSwRegister.disable() leaves behind
-    worker.message(STAND_DOWN); // ...and tells the running worker
+    await killSwitch(worker);
 
     const shell = worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' });
     assert.equal(await (await shell.answer).text(), '<html>shell v1</html>'); // from the network now
@@ -393,10 +412,9 @@ test('a worker told to stand down (the PWA kill switch left its marker) goes net
     assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`], 'it must go to the network, not the build cache');
     assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
 
-    // Nothing was added: only the build cache from install and the marker.
-    assert.deepEqual((await worker.caches.keys()).sort(), ['devocionales-disabled', 'devocionales-v1']);
+    // Reading never creates a cache and the guarded save is refused: only the marker is left.
+    assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
 });
-
 test('an evicted build cache is not mistaken for the kill switch: the worker keeps working and saving data', async () => {
     const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
     await worker.caches.delete('devocionales-v1'); // the browser evicted it under storage pressure
@@ -406,34 +424,14 @@ test('an evicted build cache is not mistaken for the kill switch: the worker kee
     assert.equal(await savedText(worker, YEAR_URL), '{"n":1}'); // still saving
 });
 
-test('activation keeps the stand-down marker and stands down because of it, even if the message never came', async () => {
+test('activation keeps the marker, and a worker saves nothing while it exists', async () => {
     const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
     await worker.caches.open('devocionales-disabled'); // a disable() racing this activation
     await worker.lifecycle('activate');
     assert.equal(await worker.caches.has('devocionales-disabled'), true);
-    worker.calls.length = 0;
-    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
-    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`], 'network only');
     assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
     assert.equal(await worker.caches.has('devocionales-data'), false, 'nothing refilled');
 });
-
-test('the first worker ever installed claims the pages that loaded without one; a replacement worker does not', async () => {
-    const first = await installed();
-    await first.lifecycle('activate');
-    assert.equal(first.spies.claim, 1, 'no previous build cache: nothing to mix, and the first visit is then cached');
-
-    const update = await installed();
-    await update.caches.open('devocionales-v0'); // the previous worker's build
-    await update.lifecycle('activate');
-    assert.equal(update.spies.claim, 0);
-
-    const dataOnly = await installed(); // data and image caches say nothing about an earlier build
-    for (const name of ['devocionales-data', 'devocionales-images', 'devocionales-disabled', 'other-app']) await dataOnly.caches.open(name);
-    await dataOnly.lifecycle('activate');
-    assert.equal(dataOnly.spies.claim, 1);
-});
-
 test('the cache prefix is the same in the worker and in the page script that disables it', () => {
     const prefixIn = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8').match(/CACHE_PREFIX = '([^']+)'/)[1];
     assert.equal(prefixIn('../devocionales/js/devotional-sw-register.js'), prefixIn('sw.template.js'));
@@ -532,15 +530,13 @@ test('the config fetch waits only freshTimeoutMs, because the page blocks on it'
     assert.equal(await (await worker.fetchEvent(CONFIG_URL).answer).text(), 'config v1');
 });
 
-test('a stood-down worker still revalidates the config script, so switching back on is not held up by the HTTP cache', async () => {
+test('after the kill switch the config script is still revalidated, so switching back on is not held up by the HTTP cache', async () => {
     const worker = await installed();
-    await worker.caches.open('devocionales-disabled');
-    worker.message(STAND_DOWN);
+    await killSwitch(worker);
     worker.requests.length = 0;
     await worker.fetchEvent(CONFIG_URL).answer;
     assert.equal(worker.requests.at(-1).cache, 'no-cache');
 });
-
 test('the legal pages also open offline through their extensionless URL, which the host redirects to', async () => {
     const worker = await installed();
     worker.net.offline = true;
@@ -627,14 +623,14 @@ test('a hero image that cannot be saved still displays', async () => {
     await Promise.all(event.waits);
 });
 
-test('a stood-down worker leaves hero images to the network and creates no image cache', async () => {
+test('after the kill switch hero images come from the network and no image cache is created', async () => {
     const worker = await installed({ [imageUrl(1)]: response('IMG1') });
-    await worker.caches.open('devocionales-disabled');
-    worker.message(STAND_DOWN);
-    assert.equal(await (await worker.fetchEvent(imageUrl(1), { mode: 'no-cors' }).answer).text(), 'IMG1');
+    await killSwitch(worker);
+    const event = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
+    assert.equal(await (await event.answer).text(), 'IMG1');
+    await Promise.all(event.waits);
     assert.equal((await worker.caches.keys()).includes('devocionales-images'), false);
 });
-
 // --------------------------------------------------------- install while switched off
 
 test('a worker refuses to install while the PWA is switched off, and creates no build cache', async () => {
@@ -698,77 +694,6 @@ test('install gives up after the bounded attempts, removes the half-built cache'
     assert.equal(await worker.caches.has('devocionales-v1'), false, 'a build cache is all or nothing');
 });
 
-// ------------------------------------------------------------ review fixes: stand-down flag
-
-test('the stand-down state is a worker flag: serving a page or asset never queries the Cache API for it', async () => {
-    const worker = await installed();
-    const before = worker.hasCalls.count;
-    for (let i = 0; i < 5; i += 1) {
-        await (await worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' }).answer).text();
-        await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text();
-    }
-    assert.equal(worker.hasCalls.count, before);
-});
-
-test('a kill switch whose message never arrives still stops the worker saving: it re-checks the marker before a save', async () => {
-    const worker = await installed({ [YEAR_URL]: response('{"n":1}'), [imageUrl(1)]: response('IMG1') });
-    await worker.caches.open('devocionales-disabled'); // the page created it, then failed to message
-    assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
-    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
-    await image.answer;
-    await Promise.all(image.waits);
-    assert.equal(await worker.caches.has('devocionales-data'), false);
-    assert.equal((await worker.caches.open('devocionales-images')).entries.size, 0);
-    // ...and it has now latched: later requests go straight to the network.
-    worker.calls.length = 0;
-    await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text();
-    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`]);
-});
-
-test('a marker left by an earlier switch-off is honoured when the worker starts', async () => {
-    const worker = loadWorker({ routes: ALL_ROUTES(), preexisting: ['devocionales-disabled'] });
-    worker.calls.length = 0;
-    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
-    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`]);
-});
-
-test('activation without a marker does not stand the worker down', async () => {
-    const worker = await installed();
-    await worker.lifecycle('activate');
-    worker.net.offline = true;
-    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js'); // from the build cache
-});
-
-test('an unrelated message does not stand the worker down', async () => {
-    const worker = await installed();
-    for (const data of [{ type: 'other' }, 'devocionales-stand-down', null, undefined, {}]) worker.message(data);
-    worker.net.offline = true;
-    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
-});
-
-test('the stand-down message type is the same in the worker and in the page script that sends it', () => {
-    const typeIn = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8').match(/STAND_DOWN_MESSAGE = '([^']+)'/)[1];
-    assert.equal(typeIn('../devocionales/js/devotional-sw-register.js'), typeIn('sw.template.js'));
-});
-
-test('a save still in flight when the worker is told to stand down is dropped, so the sweep is not undone', async () => {
-    const worker = await installed({
-        [YEAR_URL]: () => new Promise((resolve) => setTimeout(() => resolve(response('{"n":1}')), 15)),
-        [imageUrl(1)]: () => new Promise((resolve) => setTimeout(() => resolve(response('IMG1')), 15)),
-    });
-    const data = worker.fetchEvent(YEAR_URL);
-    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
-    await new Promise((resolve) => setTimeout(resolve, 5));
-    worker.message(STAND_DOWN); // the page's kill switch, while both requests are on the network
-    await data.answer;
-    await image.answer;
-    await Promise.all([...data.waits, ...image.waits]);
-    assert.equal((await worker.caches.keys()).includes('devocionales-data'), false);
-    // Looking the image up opened its cache before the message; nothing may have been put in it.
-    assert.equal((await worker.caches.open('devocionales-images')).entries.size, 0);
-});
-
-
 // ------------------------------------------------------------ second review: copies
 
 test('a response that was not redirected is stored as it came, not buffered into a copy', async () => {
@@ -790,4 +715,152 @@ test('a partial (206) or opaque answer is never stored as a complete file', asyn
     const routes = ALL_ROUTES();
     routes[`${ORIGIN}/js/shared.js`] = response('part', { status: 206, type: 'basic' });
     await assert.rejects(loadWorker({ routes }).lifecycle('install'), /shared\.js/);
+});
+
+
+// ------------------------------------------------------------ kill switch: one guard on every write
+
+test('serving a page or asset never queries the Cache API for the marker', async () => {
+    const worker = await installed();
+    const before = worker.hasCalls.count;
+    for (let i = 0; i < 5; i += 1) {
+        await (await worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' }).answer).text();
+        await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text();
+    }
+    assert.equal(worker.hasCalls.count, before);
+});
+
+test('a marker that exists when a save starts means nothing is written, with no message needed', async () => {
+    const worker = await installed({ [YEAR_URL]: response('{"n":1}'), [imageUrl(1)]: response('IMG1') });
+    await worker.caches.open('devocionales-disabled');
+    assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
+    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
+    await image.answer;
+    await Promise.all(image.waits);
+    assert.equal(await worker.caches.has('devocionales-data'), false);
+    assert.equal(await worker.caches.has('devocionales-images'), false);
+});
+
+test('a save that races the kill switch cannot recreate a swept cache', async () => {
+    const worker = await installed({
+        [YEAR_URL]: response('{"n":1}'),
+        [imageUrl(1)]: response('IMG1'),
+    });
+    worker.caches.openDelayMs = 30; // the kill switch runs between the marker check and the cache being opened
+    const data = worker.fetchEvent(YEAR_URL);
+    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
+    await Promise.all([data.answer, image.answer]);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    worker.caches.openDelayMs = 0;
+    await killSwitch(worker); // marker first, then the sweep, as disable() does
+    await Promise.all([...data.waits, ...image.waits]);
+    assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
+});
+
+test('an install in progress when the kill switch runs rolls back and leaves no build cache', async () => {
+    const slow = () => new Promise((resolve) => setTimeout(() => resolve(response('js', { type: 'basic' })), 40));
+    const worker = loadWorker({ routes: { ...ALL_ROUTES(), [`${ORIGIN}/js/shared.js`]: slow } });
+    const install = assert.rejects(worker.lifecycle('install'), /switched off/);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    await killSwitch(worker);
+    await install;
+    assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
+});
+
+test('an install whose writes are overtaken by the kill switch deletes what it wrote', async () => {
+    const worker = loadWorker({ routes: ALL_ROUTES() });
+    worker.caches.putDelayMs = 20;
+    const install = assert.rejects(worker.lifecycle('install'), /switched off/);
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    await killSwitch(worker);
+    await install;
+    assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
+});
+
+test('a failed install never leaves a build cache behind', async () => {
+    const routes = ALL_ROUTES();
+    delete routes[`${ORIGIN}/js/shared.js`];
+    const worker = loadWorker({ routes });
+    await assert.rejects(worker.lifecycle('install'));
+    assert.deepEqual(await worker.caches.keys(), []);
+});
+
+test('a marker left by an earlier switch-off is honoured when the worker starts', async () => {
+    const worker = loadWorker({ routes: ALL_ROUTES(), preexisting: ['devocionales-disabled'] });
+    worker.calls.length = 0;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
+    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`]);
+    assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
+});
+
+// ------------------------------------------------------------ claiming only pages of this build
+
+// A page window that answers the worker's build question like DevotionalSwRegister does.
+const pageOf = (build, visibilityState = 'visible') => ({
+    visibilityState,
+    postMessage: (message, [port]) => {
+        assert.equal(message.type, 'devocionales-build?');
+        if (build !== undefined) port.postMessage(build);
+    },
+});
+
+test('the worker claims when there is no page, or every page runs this build', async () => {
+    const empty = await installed();
+    await empty.lifecycle('activate');
+    assert.equal(empty.spies.claim, 1);
+
+    const same = await installed();
+    same.windows.push(pageOf('v1'), pageOf('v1'));
+    await same.lifecycle('activate');
+    assert.equal(same.spies.claim, 1);
+});
+
+test('the worker does not claim when any page runs another build, never answers, or cannot be asked', async () => {
+    const cases = {
+        'another build': [pageOf('v1'), pageOf('v0')],
+        'no answer (a page from before the build stamp, or a legal page)': [pageOf('v1'), pageOf(undefined)],
+        'unaskable': [{ visibilityState: 'visible', postMessage: () => { throw new Error('gone'); } }],
+    };
+    for (const [label, windows] of Object.entries(cases)) {
+        const worker = await installed();
+        worker.windows.push(...windows);
+        await worker.lifecycle('activate');
+        assert.equal(worker.spies.claim, 0, label);
+    }
+});
+
+test('claiming never depends on which caches exist: a swept and re-enabled worker leaves a page of an older build alone', async () => {
+    const worker = await installed();
+    worker.windows.push(pageOf('v0')); // a tab still running the build from before the kill switch
+    await worker.lifecycle('activate');
+    assert.equal(worker.spies.claim, 0);
+});
+
+// ------------------------------------------------------------ update delivery
+
+test('a page asking the waiting worker to take over is obeyed only when every page is hidden', async () => {
+    const hidden = await installed();
+    hidden.windows.push(pageOf('v0', 'hidden'), pageOf('v0', 'hidden'));
+    await hidden.message(SKIP_WAITING);
+    assert.equal(hidden.spies.skipWaiting, 1);
+
+    const oneVisible = await installed();
+    oneVisible.windows.push(pageOf('v0', 'hidden'), pageOf('v0', 'visible'));
+    await oneVisible.message(SKIP_WAITING);
+    assert.equal(oneVisible.spies.skipWaiting, 0, 'a visible page must never get a new build under it');
+});
+
+test('other messages do not make the worker take over', async () => {
+    const worker = await installed();
+    for (const data of [{ type: 'other' }, 'devocionales-skip-waiting', null, undefined, {}]) await worker.message(data);
+    assert.equal(worker.spies.skipWaiting, 0);
+});
+
+test('the message types are the same in the worker and in the page script', () => {
+    const constants = (file) => Object.fromEntries(
+        [...fs.readFileSync(path.join(__dirname, file), 'utf8').matchAll(/(SKIP_WAITING_MESSAGE|BUILD_QUERY_MESSAGE) = '([^']+)'/g)].map((m) => [m[1], m[2]]),
+    );
+    const worker = constants('sw.template.js');
+    assert.equal(Object.keys(worker).length, 2);
+    assert.deepEqual(constants('../devocionales/js/devotional-sw-register.js'), worker);
 });

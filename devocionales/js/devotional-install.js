@@ -27,7 +27,6 @@
             button.classList.add('inline-flex');
         };
         const hide = () => {
-            deferred = null;
             button.classList.add('hidden');
             button.classList.remove('inline-flex');
         };
@@ -37,7 +36,10 @@
             deferred = event;
             show();
         });
-        win.addEventListener('appinstalled', hide);
+        win.addEventListener('appinstalled', () => {
+            deferred = null;
+            hide();
+        });
         button.addEventListener('click', async () => {
             const event = deferred;
             if (!event) return;
@@ -50,8 +52,8 @@
             }
             // Accepted, dismissed or refused, the event is used up and a button without a usable
             // prompt behind it would be dead: hide it. The browser's next beforeinstallprompt
-            // shows it again.
-            hide();
+            // shows it again, and an offer that arrived while the prompt was open is kept.
+            if (!deferred) hide();
         });
     }
 

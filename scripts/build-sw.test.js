@@ -265,3 +265,28 @@ test('collectPrecache fails the build, naming the page, on markup it cannot unde
     write('devocionales/index.html', '<html><head><script src="/js/shared.js></head></html>');
     assert.throws(() => collectPrecache(root), /devocionales\/index\.html.*Cannot parse HTML/);
 });
+
+// ------------------------------------------------------------ build stamp
+
+const STAMPED_INDEX = INDEX_HTML.replace('<script src="/js/shared.js">', '<script src="/devocionales/js/devotional-build.js"></script>\n<script src="/js/shared.js">');
+
+test('buildSw also produces the stamp that tells a page which build it is, equal to the worker version', () => {
+    const { root } = makeSite();
+    const { config, stamp } = buildSw(root);
+    const sandbox = { window: {} };
+    vm.runInNewContext(stamp, sandbox);
+    assert.equal(sandbox.window.DevotionalBuild.id, config.version);
+    assert.match(config.version, /^[0-9a-f]{12}$/);
+});
+
+test('the stamp file is precached but is not part of the version it carries', () => {
+    const { root, write } = makeSite();
+    write('devocionales/index.html', STAMPED_INDEX);
+    write('devocionales/js/devotional-build.js', 'window.DevotionalBuild = { id: "old" };');
+    const before = buildSw(root).config;
+    assert.ok(before.precache.includes('/devocionales/js/devotional-build.js'));
+    write('devocionales/js/devotional-build.js', 'window.DevotionalBuild = { id: "something else" };');
+    assert.equal(buildSw(root).config.version, before.version, 'otherwise the stamp could never match the worker');
+    write('js/shared.js', 'changed();');
+    assert.notEqual(buildSw(root).config.version, before.version);
+});

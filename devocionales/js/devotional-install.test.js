@@ -226,3 +226,21 @@ test('a page without the button registers nothing and does not throw', () => {
     assert.doesNotThrow(() => init(doc(null), win));
     assert.deepEqual(Object.keys(win.listeners), []);
 });
+
+test('an offer that arrives while the prompt is open is kept: the button stays and works', async () => {
+    const button = fakeButton();
+    const win = fakeWindow();
+    init(doc(button), win);
+    let finish;
+    const first = promptEvent({ outcome: 'dismissed' });
+    first.userChoice = new Promise((resolve) => { finish = () => resolve({ outcome: 'dismissed' }); });
+    win.listeners.beforeinstallprompt(first);
+    const tap = button.listeners.click();
+    const fresh = promptEvent({ outcome: 'accepted' });
+    win.listeners.beforeinstallprompt(fresh); // the browser re-offers while the prompt is still open
+    finish();
+    await tap;
+    assert.equal(button.shown, true, 'a usable offer exists, so the button must not be hidden');
+    await button.listeners.click();
+    assert.equal(fresh.prompts, 1);
+});

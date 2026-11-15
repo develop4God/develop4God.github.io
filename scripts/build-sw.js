@@ -9,8 +9,8 @@
 // referenced file does not exist. The cache version is a hash of every precached file plus the
 // template, so any change to the page ships a new worker.
 //
-// Usage: node scripts/build-sw.js            writes devocionales/sw.js
-//        node scripts/build-sw.js --check    exits 1 when the committed sw.js is out of date
+// Usage: node scripts/build-sw.js            writes devocionales/sw.js and the build stamp
+//        node scripts/build-sw.js --check    exits 1 when either committed file is out of date
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
@@ -27,10 +27,15 @@ const LANG_DIR = 'lang/devocionales';
 const TEMPLATE_FILE = 'scripts/sw.template.js';
 const OUTPUT_FILE = 'devocionales/sw.js';
 const WORKER_URL = '/devocionales/sw.js';
+// Tells a page which build it is (read by the worker, through the page, before it claims the
+// page). It is precached like any page script but is not part of the version it carries.
+const STAMP_URL = '/devocionales/js/devotional-build.js';
+const STAMP_FILE = 'devocionales/js/devotional-build.js';
 const LINK_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'manifest', 'apple-touch-icon', 'icon']);
 
 // Runtime behaviour that is not derived from the page.
 const RUNTIME = {
+    claimTimeoutMs: 1000, // how long a page may take to say which build it runs before it blocks a claim
     installAttempts: 3, // tries per precached file before an install gives up
     installRetryDelayMs: 500, // grows with each retry
     timeoutMs: 4000,
@@ -138,7 +143,7 @@ function computeVersion(root, urls, template, runtime) {
     const hash = crypto.createHash('sha256');
     hash.update(sha256(template));
     hash.update(`\n${JSON.stringify(runtime)}`);
-    for (const url of urls) hash.update(`\n${url}\n${sha256(fs.readFileSync(path.join(root, fileFor(url))))}`);
+    for (const url of urls.filter((u) => u !== STAMP_URL)) hash.update(`\n${url}\n${sha256(fs.readFileSync(path.join(root, fileFor(url))))}`);
     return hash.digest('hex').slice(0, 12);
 }
 
@@ -148,6 +153,8 @@ function renderSw(template, config) {
     if (!template.includes(marker)) throw new Error(`Worker template is missing the ${PLACEHOLDER} placeholder`);
     return template.replace(marker, () => JSON.stringify(JSON.stringify(config)));
 }
+
+const stampSource = (version) => `window.DevotionalBuild = Object.freeze({ id: '${version}' });\n`;
 
 // `overrides` replaces runtime settings; it exists so tests can exercise the validation below.
 function buildSw(root, overrides = {}) {
@@ -161,21 +168,24 @@ function buildSw(root, overrides = {}) {
     // collectPrecache walked, so the two can never disagree about what a page is.
     const pages = pageFiles(root).filter((file) => file !== SHELL_FILE).map((file) => `/${file}`);
     const config = { version: computeVersion(root, precache, template, runtime), ...runtime, pages, precache };
-    return { source: renderSw(template, config), config };
+    return { source: renderSw(template, config), config, stamp: stampSource(config.version) };
 }
 
 function main(root, args) {
-    const { source } = buildSw(root);
-    const target = path.join(root, OUTPUT_FILE);
+    const { source, stamp } = buildSw(root);
+    const outputs = [[OUTPUT_FILE, source], [STAMP_FILE, stamp]];
     if (args.includes('--check')) {
-        const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : '';
-        if (current !== source) {
-            console.error(`${OUTPUT_FILE} is out of date. Run: node scripts/build-sw.js`);
+        const stale = outputs.filter(([file, content]) => {
+            const target = path.join(root, file);
+            return !fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content;
+        });
+        if (stale.length > 0) {
+            console.error(`${stale.map(([file]) => file).join(', ')} out of date. Run: node scripts/build-sw.js`);
             process.exit(1);
         }
         return;
     }
-    fs.writeFileSync(target, source);
+    for (const [file, content] of outputs) fs.writeFileSync(path.join(root, file), content);
 }
 
 if (require.main === module) main(path.join(__dirname, '..'), process.argv.slice(2));

@@ -2,11 +2,10 @@
 // Service worker for /devocionales/. Generated into devocionales/sw.js by scripts/build-sw.js:
 // edit this template, never the generated file.
 //
-// What it does, by kind of request:
+// What it serves, by kind of request:
 //  - The page shell, the legal pages and every file they load (scripts, styles, fonts, icons,
 //    language files) are precached in one cache per build and served from it. HTML and scripts
-//    therefore always come from the same build; a deploy reaches readers through a new worker,
-//    not through a newer HTML file meeting older cached scripts.
+//    therefore always come from the same build.
 //  - The PWA config script is the one precached file fetched fresh first (bypassing the HTTP
 //    cache), so switching the PWA off reaches an online reader on their next visit without
 //    waiting for a worker update. The build copy is the fallback.
@@ -15,27 +14,34 @@
 //    reader online always gets current content. The last good copy is the fallback when the
 //    network fails, is slow, or answers with anything but success or a real absence: a rate limit
 //    (403, 429), a timeout (408) or a server error (5xx) must not hide a devotional already read.
-//    A 404 or 410 (the year or file does not exist) is returned as is and never saved. The fallback
-//    is what lets a devotional already read open offline. Only complete (200), CORS-readable
-//    responses are saved, and saving happens in the background so a full or failing cache can
-//    never delay or break reading.
+//    A 404 or 410 (the year or file does not exist) is returned as is and never saved. Only
+//    complete (200), CORS-readable responses are saved, in the background, so a full or failing
+//    cache can never delay or break reading.
 //  - Hero images: saved on first view and served from the saved copy afterwards. An <img> sends
 //    a no-cors request whose response is opaque and unsavable, so the worker fetches the image
 //    again with CORS (the host allows it) and answers with that.
 //  - Everything else (analytics, other pages, non-GET, Range requests) is left alone.
 //
-// One build at a time: a new worker does not call skipWaiting(), and claims pages only when it is
-// the first worker (below). It installs and waits until no page the previous worker controls is
-// open, and only then activates and deletes the previous build cache. A page that loaded one
-// build's scripts therefore never has them answered from another build, at the price that an
-// update reaches a reader on their next visit after closing the app, not under an open page.
-// The first worker ever installed (no earlier build cache exists) claims the pages that loaded
-// without a worker: they came from the live site, which is the build it just precached, so
-// nothing can mix, and the very first visit is then cached and readable offline.
+// Builds never mix in one page:
+//  - A new worker installs and waits; it does not take over by itself. The page that is running
+//    the old build asks it to (DevotionalSwRegister.deliverUpdates) only while its tab is hidden,
+//    and the worker obeys only when every page of the site is hidden, so no visible page ever gets
+//    another build's files. The pages then reload (reloadOnUpdate) once hidden.
+//  - The first worker ever installed claims the pages that loaded without one, but only if every
+//    page answers that it runs this worker's build (DevotionalBuild.id, stamped by build-sw). A
+//    page of another build, or one that does not answer, is never claimed.
 //
-// Installing is all or nothing: every precached file is fetched (a few bounded retries each) and
-// stored; if one still fails the half-built cache is deleted and the install rejects. The worker
-// logs and reports nothing by design (the site has no error logging).
+// The kill switch (DevotionalSwRegister.disable) leaves the marker cache, unregisters the worker
+// and deletes every other devocionales-* cache. The marker is the one source of truth, and no
+// message is needed: every write goes through writeTo(), which refuses to write while the marker
+// exists and deletes the cache it just wrote if the marker appeared meanwhile, so a worker that
+// still controls an open page, or is still installing, cannot refill what the sweep emptied.
+// Reads use caches.match with a cacheName, which never creates a cache, and serving from the build
+// cache does not look the marker up at all. An enabled page deletes the marker before registering.
+//
+// Installing is all or nothing: every precached file is fetched first (a few bounded retries
+// each) and only then written, in one guarded write; one failure rejects the install and no build
+// cache exists. The worker logs and reports nothing by design (the site has no error logging).
 //
 // Caches: `devocionales-<version>` holds one build and is deleted when a newer worker activates;
 // `devocionales-data` and `devocionales-images` survive deploys, since remote content is
@@ -50,6 +56,10 @@ const DATA_CACHE = `${CACHE_PREFIX}data`;
 const IMAGE_CACHE = `${CACHE_PREFIX}images`;
 const DISABLED_CACHE = `${CACHE_PREFIX}disabled`;
 const KEPT_CACHES = [BUILD_CACHE, DATA_CACHE, IMAGE_CACHE, DISABLED_CACHE];
+// Must equal the constants of the same name in devocionales/js/devotional-sw-register.js
+// (scripts/sw.test.js enforces it).
+const SKIP_WAITING_MESSAGE = 'devocionales-skip-waiting';
+const BUILD_QUERY_MESSAGE = 'devocionales-build?';
 const SHELL_PATH = '/devocionales/';
 const SHELL_PATHS = new Set([SHELL_PATH, `${SHELL_PATH}index.html`]);
 // The host redirects `page.html` to the extensionless `page`, so both forms must be served offline.
@@ -58,14 +68,26 @@ const pageKey = (pathname) => {
   if (SHELL_PATHS.has(pathname)) return SHELL_PATH;
   return pathname.endsWith('.html') ? pathname : `${pathname}.html`;
 };
-// Must equal STAND_DOWN_MESSAGE in devocionales/js/devotional-sw-register.js (scripts/sw.test.js enforces it).
-const STAND_DOWN_MESSAGE = 'devocionales-stand-down';
 const SLOW = Symbol('slow');
 const FAILED = Symbol('failed');
 
 const siteOrigin = self.location.origin;
 const absolute = (path) => new URL(path, siteOrigin).href;
 const precached = new Set(CONFIG.precache.map(absolute));
+
+// The only way this worker writes to a cache. `write` gets the opened cache; nothing is written
+// while the kill-switch marker exists, and if the marker appeared during the write the cache is
+// deleted again (the kill switch creates the marker before it sweeps, so a write that ends after
+// the sweep always sees the marker). Resolves to whether the write was kept.
+async function writeTo(name, write) {
+  if (await caches.has(DISABLED_CACHE)) return false;
+  await write(await caches.open(name));
+  if (await caches.has(DISABLED_CACHE)) {
+    await caches.delete(name);
+    return false;
+  }
+  return true;
+}
 
 // What gets stored. A redirected response (the host 308s `page.html` to `page`) cannot be served
 // to a navigation, so it is stored as a fresh copy without the redirect flag; any other response
@@ -89,7 +111,7 @@ async function fetchForBuild(path) {
     if (attempt > 1) await sleep(CONFIG.installRetryDelayMs * (attempt - 1));
     try {
       const response = await fetch(new Request(absolute(path), { cache: 'reload' }));
-      if (response.status === 200) return await cleanCopy(response);
+      if (response.status === 200) return [absolute(path), await cleanCopy(response)];
       failure = new Error(`${response.status} for ${path}`);
     } catch (err) {
       failure = err;
@@ -99,84 +121,78 @@ async function fetchForBuild(path) {
 }
 
 async function buildCache() {
-  // The kill switch has run: do not rebuild what it just removed.
-  if (await caches.has(DISABLED_CACHE)) throw new Error('The PWA is switched off');
-  const cache = await caches.open(BUILD_CACHE);
-  const failed = [];
-  await Promise.all(CONFIG.precache.map(async (path) => {
-    try {
-      await cache.put(absolute(path), await fetchForBuild(path));
-    } catch (err) {
-      failed.push(absolute(path));
-    }
-  }));
-  if (failed.length > 0) {
+  const switchedOff = new Error('The PWA is switched off');
+  if (await caches.has(DISABLED_CACHE)) throw switchedOff;
+  const files = await Promise.all(CONFIG.precache.map(fetchForBuild));
+  let kept;
+  try {
+    kept = await writeTo(BUILD_CACHE, async (cache) => {
+      for (const [url, response] of files) await cache.put(url, response);
+    });
+  } catch (err) {
     await caches.delete(BUILD_CACHE); // never leave a partial build behind
-    throw new Error(`Could not precache ${failed.join(', ')}`);
+    throw err;
   }
+  if (!kept) throw switchedOff;
 }
 
 self.addEventListener('install', (event) => {
   event.waitUntil(buildCache());
 });
 
-// Sweeps the older build caches and keeps the stand-down marker: a kill switch racing this
-// activation must not be undone, so a marker that exists makes the worker stand down.
+// Asks one page which build it runs; null when it cannot or does not answer in time.
+function askBuild(client) {
+  return new Promise((resolve) => {
+    const channel = new MessageChannel();
+    const done = (answer) => {
+      clearTimeout(timer);
+      channel.port1.close();
+      resolve(answer);
+    };
+    const timer = setTimeout(() => done(null), CONFIG.claimTimeoutMs);
+    channel.port1.onmessage = (event) => done(event.data);
+    try {
+      client.postMessage({ type: BUILD_QUERY_MESSAGE }, [channel.port2]);
+    } catch (err) {
+      done(null);
+    }
+  });
+}
+
+// Claims the open pages only when every one of them runs this worker's build.
+async function claimMatchingPages() {
+  const pages = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  const builds = await Promise.all(pages.map(askBuild));
+  if (builds.every((build) => build === CONFIG.version)) await self.clients.claim();
+}
+
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    standDownKnown
-      .then(() => caches.keys())
-      .then(async (names) => {
-        const older = names.filter((name) => name.startsWith(CACHE_PREFIX) && !KEPT_CACHES.includes(name));
-        await Promise.all(older.map((name) => caches.delete(name)));
-        if (names.includes(DISABLED_CACHE)) standDown = true;
-        // No earlier build cache: this is the first worker, and claiming cannot mix builds.
-        if (older.length === 0) await self.clients.claim();
-      }),
+    caches
+      .keys()
+      .then((names) => Promise.all(
+        names
+          .filter((name) => name.startsWith(CACHE_PREFIX) && !KEPT_CACHES.includes(name))
+          .map((name) => caches.delete(name)),
+      ))
+      .then(claimMatchingPages),
   );
 });
 
+// A page running the old build asks this waiting worker to take over. Only when every page is
+// hidden: a visible page must never get another build's files under it.
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === STAND_DOWN_MESSAGE) standDown = true;
+  if (!event.data || event.data.type !== SKIP_WAITING_MESSAGE) return;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((pages) => {
+      if (pages.every((page) => page.visibilityState === 'hidden')) return self.skipWaiting();
+      return undefined;
+    }),
+  );
 });
 
-// The page's kill switch (DevotionalSwRegister.disable) leaves the DISABLED_CACHE marker and
-// sends STAND_DOWN_MESSAGE, then unregisters this worker and deletes the other caches. An
-// unregistered worker keeps controlling the open page until that closes, so it passes requests to
-// the network, creating no cache. The marker is explicit on purpose: a build cache evicted by the
-// browser must not be mistaken for the kill switch. The worker keeps the answer in `standDown`
-// instead of asking the Cache API when serving a request: it reads the marker when it starts (a
-// restarted worker has no memory of the message) and on activation, and sets the flag on the
-// message. Should the message never arrive, `markerExists` re-checks the marker before every save,
-// off the serving path, so a lost message cannot let the worker refill the caches the sweep
-// emptied. The flag never clears: an enabled page deletes the marker before registering, and the
-// worker that registers then is a new one. 
-let standDown = false;
-const standDownKnown = caches.has(DISABLED_CACHE).then(
-  (marked) => {
-    if (marked) standDown = true;
-  },
-  () => {},
-);
-
-async function markerExists() {
-  if (standDown) return true;
-  try {
-    if (await caches.has(DISABLED_CACHE)) standDown = true;
-  } catch (err) {
-    // Cannot tell: carry on as enabled.
-  }
-  return standDown;
-}
-
-async function unlessDisabled(request, handle, passThrough = () => fetch(request)) {
-  await standDownKnown;
-  if (standDown) return passThrough();
-  return handle();
-}
-
 async function fromBuild(request, url) {
-  const saved = await (await caches.open(BUILD_CACHE)).match(url);
+  const saved = await caches.match(url, { cacheName: BUILD_CACHE });
   return saved || fetch(request);
 }
 
@@ -213,17 +229,19 @@ async function trim(cache, limit, counts = () => true) {
 
 // Only year files are capped: the index and stats files are small and every load needs them.
 async function saveData(request, response) {
-  if (await markerExists()) return; // stood down while the request was in flight: do not undo the sweep
-  const cache = await caches.open(DATA_CACHE);
-  await cache.put(request, await cleanCopy(response));
-  await trim(cache, CONFIG.maxDataEntries, (url) => url.includes('/Devocional_year_'));
+  const copy = await cleanCopy(response);
+  await writeTo(DATA_CACHE, async (cache) => {
+    await cache.put(request, copy);
+    await trim(cache, CONFIG.maxDataEntries, (url) => url.includes('/Devocional_year_'));
+  });
 }
 
 async function saveImage(url, response) {
-  if (await markerExists()) return;
-  const cache = await caches.open(IMAGE_CACHE);
-  await cache.put(url, await cleanCopy(response));
-  await trim(cache, CONFIG.maxImageEntries);
+  const copy = await cleanCopy(response);
+  await writeTo(IMAGE_CACHE, async (cache) => {
+    await cache.put(url, copy);
+    await trim(cache, CONFIG.maxImageEntries);
+  });
 }
 
 async function fetchAndSave(request, event) {
@@ -245,7 +263,7 @@ async function networkFirst(request, event) {
   // Success, or a real absence (a year that does not exist), is the answer. Anything else (a rate
   // limit, a timeout, an outage) falls back to the saved copy.
   if (answered && (first.ok || first.status === 404 || first.status === 410)) return first;
-  const saved = await (await caches.open(DATA_CACHE)).match(request);
+  const saved = await caches.match(request, { cacheName: DATA_CACHE });
   if (saved) {
     if (first === SLOW) event.waitUntil(network.catch(() => {}));
     return saved;
@@ -256,7 +274,7 @@ async function networkFirst(request, event) {
 }
 
 async function heroImage(request, event) {
-  const saved = await (await caches.open(IMAGE_CACHE)).match(request.url);
+  const saved = await caches.match(request.url, { cacheName: IMAGE_CACHE });
   if (saved) return saved;
   let response;
   try {
@@ -278,27 +296,21 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === siteOrigin) {
     const key = absolute(url.pathname);
     if (request.mode === 'navigate' && PAGE_PATHS.has(url.pathname)) {
-      const page = absolute(pageKey(url.pathname));
-      event.respondWith(unlessDisabled(request, () => fromBuild(request, page)));
+      event.respondWith(fromBuild(request, absolute(pageKey(url.pathname))));
     } else if (CONFIG.freshFirst.includes(url.pathname)) {
-      // Even stood down, the config is revalidated: the HTTP cache must not delay switching back on.
-      event.respondWith(unlessDisabled(
-        request,
-        () => networkThenBuild(request, key),
-        () => fetch(new Request(key, { cache: 'no-cache' })),
-      ));
+      event.respondWith(networkThenBuild(request, key));
     } else if (url.pathname !== SHELL_PATH && precached.has(key)) {
-      event.respondWith(unlessDisabled(request, () => fromBuild(request, key)));
+      event.respondWith(fromBuild(request, key));
     } else if (CONFIG.sameOriginData.includes(url.pathname)) {
-      event.respondWith(unlessDisabled(request, () => networkFirst(request, event)));
+      event.respondWith(networkFirst(request, event));
     }
     return;
   }
 
   if (url.hostname !== CONFIG.dataHost) return;
   if (CONFIG.dataPathPrefixes.some((prefix) => url.pathname.startsWith(prefix))) {
-    event.respondWith(unlessDisabled(request, () => networkFirst(request, event)));
+    event.respondWith(networkFirst(request, event));
   } else if (url.pathname.startsWith(CONFIG.imagePathPrefix)) {
-    event.respondWith(unlessDisabled(request, () => heroImage(request, event)));
+    event.respondWith(heroImage(request, event));
   }
 });

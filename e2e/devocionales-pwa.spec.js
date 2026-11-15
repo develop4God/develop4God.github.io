@@ -177,12 +177,11 @@ test.describe('updates', () => {
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
 
             await expect.poll(() => cacheNames(page)).toContain(`devocionales-${newVersion}`);
-            // The open page still runs the old build's scripts, so the old build must stay: the new
-            // worker waits instead of taking over, and the page is not reloaded under the reader.
-            await page.waitForTimeout(1000);
+            // The open page still runs the old build's scripts, and the tab is visible: the new worker
+            // is waiting, and neither the worker nor the page may take it over or reload the page.
+            await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
             expect(await cacheNames(page)).toContain(`devocionales-${oldVersion}`);
             expect(await page.evaluate(() => window.readerSession)).toBe('still-open');
-            expect(await page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
 
             // Once no old page is open the new worker activates and removes the old build.
             await page.close();
