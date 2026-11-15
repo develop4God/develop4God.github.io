@@ -16,22 +16,9 @@
         element.classList.add('inline-flex');
     }
 
-    // Google Play download button: Android only (every other platform gets the PWA) and only once
-    // the visitor has shared (DevotionalShareTracker). A browser without Web Share can never earn
-    // that, so it gets the button straight away. Safe to call again after a share so the button
-    // appears without a reload.
-    function refreshDownloadGate(doc, win) {
-        const tracker = win.DevotionalShareTracker;
-        if (!tracker || !isAndroid(win.navigator)) return;
-        let unlocked = typeof win.navigator.share !== 'function';
-        if (!unlocked) {
-            try {
-                unlocked = tracker.hasShared(win.localStorage); // the accessor throws when site data is blocked
-            } catch (err) {
-                unlocked = false;
-            }
-        }
-        if (unlocked) reveal(doc.getElementById('download-app-android-btn'));
+    // Google Play download button: Android only (every other platform gets the PWA instead).
+    function showAndroidDownload(doc, win) {
+        if (isAndroid(win.navigator)) reveal(doc.getElementById('download-app-android-btn'));
     }
 
     // "Install app" button. It is hidden in the HTML and shown only once the browser reports that
@@ -42,7 +29,7 @@
     // behaviour described above when absent.
     function init(doc, win, config) {
         // First, so nothing below (no install button, PWA switched off) can keep it from running.
-        refreshDownloadGate(doc, win);
+        showAndroidDownload(doc, win);
         const button = doc.querySelector('[data-install]');
         if (!button) return;
         if (config && config.enabled === false) return;
@@ -80,5 +67,5 @@
         });
     }
 
-    global.DevotionalInstall = { init, isAndroid, refreshDownloadGate };
+    global.DevotionalInstall = { init, isAndroid, showAndroidDownload };
 })(window);

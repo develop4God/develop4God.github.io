@@ -12,7 +12,8 @@ function loadModule() {
     return win.DevotionalInstall;
 }
 
-const { init, isAndroid } = loadModule();
+const DevotionalInstallApi = loadModule();
+const { init, isAndroid } = DevotionalInstallApi;
 
 function fakeButton() {
     const classes = new Set(['hidden']);
@@ -248,116 +249,47 @@ test('an offer that arrives while the prompt is open is kept: the button stays a
     assert.equal(fresh.prompts, 1);
 });
 
-// --- Android download gate (share-to-unlock) ---------------------------------------------------
+// --- Android-only Google Play button ----------------------------------------------------------
 
-const SHARED_KEY = 'develop4God_shared';
-
-function loadGateModules() {
-    const win = {};
-    for (const file of ['devotional-share-tracker.js', 'devotional-install.js']) {
-        const filename = path.join(__dirname, file);
-        const source = fs.readFileSync(filename, 'utf8');
-        vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
-    }
-    return win;
-}
-
-function gateStorage(initial = {}) {
-    const store = { ...initial };
-    return {
-        getItem: (k) => (k in store ? store[k] : null),
-        setItem: (k, v) => { store[k] = String(v); },
-    };
-}
-
-function gateRig({ ua = UA.androidPhone, storage = gateStorage(), withTracker = true, canShare = true } = {}) {
-    const loaded = loadGateModules();
-    const win = fakeWindow(canShare ? { userAgent: ua, share: () => Promise.resolve() } : { userAgent: ua });
-    Object.defineProperty(win, 'localStorage', { get: () => storage, configurable: true });
-    if (withTracker) win.DevotionalShareTracker = loaded.DevotionalShareTracker;
+function playRig(ua) {
+    const win = fakeWindow({ userAgent: ua });
     const button = fakeButton();
-    const elements = { 'download-app-android-btn': button };
     const document = {
         querySelector: () => null,
-        getElementById: (id) => elements[id] || null,
+        getElementById: (id) => (id === 'download-app-android-btn' ? button : null),
     };
-    return { api: loaded.DevotionalInstall, win, document, button };
+    return { win, document, button };
 }
 
-function blockStorage(win) {
-    Object.defineProperty(win, 'localStorage', {
-        get: () => { throw new Error('SecurityError'); },
-        configurable: true,
-    });
-}
-
-test('gate: Android + shared reveals the download button', () => {
-    const rig = gateRig({ storage: gateStorage({ [SHARED_KEY]: '1' }) });
-    rig.api.refreshDownloadGate(rig.document, rig.win);
-    assert.equal(rig.button.shown, true);
+test('play button: shown on Android phones, tablets and Firefox', () => {
+    for (const ua of [UA.androidPhone, UA.androidTablet, UA.androidFirefox]) {
+        const rig = playRig(ua);
+        DevotionalInstallApi.showAndroidDownload(rig.document, rig.win);
+        assert.equal(rig.button.shown, true, ua);
+    }
 });
 
-test('gate: Android without a share keeps the button hidden', () => {
-    const rig = gateRig();
-    rig.api.refreshDownloadGate(rig.document, rig.win);
-    assert.equal(rig.button.shown, false);
-});
-
-test('gate: shared but not Android keeps the button hidden', () => {
-    for (const ua of [UA.iphone, UA.windows, UA.mac]) {
-        const rig = gateRig({ ua, storage: gateStorage({ [SHARED_KEY]: '1' }) });
-        rig.api.refreshDownloadGate(rig.document, rig.win);
+test('play button: stays hidden on iOS, Mac, Windows and Linux (they use the PWA)', () => {
+    for (const ua of [UA.iphone, UA.mac, UA.windows, UA.linuxDesktop]) {
+        const rig = playRig(ua);
+        DevotionalInstallApi.showAndroidDownload(rig.document, rig.win);
         assert.equal(rig.button.shown, false, ua);
     }
 });
 
-test('gate: Android without Web Share shows the button, since sharing can never unlock it', () => {
-    const rig = gateRig({ canShare: false });
-    rig.api.refreshDownloadGate(rig.document, rig.win);
+test('play button: a missing element is a safe no-op', () => {
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    assert.doesNotThrow(() => DevotionalInstallApi.showAndroidDownload({ getElementById: () => null }, win));
+});
+
+test('play button: init shows it on Android even when the PWA feature is off', () => {
+    const rig = playRig(UA.androidPhone);
+    init(rig.document, rig.win, { enabled: false });
     assert.equal(rig.button.shown, true);
 });
 
-test('gate: no Web Share but not Android still keeps the button hidden', () => {
-    const rig = gateRig({ canShare: false, ua: UA.windows });
-    rig.api.refreshDownloadGate(rig.document, rig.win);
+test('play button: init leaves it hidden on iOS', () => {
+    const rig = playRig(UA.iphone);
+    init(rig.document, rig.win, {});
     assert.equal(rig.button.shown, false);
-});
-
-test('gate: blocked storage does not throw and keeps the button hidden', () => {
-    const rig = gateRig();
-    blockStorage(rig.win);
-    assert.doesNotThrow(() => rig.api.refreshDownloadGate(rig.document, rig.win));
-    assert.equal(rig.button.shown, false);
-});
-
-test('gate: missing tracker or missing element is a safe no-op', () => {
-    const noTracker = gateRig({ withTracker: false, storage: gateStorage({ [SHARED_KEY]: '1' }) });
-    assert.doesNotThrow(() => noTracker.api.refreshDownloadGate(noTracker.document, noTracker.win));
-    assert.equal(noTracker.button.shown, false);
-    const rig = gateRig({ storage: gateStorage({ [SHARED_KEY]: '1' }) });
-    assert.doesNotThrow(() => rig.api.refreshDownloadGate({ getElementById: () => null }, rig.win));
-});
-
-test('gate: re-checking after markShared reveals the button without a reload', () => {
-    const rig = gateRig();
-    rig.api.refreshDownloadGate(rig.document, rig.win);
-    assert.equal(rig.button.shown, false);
-    rig.win.DevotionalShareTracker.markShared(rig.win.localStorage);
-    rig.api.refreshDownloadGate(rig.document, rig.win);
-    assert.equal(rig.button.shown, true);
-});
-
-test('gate: init applies the gate even with the PWA disabled', () => {
-    const rig = gateRig({ storage: gateStorage({ [SHARED_KEY]: '1' }) });
-    rig.api.init(rig.document, rig.win, { enabled: false });
-    assert.equal(rig.button.shown, true);
-});
-
-test('gate: init survives blocked storage and still wires the install listeners', () => {
-    const rig = gateRig();
-    blockStorage(rig.win);
-    const installButton = fakeButton();
-    const document = { ...rig.document, querySelector: (s) => (s === '[data-install]' ? installButton : null) };
-    assert.doesNotThrow(() => rig.api.init(document, rig.win, {}));
-    assert.equal(typeof rig.win.listeners.beforeinstallprompt, 'function');
 });

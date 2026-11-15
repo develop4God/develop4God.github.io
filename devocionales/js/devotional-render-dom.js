@@ -98,16 +98,7 @@
         if (shareHandlerBound) return;
         shareHandlerBound = true;
         nativeBtn.addEventListener('click', () => {
-            navigator.share(shareData).then(() => {
-                // Share gate: record that the user has shared so gated
-                // features (the Android download button) can appear.
-                try {
-                    global.DevotionalShareTracker.markShared(global.localStorage);
-                    global.DevotionalInstall.refreshDownloadGate(document, global);
-                } catch (err) {
-                    // Blocked storage, or an older cached script without the gate: sharing still worked.
-                }
-            }).catch(() => {});
+            navigator.share(shareData).catch(() => {});
         });
     }
 

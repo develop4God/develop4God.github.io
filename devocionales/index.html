@@ -396,11 +396,6 @@
                     <i data-lucide="download" class="w-4 h-4"></i>
                     <span data-i18n="devotionals.installApp">Install app</span>
                 </button>
-                <!-- Shown only on Android devices that have shared (devotional-install.js) — direct link to the native app on Google Play. -->
-                <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" id="download-app-android-btn" class="btn-primary px-4 py-2 hidden items-center gap-2" target="_blank" rel="noopener">
-                    <i data-lucide="download" class="w-4 h-4"></i>
-                    <span data-i18n="devotionals.downloadApp">Download App</span>
-                </a>
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
                 <!-- [html-validate-disable-next no-redundant-for] -->
@@ -494,7 +489,8 @@
                         <i data-lucide="volume-2" class="w-4 h-4"></i>
                         <span class="tts-label">Escuchar</span>
                     </button>
-                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="btn-secondary px-5 py-2 flex items-center gap-2">
+                    <!-- Android only (devotional-install.js); every other platform gets the PWA install button. -->
+                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" id="download-app-android-btn" class="btn-secondary px-5 py-2 hidden items-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
                         <span id="download-app-label">Descarga la App</span>
                     </a>
@@ -618,7 +614,6 @@
     <script src="/devocionales/js/bible-text-formatter.js"></script>
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
     <script src="/devocionales/js/devotional-share.js"></script>
-    <script src="/devocionales/js/devotional-share-tracker.js"></script>
     <script src="/devocionales/js/devotional-fetch.js"></script>
     <script src="/devocionales/js/devotional-error-logger.js"></script>
     <script src="/devocionales/js/devotional-nav.js"></script>
