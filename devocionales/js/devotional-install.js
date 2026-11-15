@@ -41,12 +41,14 @@
         button.addEventListener('click', async () => {
             const event = deferred;
             if (!event) return;
-            hide(); // a prompt event can be used only once, whatever the answer
+            deferred = null; // a prompt event can be used only once, whatever the answer
             try {
                 await event.prompt();
-                await event.userChoice;
+                const choice = await event.userChoice;
+                if (choice && choice.outcome === 'accepted') hide();
+                // Dismissed: the button stays, and the browser's next beforeinstallprompt re-arms it.
             } catch (err) {
-                // The browser refused to show the prompt; the button stays hidden until it offers another.
+                // The browser refused to show the prompt; the button stays for its next offer.
             }
         });
     }

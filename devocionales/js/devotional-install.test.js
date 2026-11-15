@@ -50,7 +50,7 @@ const UA = {
 
 const doc = (button) => ({ querySelector: (selector) => (selector === '[data-install]' ? button : null) });
 
-function promptEvent({ rejects = false } = {}) {
+function promptEvent({ rejects = false, outcome = 'accepted' } = {}) {
     const event = {
         defaultPrevented: false,
         prompts: 0,
@@ -59,7 +59,7 @@ function promptEvent({ rejects = false } = {}) {
             this.prompts += 1;
             return rejects ? Promise.reject(new Error('refused')) : Promise.resolve();
         },
-        userChoice: Promise.resolve({ outcome: 'accepted' }),
+        userChoice: Promise.resolve({ outcome }),
     };
     return event;
 }
@@ -80,17 +80,44 @@ test('beforeinstallprompt is deferred (no mini-infobar) and reveals the button',
     assert.equal(button.shown, true);
 });
 
-test('a tap opens the browser prompt once and hides the button, whatever the answer', async () => {
+test('a tap opens the browser prompt, and an accepted install hides the button', async () => {
     const button = fakeButton();
     const win = fakeWindow();
     init(doc(button), win);
-    const event = promptEvent();
+    const event = promptEvent({ outcome: 'accepted' });
     win.listeners.beforeinstallprompt(event);
-    await button.listeners.click();
+    const tap = button.listeners.click();
+    assert.equal(button.shown, true, 'the button must stay while the prompt is open');
+    await tap;
     assert.equal(event.prompts, 1);
     assert.equal(button.shown, false);
     await button.listeners.click();
     assert.equal(event.prompts, 1);
+});
+
+test('a dismissed prompt leaves the button, and a prompt event is never used twice', async () => {
+    const button = fakeButton();
+    const win = fakeWindow();
+    init(doc(button), win);
+    const event = promptEvent({ outcome: 'dismissed' });
+    win.listeners.beforeinstallprompt(event);
+    await button.listeners.click();
+    assert.equal(button.shown, true);
+    await assert.doesNotReject(async () => button.listeners.click()); // the used event is not prompted again
+    assert.equal(event.prompts, 1);
+});
+
+test('after a dismissal the browser\'s next offer makes the same button work again', async () => {
+    const button = fakeButton();
+    const win = fakeWindow();
+    init(doc(button), win);
+    win.listeners.beforeinstallprompt(promptEvent({ outcome: 'dismissed' }));
+    await button.listeners.click();
+    const next = promptEvent({ outcome: 'accepted' });
+    win.listeners.beforeinstallprompt(next);
+    await button.listeners.click();
+    assert.equal(next.prompts, 1);
+    assert.equal(button.shown, false);
 });
 
 test('a tap before any install offer does nothing', async () => {
@@ -100,13 +127,13 @@ test('a tap before any install offer does nothing', async () => {
     assert.equal(button.shown, false);
 });
 
-test('a refused prompt does not throw and leaves the button hidden', async () => {
+test('a refused prompt does not throw and leaves the button', async () => {
     const button = fakeButton();
     const win = fakeWindow();
     init(doc(button), win);
     win.listeners.beforeinstallprompt(promptEvent({ rejects: true }));
     await assert.doesNotReject(async () => button.listeners.click());
-    assert.equal(button.shown, false);
+    assert.equal(button.shown, true);
 });
 
 test('appinstalled hides the button', () => {
