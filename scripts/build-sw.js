@@ -16,6 +16,8 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
+const { parseTags } = require('./html-tags.js');
+
 const PLACEHOLDER = '__SW_CONFIG__';
 const SHELL_URL = '/devocionales/';
 const PAGES_DIR = 'devocionales';
@@ -29,6 +31,8 @@ const LINK_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'manifest',
 
 // Runtime behaviour that is not derived from the page.
 const RUNTIME = {
+    installAttempts: 3, // tries per precached file before an install gives up
+    installRetryDelayMs: 500, // grows with each retry
     timeoutMs: 4000,
     freshTimeoutMs: 1000, // the page blocks on the config script, so it waits less than the data does
     maxDataEntries: 24, // year files kept: a few languages and versions, current and previous year
@@ -58,24 +62,17 @@ function localPath(reference) {
     return reference.split(/[?#]/)[0];
 }
 
-// A tag's attribute value, in double or single quotes.
-function attribute(tag, name) {
-    const match = tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)')`));
-    return match ? (match[1] ?? match[2]) : null;
-}
-
 // Everything a page loads by tag: scripts, images, the link rels that matter, and the url()
-// references inside its inline <style> blocks (resolved against the page's own URL).
+// references inside its inline <style> blocks (resolved against the page's own URL). Throws when
+// the markup cannot be parsed (see html-tags.js).
 function htmlReferences(html, pageUrl) {
-    const live = html.replace(/<!--[\s\S]*?-->/g, ''); // a commented-out tag is not part of the page
-    const scripts = [...live.matchAll(/<script\b[^>]*>/g)].map((m) => attribute(m[0], 'src'));
-    const images = [...live.matchAll(/<img\b[^>]*>/g)].map((m) => attribute(m[0], 'src'));
-    const links = [...live.matchAll(/<link\b[^>]*>/g)]
-        .filter((m) => (attribute(m[0], 'rel') || '').split(/\s+/).some((rel) => LINK_RELS.has(rel)))
-        .map((m) => attribute(m[0], 'href'));
-    const inlineStyles = [...live.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
-        .flatMap((m) => cssReferences(m[1], pageUrl));
-    return [...scripts, ...images, ...links, ...inlineStyles].filter(Boolean);
+    const references = [];
+    for (const tag of parseTags(html)) {
+        if (tag.name === 'script' || tag.name === 'img') references.push(tag.attrs.src);
+        else if (tag.name === 'link' && (tag.attrs.rel || '').split(/\s+/).some((rel) => LINK_RELS.has(rel))) references.push(tag.attrs.href);
+        else if (tag.name === 'style') references.push(...cssReferences(tag.body, pageUrl));
+    }
+    return references.filter(Boolean);
 }
 
 // url(...) targets inside a stylesheet, resolved against the stylesheet's own URL.
@@ -111,7 +108,13 @@ function collectPrecache(root) {
     for (const page of pageFiles(root)) {
         if (page !== SHELL_FILE) urls.add(`/${page}`);
         const pageUrl = page === SHELL_FILE ? SHELL_URL : `/${page}`;
-        for (const reference of htmlReferences(read(page), pageUrl)) {
+        let references;
+        try {
+            references = htmlReferences(read(page), pageUrl);
+        } catch (err) {
+            throw new Error(`${page}: ${err.message}`);
+        }
+        for (const reference of references) {
             const url = localPath(reference);
             if (url && url !== WORKER_URL) requireFile(url, page);
         }

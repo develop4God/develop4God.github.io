@@ -245,3 +245,23 @@ test('the real site builds, and the worker never lists itself', () => {
     for (const path of config.sameOriginData) assert.equal(config.precache.includes(path), false, `${path} is fetched live`);
     assert.equal(config.precache.filter((url) => url.startsWith('/lang/devocionales/')).length, 10);
 });
+
+test('collectPrecache finds references written with unquoted attributes and ">" inside attribute values', () => {
+    const { root, write } = makeSite();
+    write('devocionales/index.html', `<!DOCTYPE html><html><head>
+<script src=/js/unquoted.js></script>
+<img alt="a > b" src="/devocionales/icons/arrow.png">
+<link rel=stylesheet href=/devocionales/vendor/plain.css>
+</head></html>`);
+    write('js/unquoted.js', 'x');
+    write('devocionales/icons/arrow.png', 'x');
+    write('devocionales/vendor/plain.css', 'x');
+    const urls = collectPrecache(root);
+    for (const url of ['/js/unquoted.js', '/devocionales/icons/arrow.png', '/devocionales/vendor/plain.css']) assert.ok(urls.includes(url), url);
+});
+
+test('collectPrecache fails the build, naming the page, on markup it cannot understand', () => {
+    const { root, write } = makeSite();
+    write('devocionales/index.html', '<html><head><script src="/js/shared.js></head></html>');
+    assert.throws(() => collectPrecache(root), /devocionales\/index\.html.*Cannot parse HTML/);
+});
