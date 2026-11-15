@@ -660,5 +660,19 @@ test.describe('manifest link by platform', () => {
             expect(await page.locator('link[rel="manifest"]').count()).toBeLessThanOrEqual(1);
             expect(errors).toEqual([]);
         });
+
+        test.describe('on Android', () => {
+            test.use({ userAgent: ANDROID_UA, hasTouch: true });
+
+            test('new scripts against the previous HTML still show the Google Play banner and button, with no manifest link', async ({ page }) => {
+                const errors = trackErrors(page);
+                await page.route('**/devocionales/?*', (route) => route.fulfill({ contentType: 'text/html', body: old('index.html') }));
+                await page.goto(READER, { waitUntil: 'networkidle' });
+                await expect(page.locator('#app-banner')).toBeVisible();
+                await expect(page.locator('#download-app-android-btn')).toBeVisible();
+                expect(await page.locator('link[rel="manifest"]').count()).toBe(0);
+                expect(errors).toEqual([]);
+            });
+        });
     });
 });

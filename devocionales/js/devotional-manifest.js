@@ -12,13 +12,12 @@
     }
 
     // The web app is not offered on Android (the native app is), so the static link is removed
-    // there: no link, no install offer. The page also passes DevotionalPwaConfig as a third
-    // argument; it is not read, because the kill switch stays in DevotionalSwRegister and init
-    // never adds a link. Missing DevotionalPlatform means "not Android".
+    // there: no link, no install offer. The kill switch stays in DevotionalSwRegister; init never
+    // adds a link. Missing DevotionalStandalone means "not Android".
     function init(doc, win) {
         const link = doc.querySelector('link[rel="manifest"]');
         if (!link) return;
-        if (win.DevotionalPlatform && win.DevotionalPlatform.isAndroid(win.navigator)) {
+        if (win.DevotionalStandalone && win.DevotionalStandalone.isAndroid(win.navigator)) {
             link.remove();
             return;
         }

@@ -21,7 +21,6 @@
     "DevotionalRenderDom": "readonly",
     "DevotionalSalvationModal": "readonly",
     "DevotionalInstall": "readonly",
-    "DevotionalPlatform": "readonly",
     "DevotionalIosHint": "readonly",
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",

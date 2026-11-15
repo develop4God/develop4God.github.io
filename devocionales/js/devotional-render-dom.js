@@ -140,8 +140,8 @@
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
         // App banner: Android only (native app via Google Play); every other platform has the PWA.
-        if (global.DevotionalPlatform
-            && global.DevotionalPlatform.isAndroid(global.navigator)
+        if (global.DevotionalStandalone
+            && global.DevotionalStandalone.isAndroid(global.navigator)
             && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }

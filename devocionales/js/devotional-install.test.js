@@ -4,12 +4,12 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function loadPlatform() {
-    const filename = path.join(__dirname, 'devotional-platform.js');
+function loadStandalone() {
+    const filename = path.join(__dirname, 'devotional-standalone.js');
     const source = fs.readFileSync(filename, 'utf8');
     const win = {};
     vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
-    return win.DevotionalPlatform;
+    return win.DevotionalStandalone;
 }
 
 function loadModule() {
@@ -21,7 +21,7 @@ function loadModule() {
 }
 
 const { init, showAndroidDownload } = loadModule();
-const platform = loadPlatform();
+const platform = loadStandalone();
 
 function fakeButton() {
     const classes = new Set(['hidden']);
@@ -43,7 +43,7 @@ function fakeWindow(navigator) {
     return {
         listeners,
         navigator,
-        DevotionalPlatform: platform,
+        DevotionalStandalone: platform,
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
 }
@@ -279,14 +279,14 @@ test('Android never gets the button, even with a stale installOnAndroid: true in
     assert.equal(button.shown, false);
 });
 
-test('DevotionalInstall no longer exposes isAndroid (it lives in DevotionalPlatform)', () => {
+test('DevotionalInstall no longer exposes isAndroid (it lives in DevotionalStandalone)', () => {
     assert.equal(loadModule().isAndroid, undefined);
 });
 
-test('without DevotionalPlatform nothing throws and the platform is treated as not Android', () => {
+test('without DevotionalStandalone nothing throws and the platform is treated as not Android', () => {
     const button = fakeButton();
     const win = fakeWindow({ userAgent: UA.androidPhone });
-    delete win.DevotionalPlatform;
+    delete win.DevotionalStandalone;
     assert.doesNotThrow(() => init(doc(button), win));
     win.listeners.beforeinstallprompt(promptEvent());
     assert.equal(button.shown, true);

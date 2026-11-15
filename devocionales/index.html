@@ -689,7 +689,6 @@
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script src="/devocionales/js/devotional-pwa-config.js"></script>
     <script src="/devocionales/js/devotional-standalone.js"></script>
-    <script src="/devocionales/js/devotional-platform.js"></script>
     <script src="/devocionales/js/devotional-manifest.js"></script>
     <script src="/devocionales/js/devotional-install.js"></script>
     <script src="/devocionales/js/devotional-ios-hint.js"></script>
@@ -747,7 +746,7 @@
             () => DevotionalInstall.init(document, window, window.DevotionalPwaConfig),
             () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
             () => DevotionalStandalone.apply(document, window),
-            () => DevotionalManifest.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalManifest.init(document, window),
             // Off unless pushEnabled is true; loads no Firebase code until the reader taps enable.
             () => DevotionalPush.init(document, window, window.DevotionalPwaConfig, {
                 adapter: DevotionalPushFirebase.create(window, window.DevotionalPwaConfig),

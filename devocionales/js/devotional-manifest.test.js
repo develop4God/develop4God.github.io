@@ -18,12 +18,12 @@ const SUPPORTED = ['es', 'en', 'zh', 'hi'];
 const ANDROID = { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) Chrome/130 Mobile Safari/537.36' };
 const DESKTOP = { userAgent: 'Mozilla/5.0 (X11; Linux x86_64) Chrome/130 Safari/537.36' };
 
-function loadPlatform() {
-    const filename = path.join(__dirname, 'devotional-platform.js');
+function loadStandalone() {
+    const filename = path.join(__dirname, 'devotional-standalone.js');
     const source = fs.readFileSync(filename, 'utf8');
     const win = {};
     vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
-    return win.DevotionalPlatform;
+    return win.DevotionalStandalone;
 }
 
 function rig({ lang = 'zh', ready = true, withLink = true, navigator = DESKTOP, platform = true } = {}) {
@@ -34,7 +34,7 @@ function rig({ lang = 'zh', ready = true, withLink = true, navigator = DESKTOP, 
     };
     const win = {
         navigator,
-        ...(platform ? { DevotionalPlatform: loadPlatform() } : {}),
+        ...(platform ? { DevotionalStandalone: loadStandalone() } : {}),
         i18n: { currentLang: lang, supportedLanguages: Object.fromEntries(SUPPORTED.map((c) => [c, {}])) },
         DevotionalI18n: {
             whenReady: (cb) => (ready ? cb() : state.readyCallbacks.push(cb)),
@@ -153,7 +153,7 @@ test('5f without DevotionalPwaConfig nothing throws and a non-Android link is ke
     assert.equal(r.link.href, '/devocionales/manifests/zh.webmanifest');
 });
 
-test('5g without DevotionalPlatform nothing throws and the link is kept, even on an Android user agent', () => {
+test('5g without DevotionalStandalone nothing throws and the link is kept, even on an Android user agent', () => {
     const r = rig({ navigator: ANDROID, platform: false });
     assert.doesNotThrow(() => init(r.doc, r.win, { enabled: true }));
     assert.equal(r.state.present, true);

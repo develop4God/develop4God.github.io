@@ -1,10 +1,10 @@
 (function (global) {
     'use strict';
 
-    // Platform detection lives in DevotionalPlatform. If that script failed to load, the platform
+    // Platform detection lives in DevotionalStandalone. If that script failed to load, the platform
     // is treated as not Android and nothing here throws.
     function isAndroid(win) {
-        return Boolean(win.DevotionalPlatform && win.DevotionalPlatform.isAndroid(win.navigator));
+        return Boolean(win.DevotionalStandalone && win.DevotionalStandalone.isAndroid(win.navigator));
     }
 
     function reveal(element) {
