@@ -24,6 +24,12 @@
         return supportedLanguages.includes(lang) ? lang : defaultLang;
     }
 
+    // The site language once translations exist, otherwise undefined: before that currentLang is a
+    // default, not the reader's language.
+    function currentLanguage() {
+        return ready() && global.i18n.currentLang ? global.i18n.currentLang : undefined;
+    }
+
     function onLanguageChanged(handler) {
         global.addEventListener('languageChanged', handler);
     }
@@ -44,5 +50,5 @@
         }, 30);
     }
 
-    global.DevotionalI18n = { t, getLanguage, onLanguageChanged, whenReady };
+    global.DevotionalI18n = { t, getLanguage, currentLanguage, onLanguageChanged, whenReady };
 })(window);

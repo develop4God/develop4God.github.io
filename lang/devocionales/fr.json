@@ -227,5 +227,17 @@
     "salvationContinue": "Continuer",
     "salvationAlreadyPrayed": "Déjà fait 🙏",
     "salvationDontShowAgain": "Ne plus afficher"
+  },
+  "push": {
+    "title": "Rappel quotidien",
+    "description": "Recevez une notification avec votre dévotion du jour à l'heure de votre choix.",
+    "consent": "En l'activant, ce navigateur recevra une notification par jour. Nous conservons un identifiant anonyme, votre fuseau horaire, votre langue et l'heure choisie. Vous pouvez la désactiver à tout moment.",
+    "enable": "Activer les notifications",
+    "disable": "Désactiver les notifications",
+    "hour_label": "Heure du rappel",
+    "status_enabled": "Notifications activées.",
+    "status_denied": "Les notifications sont bloquées dans ce navigateur. Autorisez-les dans les réglages du site pour les activer.",
+    "status_error": "Impossible d'activer les notifications. Veuillez réessayer plus tard.",
+    "status_ios_install": "Pour recevoir des notifications sur iPhone ou iPad, installez d'abord l'app : touchez Partager, puis « Sur l'écran d'accueil »."
   }
 }

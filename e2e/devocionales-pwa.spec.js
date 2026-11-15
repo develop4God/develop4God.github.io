@@ -186,7 +186,10 @@ test.describe('updates', () => {
             // Once no old page is open the new worker activates and removes the old build.
             await page.close();
             const next = await context.newPage();
-            await next.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
+            // By design the app reloads the page when the new worker takes over, which can abort this goto.
+            await next.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' }).catch((error) => {
+                if (!String(error.message).includes('ERR_ABORTED')) throw error;
+            });
             await expect.poll(() => cacheNames(next), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
             expect(await cacheNames(next)).toContain('devocionales-data');
         } finally {

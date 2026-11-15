@@ -19,12 +19,14 @@ const path = require('node:path');
 const { parseTags } = require('./html-tags.js');
 
 const PLACEHOLDER = '__SW_CONFIG__';
+const PUSH_MARKER = '/* __SW_PUSH__ */';
 const SHELL_URL = '/devocionales/';
 const PAGES_DIR = 'devocionales';
 const SHELL_FILE = `${PAGES_DIR}/index.html`;
 const MANIFEST_FILE = 'devocionales/manifest.webmanifest';
 const LANG_DIR = 'lang/devocionales';
 const TEMPLATE_FILE = 'scripts/sw.template.js';
+const PUSH_FILE = 'scripts/sw-push.js';
 const OUTPUT_FILE = 'devocionales/sw.js';
 const WORKER_URL = '/devocionales/sw.js';
 // Tells a page which build it is (read by the worker, through the page, before it claims the
@@ -138,20 +140,26 @@ function collectPrecache(root) {
 }
 
 // Covers everything that shapes the worker: its template, its runtime settings and every file it
-// precaches, so changing any of them ships a new versioned cache and never rewrites one in place.
-function computeVersion(root, urls, template, runtime) {
+// precaches (and the push handlers inlined into it), so changing any of them ships a new versioned
+// cache and never rewrites one in place.
+function computeVersion(root, urls, template, runtime, pushSource = '') {
     const hash = crypto.createHash('sha256');
     hash.update(sha256(template));
+    hash.update(`\n${sha256(pushSource)}`);
     hash.update(`\n${JSON.stringify(runtime)}`);
     for (const url of urls.filter((u) => u !== STAMP_URL)) hash.update(`\n${url}\n${sha256(fs.readFileSync(path.join(root, fileFor(url))))}`);
     return hash.digest('hex').slice(0, 12);
 }
 
 // The replacement is a function so `$` sequences in the config are never read as patterns.
-function renderSw(template, config) {
+// `pushSource` (the push handlers) is inlined at PUSH_MARKER; leaving it out skips that step.
+function renderSw(template, config, pushSource) {
     const marker = `'${PLACEHOLDER}'`;
     if (!template.includes(marker)) throw new Error(`Worker template is missing the ${PLACEHOLDER} placeholder`);
-    return template.replace(marker, () => JSON.stringify(JSON.stringify(config)));
+    const withConfig = template.replace(marker, () => JSON.stringify(JSON.stringify(config)));
+    if (pushSource === undefined) return withConfig;
+    if (!withConfig.includes(PUSH_MARKER)) throw new Error(`Worker template is missing the ${PUSH_MARKER} marker`);
+    return withConfig.replace(PUSH_MARKER, () => pushSource.trimEnd());
 }
 
 const stampSource = (version) => `window.DevotionalBuild = Object.freeze({ id: '${version}' });\n`;
@@ -160,6 +168,9 @@ const stampSource = (version) => `window.DevotionalBuild = Object.freeze({ id: '
 function buildSw(root, overrides = {}) {
     const runtime = { ...RUNTIME, ...overrides };
     const template = fs.readFileSync(path.join(root, TEMPLATE_FILE), 'utf8');
+    const pushFile = path.join(root, PUSH_FILE);
+    if (!fs.existsSync(pushFile)) throw new Error(`Push handlers ${PUSH_FILE} do not exist`);
+    const pushSource = fs.readFileSync(pushFile, 'utf8');
     const precache = collectPrecache(root);
     for (const url of runtime.freshFirst) {
         if (!precache.includes(url)) throw new Error(`freshFirst path ${url} is not in the precache list`);
@@ -167,8 +178,8 @@ function buildSw(root, overrides = {}) {
     // The pages other than the shell, which the worker serves for navigations: the same list
     // collectPrecache walked, so the two can never disagree about what a page is.
     const pages = pageFiles(root).filter((file) => file !== SHELL_FILE).map((file) => `/${file}`);
-    const config = { version: computeVersion(root, precache, template, runtime), ...runtime, pages, precache };
-    return { source: renderSw(template, config), config, stamp: stampSource(config.version) };
+    const config = { version: computeVersion(root, precache, template, runtime, pushSource), ...runtime, pages, precache };
+    return { source: renderSw(template, config, pushSource), config, stamp: stampSource(config.version) };
 }
 
 function main(root, args) {

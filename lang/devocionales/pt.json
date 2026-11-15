@@ -227,5 +227,17 @@
     "salvationContinue": "Continuar",
     "salvationAlreadyPrayed": "Já fiz 🙏",
     "salvationDontShowAgain": "Não mostrar novamente"
+  },
+  "push": {
+    "title": "Lembrete diário",
+    "description": "Receba uma notificação com o seu devocional do dia no horário que escolher.",
+    "consent": "Ao ativar, este navegador receberá uma notificação por dia. Guardamos um identificador anônimo, seu fuso horário, seu idioma e o horário escolhido. Você pode desativar quando quiser.",
+    "enable": "Ativar notificações",
+    "disable": "Desativar notificações",
+    "hour_label": "Horário do lembrete",
+    "status_enabled": "Notificações ativadas.",
+    "status_denied": "As notificações estão bloqueadas neste navegador. Permita-as nas configurações do site para ativá-las.",
+    "status_error": "Não foi possível ativar as notificações. Tente novamente mais tarde.",
+    "status_ios_install": "Para receber notificações no iPhone ou iPad, primeiro instale o app: toque em Compartilhar e depois em “Adicionar à Tela de Início”."
   }
 }
