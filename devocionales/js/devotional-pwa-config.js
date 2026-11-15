@@ -1,8 +1,9 @@
 (function (global) {
     'use strict';
 
-    // The one place to switch the devocionales PWA features. It is a precached script, so a change
-    // here reaches readers through the normal worker update (scripts/build-sw.js picks it up).
+    // The one place to switch the devocionales PWA features. The service worker fetches this file
+    // fresh first, so a change reaches an online reader on their next visit; an offline reader
+    // keeps the last copy until they are online again. Deploy it like any other file.
     global.DevotionalPwaConfig = Object.freeze({
         // Master switch. false = no service worker, no install button, no manifest, and any worker
         // or cache already installed in a reader's browser is removed on their next visit.

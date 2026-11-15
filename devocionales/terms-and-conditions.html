@@ -17,9 +17,8 @@
     <meta name="description" content="Términos y Condiciones de Uso de la aplicación Devocionales Cristianos. Normativas y condiciones de uso de la aplicación móvil.">
     <link rel="canonical" href="https://develop4god.github.io/devocionales/terms-and-conditions.html">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="/devocionales/vendor/lucide.min.js"></script>
     <link rel="stylesheet" href="/devocionales/css/modern.css">
     <link rel="stylesheet" href="/devocionales/css/language-selector.css">
     <script src="/js/rtl-helper.js"></script>
@@ -151,6 +150,8 @@
            theme-aware footer text stays readable in light mode. */
         footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
     </style>
+    <!-- Last in <head>, like the Tailwind CDN's injected <style> was, so the cascade order is unchanged. -->
+    <link rel="stylesheet" href="/devocionales/vendor/tailwind.css">
 </head>
 <body>
 

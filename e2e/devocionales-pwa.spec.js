@@ -96,7 +96,43 @@ test.describe('offline', () => {
         await expect(page.locator('h1').first()).toHaveText(online);
     });
 
-    test('with nothing saved the reader shows its error state instead of a blank page', async ({ page, context }) => {
+    test('the legal pages open styled with no network', async ({ page, context }) => {
+        await installWorker(page);
+        await context.setOffline(true);
+        for (const legal of ['privacy-policy', 'terms-and-conditions']) {
+            await page.goto(`/devocionales/${legal}.html?lang=en`, { waitUntil: 'domcontentloaded' });
+            const icon = page.locator('svg.lucide.w-4').first();
+            await expect(icon).toBeVisible();
+            await expect(icon).toHaveCSS('width', '16px'); // a Tailwind rule, so the stylesheet came from cache
+            await expect(page.locator('h1').first()).not.toHaveText('');
+        }
+    });
+
+    test('the hero image of a devotional already read shows again with no network', async ({ page, context }) => {
+        await installWorker(page);
+        const hero = page.locator('#hero-image');
+        await expect.poll(() => hero.evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+        await expect.poll(async () => page.evaluate(async () => (await (await caches.open('devocionales-images')).keys()).length)).toBeGreaterThan(0);
+
+        await context.setOffline(true);
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect.poll(() => page.locator('#hero-image').evaluate((img) => img.complete && img.naturalWidth > 0)).toBe(true);
+    });
+
+    test('offline, the app stats come from the saved copy and raise no error', async ({ page, context }) => {
+        await installWorker(page);
+        await expect.poll(async () => page.evaluate(async () => (await (await caches.open('devocionales-data')).keys()).some((r) => r.url.endsWith('/app-stats.json')))).toBe(true);
+        const errors = [];
+        page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+        await context.setOffline(true);
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        await expect(page.locator('h1').first()).not.toHaveText('');
+        await page.waitForTimeout(500);
+        expect(errors.filter((text) => /AppStats/.test(text))).toEqual([]);
+    });
+
+    test('with nothing saved the reader shows its error state instead of a blank page', async ({ page, context, browserName }) => {
+        test.skip(browserName === 'webkit', "Playwright's WebKit cannot intercept a service worker's own requests, so the data cache cannot be kept empty there");
         // Block the data host for the whole context: the loader retries with backoff, and those
         // retries go through the worker once it is active. page.route() cannot see the worker's own
         // network calls, so only a context-level route keeps the data cache truly empty.
@@ -162,6 +198,56 @@ test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
         await expect(page.locator('h1').first()).not.toHaveText(''); // the reader itself still works
     });
 
+    test('an online reader is switched off at once: the config is fetched fresh, with no worker update', async ({ page }) => {
+        const state = { overrides: {} };
+        const server = await startSiteServer(state);
+        const base = `http://127.0.0.1:${server.address().port}`;
+        try {
+            await installWorker(page, base);
+            expect(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(1);
+
+            state.overrides[CONFIG_PATH] = DISABLED; // only the config changes: sw.js is untouched
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+            await expect.poll(async () => (await cacheNames(page)).filter((name) => name.startsWith('devocionales-')))
+                .toEqual(['devocionales-disabled']);
+        } finally {
+            server.close();
+        }
+    });
+
+    test('switched back on: the page clears the marker and a new worker installs', async ({ page }) => {
+        const state = { overrides: {} };
+        const server = await startSiteServer(state);
+        const base = `http://127.0.0.1:${server.address().port}`;
+        try {
+            await installWorker(page, base);
+            state.overrides[CONFIG_PATH] = DISABLED;
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+
+            delete state.overrides[CONFIG_PATH]; // the real config says enabled again
+            await page.reload({ waitUntil: 'domcontentloaded' });
+            await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(1);
+            // The new worker installed (its build cache exists), which it refuses to do while the marker exists.
+            await expect.poll(async () => (await cacheNames(page)).some((name) => /^devocionales-[0-9a-f]{12}$/.test(name)), { timeout: 15_000 }).toBe(true);
+            expect(await cacheNames(page)).not.toContain('devocionales-disabled');
+        } finally {
+            server.close();
+        }
+    });
+
+    test('one PWA module throwing does not stop the worker from registering', async ({ page, context }) => {
+        // The kill switch and the registration live in start(); a broken sibling must not take it
+        // down. The module loads (a precached file the worker's install also fetches) but throws.
+        await context.route('**/devocionales/js/devotional-ios-hint.js', (route) => route.fulfill({
+            contentType: 'text/javascript',
+            body: 'window.DevotionalIosHint = { init() { throw new Error("hint exploded"); } };',
+        }));
+        await page.goto(READER, { waitUntil: 'networkidle' });
+        await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(1);
+    });
+
     test('a config script that fails to load degrades to the defaults and does not break the page', async ({ page, context }) => {
         await context.route(`**${CONFIG_PATH}`, (route) => route.abort());
         const pageErrors = [];
@@ -199,6 +285,52 @@ test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
         } finally {
             server.close();
         }
+    });
+});
+
+test.describe('iOS install hint', () => {
+    const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+    const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+
+    test.describe('on an iPhone', () => {
+        test.use({ userAgent: IPHONE, hasTouch: true });
+
+        test('shows a translated hint that stays dismissed once closed', async ({ page }) => {
+            await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+            const hint = page.locator('#ios-install-hint');
+            await expect(hint).toBeVisible();
+            await expect(hint).toContainText('Añadir a pantalla de inicio');
+            await hint.locator('[data-ios-hint-close]').click();
+            await expect(hint).toBeHidden();
+            await page.reload({ waitUntil: 'networkidle' });
+            await expect(hint).toBeHidden();
+        });
+
+        test('is not shown when the PWA is switched off', async ({ page, context }) => {
+            await context.route('**/devocionales/js/devotional-pwa-config.js', (route) => route.fulfill({
+                contentType: 'text/javascript',
+                body: 'window.DevotionalPwaConfig = Object.freeze({ enabled: false, installOnAndroid: false });',
+            }));
+            await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+            await page.waitForTimeout(300);
+            await expect(page.locator('#ios-install-hint')).toBeHidden();
+        });
+    });
+
+    test.describe('on Android', () => {
+        test.use({ userAgent: ANDROID, hasTouch: true });
+
+        test('is not shown: the native app is the offer there', async ({ page }) => {
+            await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+            await page.waitForTimeout(300);
+            await expect(page.locator('#ios-install-hint')).toBeHidden();
+        });
+    });
+
+    test('is not shown on a laptop', async ({ page }) => {
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await page.waitForTimeout(300);
+        await expect(page.locator('#ios-install-hint')).toBeHidden();
     });
 });
 

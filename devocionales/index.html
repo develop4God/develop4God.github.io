@@ -427,6 +427,18 @@
         </div>
     </div>
 
+    <!-- Shown by devotional-ios-hint.js only on iOS, where the app can be installed but there is no install button. -->
+    <div id="ios-install-hint" data-ios-hint class="app-banner hidden">
+        <div class="app-banner-inner max-w-5xl mx-auto">
+            <i data-lucide="share" class="w-4 h-4 flex-shrink-0"></i>
+            <span class="app-banner-text" data-i18n="devotionals.iosInstallHint">To install this app: tap Share, then “Add to Home Screen”.</span>
+            <button type="button" data-ios-hint-close class="app-banner-close">
+                <i data-lucide="x" class="w-4 h-4"></i>
+                <span class="sr-only" data-i18n="devotionals.appBannerClose">Close</span>
+            </button>
+        </div>
+    </div>
+
     <main class="max-w-5xl mx-auto px-4 py-8">
 
         <!-- Loading skeleton -->
@@ -613,6 +625,7 @@
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script src="/devocionales/js/devotional-pwa-config.js"></script>
     <script src="/devocionales/js/devotional-install.js"></script>
+    <script src="/devocionales/js/devotional-ios-hint.js"></script>
     <script src="/devocionales/js/devotional-sw-register.js"></script>
     <script>
         lucide.createIcons();
@@ -655,9 +668,20 @@
         })();
 
         // Last, so nothing above can be stopped by it. window.DevotionalPwaConfig is undefined if
-        // its script failed to load, and both modules then fall back to their defaults.
-        DevotionalInstall.init(document, window, window.DevotionalPwaConfig);
-        DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig);
+        // its script failed to load, and the modules then fall back to their defaults. Each step
+        // is independent: one that fails (a script that did not load) must not stop the others,
+        // above all the service worker registration, which also carries the kill switch.
+        [
+            () => DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig),
+            () => DevotionalInstall.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
+        ].forEach((step) => {
+            try {
+                step();
+            } catch (error) {
+                console.error('PWA setup step failed', error);
+            }
+        });
     </script>
 </body>
 </html>

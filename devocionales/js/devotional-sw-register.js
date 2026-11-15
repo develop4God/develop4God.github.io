@@ -84,6 +84,14 @@
         }
     }
 
+    async function clearStandDownMarker(win) {
+        try {
+            if (win.caches) await win.caches.delete(DISABLED_CACHE);
+        } catch (err) {
+            // Best effort: a leftover marker only delays the next install.
+        }
+    }
+
     // Registers once the page has loaded, so the worker never competes with the first paint.
     // `config` is DevotionalPwaConfig; only an explicit `enabled: false` switches the PWA off.
     function start(win, workerUrl, scope, config) {
@@ -91,7 +99,9 @@
             disable(win, scope);
             return;
         }
-        const registerWorker = () => register(win.navigator, workerUrl, scope);
+        // A worker refuses to install while the stand-down marker exists, so an enabled page
+        // removes any marker a previous switch-off left behind before it registers.
+        const registerWorker = () => clearStandDownMarker(win).then(() => register(win.navigator, workerUrl, scope));
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
         reloadOnUpdate(win.navigator, win.document, () => win.location.reload());

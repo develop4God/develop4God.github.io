@@ -3,7 +3,7 @@
 // Paths are relative to the repo root, where scripts/build-tailwind.sh runs the CLI.
 module.exports = {
   content: [
-    'devocionales/index.html',
+    'devocionales/*.html', // the reader and the legal pages
     'devocionales/js/*.js',
     '!devocionales/js/*.test.js',
     // Shared scripts the devocionales page also loads.

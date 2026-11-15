@@ -18,6 +18,7 @@ const INDEX_HTML = `<!DOCTYPE html><html><head>
 <link rel="apple-touch-icon" href="/devocionales/icons/touch.png">
 <script async src="https://www.googletagmanager.com/gtag/js?id=X"></script>
 <script src="//cdn.example.com/x.js"></script>
+<script src="/devocionales/js/devotional-pwa-config.js"></script>
 <script src="/js/shared.js"></script>
 </head><body></body></html>`;
 
@@ -36,6 +37,7 @@ function makeSite() {
     for (const font of ['a', 'b']) write(`devocionales/vendor/fonts/${font}.woff2`, `font-${font}`);
     for (const icon of ['touch', 'icon-192', 'icon-512']) write(`devocionales/icons/${icon}.png`, `icon-${icon}`);
     write('js/shared.js', 'shared();');
+    write('devocionales/js/devotional-pwa-config.js', 'window.DevotionalPwaConfig = {};');
     write('lang/devocionales/en.json', '{"a":1}');
     write('lang/devocionales/es.json', '{"a":2}');
     write('scripts/sw.template.js', TEMPLATE);
@@ -49,6 +51,7 @@ test('collectPrecache lists the shell, page assets, css fonts, manifest icons an
         '/devocionales/icons/icon-192.png',
         '/devocionales/icons/icon-512.png',
         '/devocionales/icons/touch.png',
+        '/devocionales/js/devotional-pwa-config.js',
         '/devocionales/manifest.webmanifest',
         '/devocionales/vendor/fonts/a.woff2',
         '/devocionales/vendor/fonts/b.woff2',
@@ -103,6 +106,34 @@ test('collectPrecache ignores url() references inside css comments', () => {
     const urls = collectPrecache(root);
     assert.equal(urls.some((url) => /ghost/.test(url)), false);
     assert.ok(urls.includes('/devocionales/vendor/fonts/b.woff2'));
+});
+
+test('collectPrecache also covers the other pages in devocionales/ and everything they load', () => {
+    const { root, write } = makeSite();
+    write('devocionales/privacy-policy.html', '<html><head><script src="/js/legal-only.js"></script></head></html>');
+    write('js/legal-only.js', 'legal();');
+    const urls = collectPrecache(root);
+    assert.ok(urls.includes('/devocionales/privacy-policy.html'));
+    assert.ok(urls.includes('/js/legal-only.js'));
+});
+
+test('collectPrecache fails when another page references a file that does not exist', () => {
+    const { root, write } = makeSite();
+    write('devocionales/terms.html', '<html><head><script src="/js/legal-missing.js"></script></head></html>');
+    assert.throws(() => collectPrecache(root), /legal-missing\.js/);
+});
+
+test('buildSw lists the extra pages for the worker, and none when there are none', () => {
+    const { root, write } = makeSite();
+    assert.deepEqual(buildSw(root).config.pages, []);
+    write('devocionales/privacy-policy.html', '<html></html>');
+    write('devocionales/terms.html', '<html></html>');
+    assert.deepEqual(buildSw(root).config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms.html']);
+});
+
+test('buildSw rejects a fresh-first path that is not precached', () => {
+    const { root } = makeSite();
+    assert.throws(() => buildSw(root, { freshFirst: ['/devocionales/js/not-precached.js'] }), /not-precached\.js/);
 });
 
 test('buildSw is deterministic: the same site gives byte-identical output', () => {
@@ -170,5 +201,9 @@ test('the real site builds, and the worker never lists itself', () => {
     assert.ok(config.precache.includes('/devocionales/vendor/tailwind.css'));
     assert.ok(config.precache.includes('/devocionales/vendor/fonts/inter-latin.woff2'));
     assert.equal(config.precache.filter((url) => url.endsWith('/sw.js')).length, 0);
+    assert.deepEqual(config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html']);
+    assert.ok(config.freshFirst.length > 0);
+    for (const path of config.freshFirst) assert.ok(config.precache.includes(path), `${path} must be precached`);
+    for (const path of config.sameOriginData) assert.equal(config.precache.includes(path), false, `${path} is fetched live`);
     assert.equal(config.precache.filter((url) => url.startsWith('/lang/devocionales/')).length, 10);
 });

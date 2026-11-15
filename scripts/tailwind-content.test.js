@@ -37,13 +37,21 @@ function isCovered(patterns, file) {
     return included && !excluded;
 }
 
-test('every local script devocionales/index.html loads is scanned by Tailwind', () => {
-    const html = fs.readFileSync(path.join(ROOT, 'devocionales/index.html'), 'utf8');
-    const sources = localScriptSources(html);
-    assert.ok(sources.length > 10, 'expected to find the page scripts');
-    const uncovered = sources.filter((src) => !isCovered(content, src));
-    assert.deepEqual(uncovered, []);
+const PAGES = fs.readdirSync(path.join(ROOT, 'devocionales')).filter((name) => name.endsWith('.html'));
+
+test('devocionales has the pages this check is meant to cover', () => {
+    assert.deepEqual(PAGES.sort(), ['index.html', 'privacy-policy.html', 'terms-and-conditions.html']);
 });
+
+for (const page of PAGES) {
+    test(`devocionales/${page}: the page and every local script it loads are scanned by Tailwind`, () => {
+        const html = fs.readFileSync(path.join(ROOT, 'devocionales', page), 'utf8');
+        const sources = localScriptSources(html);
+        assert.ok(sources.length >= 3, 'expected to find the page scripts');
+        const uncovered = [`devocionales/${page}`, ...sources].filter((file) => !isCovered(content, file));
+        assert.deepEqual(uncovered, []);
+    });
+}
 
 test('isCovered: a script missing from the content list is reported', () => {
     assert.equal(isCovered(content, 'js/brand-new-widget.js'), false);

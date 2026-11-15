@@ -28,6 +28,9 @@ function fakeNavigator({ controller = null, registerImpl } = {}) {
     };
 }
 
+// Lets chained promises and timers run: registration now follows an asynchronous marker cleanup.
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 function fakeDocument(state) {
     const listeners = {};
     return {
@@ -113,7 +116,7 @@ test('start: registers at once when the page has already loaded', async () => {
     const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
     win.document.readyState = 'complete';
     start(win, '/devocionales/sw.js', '/devocionales/');
-    await Promise.resolve();
+    await settle();
     assert.equal(nav.calls.length, 1);
 });
 
@@ -125,7 +128,7 @@ test('start: waits for the load event so the worker never competes with first pa
     start(win, '/devocionales/sw.js', '/devocionales/');
     assert.equal(nav.calls.length, 0);
     handlers.load();
-    await Promise.resolve();
+    await settle();
     assert.equal(nav.calls.length, 1);
 });
 
@@ -217,7 +220,38 @@ test('start: enabled, or no config at all, still registers', async () => {
         const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
         win.document.readyState = 'complete';
         start(win, '/devocionales/sw.js', '/devocionales/', config);
-        await Promise.resolve();
+        await settle();
         assert.equal(nav.calls.length, 1, JSON.stringify(config));
     }
+});
+
+test('start: enabling removes a stale stand-down marker first, then registers', async () => {
+    const order = [];
+    const nav = fakeNavigator({ registerImpl: () => { order.push('register'); return Promise.resolve({}); } });
+    const win = {
+        navigator: nav,
+        document: fakeDocument('visible'),
+        location: { reload() {} },
+        addEventListener() {},
+        caches: { delete: async (name) => { order.push(`delete ${name}`); return true; } },
+    };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/', { enabled: true });
+    await settle();
+    assert.deepEqual(order, ['delete devocionales-disabled', 'register']);
+});
+
+test('start: a failing marker delete never stops registration', async () => {
+    const nav = fakeNavigator();
+    const win = {
+        navigator: nav,
+        document: fakeDocument('visible'),
+        location: { reload() {} },
+        addEventListener() {},
+        caches: { delete: async () => { throw new Error('denied'); } },
+    };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/', {});
+    await settle();
+    assert.equal(nav.calls.length, 1);
 });

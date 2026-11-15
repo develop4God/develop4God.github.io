@@ -18,7 +18,8 @@ const path = require('node:path');
 
 const PLACEHOLDER = '__SW_CONFIG__';
 const SHELL_URL = '/devocionales/';
-const SHELL_FILE = 'devocionales/index.html';
+const PAGES_DIR = 'devocionales';
+const SHELL_FILE = `${PAGES_DIR}/index.html`;
 const MANIFEST_FILE = 'devocionales/manifest.webmanifest';
 const LANG_DIR = 'lang/devocionales';
 const TEMPLATE_FILE = 'scripts/sw.template.js';
@@ -30,6 +31,13 @@ const LINK_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'manifest',
 const RUNTIME = {
     timeoutMs: 4000,
     maxDataEntries: 24, // year files kept: a few languages and versions, current and previous year
+    // Hero images: saved on first view. Their list (index.json, above) is data; the images are not.
+    imagePathPrefix: '/develop4God/Devocionales-assets/main/images/devotionals/',
+    maxImageEntries: 30,
+    // Precached, but fetched fresh first so switching the PWA off does not wait for a worker update.
+    freshFirst: ['/devocionales/js/devotional-pwa-config.js'],
+    // Same-origin files fetched live and kept only as an offline fallback.
+    sameOriginData: ['/data/app-stats.json'],
     dataHost: 'raw.githubusercontent.com',
     // The devotional files, and the hero-image list (not the images themselves, which are opaque
     // no-cors <img> loads). The page waits for that list before rendering, so offline it must
@@ -73,6 +81,15 @@ function cssReferences(css, cssUrl) {
         .map((ref) => new URL(ref, `http://x${cssUrl}`).pathname);
 }
 
+// devocionales/index.html first, then the other .html pages in that folder, sorted.
+function pageFiles(root) {
+    const others = fs.readdirSync(path.join(root, PAGES_DIR))
+        .filter((name) => name.endsWith('.html') && `${PAGES_DIR}/${name}` !== SHELL_FILE)
+        .sort()
+        .map((name) => `${PAGES_DIR}/${name}`);
+    return [SHELL_FILE, ...others];
+}
+
 function collectPrecache(root) {
     const read = (relative) => fs.readFileSync(path.join(root, relative), 'utf8');
     const urls = new Set([SHELL_URL]);
@@ -83,9 +100,14 @@ function collectPrecache(root) {
         urls.add(url);
     };
 
-    for (const reference of htmlReferences(read(SHELL_FILE))) {
-        const url = localPath(reference);
-        if (url && url !== WORKER_URL) requireFile(url, SHELL_FILE);
+    // The shell, then every other page in devocionales/ (the legal pages): each page is precached
+    // itself and so is everything it loads.
+    for (const page of pageFiles(root)) {
+        if (page !== SHELL_FILE) urls.add(`/${page}`);
+        for (const reference of htmlReferences(read(page))) {
+            const url = localPath(reference);
+            if (url && url !== WORKER_URL) requireFile(url, page);
+        }
     }
     for (const icon of JSON.parse(read(MANIFEST_FILE)).icons || []) {
         const url = localPath(icon.src);
@@ -117,10 +139,18 @@ function renderSw(template, config) {
     return template.replace(marker, () => JSON.stringify(JSON.stringify(config)));
 }
 
-function buildSw(root) {
+// `overrides` replaces runtime settings; it exists so tests can exercise the validation below.
+function buildSw(root, overrides = {}) {
+    const runtime = { ...RUNTIME, ...overrides };
     const template = fs.readFileSync(path.join(root, TEMPLATE_FILE), 'utf8');
     const precache = collectPrecache(root);
-    const config = { version: computeVersion(root, precache, template, RUNTIME), ...RUNTIME, precache };
+    for (const url of runtime.freshFirst) {
+        if (!precache.includes(url)) throw new Error(`freshFirst path ${url} is not in the precache list`);
+    }
+    // The pages other than the shell, which the worker serves for navigations: the same list
+    // collectPrecache walked, so the two can never disagree about what a page is.
+    const pages = pageFiles(root).filter((file) => file !== SHELL_FILE).map((file) => `/${file}`);
+    const config = { version: computeVersion(root, precache, template, runtime), ...runtime, pages, precache };
     return { source: renderSw(template, config), config };
 }
 

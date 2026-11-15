@@ -18,6 +18,30 @@ test('the page makes no request to a CDN host', async ({ page }) => {
   expect([...hosts].filter((host) => CDN_HOSTS.includes(host))).toEqual([]);
 });
 
+for (const page of ['privacy-policy', 'terms-and-conditions']) {
+    test.describe(`${page} page`, () => {
+        test('makes no request to a CDN host', async ({ page: browserPage }) => {
+            const hosts = new Set();
+            browserPage.on('request', (request) => hosts.add(new URL(request.url()).hostname));
+            await browserPage.goto(`/devocionales/${page}.html?lang=en`, { waitUntil: 'networkidle' });
+            expect([...hosts].filter((host) => CDN_HOSTS.includes(host))).toEqual([]);
+        });
+
+        test('is styled, with icons and Inter, with every non-local host blocked', async ({ page: browserPage }) => {
+            await browserPage.route((url) => url.hostname !== '127.0.0.1', (route) => route.abort());
+            await browserPage.goto(`/devocionales/${page}.html?lang=en`, { waitUntil: 'networkidle' });
+            const icon = browserPage.locator('svg.lucide.w-4').first();
+            await expect(icon).toBeVisible();
+            await expect(icon).toHaveCSS('width', '16px'); // a Tailwind rule
+            const interLoaded = await browserPage.evaluate(async () => {
+                await document.fonts.ready;
+                return [...document.fonts].some((face) => face.family.replace(/"/g, '') === 'Inter' && face.status === 'loaded');
+            });
+            expect(interLoaded).toBe(true);
+        });
+    });
+}
+
 test('every vendored file is served', async ({ request }) => {
   for (const path of VENDORED) {
     const response = await request.get(path);
