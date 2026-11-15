@@ -565,30 +565,38 @@ test.describe('installed app name follows the language', () => {
         ja: 'クリスチャン・デボーション',
     };
 
-    // Asks Chrome which manifest it parsed for the page: the name it would give an installed app.
-    async function parsedManifest(page) {
+    // The manifest the page links, read like the browser would: works in every engine.
+    const linkedManifest = (page) => page.evaluate(async () => {
+        const href = document.querySelector('link[rel="manifest"]').href;
+        return (await fetch(href)).json();
+    });
+
+    // Chromium only (DevTools protocol): what Chrome itself parsed, i.e. the name it would install.
+    async function chromeParsedManifest(page) {
         const cdp = await page.context().newCDPSession(page);
         await cdp.send('Page.enable');
-        const { url, data } = await cdp.send('Page.getAppManifest');
-        return { url, manifest: JSON.parse(data) };
+        const { data } = await cdp.send('Page.getAppManifest');
+        return JSON.parse(data);
     }
 
     for (const [lang, name] of Object.entries(NAMES)) {
-        test(`?lang=${lang} gives the app the name "${name}", same identity`, async ({ page }) => {
+        test(`?lang=${lang} gives the app the name "${name}", same identity`, async ({ page, browserName }) => {
             await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
             await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', `/devocionales/manifests/${lang}.webmanifest`);
-            const { manifest } = await parsedManifest(page);
+            const manifest = await linkedManifest(page);
             expect(manifest.name).toBe(name);
             expect(manifest.id).toBe('/devocionales/');
             expect(manifest.scope).toBe('/devocionales/');
+            if (browserName === 'chromium') expect((await chromeParsedManifest(page)).name).toBe(name);
         });
     }
 
-    test('switching the language in the page renames the app', async ({ page }) => {
+    test('switching the language in the page renames the app', async ({ page, browserName }) => {
         await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
         await page.locator('.language-selector-button').click();
         await page.locator('.language-option[data-lang="zh"]').click();
         await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/devocionales/manifests/zh.webmanifest');
-        expect((await parsedManifest(page)).manifest.name).toBe('基督徒灵修');
+        expect((await linkedManifest(page)).name).toBe('基督徒灵修');
+        if (browserName === 'chromium') expect((await chromeParsedManifest(page)).name).toBe('基督徒灵修');
     });
 });
