@@ -38,6 +38,13 @@ test('parseTags keeps script and style bodies as raw text, so "<" inside them is
     assert.equal(tags[2].attrs.src, '/yes.png');
 });
 
+test('parseTags treats <!--> and <!---> as complete empty comments, per the HTML spec', () => {
+    for (const empty of ['<!-->', '<!--->', '<!---->']) {
+        const tags = parseTags(`${empty}<script src="/after.js"></script>`);
+        assert.deepEqual(tags.map((tag) => tag.attrs.src), ['/after.js'], empty);
+    }
+});
+
 test('parseTags ignores the doctype, closing tags and a lone "<" in text', () => {
     const tags = parseTags('<!DOCTYPE html><p>1 < 2 and 3 <4</p><img src="/x.png">');
     assert.deepEqual(tags.map((tag) => tag.name), ['p', 'img']);

@@ -12,7 +12,7 @@ function loadModule() {
     return win.DevotionalSwRegister;
 }
 
-const { register, reloadOnUpdate, start, disable } = loadModule();
+const { register, start, disable } = loadModule();
 
 function fakeNavigator({ controller = null, registerImpl } = {}) {
     const listeners = {};
@@ -66,51 +66,6 @@ test('register: a synchronous throw from register is also contained', async () =
     assert.equal(await register(nav, '/devocionales/sw.js', '/devocionales/'), null);
 });
 
-test('reloadOnUpdate: the worker claiming a page that started without one is not an update', () => {
-    const nav = fakeNavigator({ controller: null });
-    const doc = fakeDocument('hidden');
-    let reloads = 0;
-    reloadOnUpdate(nav, doc, () => { reloads += 1; });
-    nav.listeners.controllerchange();
-    assert.equal(reloads, 0);
-});
-
-test('reloadOnUpdate: a deploy never reloads under the reader\'s eyes, only once the tab is hidden', () => {
-    const nav = fakeNavigator({ controller: {} });
-    const doc = fakeDocument('visible');
-    let reloads = 0;
-    reloadOnUpdate(nav, doc, () => { reloads += 1; });
-    nav.listeners.controllerchange();
-    assert.equal(reloads, 0);
-    doc.hide();
-    assert.equal(reloads, 1);
-});
-
-test('reloadOnUpdate: an update while the tab is already hidden reloads at once, and only once', () => {
-    const nav = fakeNavigator({ controller: {} });
-    const doc = fakeDocument('hidden');
-    let reloads = 0;
-    reloadOnUpdate(nav, doc, () => { reloads += 1; });
-    nav.listeners.controllerchange();
-    nav.listeners.controllerchange();
-    assert.equal(reloads, 1);
-});
-
-test('reloadOnUpdate: the first claim is skipped but the next worker change is an update', () => {
-    const nav = fakeNavigator({ controller: null });
-    const doc = fakeDocument('hidden');
-    let reloads = 0;
-    reloadOnUpdate(nav, doc, () => { reloads += 1; });
-    nav.listeners.controllerchange();
-    nav.listeners.controllerchange();
-    assert.equal(reloads, 1);
-});
-
-test('reloadOnUpdate: without service worker support it does nothing', () => {
-    assert.doesNotThrow(() => reloadOnUpdate({}, fakeDocument('visible'), () => {}));
-    assert.doesNotThrow(() => reloadOnUpdate(undefined, fakeDocument('visible'), () => {}));
-});
-
 test('start: registers at once when the page has already loaded', async () => {
     const nav = fakeNavigator();
     const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
@@ -134,7 +89,7 @@ test('start: waits for the load event so the worker never competes with first pa
 
 // ------------------------------------------------------------------ master switch (kill switch)
 
-function disableWindow({ registrations = [], cacheNames = [], manifest = { removed: false, remove() { this.removed = true; } } } = {}) {
+function disableWindow({ registrations = [], cacheNames = [], controller = null, manifest = { removed: false, remove() { this.removed = true; } } } = {}) {
     const unregistered = [];
     const deleted = [];
     const events = [];
@@ -147,6 +102,7 @@ function disableWindow({ registrations = [], cacheNames = [], manifest = { remov
         manifest,
         navigator: {
             serviceWorker: {
+                controller: controller && { postMessage: (message) => { messages.push(message); events.push(`controller ${message.type}`); } },
                 getRegistrations: async () => registrations.map((scope) => ({
                     scope,
                     active: { postMessage: (message) => { messages.push(message); events.push(`message ${message.type}`); } },
@@ -284,23 +240,6 @@ test('start: enabling removes a stale stand-down marker first, then registers', 
     assert.deepEqual(order, ['delete devocionales-disabled', 'register']);
 });
 
-test('start: a marker delete that fails once is retried before registering', async () => {
-    const order = [];
-    let attempts = 0;
-    const nav = fakeNavigator({ registerImpl: () => { order.push('register'); return Promise.resolve({}); } });
-    const win = {
-        navigator: nav,
-        document: fakeDocument('visible'),
-        location: { reload() {} },
-        addEventListener() {},
-        caches: { delete: async () => { attempts += 1; order.push(`delete ${attempts}`); if (attempts === 1) throw new Error('denied'); return true; } },
-    };
-    win.document.readyState = 'complete';
-    start(win, '/devocionales/sw.js', '/devocionales/', {});
-    await settle();
-    assert.deepEqual(order, ['delete 1', 'delete 2', 'register']);
-});
-
 test('start: a failing marker delete never stops registration', async () => {
     const nav = fakeNavigator();
     const win = {
@@ -313,5 +252,37 @@ test('start: a failing marker delete never stops registration', async () => {
     win.document.readyState = 'complete';
     start(win, '/devocionales/sw.js', '/devocionales/', {});
     await settle();
+    assert.equal(nav.calls.length, 1);
+});
+
+test('disable: a controlled page tells its controlling worker to stand down even when the registrations cannot be listed', async () => {
+    const win = disableWindow({ controller: true, cacheNames: [] });
+    win.navigator.serviceWorker.getRegistrations = async () => { throw new Error('denied'); };
+    await disable(win, '/devocionales/');
+    assert.deepEqual(win.messages, [{ type: 'devocionales-stand-down' }]);
+    assert.ok(win.events.includes('open devocionales-disabled'), 'the marker is left for a worker that misses the message');
+});
+
+test('disable: a worker that cannot be messaged through the controller does not stop the sweep', async () => {
+    const win = disableWindow({ controller: true, cacheNames: ['devocionales-data'] });
+    win.navigator.serviceWorker.controller.postMessage = () => { throw new Error('gone'); };
+    await disable(win, '/devocionales/');
+    assert.deepEqual(win.deleted, ['devocionales-data']);
+});
+
+test('start: enabling deletes the marker once; a delete that fails is not retried and does not stop registration', async () => {
+    let attempts = 0;
+    const nav = fakeNavigator();
+    const win = {
+        navigator: nav,
+        document: fakeDocument('visible'),
+        location: { reload() {} },
+        addEventListener() {},
+        caches: { delete: async () => { attempts += 1; throw new Error('denied'); } },
+    };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/', {});
+    await settle();
+    assert.equal(attempts, 1);
     assert.equal(nav.calls.length, 1);
 });

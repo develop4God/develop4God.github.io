@@ -65,6 +65,12 @@ test('a worker scoped to /devocionales/ takes control and precaches one build', 
     expect(await cacheNames(page)).toContain(`devocionales-${version}`);
 });
 
+test('the first worker takes control of the page that registered it, so the first visit is cached', async ({ page }) => {
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+});
+
 test.describe('offline', () => {
     test.setTimeout(45_000);
 

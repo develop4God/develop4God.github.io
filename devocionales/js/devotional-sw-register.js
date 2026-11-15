@@ -1,9 +1,8 @@
 (function (global) {
     'use strict';
 
-    // Registers the service worker and reloads the page after a deploy, without ever
-    // interrupting a reader. Its own module so devotional-loader.js does not grow another concern;
-    // see .claude/skills/web-coding-agent/SKILL.md Step 4 (SOLID-lite).
+    // Registers the service worker and runs the PWA kill switch. Its own module so
+    // devotional-loader.js does not grow another concern; see .claude/skills/web-coding-agent/SKILL.md Step 4 (SOLID-lite).
 
     // Resolves to null when service workers are unsupported or registration fails: the page works
     // without the worker, so a failure here must never surface as an error.
@@ -16,31 +15,6 @@
         } catch (err) {
             return Promise.resolve(null);
         }
-    }
-
-    // After a deploy the new worker takes over a page that was loaded with the old build's
-    // scripts. Reload once when that happens, but never under the reader's eyes: a visible tab
-    // waits until it is hidden. Whether a change is an update is decided when it fires: the first
-    // change of a page that started without a worker is that worker claiming it (nothing is
-    // stale), every later one is a deploy.
-    function reloadOnUpdate(nav, doc, reload) {
-        const container = nav && nav.serviceWorker;
-        if (!container) return;
-        let controlled = Boolean(container.controller);
-        let waiting = false;
-        const reloadWhenHidden = () => {
-            if (doc.visibilityState !== 'hidden') return;
-            doc.removeEventListener('visibilitychange', reloadWhenHidden);
-            reload();
-        };
-        container.addEventListener('controllerchange', () => {
-            const update = controlled;
-            controlled = true;
-            if (!update || waiting) return;
-            waiting = true;
-            doc.addEventListener('visibilitychange', reloadWhenHidden);
-            reloadWhenHidden();
-        });
     }
 
     // Must equal CACHE_PREFIX in scripts/sw.template.js (scripts/sw.test.js enforces it).
@@ -81,15 +55,19 @@
         const manifest = win.document && win.document.querySelector('link[rel="manifest"]');
         if (manifest) manifest.remove();
         const registrations = await installedRegistrations(win, scope);
-        if (registrations.length === 0 && (await installedCacheNames(win)).length === 0) return;
+        const controller = win.navigator && win.navigator.serviceWorker && win.navigator.serviceWorker.controller;
+        // A controlled page has a worker even when the registrations could not be listed.
+        if (!controller && registrations.length === 0 && (await installedCacheNames(win)).length === 0) return;
         try {
             if (win.caches) await win.caches.open(DISABLED_CACHE);
         } catch (err) {
             // Without the marker the worker may recreate a cache; the rest still helps.
         }
-        for (const registration of registrations) {
+        // Through the registrations and through the page's own controller, so one failing lookup
+        // cannot leave the worker running; a worker that still misses both re-checks the marker.
+        for (const worker of [controller, ...registrations.map((registration) => registration.active)]) {
             try {
-                if (registration.active) registration.active.postMessage({ type: STAND_DOWN_MESSAGE });
+                if (worker) worker.postMessage({ type: STAND_DOWN_MESSAGE });
             } catch (err) {
                 // The worker is already gone.
             }
@@ -106,16 +84,13 @@
         }
     }
 
-    // A worker refuses to install while the marker exists, so a delete that fails is tried once
-    // more; if it still fails, registration goes ahead and the next page view tries again.
+    // A worker refuses to install while the marker exists, so an enabled page removes it first. If
+    // the delete fails registration goes ahead anyway and the next page view tries again.
     async function clearStandDownMarker(win) {
-        for (let attempt = 0; attempt < 2; attempt += 1) {
-            try {
-                if (win.caches) await win.caches.delete(DISABLED_CACHE);
-                return;
-            } catch (err) {
-                // Best effort.
-            }
+        try {
+            if (win.caches) await win.caches.delete(DISABLED_CACHE);
+        } catch (err) {
+            // Best effort.
         }
     }
 
@@ -131,8 +106,7 @@
         const registerWorker = () => clearStandDownMarker(win).then(() => register(win.navigator, workerUrl, scope));
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
-        reloadOnUpdate(win.navigator, win.document, () => win.location.reload());
     }
 
-    global.DevotionalSwRegister = { register, reloadOnUpdate, start, disable };
+    global.DevotionalSwRegister = { register, start, disable };
 })(window);

@@ -80,7 +80,7 @@ test('beforeinstallprompt is deferred (no mini-infobar) and reveals the button',
     assert.equal(button.shown, true);
 });
 
-test('a tap opens the browser prompt, and an accepted install hides the button', async () => {
+test('a tap opens the browser prompt; the button stays while it is open and an accepted install hides it', async () => {
     const button = fakeButton();
     const win = fakeWindow();
     init(doc(button), win);
@@ -95,26 +95,20 @@ test('a tap opens the browser prompt, and an accepted install hides the button',
     assert.equal(event.prompts, 1);
 });
 
-test('a dismissed prompt leaves the button, and a prompt event is never used twice', async () => {
+test('a dismissed prompt hides the used-up button, and the browser\'s next offer brings it back working', async () => {
     const button = fakeButton();
     const win = fakeWindow();
     init(doc(button), win);
-    const event = promptEvent({ outcome: 'dismissed' });
-    win.listeners.beforeinstallprompt(event);
+    const dismissed = promptEvent({ outcome: 'dismissed' });
+    win.listeners.beforeinstallprompt(dismissed);
     await button.listeners.click();
-    assert.equal(button.shown, true);
-    await assert.doesNotReject(async () => button.listeners.click()); // the used event is not prompted again
-    assert.equal(event.prompts, 1);
-});
+    assert.equal(button.shown, false, 'a visible button with no usable prompt behind it would be dead');
+    await assert.doesNotReject(async () => button.listeners.click());
+    assert.equal(dismissed.prompts, 1, 'a prompt event is never used twice');
 
-test('after a dismissal the browser\'s next offer makes the same button work again', async () => {
-    const button = fakeButton();
-    const win = fakeWindow();
-    init(doc(button), win);
-    win.listeners.beforeinstallprompt(promptEvent({ outcome: 'dismissed' }));
-    await button.listeners.click();
     const next = promptEvent({ outcome: 'accepted' });
     win.listeners.beforeinstallprompt(next);
+    assert.equal(button.shown, true);
     await button.listeners.click();
     assert.equal(next.prompts, 1);
     assert.equal(button.shown, false);
@@ -127,12 +121,14 @@ test('a tap before any install offer does nothing', async () => {
     assert.equal(button.shown, false);
 });
 
-test('a refused prompt does not throw and leaves the button', async () => {
+test('a refused prompt does not throw and hides the used-up button until the next offer', async () => {
     const button = fakeButton();
     const win = fakeWindow();
     init(doc(button), win);
     win.listeners.beforeinstallprompt(promptEvent({ rejects: true }));
     await assert.doesNotReject(async () => button.listeners.click());
+    assert.equal(button.shown, false);
+    win.listeners.beforeinstallprompt(promptEvent());
     assert.equal(button.shown, true);
 });
 

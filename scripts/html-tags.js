@@ -60,7 +60,8 @@ function parseTags(html) {
         const open = html.indexOf('<', i);
         if (open === -1) break;
         if (html.startsWith('<!--', open)) {
-            const close = html.indexOf('-->', open + 4);
+            const close = html.indexOf('-->', open + 2);
+            // From open + 2, so <!--> and <!---> are the empty comments the HTML spec says they are.
             if (close === -1) fail(html, open, 'unterminated comment');
             i = close + 3;
         } else if (/<[!?/]/.test(html.slice(open, open + 2))) { // doctype, processing instruction, closing tag

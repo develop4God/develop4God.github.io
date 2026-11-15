@@ -44,12 +44,14 @@
             deferred = null; // a prompt event can be used only once, whatever the answer
             try {
                 await event.prompt();
-                const choice = await event.userChoice;
-                if (choice && choice.outcome === 'accepted') hide();
-                // Dismissed: the button stays, and the browser's next beforeinstallprompt re-arms it.
+                await event.userChoice;
             } catch (err) {
-                // The browser refused to show the prompt; the button stays for its next offer.
+                // The browser refused to show the prompt.
             }
+            // Accepted, dismissed or refused, the event is used up and a button without a usable
+            // prompt behind it would be dead: hide it. The browser's next beforeinstallprompt
+            // shows it again.
+            hide();
         });
     }
 
