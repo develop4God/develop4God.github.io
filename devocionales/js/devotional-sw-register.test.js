@@ -138,7 +138,9 @@ function disableWindow({ registrations = [], cacheNames = [], manifest = { remov
     const unregistered = [];
     const deleted = [];
     const events = [];
+    const messages = [];
     return {
+        messages,
         unregistered,
         deleted,
         events,
@@ -147,6 +149,7 @@ function disableWindow({ registrations = [], cacheNames = [], manifest = { remov
             serviceWorker: {
                 getRegistrations: async () => registrations.map((scope) => ({
                     scope,
+                    active: { postMessage: (message) => { messages.push(message); events.push(`message ${message.type}`); } },
                     unregister: async () => { unregistered.push(scope); events.push(`unregister ${scope}`); return true; },
                 })),
             },
@@ -186,6 +189,46 @@ test('disable: with nothing installed it does nothing and does not throw', async
     await assert.doesNotReject(disable(win, '/devocionales/'));
     assert.deepEqual(win.unregistered, []);
     assert.deepEqual(win.deleted, []);
+});
+
+test('disable: a visitor who never had a worker or a build cache gets no marker and no sweep, but the manifest link still goes', async () => {
+    for (const cacheNames of [[], ['other-app'], ['devocionales-disabled']]) { // a leftover marker is not an installed app
+        const win = disableWindow({ registrations: ['https://x.test/habitus/'], cacheNames });
+        await disable(win, '/devocionales/');
+        assert.deepEqual(win.events, [], JSON.stringify(cacheNames));
+        assert.equal(win.manifest.removed, true);
+    }
+});
+
+test('disable: a registration alone, or a cache alone, is enough to run the sweep', async () => {
+    const registrationOnly = disableWindow({ registrations: ['https://x.test/devocionales/'] });
+    await disable(registrationOnly, '/devocionales/');
+    assert.deepEqual(registrationOnly.unregistered, ['https://x.test/devocionales/']);
+    assert.ok(registrationOnly.events.includes('open devocionales-disabled'));
+
+    const cacheOnly = disableWindow({ cacheNames: ['devocionales-abc123'] });
+    await disable(cacheOnly, '/devocionales/');
+    assert.deepEqual(cacheOnly.deleted, ['devocionales-abc123']);
+    assert.ok(cacheOnly.events.includes('open devocionales-disabled'));
+});
+
+test('disable: tells the running worker to stand down, before unregistering it', async () => {
+    const win = disableWindow({ registrations: ['https://x.test/devocionales/', 'https://x.test/habitus/'] });
+    await disable(win, '/devocionales/');
+    assert.deepEqual(win.messages, [{ type: 'devocionales-stand-down' }]); // only this scope's worker
+    assert.ok(win.events.indexOf('message devocionales-stand-down') < win.events.indexOf('unregister https://x.test/devocionales/'));
+});
+
+test('disable: a worker that refuses the message does not stop the sweep', async () => {
+    const win = disableWindow({ registrations: ['https://x.test/devocionales/'], cacheNames: ['devocionales-data'] });
+    const getRegistrations = win.navigator.serviceWorker.getRegistrations;
+    win.navigator.serviceWorker.getRegistrations = async () => (await getRegistrations()).map((registration) => ({
+        ...registration,
+        active: { postMessage: () => { throw new Error('gone'); } },
+    }));
+    await disable(win, '/devocionales/');
+    assert.deepEqual(win.unregistered, ['https://x.test/devocionales/']);
+    assert.deepEqual(win.deleted, ['devocionales-data']);
 });
 
 test('disable: browsers without service workers or the Cache API are fine', async () => {
@@ -239,6 +282,23 @@ test('start: enabling removes a stale stand-down marker first, then registers', 
     start(win, '/devocionales/sw.js', '/devocionales/', { enabled: true });
     await settle();
     assert.deepEqual(order, ['delete devocionales-disabled', 'register']);
+});
+
+test('start: a marker delete that fails once is retried before registering', async () => {
+    const order = [];
+    let attempts = 0;
+    const nav = fakeNavigator({ registerImpl: () => { order.push('register'); return Promise.resolve({}); } });
+    const win = {
+        navigator: nav,
+        document: fakeDocument('visible'),
+        location: { reload() {} },
+        addEventListener() {},
+        caches: { delete: async () => { attempts += 1; order.push(`delete ${attempts}`); if (attempts === 1) throw new Error('denied'); return true; } },
+    };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/', {});
+    await settle();
+    assert.deepEqual(order, ['delete 1', 'delete 2', 'register']);
 });
 
 test('start: a failing marker delete never stops registration', async () => {

@@ -47,48 +47,75 @@
     const CACHE_PREFIX = 'devocionales-';
     const DISABLED_CACHE = `${CACHE_PREFIX}disabled`;
 
+    // Must equal STAND_DOWN_MESSAGE in scripts/sw.template.js (scripts/sw.test.js enforces it).
+    const STAND_DOWN_MESSAGE = 'devocionales-stand-down';
+
+    // This app's registrations and build caches, each [] when the browser cannot say.
+    async function installedRegistrations(win, scope) {
+        try {
+            const container = win.navigator && win.navigator.serviceWorker;
+            if (!container || typeof container.getRegistrations !== 'function') return [];
+            return (await container.getRegistrations()).filter((registration) => new URL(registration.scope).pathname === scope);
+        } catch (err) {
+            return [];
+        }
+    }
+
+    async function installedCacheNames(win) {
+        try {
+            if (!win.caches) return [];
+            return (await win.caches.keys()).filter((name) => name.startsWith(CACHE_PREFIX) && name !== DISABLED_CACHE);
+        } catch (err) {
+            return [];
+        }
+    }
+
     // The kill switch: removes this app's worker and caches from the reader's browser and drops the
     // manifest link so the page stops being installable. Each step is best-effort, because there is
-    // nothing useful to do when one fails.
-    // The marker cache goes first: an unregistered worker keeps controlling this page until it
-    // closes, and the marker tells it to stop saving, so it cannot recreate what is deleted below.
-    // A newer worker deletes the marker when it activates, which is how the PWA is re-enabled.
+    // nothing useful to do when one fails. It does the removal only when a registration or a build
+    // cache exists, so a visitor who never had the app gets no marker cache and no sweep.
+    // The marker cache goes first and the running worker is told to stand down: an unregistered
+    // worker keeps controlling this page until it closes, and must not recreate what is deleted
+    // below. A newer worker deletes the marker when it activates, which is how the PWA is re-enabled.
     async function disable(win, scope) {
         const manifest = win.document && win.document.querySelector('link[rel="manifest"]');
         if (manifest) manifest.remove();
+        const registrations = await installedRegistrations(win, scope);
+        if (registrations.length === 0 && (await installedCacheNames(win)).length === 0) return;
         try {
             if (win.caches) await win.caches.open(DISABLED_CACHE);
         } catch (err) {
             // Without the marker the worker may recreate a cache; the rest still helps.
         }
-        try {
-            const container = win.navigator && win.navigator.serviceWorker;
-            if (container && typeof container.getRegistrations === 'function') {
-                const registrations = await container.getRegistrations();
-                await Promise.all(registrations
-                    .filter((registration) => new URL(registration.scope).pathname === scope)
-                    .map((registration) => registration.unregister()));
+        for (const registration of registrations) {
+            try {
+                if (registration.active) registration.active.postMessage({ type: STAND_DOWN_MESSAGE });
+            } catch (err) {
+                // The worker is already gone.
             }
+        }
+        try {
+            await Promise.all(registrations.map((registration) => registration.unregister()));
         } catch (err) {
             // Nothing to remove, or the browser refused.
         }
         try {
-            if (win.caches) {
-                const names = await win.caches.keys();
-                await Promise.all(names
-                    .filter((name) => name.startsWith(CACHE_PREFIX) && name !== DISABLED_CACHE)
-                    .map((name) => win.caches.delete(name)));
-            }
+            await Promise.all((await installedCacheNames(win)).map((name) => win.caches.delete(name)));
         } catch (err) {
             // Same: best effort.
         }
     }
 
+    // A worker refuses to install while the marker exists, so a delete that fails is tried once
+    // more; if it still fails, registration goes ahead and the next page view tries again.
     async function clearStandDownMarker(win) {
-        try {
-            if (win.caches) await win.caches.delete(DISABLED_CACHE);
-        } catch (err) {
-            // Best effort: a leftover marker only delays the next install.
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+            try {
+                if (win.caches) await win.caches.delete(DISABLED_CACHE);
+                return;
+            } catch (err) {
+                // Best effort.
+            }
         }
     }
 

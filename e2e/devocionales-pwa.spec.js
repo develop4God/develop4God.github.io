@@ -155,7 +155,7 @@ test.describe('updates', () => {
     // Playwright cannot intercept a service worker's own script-update fetch (neither page.route
     // nor context.route sees it), so this test serves the site from a small server whose
     // /devocionales/sw.js can be switched to a "new deploy".
-    test('a new worker replaces the old build, keeps saved data, and never reloads a reader mid-read', async ({ page }) => {
+    test('a new worker waits for the open reader to close, so builds are never mixed, and keeps saved data', async ({ page, context }) => {
         const state = { overrides: {} };
         const server = await startSiteServer(state);
         const base = `http://127.0.0.1:${server.address().port}`;
@@ -171,10 +171,19 @@ test.describe('updates', () => {
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
 
             await expect.poll(() => cacheNames(page)).toContain(`devocionales-${newVersion}`);
-            await expect.poll(() => cacheNames(page)).not.toContain(`devocionales-${oldVersion}`);
-            expect(await cacheNames(page)).toContain('devocionales-data');
-            // The tab is visible, so the page must not have been reloaded under the reader.
+            // The open page still runs the old build's scripts, so the old build must stay: the new
+            // worker waits instead of taking over, and the page is not reloaded under the reader.
+            await page.waitForTimeout(1000);
+            expect(await cacheNames(page)).toContain(`devocionales-${oldVersion}`);
             expect(await page.evaluate(() => window.readerSession)).toBe('still-open');
+            expect(await page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
+
+            // Once no old page is open the new worker activates and removes the old build.
+            await page.close();
+            const next = await context.newPage();
+            await next.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
+            await expect.poll(() => cacheNames(next), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
+            expect(await cacheNames(next)).toContain('devocionales-data');
         } finally {
             server.close();
         }
@@ -277,10 +286,8 @@ test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
             state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, 'bbbbbbbbbbbb');
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
             await expect.poll(() => cacheNames(page)).toContain('devocionales-bbbbbbbbbbbb');
-            // Wait for the new worker to be active (it deletes the old build cache on activation);
-            // until then a reload would still be answered by the old worker and its old config.
-            await expect.poll(() => cacheNames(page)).not.toContain(`devocionales-${oldVersion}`);
 
+            // The old worker still answers the reload, but it fetches the config fresh.
             await page.reload({ waitUntil: 'domcontentloaded' }); // the next visit picks up the new config
             await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
             // Only the marker that tells the unregistered worker to stand down is left behind.

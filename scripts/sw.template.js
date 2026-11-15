@@ -13,13 +13,24 @@
 //  - Devotional data (year files and index.json on raw.githubusercontent.com, the hero-image list
 //    the page waits for before it renders, and the same-origin app stats): network first, so a
 //    reader online always gets current content. The last good copy is the fallback when the
-//    network fails, is slow, or answers with an error, which is what lets a devotional already
-//    read open offline. Only complete, CORS-readable responses are saved, and saving happens in
+//    network fails, is slow, or answers with a server error (5xx); a 4xx answer is returned as is.
+//    That fallback is what lets a devotional already read open offline. Only complete, CORS-readable responses are saved, and saving happens in
 //    the background so a full or failing cache can never delay or break reading.
 //  - Hero images: saved on first view and served from the saved copy afterwards. An <img> sends
 //    a no-cors request whose response is opaque and unsavable, so the worker fetches the image
 //    again with CORS (the host allows it) and answers with that.
 //  - Everything else (analytics, other pages, non-GET, Range requests) is left alone.
+//
+// One build at a time: a new worker does not call skipWaiting() or clients.claim(). It installs
+// and waits until no page the previous worker controls is open, and only then activates and
+// deletes the previous build cache. A page that loaded one build's scripts therefore never has
+// them answered from another build, at the price that an update reaches a reader on their next
+// visit after closing the app, not under an open page.
+//
+// Installing is all or nothing: every precached file is fetched (a few bounded retries each) and
+// stored as a clean copy; if one still fails the half-built cache is deleted, the install rejects
+// and every open page is sent {type: 'devocionales-install-failed', version, urls}. The worker
+// logs nothing by design (the site has no error logging), the message is for a page that cares.
 //
 // Caches: `devocionales-<version>` holds one build and is deleted when a newer worker activates;
 // `devocionales-data` and `devocionales-images` survive deploys, since remote content is
@@ -41,6 +52,9 @@ const pageKey = (pathname) => {
   if (SHELL_PATHS.has(pathname)) return SHELL_PATH;
   return pathname.endsWith('.html') ? pathname : `${pathname}.html`;
 };
+// Must equal STAND_DOWN_MESSAGE in devocionales/js/devotional-sw-register.js (scripts/sw.test.js enforces it).
+const STAND_DOWN_MESSAGE = 'devocionales-stand-down';
+const INSTALL_FAILED_MESSAGE = 'devocionales-install-failed';
 const SLOW = Symbol('slow');
 const FAILED = Symbol('failed');
 
@@ -48,25 +62,72 @@ const siteOrigin = self.location.origin;
 const absolute = (path) => new URL(path, siteOrigin).href;
 const precached = new Set(CONFIG.precache.map(absolute));
 
+// A copy a browser accepts anywhere: a redirected response (the host 308s `page.html` to `page`)
+// cannot be served to a navigation, so it is never stored as it came.
+async function cleanCopy(response) {
+  return new Response(await response.blob(), {
+    status: response.status,
+    statusText: response.statusText,
+    headers: response.headers,
+  });
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// One precached file, tried up to CONFIG.installAttempts times. `reload` skips the HTTP cache so a
+// build is never assembled from stale copies.
+async function fetchForBuild(path) {
+  let failure;
+  for (let attempt = 1; attempt <= CONFIG.installAttempts; attempt += 1) {
+    if (attempt > 1) await sleep(CONFIG.installRetryDelayMs * (attempt - 1));
+    try {
+      const response = await fetch(new Request(absolute(path), { cache: 'reload' }));
+      if (response.ok) return await cleanCopy(response);
+      failure = new Error(`${response.status} for ${path}`);
+    } catch (err) {
+      failure = err;
+    }
+  }
+  throw failure;
+}
+
+async function announceInstallFailure(urls) {
+  try {
+    const pages = await self.clients.matchAll({ includeUncontrolled: true });
+    for (const page of pages) page.postMessage({ type: INSTALL_FAILED_MESSAGE, version: CONFIG.version, urls });
+  } catch (err) {
+    // Nobody to tell; the rejected install is the signal that remains.
+  }
+}
+
+async function buildCache() {
+  // The kill switch has run: do not rebuild what it just removed.
+  if (await caches.has(DISABLED_CACHE)) throw new Error('The PWA is switched off');
+  const cache = await caches.open(BUILD_CACHE);
+  const failed = [];
+  await Promise.all(CONFIG.precache.map(async (path) => {
+    try {
+      await cache.put(absolute(path), await fetchForBuild(path));
+    } catch (err) {
+      failed.push(absolute(path));
+    }
+  }));
+  if (failed.length > 0) {
+    await caches.delete(BUILD_CACHE); // never leave a partial build behind
+    await announceInstallFailure(failed.sort());
+    throw new Error(`Could not precache ${failed.join(', ')}`);
+  }
+}
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches
-      .has(DISABLED_CACHE)
-      .then((off) => {
-        // The kill switch has run: do not rebuild what it just removed.
-        if (off) throw new Error('The PWA is switched off');
-        return caches.open(BUILD_CACHE);
-      })
-      // `reload` skips the HTTP cache so a build is never assembled from stale copies.
-      .then((cache) => cache.addAll(CONFIG.precache.map((path) => new Request(absolute(path), { cache: 'reload' }))))
-      .then(() => self.skipWaiting()),
-  );
+  event.waitUntil(buildCache());
 });
 
 self.addEventListener('activate', (event) => {
+  // This also deletes the stand-down marker, so the flag goes with it.
   event.waitUntil(
-    caches
-      .keys()
+    standDownKnown
+      .then(() => caches.keys())
       .then((names) =>
         Promise.all(
           names
@@ -74,17 +135,35 @@ self.addEventListener('activate', (event) => {
             .map((name) => caches.delete(name)),
         ),
       )
-      .then(() => self.clients.claim()),
+      .then(() => {
+        standDown = false;
+      }),
   );
 });
 
-// The page's kill switch (DevotionalSwRegister.disable) leaves the DISABLED_CACHE marker, then
-// unregisters this worker and deletes the other caches. An unregistered worker keeps controlling
-// the open page until that closes, so it checks the marker and passes requests to the network,
-// creating no cache. The marker is explicit on purpose: a build cache evicted by the browser must
-// not be mistaken for the kill switch. An enabled page deletes the marker before registering.
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === STAND_DOWN_MESSAGE) standDown = true;
+});
+
+// The page's kill switch (DevotionalSwRegister.disable) leaves the DISABLED_CACHE marker and
+// sends STAND_DOWN_MESSAGE, then unregisters this worker and deletes the other caches. An
+// unregistered worker keeps controlling the open page until that closes, so it passes requests to
+// the network, creating no cache. The marker is explicit on purpose: a build cache evicted by the
+// browser must not be mistaken for the kill switch. The worker keeps the answer in `standDown`
+// instead of asking the Cache API on every request: it reads the marker once when it starts (a
+// restarted worker has no memory of the message), sets the flag on the message, and clears it when
+// it activates and removes the marker. An enabled page deletes the marker before registering.
+let standDown = false;
+const standDownKnown = caches.has(DISABLED_CACHE).then(
+  (marked) => {
+    if (marked) standDown = true;
+  },
+  () => {},
+);
+
 async function unlessDisabled(request, handle, passThrough = () => fetch(request)) {
-  if (await caches.has(DISABLED_CACHE)) return passThrough();
+  await standDownKnown;
+  if (standDown) return passThrough();
   return handle();
 }
 
@@ -126,14 +205,16 @@ async function trim(cache, limit, counts = () => true) {
 
 // Only year files are capped: the index and stats files are small and every load needs them.
 async function saveData(request, response) {
+  if (standDown) return; // told to stand down while the request was in flight: do not undo the sweep
   const cache = await caches.open(DATA_CACHE);
-  await cache.put(request, response);
+  await cache.put(request, await cleanCopy(response));
   await trim(cache, CONFIG.maxDataEntries, (url) => url.includes('/Devocional_year_'));
 }
 
 async function saveImage(url, response) {
+  if (standDown) return;
   const cache = await caches.open(IMAGE_CACHE);
-  await cache.put(url, response);
+  await cache.put(url, await cleanCopy(response));
   await trim(cache, CONFIG.maxImageEntries);
 }
 
@@ -153,14 +234,16 @@ async function networkFirst(request, event) {
   const first = await Promise.race([network.catch(() => FAILED), slow]);
   clearTimeout(timer);
   const answered = first !== SLOW && first !== FAILED;
-  if (answered && first.ok) return first;
+  // A 4xx is the server's real answer (e.g. a year that does not exist), never masked by a saved
+  // copy; only a failed network or a 5xx falls back to one.
+  if (answered && first.status < 500) return first;
   const saved = await (await caches.open(DATA_CACHE)).match(request);
   if (saved) {
     if (first === SLOW) event.waitUntil(network.catch(() => {}));
     return saved;
   }
   if (first === SLOW) return network; // nothing saved: a slow answer beats none
-  if (answered) return first; // e.g. a 404 for a year that does not exist is the page's to interpret
+  if (answered) return first; // a 5xx with nothing saved is still the server's answer
   return Response.error();
 }
 

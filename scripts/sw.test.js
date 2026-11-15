@@ -33,6 +33,8 @@ const CONFIG = {
     maxImageEntries: 3,
     freshFirst: ['/devocionales/js/devotional-pwa-config.js'],
     sameOriginData: ['/data/app-stats.json'],
+    installAttempts: 3,
+    installRetryDelayMs: 1,
     pages: ['/devocionales/privacy-policy.html'],
     precache: [
         '/devocionales/',
@@ -43,6 +45,7 @@ const CONFIG = {
         '/lang/devocionales/en.json',
     ],
 };
+const STAND_DOWN = { type: 'devocionales-stand-down' };
 const JS = { type: 'basic', contentType: 'text/javascript' }; // how the site serves its own scripts
 const PRIVACY_URL = `${ORIGIN}/devocionales/privacy-policy.html`;
 const CONFIG_URL = `${ORIGIN}/devocionales/js/devotional-pwa-config.js`;
@@ -75,13 +78,6 @@ class FakeCache {
     async keys() {
         return [...this.entries.keys()].map((url) => ({ url }));
     }
-    async addAll(requests) {
-        const responses = await Promise.all(requests.map((request) => this.fetch(request)));
-        responses.forEach((response, index) => {
-            if (!response.ok) throw new TypeError(`addAll: ${response.status} for ${urlOf(requests[index])}`);
-        });
-        requests.forEach((request, index) => this.entries.set(urlOf(request), responses[index]));
-    }
 }
 
 class FakeCaches {
@@ -111,13 +107,19 @@ class FakeCaches {
 
 // A real Response whose `type` reads as the given value (Response.type is read-only).
 // `contentType` defaults to JSON because most of what the worker saves is data.
-function response(body, { status = 200, type = 'cors', contentType = 'application/json' } = {}) {
-    const r = new Response(body, { status, headers: { 'content-type': contentType } });
-    Object.defineProperty(r, 'type', { value: type, configurable: true });
-    return r;
+function response(body, { status = 200, type = 'cors', contentType = 'application/json', redirected = false } = {}) {
+    const decorate = (r) => {
+        Object.defineProperty(r, 'type', { value: type, configurable: true });
+        // A real redirected response reports redirected === true, which `new Response` cannot set.
+        Object.defineProperty(r, 'redirected', { value: redirected, configurable: true });
+        const clone = r.clone.bind(r);
+        r.clone = () => decorate(clone()); // a real clone keeps both
+        return r;
+    };
+    return decorate(new Response(body, { status, headers: { 'content-type': contentType } }));
 }
 
-function loadWorker({ routes = {}, config = CONFIG } = {}) {
+function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
     const calls = [];
     const requests = [];
     const net = { offline: false };
@@ -142,13 +144,21 @@ function loadWorker({ routes = {}, config = CONFIG } = {}) {
         return result;
     };
     const caches = new FakeCaches(fetchImpl);
+    for (const name of preexisting) caches.stores.set(name, new FakeCache());
+    const hasCalls = { count: 0 };
+    const realHas = caches.has.bind(caches);
+    caches.has = (name) => { hasCalls.count += 1; return realHas(name); };
     const handlers = {};
+    const posted = [];
     const spies = { skipWaiting: 0, claim: 0 };
     const self = {
         location: new URL(`${ORIGIN}/devocionales/sw.js`),
         addEventListener: (type, handler) => { handlers[type] = handler; },
         skipWaiting: () => { spies.skipWaiting += 1; return Promise.resolve(); },
-        clients: { claim: () => { spies.claim += 1; return Promise.resolve(); } },
+        clients: {
+            claim: () => { spies.claim += 1; return Promise.resolve(); },
+            matchAll: async () => [{ postMessage: (message) => posted.push(message) }],
+        },
     };
     const sandbox = { self, caches, fetch: fetchImpl, Request, Response, URL, Promise, setTimeout, clearTimeout, JSON, console };
     vm.runInNewContext(renderSw(TEMPLATE, config), sandbox, { filename: TEMPLATE_PATH });
@@ -165,7 +175,8 @@ function loadWorker({ routes = {}, config = CONFIG } = {}) {
         handlers.fetch(event);
         return event;
     };
-    return { caches, calls, requests, net, spies, lifecycle, fetchEvent };
+    const message = (data) => handlers.message({ data });
+    return { caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls, posted };
 }
 
 const ALL_ROUTES = () => ({
@@ -185,14 +196,15 @@ async function installed(extra = {}) {
 
 // ---------------------------------------------------------------------------------- lifecycle
 
-test('install precaches every listed file into the versioned build cache and takes over at once', async () => {
+test('install precaches every listed file into the versioned build cache and does not take over open pages', async () => {
     const worker = await installed();
     const cache = await worker.caches.open('devocionales-v1');
     assert.deepEqual(
         [...cache.entries.keys()].sort(),
         CONFIG.precache.map((p) => `${ORIGIN}${p}`).sort(),
     );
-    assert.equal(worker.spies.skipWaiting, 1);
+    // Taking over would serve pages that run the previous build's scripts from this build.
+    assert.equal(worker.spies.skipWaiting, 0);
 });
 
 test('install fails, and does not take over, when a precached file cannot be fetched', async () => {
@@ -215,7 +227,7 @@ test('activate deletes older build caches but keeps the current build, the data 
     for (const name of ['devocionales-v0', 'devocionales-data', 'devocionales-images', 'other-app-cache']) await worker.caches.open(name);
     await worker.lifecycle('activate');
     assert.deepEqual((await worker.caches.keys()).sort(), ['devocionales-data', 'devocionales-images', 'devocionales-v1', 'other-app-cache']);
-    assert.equal(worker.spies.claim, 1);
+    assert.equal(worker.spies.claim, 0);
 });
 
 // ------------------------------------------------------------------------------- shell + assets
@@ -332,7 +344,23 @@ for (const [name, url] of DATA_URLS) {
         assert.equal(await ask(worker, url), '{"saved":true}');
     });
 
-    for (const status of [404, 429, 500, 503]) {
+    for (const status of [404, 429]) {
+        test(`${name}: a ${status} answer is returned live, not masked by the saved copy, and not saved`, async () => {
+            let failing = false;
+            const route = () => (failing ? response('nope', { status }) : response('{"saved":true}'));
+            const worker = await installed({ [url]: route });
+            await ask(worker, url);
+            failing = true;
+            const event = worker.fetchEvent(url);
+            const answer = await event.answer;
+            assert.equal(answer.status, status);
+            assert.equal(await answer.text(), 'nope');
+            await Promise.all(event.waits);
+            assert.equal(await savedText(worker, url), '{"saved":true}');
+        });
+    }
+
+    for (const status of [500, 503]) {
         test(`${name}: a ${status} answer does not replace the saved copy`, async () => {
             let failing = false;
             const route = () => (failing ? response('nope', { status }) : response('{"saved":true}'));
@@ -360,6 +388,7 @@ for (const [name, url] of DATA_URLS) {
 test('a worker told to stand down (the PWA kill switch left its marker) goes network-only and creates no cache', async () => {
     const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
     await worker.caches.open('devocionales-disabled'); // what DevotionalSwRegister.disable() leaves behind
+    worker.message(STAND_DOWN); // ...and tells the running worker
 
     const shell = worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' });
     assert.equal(await (await shell.answer).text(), '<html>shell v1</html>'); // from the network now
@@ -489,6 +518,7 @@ test('the config fetch waits only freshTimeoutMs, because the page blocks on it'
 test('a stood-down worker still revalidates the config script, so switching back on is not held up by the HTTP cache', async () => {
     const worker = await installed();
     await worker.caches.open('devocionales-disabled');
+    worker.message(STAND_DOWN);
     worker.requests.length = 0;
     await worker.fetchEvent(CONFIG_URL).answer;
     assert.equal(worker.requests.at(-1).cache, 'no-cache');
@@ -583,6 +613,7 @@ test('a hero image that cannot be saved still displays', async () => {
 test('a stood-down worker leaves hero images to the network and creates no image cache', async () => {
     const worker = await installed({ [imageUrl(1)]: response('IMG1') });
     await worker.caches.open('devocionales-disabled');
+    worker.message(STAND_DOWN);
     assert.equal(await (await worker.fetchEvent(imageUrl(1), { mode: 'no-cors' }).answer).text(), 'IMG1');
     assert.equal((await worker.caches.keys()).includes('devocionales-images'), false);
 });
@@ -595,4 +626,122 @@ test('a worker refuses to install while the PWA is switched off, and creates no 
     await assert.rejects(worker.lifecycle('install'), /switched off/);
     assert.equal(worker.spies.skipWaiting, 0);
     assert.deepEqual(await worker.caches.keys(), ['devocionales-disabled']);
+});
+
+
+// ------------------------------------------------------------ review fixes: clean copies
+
+test('a redirected response (the host 308s *.html) is precached as a clean, non-redirected copy', async () => {
+    const worker = await installed({
+        [PRIVACY_URL]: () => response('<html>privacy v1</html>', { type: 'basic', contentType: 'text/html', redirected: true }),
+    });
+    const stored = (await worker.caches.open('devocionales-v1')).entries.get(PRIVACY_URL);
+    assert.equal(stored.redirected, false, 'browsers reject a redirected response served to a navigation');
+    assert.equal(await stored.text(), '<html>privacy v1</html>');
+    assert.equal(stored.headers.get('content-type'), 'text/html');
+    assert.equal(stored.status, 200);
+});
+
+test('saved data and images are clean copies too', async () => {
+    const worker = await installed({
+        [YEAR_URL]: () => response('{"n":1}', { redirected: true }),
+        [imageUrl(1)]: () => response('IMG1', { redirected: true }),
+    });
+    await ask(worker, YEAR_URL);
+    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
+    await image.answer;
+    await Promise.all(image.waits);
+    const data = (await worker.caches.open('devocionales-data')).entries.get(YEAR_URL);
+    const img = (await worker.caches.open('devocionales-images')).entries.get(imageUrl(1));
+    assert.equal(data.redirected, false);
+    assert.equal(img.redirected, false);
+    assert.equal(await data.text(), '{"n":1}');
+});
+
+// ------------------------------------------------------------ review fixes: install retries
+
+test('install retries a file that fails transiently and still completes', async () => {
+    let calls = 0;
+    const worker = loadWorker({
+        routes: { ...ALL_ROUTES(), [`${ORIGIN}/js/shared.js`]: () => (++calls < 3 ? response('', { status: 503, type: 'basic' }) : response('js', { type: 'basic' })) },
+    });
+    await worker.lifecycle('install');
+    assert.equal(calls, 3);
+    assert.equal((await worker.caches.open('devocionales-v1')).entries.size, CONFIG.precache.length);
+});
+
+test('install gives up after the bounded attempts, removes the half-built cache and signals which file failed', async () => {
+    let calls = 0;
+    const worker = loadWorker({
+        routes: { ...ALL_ROUTES(), [`${ORIGIN}/js/shared.js`]: () => { calls += 1; return response('', { status: 503, type: 'basic' }); } },
+    });
+    await assert.rejects(worker.lifecycle('install'));
+    assert.equal(calls, CONFIG.installAttempts);
+    assert.equal(worker.spies.skipWaiting, 0);
+    assert.equal(await worker.caches.has('devocionales-v1'), false, 'a build cache is all or nothing');
+    assert.deepEqual(JSON.parse(JSON.stringify(worker.posted)), [{ type: 'devocionales-install-failed', version: 'v1', urls: [`${ORIGIN}/js/shared.js`] }]);
+});
+
+test('a failed install that cannot notify any page still rejects', async () => {
+    const routes = ALL_ROUTES();
+    delete routes[`${ORIGIN}/js/shared.js`];
+    const worker = loadWorker({ routes });
+    worker.posted.push = () => { throw new Error('no clients'); };
+    await assert.rejects(worker.lifecycle('install'), /shared\.js/);
+});
+
+// ------------------------------------------------------------ review fixes: stand-down flag
+
+test('the stand-down state is a worker flag: requests never query the Cache API for it', async () => {
+    const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
+    await ask(worker, YEAR_URL);
+    const before = worker.hasCalls.count;
+    for (let i = 0; i < 5; i += 1) await ask(worker, YEAR_URL);
+    await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text();
+    assert.equal(worker.hasCalls.count, before);
+});
+
+test('a marker left by an earlier switch-off is honoured when the worker starts', async () => {
+    const worker = loadWorker({ routes: ALL_ROUTES(), preexisting: ['devocionales-disabled'] });
+    worker.calls.length = 0;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
+    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`]);
+});
+
+test('activation clears the stand-down flag together with the marker', async () => {
+    const worker = await installed();
+    await worker.caches.open('devocionales-disabled');
+    worker.message(STAND_DOWN);
+    await worker.lifecycle('activate');
+    worker.net.offline = true;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js'); // from the build cache again
+});
+
+test('an unrelated message does not stand the worker down', async () => {
+    const worker = await installed();
+    for (const data of [{ type: 'other' }, 'devocionales-stand-down', null, undefined, {}]) worker.message(data);
+    worker.net.offline = true;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
+});
+
+test('the stand-down message type is the same in the worker and in the page script that sends it', () => {
+    const typeIn = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8').match(/STAND_DOWN_MESSAGE = '([^']+)'/)[1];
+    assert.equal(typeIn('../devocionales/js/devotional-sw-register.js'), typeIn('sw.template.js'));
+});
+
+test('a save still in flight when the worker is told to stand down is dropped, so the sweep is not undone', async () => {
+    const worker = await installed({
+        [YEAR_URL]: () => new Promise((resolve) => setTimeout(() => resolve(response('{"n":1}')), 15)),
+        [imageUrl(1)]: () => new Promise((resolve) => setTimeout(() => resolve(response('IMG1')), 15)),
+    });
+    const data = worker.fetchEvent(YEAR_URL);
+    const image = worker.fetchEvent(imageUrl(1), { mode: 'no-cors' });
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    worker.message(STAND_DOWN); // the page's kill switch, while both requests are on the network
+    await data.answer;
+    await image.answer;
+    await Promise.all([...data.waits, ...image.waits]);
+    assert.equal((await worker.caches.keys()).includes('devocionales-data'), false);
+    // Looking the image up opened its cache before the message; nothing may have been put in it.
+    assert.equal((await worker.caches.open('devocionales-images')).entries.size, 0);
 });
