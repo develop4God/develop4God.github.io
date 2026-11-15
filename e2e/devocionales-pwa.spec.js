@@ -453,27 +453,69 @@ test.describe('Google Play download button', () => {
 });
 
 test.describe('installed app keeps the visitor inside /devocionales/', () => {
-    const leavingLinks = (page) => page.locator('a[href="/"]');
+    const PAGES = ['/devocionales/?lang=en', '/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html'];
 
-    // Chromium cannot emulate display-mode, so the page is told it was launched from the home screen
-    // the way iOS does it.
+    // Chromium cannot emulate display-mode, so the page is told it was launched from the home
+    // screen the way iOS does it.
     async function standalone(page) {
         await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { value: true }));
     }
 
-    test('in a browser tab the links to the home page work', async ({ page }) => {
+    const homeLinks = (page) => page.locator('a[href="/"]');
+
+    for (const url of PAGES) {
+        test(`${url}: in a browser tab the links to the home page work`, async ({ page }) => {
+            await page.goto(url, { waitUntil: 'networkidle' });
+            expect(await homeLinks(page).count()).toBeGreaterThan(0);
+            for (const inert of await homeLinks(page).evaluateAll((links) => links.map((l) => l.inert))) {
+                expect(inert).toBe(false);
+            }
+        });
+
+        test(`${url}: in the installed app every link to the home page is inert`, async ({ page }) => {
+            await standalone(page);
+            await page.goto(url, { waitUntil: 'networkidle' });
+            const inert = await homeLinks(page).evaluateAll((links) => links.map((l) => l.inert));
+            expect(inert.length).toBeGreaterThan(0); // the elements stay: cached scripts still read them
+            expect(inert.every(Boolean)).toBe(true);
+        });
+    }
+
+    test('the back link is hidden in the installed app and shown in a tab', async ({ page }) => {
         await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
         await expect(page.locator('#back-link')).toBeVisible();
-        const brand = page.locator('header a[href="/"]');
-        expect(await brand.evaluate((el) => getComputedStyle(el).pointerEvents)).not.toBe('none');
     });
 
-    test('in the installed app no link leads out of the scope', async ({ page }) => {
+    test('the back link is hidden in the installed app', async ({ page }) => {
         await standalone(page);
         await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
         await expect(page.locator('#back-link')).toBeHidden();
-        const brand = page.locator('header a[href="/"]');
-        expect(await brand.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
-        expect(await leavingLinks(page).count()).toBeGreaterThan(0); // elements stay: cached scripts still read them
+    });
+});
+
+test.describe('install button shine', () => {
+    async function showButton(page) {
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await page.evaluate(() => {
+            const button = document.getElementById('install-app-btn');
+            button.classList.remove('hidden');
+            button.classList.add('inline-flex');
+        });
+    }
+    const shine = (page) => page.locator('#install-app-btn').evaluate((el) => {
+        const after = getComputedStyle(el, '::after');
+        return { animation: after.animationName, clipped: getComputedStyle(el).overflow };
+    });
+
+    test('a band sweeps across the button, clipped inside it', async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+        await showButton(page);
+        expect(await shine(page)).toEqual({ animation: 'btn-shine-sweep', clipped: 'hidden' });
+    });
+
+    test('there is no animation for visitors who prefer reduced motion', async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await showButton(page);
+        expect((await shine(page)).animation).toBe('none');
     });
 });

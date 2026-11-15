@@ -22,12 +22,6 @@
         return isIos(nav) && /Safari\//.test(nav.userAgent || '');
     }
 
-    // Launched from the home screen: `navigator.standalone` on iOS, the display-mode query elsewhere.
-    function isStandalone(win) {
-        if (win.navigator && win.navigator.standalone === true) return true;
-        return typeof win.matchMedia === 'function' && win.matchMedia('(display-mode: standalone)').matches;
-    }
-
     function wasDismissed(win) {
         try {
             return win.localStorage.getItem(DISMISSED_KEY) === '1';
@@ -49,7 +43,7 @@
         const hint = doc.querySelector('[data-ios-hint]');
         if (!hint) return;
         if (config && config.enabled === false) return;
-        if (!canAddToHomeScreen(win.navigator) || isStandalone(win) || wasDismissed(win)) return;
+        if (!canAddToHomeScreen(win.navigator) || global.DevotionalStandalone.isStandalone(win) || wasDismissed(win)) return;
         hint.classList.remove('hidden');
         const close = doc.querySelector('[data-ios-hint-close]');
         if (close) {
@@ -60,5 +54,5 @@
         }
     }
 
-    global.DevotionalIosHint = { init, isIos, isStandalone, canAddToHomeScreen };
+    global.DevotionalIosHint = { init, isIos, canAddToHomeScreen };
 })(window);

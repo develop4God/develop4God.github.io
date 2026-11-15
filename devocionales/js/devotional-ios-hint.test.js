@@ -5,14 +5,16 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 function loadModule() {
-    const filename = path.join(__dirname, 'devotional-ios-hint.js');
-    const source = fs.readFileSync(filename, 'utf8');
     const win = {};
-    vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
+    for (const file of ['devotional-standalone.js', 'devotional-ios-hint.js']) {
+        const filename = path.join(__dirname, file);
+        const source = fs.readFileSync(filename, 'utf8');
+        vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
+    }
     return win.DevotionalIosHint;
 }
 
-const { init, isIos, isStandalone, canAddToHomeScreen } = loadModule();
+const { init, isIos, canAddToHomeScreen } = loadModule();
 
 const UA = {
     iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
@@ -101,18 +103,6 @@ test('init: the hint is not shown in an in-app web view', () => {
     const doc = fakeDocument();
     init(doc, fakeWindow({ navigator: { userAgent: IN_APP } }), {});
     assert.equal(doc.hint.shown, false);
-});
-
-// ------------------------------------------------------------------------------ isStandalone
-
-test('isStandalone: the iOS flag, or the display-mode media query', () => {
-    assert.equal(isStandalone({ navigator: { standalone: true } }), true);
-    assert.equal(isStandalone({ navigator: {}, matchMedia: () => ({ matches: true }) }), true);
-});
-
-test('isStandalone: a normal browser tab, and browsers without matchMedia, are not standalone', () => {
-    assert.equal(isStandalone({ navigator: { standalone: false }, matchMedia: () => ({ matches: false }) }), false);
-    assert.equal(isStandalone({ navigator: {} }), false);
 });
 
 // ------------------------------------------------------------------------------------- init

@@ -169,9 +169,8 @@
         }
 
         /* The installed app lives inside /devocionales/ (manifest scope), so the links to the rest
-           of the site are switched off there (the page sets `is-standalone` on <html>). The elements stay in the page: cached scripts read them. */
+           of the site are switched off there (DevotionalStandalone sets `is-standalone` on <html> and makes the home links inert). The elements stay in the page: cached scripts read them. */
         .is-standalone #back-link { display: none; }
-        .is-standalone .site-nav > div > a[href="/"] { pointer-events: none; }
 
         .btn-secondary {
             background: transparent;
@@ -649,6 +648,7 @@
     <script src="/devocionales/js/devotional-salvation-modal.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
     <script src="/devocionales/js/devotional-pwa-config.js"></script>
+    <script src="/devocionales/js/devotional-standalone.js"></script>
     <script src="/devocionales/js/devotional-install.js"></script>
     <script src="/devocionales/js/devotional-ios-hint.js"></script>
     <script src="/devocionales/js/devotional-build.js"></script>
@@ -701,7 +701,7 @@
             () => DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig),
             () => DevotionalInstall.init(document, window, window.DevotionalPwaConfig),
             () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
-            () => document.documentElement.classList.toggle('is-standalone', DevotionalIosHint.isStandalone(window)),
+            () => DevotionalStandalone.apply(document, window),
         ].forEach((step) => {
             try {
                 step();

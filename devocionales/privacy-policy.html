@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/devocionales/css/language-selector.css">
     <script src="/js/rtl-helper.js"></script>
     <script src="/js/site-footer.js"></script>
+    <script src="/devocionales/js/devotional-standalone.js"></script>
     <script src="/devocionales/js/i18n.js"></script>
     <script>
         (function () {
@@ -218,6 +219,7 @@
     <script src="/devocionales/js/modern.js"></script>
     <script>
         lucide.createIcons();
+        DevotionalStandalone.apply(document, window); // the installed app stays inside /devocionales/
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
