@@ -200,7 +200,7 @@ test.describe('updates', () => {
 
 test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
     test.setTimeout(45_000);
-    const DISABLED = 'window.DevotionalPwaConfig = Object.freeze({ enabled: false, installOnAndroid: false });';
+    const DISABLED = 'window.DevotionalPwaConfig = Object.freeze({ enabled: false });';
     const CONFIG_PATH = '/devocionales/js/devotional-pwa-config.js';
 
     test('off from the start: no worker, no manifest, no install button', async ({ page, context }) => {
@@ -328,7 +328,7 @@ test.describe('iOS install hint', () => {
         test('is not shown when the PWA is switched off', async ({ page, context }) => {
             await context.route('**/devocionales/js/devotional-pwa-config.js', (route) => route.fulfill({
                 contentType: 'text/javascript',
-                body: 'window.DevotionalPwaConfig = Object.freeze({ enabled: false, installOnAndroid: false });',
+                body: 'window.DevotionalPwaConfig = Object.freeze({ enabled: false });',
             }));
             await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
             await page.waitForTimeout(300);
@@ -601,5 +601,64 @@ test.describe('installed app name follows the language', () => {
         await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/devocionales/manifests/zh.webmanifest');
         expect((await linkedManifest(page)).name).toBe('基督徒灵修');
         if (browserName === 'chromium') expect((await chromeParsedManifest(page)).name).toBe('基督徒灵修');
+    });
+});
+
+test.describe('manifest link by platform', () => {
+    const ANDROID_UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+
+    function trackErrors(page) {
+        const errors = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+        return errors;
+    }
+
+    test('desktop: exactly one manifest link, so the app stays installable', async ({ page }) => {
+        const errors = trackErrors(page);
+        await page.goto(READER, { waitUntil: 'networkidle' });
+        expect(await page.locator('link[rel="manifest"]').count()).toBe(1);
+        expect(errors).toEqual([]);
+    });
+
+    test.describe('on Android', () => {
+        test.use({ userAgent: ANDROID_UA, hasTouch: true });
+
+        test('no manifest link is left, so the page is not installable, and the reader still works', async ({ page }) => {
+            const errors = trackErrors(page);
+            await page.goto(READER, { waitUntil: 'networkidle' });
+            expect(await page.locator('link[rel="manifest"]').count()).toBe(0);
+            await expect(page.locator('h1').first()).not.toHaveText('');
+            await expect(page.locator('#install-app-btn')).toBeHidden();
+            expect(errors).toEqual([]);
+        });
+    });
+
+    // Cached-script rule: an old script against new HTML, and new scripts against old HTML.
+    test.describe('replay across a deploy', () => {
+        // Copies of the files as deployed before the Android manifest change.
+        const old = (file) => fs.readFileSync(path.join(__dirname, 'fixtures', 'previous-deploy', `${path.basename(file)}.txt`), 'utf8');
+        const OLD_SCRIPTS = ['devocionales/js/devotional-manifest.js', 'devocionales/js/devotional-install.js',
+            'devocionales/js/devotional-render-dom.js', 'devocionales/js/devotional-pwa-config.js'];
+
+        test('previous manifest/install/render scripts against the new HTML still render, with at most one link', async ({ page }) => {
+            const errors = trackErrors(page);
+            for (const file of OLD_SCRIPTS) {
+                await page.route(`**/${file}`, (route) => route.fulfill({ contentType: 'text/javascript', body: old(file) }));
+            }
+            await page.goto(READER, { waitUntil: 'networkidle' });
+            await expect(page.locator('h1').first()).not.toHaveText('');
+            expect(await page.locator('link[rel="manifest"]').count()).toBeLessThanOrEqual(1);
+            expect(errors).toEqual([]);
+        });
+
+        test('new scripts against the previous HTML still render, with at most one link', async ({ page }) => {
+            const errors = trackErrors(page);
+            await page.route('**/devocionales/?*', (route) => route.fulfill({ contentType: 'text/html', body: old('index.html') }));
+            await page.goto(READER, { waitUntil: 'networkidle' });
+            await expect(page.locator('h1').first()).not.toHaveText('');
+            expect(await page.locator('link[rel="manifest"]').count()).toBeLessThanOrEqual(1);
+            expect(errors).toEqual([]);
+        });
     });
 });

@@ -11,9 +11,18 @@
         return supported.includes(lang) ? `/devocionales/manifests/${lang}.webmanifest` : DEFAULT_HREF;
     }
 
+    // The web app is not offered on Android (the native app is), so the static link is removed
+    // there: no link, no install offer. The page also passes DevotionalPwaConfig as a third
+    // argument; it is not read, because the kill switch stays in DevotionalSwRegister and init
+    // never adds a link. Missing DevotionalPlatform means "not Android".
     function init(doc, win) {
         const link = doc.querySelector('link[rel="manifest"]');
-        if (!link || !win.DevotionalI18n) return;
+        if (!link) return;
+        if (win.DevotionalPlatform && win.DevotionalPlatform.isAndroid(win.navigator)) {
+            link.remove();
+            return;
+        }
+        if (!win.DevotionalI18n) return;
         // window.i18n is created after this runs, so it is read when the language is needed.
         const sync = () => {
             if (!win.i18n) return;
