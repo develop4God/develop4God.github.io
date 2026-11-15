@@ -12,7 +12,7 @@ function loadModule() {
     return win.DevotionalInstall;
 }
 
-const { init } = loadModule();
+const { init, isAndroid } = loadModule();
 
 function fakeButton() {
     const classes = new Set(['hidden']);
@@ -29,13 +29,24 @@ function fakeButton() {
     };
 }
 
-function fakeWindow() {
+function fakeWindow(navigator) {
     const listeners = {};
     return {
         listeners,
+        navigator,
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
 }
+
+const UA = {
+    androidPhone: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Mobile Safari/537.36',
+    androidTablet: 'Mozilla/5.0 (Linux; Android 13; SM-X900) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
+    androidFirefox: 'Mozilla/5.0 (Android 14; Mobile; rv:130.0) Gecko/130.0 Firefox/130.0',
+    linuxDesktop: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
+    windows: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
+    mac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15',
+    iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+};
 
 const doc = (button) => ({ querySelector: (selector) => (selector === '[data-install]' ? button : null) });
 
@@ -106,6 +117,85 @@ test('appinstalled hides the button', () => {
     assert.equal(button.shown, true);
     win.listeners.appinstalled();
     assert.equal(button.shown, false);
+});
+
+// The native Android app is the offer on Android, so the PWA install button is for everyone else.
+for (const [label, ua] of [['phone', UA.androidPhone], ['tablet', UA.androidTablet], ['Firefox', UA.androidFirefox]]) {
+    test(`Android ${label}: the button is never shown, and the browser's own banner is still suppressed`, async () => {
+        const button = fakeButton();
+        const win = fakeWindow({ userAgent: ua });
+        init(doc(button), win);
+        const event = promptEvent();
+        win.listeners.beforeinstallprompt(event);
+        assert.equal(event.defaultPrevented, true);
+        assert.equal(button.shown, false);
+        await assert.doesNotReject(async () => button.listeners.click());
+        assert.equal(event.prompts, 0);
+    });
+}
+
+test('Android is also recognised from the client-hints platform, even with a desktop-style user agent', () => {
+    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'Android' } }), true);
+});
+
+test('the client-hints platform is compared without regard to case', () => {
+    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'android' } }), true);
+    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'ANDROID' } }), true);
+});
+
+for (const [label, ua] of [['Linux desktop', UA.linuxDesktop], ['Windows', UA.windows], ['macOS', UA.mac], ['iPhone', UA.iphone]]) {
+    test(`${label}: the button is offered`, () => {
+        const button = fakeButton();
+        const win = fakeWindow({ userAgent: ua });
+        init(doc(button), win);
+        win.listeners.beforeinstallprompt(promptEvent());
+        assert.equal(button.shown, true);
+    });
+}
+
+// ------------------------------------------------------------------------------------ config
+
+test('config.installOnAndroid: true offers the button on Android too', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    init(doc(button), win, { enabled: true, installOnAndroid: true });
+    win.listeners.beforeinstallprompt(promptEvent());
+    assert.equal(button.shown, true);
+});
+
+test('config.installOnAndroid: false (or absent) keeps Android on the native app', () => {
+    for (const config of [{ installOnAndroid: false }, {}, undefined]) {
+        const button = fakeButton();
+        const win = fakeWindow({ userAgent: UA.androidPhone });
+        init(doc(button), win, config);
+        win.listeners.beforeinstallprompt(promptEvent());
+        assert.equal(button.shown, false, JSON.stringify(config));
+    }
+});
+
+test('config.enabled: false registers nothing, so no browser banner is suppressed and no button appears', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.windows });
+    init(doc(button), win, { enabled: false, installOnAndroid: true });
+    assert.deepEqual(Object.keys(win.listeners), []);
+    assert.equal(button.shown, false);
+});
+
+test('config.enabled: anything but an explicit false means enabled', () => {
+    for (const config of [undefined, {}, { enabled: true }, { enabled: undefined }]) {
+        const button = fakeButton();
+        const win = fakeWindow({ userAgent: UA.windows });
+        init(doc(button), win, config);
+        win.listeners.beforeinstallprompt(promptEvent());
+        assert.equal(button.shown, true, JSON.stringify(config));
+    }
+});
+
+test('isAndroid: unknown or missing navigator data is not Android', () => {
+    assert.equal(isAndroid(undefined), false);
+    assert.equal(isAndroid({}), false);
+    assert.equal(isAndroid({ userAgent: '' }), false);
+    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'Linux' } }), false);
 });
 
 test('a page without the button registers nothing and does not throw', () => {

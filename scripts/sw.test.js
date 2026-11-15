@@ -81,6 +81,9 @@ class FakeCaches {
         }
         return this.stores.get(name);
     }
+    async has(name) {
+        return this.stores.has(name);
+    }
     async keys() {
         return [...this.stores.keys()];
     }
@@ -320,6 +323,42 @@ for (const [name, url] of DATA_URLS) {
         assert.equal(answer.status, 404);
     });
 }
+
+test('a worker told to stand down (the PWA kill switch left its marker) goes network-only and creates no cache', async () => {
+    const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
+    await worker.caches.open('devocionales-disabled'); // what DevotionalSwRegister.disable() leaves behind
+
+    const shell = worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' });
+    assert.equal(await (await shell.answer).text(), '<html>shell v1</html>'); // from the network now
+    worker.calls.length = 0;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/js/shared.js`).answer).text(), 'js');
+    assert.deepEqual(worker.calls, [`${ORIGIN}/js/shared.js`], 'it must go to the network, not the build cache');
+    assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
+
+    // Nothing was added: only the build cache from install and the marker.
+    assert.deepEqual((await worker.caches.keys()).sort(), ['devocionales-disabled', 'devocionales-v1']);
+});
+
+test('an evicted build cache is not mistaken for the kill switch: the worker keeps working and saving data', async () => {
+    const worker = await installed({ [YEAR_URL]: response('{"n":1}') });
+    await worker.caches.delete('devocionales-v1'); // the browser evicted it under storage pressure
+    const shell = worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' });
+    assert.equal(await (await shell.answer).text(), '<html>shell v1</html>'); // network fallback
+    assert.equal(await ask(worker, YEAR_URL), '{"n":1}');
+    assert.equal(await savedText(worker, YEAR_URL), '{"n":1}'); // still saving
+});
+
+test('a newer worker clears the stand-down marker when it activates, so re-enabling the PWA works', async () => {
+    const worker = await installed();
+    await worker.caches.open('devocionales-disabled');
+    await worker.lifecycle('activate');
+    assert.deepEqual((await worker.caches.keys()).sort(), ['devocionales-v1']);
+});
+
+test('the cache prefix is the same in the worker and in the page script that disables it', () => {
+    const prefixIn = (file) => fs.readFileSync(path.join(__dirname, file), 'utf8').match(/CACHE_PREFIX = '([^']+)'/)[1];
+    assert.equal(prefixIn('../devocionales/js/devotional-sw-register.js'), prefixIn('sw.template.js'));
+});
 
 test('opaque and error responses are never saved', async () => {
     for (const bad of [response('x', { type: 'opaque', status: 200 }), response('missing', { status: 404 }), response('boom', { status: 500 })]) {

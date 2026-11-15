@@ -14,15 +14,16 @@ const CONTENT_TYPES = {
     '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.woff2': 'font/woff2',
 };
 
-// Serves the repo as a static site; `state.swSource`, when set, replaces /devocionales/sw.js.
+// Serves the repo as a static site; `state.overrides` maps a URL path to JavaScript source served
+// instead of the file on disk, which is how a test simulates a new deploy.
 function startSiteServer(state) {
     return new Promise((resolve) => {
         const server = http.createServer((req, res) => {
             let pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname);
             if (pathname.endsWith('/')) pathname += 'index.html';
-            if (pathname === '/devocionales/sw.js' && state.swSource) {
+            if (state.overrides[pathname]) {
                 res.writeHead(200, { 'content-type': 'text/javascript' });
-                return res.end(state.swSource);
+                return res.end(state.overrides[pathname]);
             }
             const file = path.resolve(SITE_ROOT, `.${pathname}`);
             if (!file.startsWith(SITE_ROOT + path.sep) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
@@ -115,7 +116,7 @@ test.describe('updates', () => {
     // nor context.route sees it), so this test serves the site from a small server whose
     // /devocionales/sw.js can be switched to a "new deploy".
     test('a new worker replaces the old build, keeps saved data, and never reloads a reader mid-read', async ({ page }) => {
-        const state = { swSource: null };
+        const state = { overrides: {} };
         const server = await startSiteServer(state);
         const base = `http://127.0.0.1:${server.address().port}`;
         try {
@@ -126,7 +127,7 @@ test.describe('updates', () => {
             expect(await cacheNames(page)).toContain(`devocionales-${oldVersion}`);
             await page.evaluate(() => { window.readerSession = 'still-open'; });
 
-            state.swSource = source.replace(oldVersion, newVersion); // the deploy
+            state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, newVersion); // the deploy
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
 
             await expect.poll(() => cacheNames(page)).toContain(`devocionales-${newVersion}`);
@@ -137,6 +138,85 @@ test.describe('updates', () => {
         } finally {
             server.close();
         }
+    });
+});
+
+test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
+    test.setTimeout(45_000);
+    const DISABLED = 'window.DevotionalPwaConfig = Object.freeze({ enabled: false, installOnAndroid: false });';
+    const CONFIG_PATH = '/devocionales/js/devotional-pwa-config.js';
+
+    test('off from the start: no worker, no manifest, no install button', async ({ page, context }) => {
+        await context.route(`**${CONFIG_PATH}`, (route) => route.fulfill({ contentType: 'text/javascript', body: DISABLED }));
+        await page.goto(READER, { waitUntil: 'networkidle' });
+        await page.evaluate(() => {
+            const offer = new Event('beforeinstallprompt', { cancelable: true });
+            offer.prompt = () => Promise.resolve();
+            offer.userChoice = Promise.resolve({ outcome: 'accepted' });
+            window.dispatchEvent(offer);
+        });
+        await page.waitForTimeout(500);
+        expect(await page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+        expect(await page.locator('link[rel="manifest"]').count()).toBe(0);
+        await expect(page.locator('#install-app-btn')).toBeHidden();
+        await expect(page.locator('h1').first()).not.toHaveText(''); // the reader itself still works
+    });
+
+    test('a config script that fails to load degrades to the defaults and does not break the page', async ({ page, context }) => {
+        await context.route(`**${CONFIG_PATH}`, (route) => route.abort());
+        const pageErrors = [];
+        page.on('pageerror', (error) => pageErrors.push(error.message));
+        await page.goto(READER, { waitUntil: 'networkidle' });
+        await page.locator('label.theme-switch').click(); // inline code after the PWA wiring must still run
+        await expect(page.locator('html')).toHaveAttribute('data-theme', /^(dark|light)$/);
+        expect(pageErrors.filter((message) => /DevotionalPwaConfig/.test(message))).toEqual([]);
+    });
+
+    test('switched off by a deploy: an already installed worker and its caches are removed', async ({ page }) => {
+        const state = { overrides: {} };
+        const server = await startSiteServer(state);
+        const base = `http://127.0.0.1:${server.address().port}`;
+        try {
+            await installWorker(page, base);
+            const source = fs.readFileSync(path.join(SITE_ROOT, 'devocionales/sw.js'), 'utf8');
+            const oldVersion = source.match(/version\\":\\"([0-9a-f]{12})/)[1];
+            expect((await cacheNames(page)).some((name) => name.startsWith('devocionales-'))).toBe(true);
+
+            // The deploy: a new worker version whose precached config says enabled: false.
+            state.overrides[CONFIG_PATH] = DISABLED;
+            state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, 'bbbbbbbbbbbb');
+            await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
+            await expect.poll(() => cacheNames(page)).toContain('devocionales-bbbbbbbbbbbb');
+            // Wait for the new worker to be active (it deletes the old build cache on activation);
+            // until then a reload would still be answered by the old worker and its old config.
+            await expect.poll(() => cacheNames(page)).not.toContain(`devocionales-${oldVersion}`);
+
+            await page.reload({ waitUntil: 'domcontentloaded' }); // the next visit picks up the new config
+            await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);
+            // Only the marker that tells the unregistered worker to stand down is left behind.
+            await expect.poll(async () => (await cacheNames(page)).filter((name) => name.startsWith('devocionales-')))
+                .toEqual(['devocionales-disabled']);
+        } finally {
+            server.close();
+        }
+    });
+});
+
+test.describe('install button on Android', () => {
+    // Android users have the native app, so the web app is not offered there.
+    test.use({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36' });
+
+    test('is never shown, while the browser\'s own install banner is still suppressed', async ({ page }) => {
+        await page.goto(READER, { waitUntil: 'networkidle' });
+        const notPrevented = await page.evaluate(() => {
+            const offer = new Event('beforeinstallprompt', { cancelable: true });
+            offer.prompt = () => Promise.resolve();
+            offer.userChoice = Promise.resolve({ outcome: 'accepted' });
+            return window.dispatchEvent(offer); // false when a listener called preventDefault()
+        });
+        expect(notPrevented).toBe(false);
+        await page.waitForTimeout(300);
+        await expect(page.locator('#install-app-btn')).toBeHidden();
     });
 });
 

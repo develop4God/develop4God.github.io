@@ -43,13 +43,59 @@
         });
     }
 
+    // Must equal CACHE_PREFIX in scripts/sw.template.js (scripts/sw.test.js enforces it).
+    const CACHE_PREFIX = 'devocionales-';
+    const DISABLED_CACHE = `${CACHE_PREFIX}disabled`;
+
+    // The kill switch: removes this app's worker and caches from the reader's browser and drops the
+    // manifest link so the page stops being installable. Each step is best-effort, because there is
+    // nothing useful to do when one fails.
+    // The marker cache goes first: an unregistered worker keeps controlling this page until it
+    // closes, and the marker tells it to stop saving, so it cannot recreate what is deleted below.
+    // A newer worker deletes the marker when it activates, which is how the PWA is re-enabled.
+    async function disable(win, scope) {
+        const manifest = win.document && win.document.querySelector('link[rel="manifest"]');
+        if (manifest) manifest.remove();
+        try {
+            if (win.caches) await win.caches.open(DISABLED_CACHE);
+        } catch (err) {
+            // Without the marker the worker may recreate a cache; the rest still helps.
+        }
+        try {
+            const container = win.navigator && win.navigator.serviceWorker;
+            if (container && typeof container.getRegistrations === 'function') {
+                const registrations = await container.getRegistrations();
+                await Promise.all(registrations
+                    .filter((registration) => new URL(registration.scope).pathname === scope)
+                    .map((registration) => registration.unregister()));
+            }
+        } catch (err) {
+            // Nothing to remove, or the browser refused.
+        }
+        try {
+            if (win.caches) {
+                const names = await win.caches.keys();
+                await Promise.all(names
+                    .filter((name) => name.startsWith(CACHE_PREFIX) && name !== DISABLED_CACHE)
+                    .map((name) => win.caches.delete(name)));
+            }
+        } catch (err) {
+            // Same: best effort.
+        }
+    }
+
     // Registers once the page has loaded, so the worker never competes with the first paint.
-    function start(win, workerUrl, scope) {
+    // `config` is DevotionalPwaConfig; only an explicit `enabled: false` switches the PWA off.
+    function start(win, workerUrl, scope, config) {
+        if (config && config.enabled === false) {
+            disable(win, scope);
+            return;
+        }
         const registerWorker = () => register(win.navigator, workerUrl, scope);
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
         reloadOnUpdate(win.navigator, win.document, () => win.location.reload());
     }
 
-    global.DevotionalSwRegister = { register, reloadOnUpdate, start };
+    global.DevotionalSwRegister = { register, reloadOnUpdate, start, disable };
 })(window);

@@ -19,11 +19,12 @@
 // worker activates; `devocionales-data` survives deploys, since remote content is independent of
 // the page build. The data cache keeps the newest few year files and never evicts index.json.
 
-const CONFIG = JSON.parse("{\"version\":\"f244db597436\",\"timeoutMs\":4000,\"maxDataEntries\":24,\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
+const CONFIG = JSON.parse("{\"version\":\"667d858ba8a7\",\"timeoutMs\":4000,\"maxDataEntries\":24,\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-pwa-config.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
 
 const CACHE_PREFIX = 'devocionales-';
 const BUILD_CACHE = `${CACHE_PREFIX}${CONFIG.version}`;
 const DATA_CACHE = `${CACHE_PREFIX}data`;
+const DISABLED_CACHE = `${CACHE_PREFIX}disabled`;
 const SHELL_PATH = '/devocionales/';
 const SHELL_PATHS = new Set([SHELL_PATH, `${SHELL_PATH}index.html`]);
 const SLOW = Symbol('slow');
@@ -57,6 +58,16 @@ self.addEventListener('activate', (event) => {
       .then(() => self.clients.claim()),
   );
 });
+
+// The page's kill switch (DevotionalSwRegister.disable) leaves the DISABLED_CACHE marker, then
+// unregisters this worker and deletes the other caches. An unregistered worker keeps controlling
+// the open page until that closes, so it checks the marker and passes requests to the network,
+// creating no cache. The marker is explicit on purpose: a build cache evicted by the browser must
+// not be mistaken for the kill switch. The next worker to activate deletes the marker.
+async function unlessDisabled(request, handle) {
+  if (await caches.has(DISABLED_CACHE)) return fetch(request);
+  return handle();
+}
 
 async function fromBuild(request, url) {
   const saved = await (await caches.open(BUILD_CACHE)).match(url);
@@ -111,14 +122,14 @@ self.addEventListener('fetch', (event) => {
 
   if (url.origin === siteOrigin) {
     if (request.mode === 'navigate' && SHELL_PATHS.has(url.pathname)) {
-      event.respondWith(fromBuild(request, absolute(SHELL_PATH)));
+      event.respondWith(unlessDisabled(request, () => fromBuild(request, absolute(SHELL_PATH))));
     } else if (url.pathname !== SHELL_PATH && precached.has(absolute(url.pathname))) {
-      event.respondWith(fromBuild(request, absolute(url.pathname)));
+      event.respondWith(unlessDisabled(request, () => fromBuild(request, absolute(url.pathname))));
     }
     return;
   }
 
   if (url.hostname === CONFIG.dataHost && CONFIG.dataPathPrefixes.some((prefix) => url.pathname.startsWith(prefix))) {
-    event.respondWith(networkFirst(request, event));
+    event.respondWith(unlessDisabled(request, () => networkFirst(request, event)));
   }
 });

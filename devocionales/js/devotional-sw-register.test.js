@@ -12,7 +12,7 @@ function loadModule() {
     return win.DevotionalSwRegister;
 }
 
-const { register, reloadOnUpdate, start } = loadModule();
+const { register, reloadOnUpdate, start, disable } = loadModule();
 
 function fakeNavigator({ controller = null, registerImpl } = {}) {
     const listeners = {};
@@ -127,4 +127,97 @@ test('start: waits for the load event so the worker never competes with first pa
     handlers.load();
     await Promise.resolve();
     assert.equal(nav.calls.length, 1);
+});
+
+// ------------------------------------------------------------------ master switch (kill switch)
+
+function disableWindow({ registrations = [], cacheNames = [], manifest = { removed: false, remove() { this.removed = true; } } } = {}) {
+    const unregistered = [];
+    const deleted = [];
+    const events = [];
+    return {
+        unregistered,
+        deleted,
+        events,
+        manifest,
+        navigator: {
+            serviceWorker: {
+                getRegistrations: async () => registrations.map((scope) => ({
+                    scope,
+                    unregister: async () => { unregistered.push(scope); events.push(`unregister ${scope}`); return true; },
+                })),
+            },
+        },
+        caches: {
+            open: async (name) => { events.push(`open ${name}`); return {}; },
+            keys: async () => cacheNames,
+            delete: async (name) => { deleted.push(name); events.push(`delete ${name}`); return true; },
+        },
+        document: { querySelector: (selector) => (selector === 'link[rel="manifest"]' ? manifest : null) },
+    };
+}
+
+test('disable: removes this app\'s worker and caches and the manifest link, and nothing else', async () => {
+    const win = disableWindow({
+        registrations: ['https://x.test/devocionales/', 'https://x.test/devocionales/sub/', 'https://x.test/habitus/', 'https://x.test/'],
+        cacheNames: ['devocionales-abc123', 'devocionales-data', 'devocionales-disabled', 'other-app', 'workbox-precache'],
+    });
+    await disable(win, '/devocionales/');
+    assert.deepEqual(win.unregistered, ['https://x.test/devocionales/']); // exactly this scope, not deeper ones
+    assert.deepEqual(win.deleted.sort(), ['devocionales-abc123', 'devocionales-data']); // not the marker
+    assert.equal(win.manifest.removed, true);
+});
+
+test('disable: leaves the stand-down marker first, so a still-running worker stops saving before anything is deleted', async () => {
+    const win = disableWindow({
+        registrations: ['https://x.test/devocionales/'],
+        cacheNames: ['devocionales-abc123', 'devocionales-data'],
+    });
+    await disable(win, '/devocionales/');
+    assert.equal(win.events[0], 'open devocionales-disabled');
+    assert.ok(win.events.indexOf('open devocionales-disabled') < win.events.findIndex((e) => e.startsWith('delete ')));
+});
+
+test('disable: with nothing installed it does nothing and does not throw', async () => {
+    const win = disableWindow({ manifest: null });
+    await assert.doesNotReject(disable(win, '/devocionales/'));
+    assert.deepEqual(win.unregistered, []);
+    assert.deepEqual(win.deleted, []);
+});
+
+test('disable: browsers without service workers or the Cache API are fine', async () => {
+    await assert.doesNotReject(disable({ navigator: {}, document: { querySelector: () => null } }, '/devocionales/'));
+    await assert.doesNotReject(disable({ navigator: undefined, document: { querySelector: () => null } }, '/devocionales/'));
+});
+
+test('disable: a failing unregister or cache delete never throws', async () => {
+    const win = disableWindow({ registrations: ['https://x.test/devocionales/'], cacheNames: ['devocionales-data'] });
+    win.navigator.serviceWorker.getRegistrations = async () => { throw new Error('denied'); };
+    win.caches.delete = async () => { throw new Error('denied'); };
+    await assert.doesNotReject(disable(win, '/devocionales/'));
+});
+
+test('start: with the PWA disabled it registers nothing, watches nothing, and removes what is installed', async () => {
+    const nav = fakeNavigator();
+    const win = disableWindow({ registrations: ['https://x.test/devocionales/'], cacheNames: ['devocionales-data'] });
+    win.navigator = { ...nav };
+    win.document.readyState = 'complete';
+    win.location = { reload() {} };
+    win.addEventListener = () => {};
+    start(win, '/devocionales/sw.js', '/devocionales/', { enabled: false });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(nav.calls.length, 0);
+    assert.deepEqual(Object.keys(nav.listeners), []);
+    assert.equal(win.manifest.removed, true);
+});
+
+test('start: enabled, or no config at all, still registers', async () => {
+    for (const config of [undefined, {}, { enabled: true }]) {
+        const nav = fakeNavigator();
+        const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
+        win.document.readyState = 'complete';
+        start(win, '/devocionales/sw.js', '/devocionales/', config);
+        await Promise.resolve();
+        assert.equal(nav.calls.length, 1, JSON.stringify(config));
+    }
 });

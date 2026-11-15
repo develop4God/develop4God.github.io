@@ -611,12 +611,11 @@
     <script src="/devocionales/js/devotional-render-dom.js"></script>
     <script src="/devocionales/js/devotional-salvation-modal.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
+    <script src="/devocionales/js/devotional-pwa-config.js"></script>
     <script src="/devocionales/js/devotional-install.js"></script>
     <script src="/devocionales/js/devotional-sw-register.js"></script>
     <script>
         lucide.createIcons();
-        DevotionalInstall.init(document, window);
-        DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/');
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
@@ -654,6 +653,11 @@
                 localStorage.setItem('appBannerDismissed', '1');
             });
         })();
+
+        // Last, so nothing above can be stopped by it. window.DevotionalPwaConfig is undefined if
+        // its script failed to load, and both modules then fall back to their defaults.
+        DevotionalInstall.init(document, window, window.DevotionalPwaConfig);
+        DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig);
     </script>
 </body>
 </html>
