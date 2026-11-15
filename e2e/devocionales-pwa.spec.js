@@ -517,13 +517,13 @@ test.describe('install button shine', () => {
     }
     const shine = (page) => page.locator('#install-app-btn').evaluate((el) => {
         const after = getComputedStyle(el, '::after');
-        return { animation: after.animationName, clipped: getComputedStyle(el).overflow };
+        return { animation: after.animationName, runs: after.animationIterationCount, clipped: getComputedStyle(el).overflow };
     });
 
-    test('a band sweeps across the button, clipped inside it', async ({ page }) => {
+    test('a band sweeps across the button 5 times, clipped inside it, then stops', async ({ page }) => {
         await page.emulateMedia({ reducedMotion: 'no-preference' });
         await showButton(page);
-        expect(await shine(page)).toEqual({ animation: 'btn-shine-sweep', clipped: 'hidden' });
+        expect(await shine(page)).toEqual({ animation: 'btn-shine-sweep', runs: '5', clipped: 'hidden' });
     });
 
     test('there is no animation for visitors who prefer reduced motion', async ({ page }) => {

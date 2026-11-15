@@ -136,7 +136,7 @@
         }
         .btn-primary:hover { opacity: 0.85; }
 
-        /* A light band sweeps across the install button now and then, to draw the eye to it. */
+        /* A light band sweeps across the install button 5 times, to draw the eye to it, then stops. */
         .btn-shine { position: relative; overflow: hidden; }
         .btn-shine::after {
             content: "";
@@ -145,7 +145,7 @@
             width: 40%;
             background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.5), transparent);
             transform: translateX(-150%) skewX(-20deg);
-            animation: btn-shine-sweep 3.5s ease-in-out infinite;
+            animation: btn-shine-sweep 3.5s ease-in-out 5;
             pointer-events: none;
         }
         @keyframes btn-shine-sweep {
