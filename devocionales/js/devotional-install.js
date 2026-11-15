@@ -30,6 +30,12 @@
             button.classList.add('hidden');
             button.classList.remove('inline-flex');
         };
+        // Android gets a direct Google Play download button instead of the PWA install prompt.
+        const androidDownloadBtn = doc.getElementById?.('download-app-android-btn');
+        if (androidDownloadBtn && isAndroid(win.navigator)) {
+            androidDownloadBtn.classList.remove('hidden');
+            androidDownloadBtn.classList.add('inline-flex');
+        }
         win.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault(); // also keeps the browser's own banner off where it is withheld
             if (withheld) return;
