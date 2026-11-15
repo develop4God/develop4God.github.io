@@ -136,6 +136,26 @@
         }
         .btn-primary:hover { opacity: 0.85; }
 
+        /* A light band sweeps across the install button now and then, to draw the eye to it. */
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 40%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-150%) skewX(-20deg);
+            animation: btn-shine-sweep 3.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes btn-shine-sweep {
+            0%, 55% { transform: translateX(-150%) skewX(-20deg); }
+            100% { transform: translateX(400%) skewX(-20deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-shine::after { animation: none; }
+        }
+
         .support-btn-icon { animation: support-heartbeat 1.8s ease-in-out infinite; }
         @keyframes support-heartbeat {
             0%, 100% { transform: scale(1); }
@@ -392,7 +412,7 @@
                     <span id="support-ministry-label"></span>
                 </a>
                 <!-- Shown by devotional-install.js only when the browser offers to install the app. -->
-                <button type="button" id="install-app-btn" data-install class="btn-primary px-4 py-2 hidden items-center gap-2">
+                <button type="button" id="install-app-btn" data-install class="btn-primary btn-shine px-4 py-2 hidden items-center gap-2">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     <span data-i18n="devotionals.installApp">Install app</span>
                 </button>
