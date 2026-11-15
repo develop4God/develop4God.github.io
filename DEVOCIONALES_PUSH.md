@@ -101,11 +101,12 @@ automated tests, any change to the Flutter app or the Cloud Functions.
 
 ## Before launch (outside the code)
 
-1. Create our own VAPID key pair (changing it later invalidates every token).
-2. Restrict the web API key by HTTP referrer in the Google Cloud console.
-3. Add budget alerts on Firestore reads and Functions.
-4. Add the production and preview hosts to Authentication authorized domains.
+1. Done (2026-11-15): our own VAPID public key is in `devotional-pwa-config.js` (changing it later invalidates every token).
+2. Done (2026-11-15): the web API key (`8e14c025...`) is restricted by HTTP referrer to develop4god.com, www.develop4god.com, develop4god-github-io.pages.dev, develop4god.github.io, the two Firebase hosts and localhost; its 27 API restrictions are unchanged. Allowed origins pass, other origins and empty referers get 403.
+3. Done by the owner: budget alerts.
+4. Done (2026-11-15): authorized domains in Authentication now include develop4god.com, www.develop4god.com, develop4god-github-io.pages.dev and develop4god.github.io.
 5. No privacy policy change: the policy page is already linked from the page and reachable by every PWA user. The short consent line next to the button (`push.consent`) stays.
+6. Still open: real-device checks (installed PWA click with the app closed and open, Android Chrome, installed iOS PWA), then set `pushEnabled: true`.
 
 ## Merge gate
 
