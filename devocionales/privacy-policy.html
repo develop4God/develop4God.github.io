@@ -219,7 +219,7 @@
     <script src="/devocionales/js/modern.js"></script>
     <script>
         lucide.createIcons();
-        DevotionalStandalone.apply(document, window); // the installed app stays inside /devocionales/
+        if (window.DevotionalStandalone) DevotionalStandalone.apply(document, window); // the installed app stays inside /devocionales/
 
         (function () {
             const toggle = document.getElementById('theme-toggle');

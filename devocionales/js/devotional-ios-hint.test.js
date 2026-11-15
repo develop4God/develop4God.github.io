@@ -169,3 +169,14 @@ test('init: a page without the hint element does nothing and does not throw', ()
     const doc = { querySelector: () => null };
     assert.doesNotThrow(() => init(doc, fakeWindow(), {}));
 });
+
+// An older cached page does not load devotional-standalone.js: the hint must stay quiet, not throw.
+test('init: without the standalone module the hint stays hidden and nothing throws', () => {
+    const filename = path.join(__dirname, 'devotional-ios-hint.js');
+    const source = fs.readFileSync(filename, 'utf8');
+    const win = {};
+    vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
+    const doc = fakeDocument();
+    assert.doesNotThrow(() => win.DevotionalIosHint.init(doc, fakeWindow(), {}));
+    assert.equal(doc.hint.shown, false);
+});

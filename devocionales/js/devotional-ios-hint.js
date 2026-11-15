@@ -43,6 +43,9 @@
         const hint = doc.querySelector('[data-ios-hint]');
         if (!hint) return;
         if (config && config.enabled === false) return;
+        // Standalone detection lives in devotional-standalone.js. A page cached from before that file
+        // existed does not load it: with no way to tell whether the app is installed, show nothing.
+        if (!global.DevotionalStandalone) return;
         if (!canAddToHomeScreen(win.navigator) || global.DevotionalStandalone.isStandalone(win) || wasDismissed(win)) return;
         hint.classList.remove('hidden');
         const close = doc.querySelector('[data-ios-hint-close]');

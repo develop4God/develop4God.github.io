@@ -486,6 +486,19 @@ test.describe('installed app keeps the visitor inside /devocionales/', () => {
         await expect(page.locator('#back-link')).toBeVisible();
     });
 
+    test('Android and desktop installs (display-mode: standalone) get the same treatment', async ({ page }) => {
+        await page.addInitScript(() => {
+            const original = window.matchMedia.bind(window);
+            window.matchMedia = (query) => (query === '(display-mode: standalone)'
+                ? { matches: true, media: query, addEventListener() {}, removeEventListener() {} }
+                : original(query));
+        });
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await expect(page.locator('#back-link')).toBeHidden();
+        const inert = await page.locator('a[href="/"]').evaluateAll((links) => links.map((l) => l.inert));
+        expect(inert.every(Boolean)).toBe(true);
+    });
+
     test('the back link is hidden in the installed app', async ({ page }) => {
         await standalone(page);
         await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
