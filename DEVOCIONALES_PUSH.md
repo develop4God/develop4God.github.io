@@ -108,6 +108,21 @@ automated tests, any change to the Flutter app or the Cloud Functions.
 5. No privacy policy change: the policy page is already linked from the page and reachable by every PWA user. The short consent line next to the button (`push.consent`) stays.
 6. Still open: real-device checks (installed PWA click with the app closed and open, Android Chrome, installed iOS PWA), then set `pushEnabled: true`.
 
+## Status (2026-11-15)
+
+| Area | State |
+|---|---|
+| Implementation (store, facade, adapter, worker handlers, UI, 10 languages) | Done, on this PR, validator 8/8, CI green |
+| Write model mirrors the app's `FirestoreUserProfileStore` | Done, checked against real documents |
+| Own VAPID key | Done, delivery verified in a real browser |
+| Web API key referrer restriction, authorized domains | Done and verified |
+| Secret-scanning alert #1 (the public web key) | Closed as "won't fix" (public by design, restricted) |
+| Proven live (throwaway spike) | Background display, production scheduler payload (twice), real click opens the page |
+| Installed-PWA click with the app closed and open | **Open** (needs a person at the desktop) |
+| Android Chrome, installed iOS PWA | **Open** (needs real devices) |
+| `pushEnabled: true` | **Open**, only after the three checks above |
+| Known intermittent e2e: `devocionales-pwa.spec.js` worker-update test fails in roughly 4 of 10 full-suite runs on this branch (passes alone, passed 3 of 3 on `main`); under load the 45 s test budget is exceeded. A hero-image reader test that loads a remote image can also fail on a network hiccup. | **Open**, under investigation; CI passed. |
+
 ## Merge gate
 
 Do not merge, and do not enable `pushEnabled`, until C1 to C5 are proven on a real device.
