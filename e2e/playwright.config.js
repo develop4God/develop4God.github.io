@@ -7,6 +7,10 @@
 //   npx playwright install chromium
 // Then from the repo root: /tmp/pw-tools/node_modules/.bin/playwright test -c e2e/
 const { defineConfig } = require('/tmp/pw-tools/node_modules/@playwright/test');
+const { resolvePort } = require('../scripts/e2e-port');
+
+// Set E2E_PORT to run on a private port (e.g. E2E_PORT=8899) when another run holds the default.
+const PORT = resolvePort(process.env);
 
 module.exports = defineConfig({
   testDir: '.',
@@ -16,7 +20,7 @@ module.exports = defineConfig({
   outputDir: '/tmp/pw-results',
   reporter: [['list'], ['html', { outputFolder: '/tmp/pw-report', open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:8791',
+    baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
     // The devocionales page registers a service worker. An active worker answers requests
     // without Playwright's page.route() seeing them, which would silently break every spec that
@@ -38,8 +42,8 @@ module.exports = defineConfig({
       : []),
   ],
   webServer: {
-    command: 'python3 -m http.server 8791 --bind 127.0.0.1',
-    url: 'http://127.0.0.1:8791',
+    command: `python3 -m http.server ${PORT} --bind 127.0.0.1`,
+    url: `http://127.0.0.1:${PORT}`,
     cwd: '..',
     reuseExistingServer: true,
     stdout: 'ignore',
