@@ -98,7 +98,13 @@
         if (shareHandlerBound) return;
         shareHandlerBound = true;
         nativeBtn.addEventListener('click', () => {
-            navigator.share(shareData).catch(() => {});
+            navigator.share(shareData).then(() => {
+                // Share gate: record that the user has shared so gated
+                // features (Android download button, app banner) can appear.
+                if (global.DevotionalShareGate) {
+                    global.DevotionalShareGate.markShared(localStorage);
+                }
+            }).catch(() => {});
         });
     }
 
@@ -139,10 +145,13 @@
         }
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
-        // App download banner: only relevant on Android (native app via Google Play).
+        // App download banner: only relevant on Android (native app via Google Play)
+        // and only after the user has shared (share gate).
         if (localStorage.getItem('appBannerDismissed') !== '1'
             && global.DevotionalInstall
-            && global.DevotionalInstall.isAndroid(global.navigator)) {
+            && global.DevotionalInstall.isAndroid(global.navigator)
+            && global.DevotionalShareGate
+            && global.DevotionalShareGate.hasShared(localStorage)) {
             document.getElementById('app-banner').classList.remove('hidden');
         }
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');

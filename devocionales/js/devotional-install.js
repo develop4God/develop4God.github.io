@@ -31,8 +31,11 @@
             button.classList.remove('inline-flex');
         };
         // Android gets a direct Google Play download button instead of the PWA install prompt.
+        // Share gate: only reveal after the user has shared.
         const androidDownloadBtn = doc.getElementById?.('download-app-android-btn');
-        if (androidDownloadBtn && isAndroid(win.navigator)) {
+        if (androidDownloadBtn && isAndroid(win.navigator)
+            && global.DevotionalShareGate
+            && global.DevotionalShareGate.hasShared(localStorage)) {
             androidDownloadBtn.classList.remove('hidden');
             androidDownloadBtn.classList.add('inline-flex');
         }
