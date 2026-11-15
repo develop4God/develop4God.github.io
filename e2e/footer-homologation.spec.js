@@ -107,3 +107,25 @@ test('all pages use the same contact-link icon+label structure', async ({ page }
     await expect(icon).toHaveCount(1);
   }
 });
+
+// The brand in the copyright line is coloured, with a palette per theme (same look as the home).
+const BRAND_PAGES = ['/devocionales/?lang=en', '/habitus/', '/work-with-me/', '/devocionales/privacy-policy.html'];
+const BRAND_COLORS = {
+  light: { four: 'rgb(79, 111, 0)', god: 'rgb(138, 90, 0)' },
+  dark: { four: 'rgb(132, 204, 22)', god: 'rgb(212, 160, 23)' },
+};
+
+for (const brandPath of BRAND_PAGES) {
+  for (const theme of ['light', 'dark']) {
+    test(`${brandPath} copyright brand uses the ${theme} palette`, async ({ page }) => {
+      await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+      await page.goto(brandPath, { waitUntil: 'networkidle' });
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
+      const colorOf = (cls) => page.locator(`[data-site-footer-line="copyright"] .${cls}`)
+        .evaluate((el) => getComputedStyle(el).color);
+      expect(await colorOf('site-footer-4')).toBe(BRAND_COLORS[theme].four);
+      expect(await colorOf('site-footer-god')).toBe(BRAND_COLORS[theme].god);
+      await expect(page.locator('[data-site-footer-line="copyright"]')).toContainText('Develop4God');
+    });
+  }
+}

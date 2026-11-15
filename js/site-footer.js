@@ -11,6 +11,61 @@
 (function (window) {
   'use strict';
 
+  const BRAND = 'Develop4God';
+  const STYLE_ID = 'site-footer-style';
+
+  // The brand is coloured in the home's palette: "Develop" in the page text colour, "4" and "God"
+  // in the brand lime and gold. Each palette is picked for contrast on its own background, so
+  // light and dark mode differ. `--text` is the page text colour on every page that uses this.
+  // Pages force every colour inside #page-footer with !important (modern.css does too), so these
+  // rules are scoped to #page-footer and carry !important to win.
+  const STYLE = [
+    '#page-footer .site-footer-brand { font-weight: 700; }',
+    '#page-footer .site-footer-dev { color: var(--text, inherit) !important; }',
+    '#page-footer .site-footer-4 { color: #4f6f00 !important; }',
+    '#page-footer .site-footer-god { color: #8a5a00 !important; }',
+    ':root[data-theme="dark"] #page-footer .site-footer-4 { color: #84cc16 !important; }',
+    ':root[data-theme="dark"] #page-footer .site-footer-god { color: #d4a017 !important; }',
+    '@media (prefers-color-scheme: dark) {',
+    '  :root:not([data-theme="light"]) #page-footer .site-footer-4 { color: #84cc16 !important; }',
+    '  :root:not([data-theme="light"]) #page-footer .site-footer-god { color: #d4a017 !important; }',
+    '}',
+  ].join('\n');
+
+  function ensureStyle() {
+    if (!document.head || !document.getElementById) return;
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = STYLE;
+    document.head.appendChild(style);
+  }
+
+  function brandElement() {
+    const brand = document.createElement('span');
+    brand.className = 'site-footer-brand';
+    [['site-footer-dev', 'Develop'], ['site-footer-4', '4'], ['site-footer-god', 'God']].forEach(([cls, text]) => {
+      const part = document.createElement('span');
+      part.className = cls;
+      part.textContent = text;
+      brand.appendChild(part);
+    });
+    return brand;
+  }
+
+  // Fills the line with the translated text, colouring the brand wherever it sits in the sentence.
+  function fillCopyright(el, text) {
+    const at = text.indexOf(BRAND);
+    if (at === -1) {
+      el.textContent = text;
+      return;
+    }
+    el.appendChild(document.createTextNode(text.slice(0, at)));
+    el.appendChild(brandElement());
+    el.appendChild(document.createTextNode(text.slice(at + BRAND.length)));
+    ensureStyle();
+  }
+
   function renderSharedLines(footerEl, { copyright, madeWith }) {
     if (!footerEl) return;
 
@@ -18,7 +73,7 @@
 
     const copyrightEl = document.createElement('p');
     copyrightEl.dataset.siteFooterLine = 'copyright';
-    copyrightEl.textContent = copyright;
+    fillCopyright(copyrightEl, copyright);
 
     const madeWithEl = document.createElement('p');
     madeWithEl.dataset.siteFooterLine = 'madeWith';
