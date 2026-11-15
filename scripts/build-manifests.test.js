@@ -47,3 +47,19 @@ test('a language file without a title is an error, not a blank app name', () => 
     assert.throws(() => buildManifest(base, '', 'xx'), /title/i);
     assert.throws(() => buildManifest(base, undefined, 'xx'), /title/i);
 });
+
+test('--check never writes to the tree, even when the output folder is missing', () => {
+    const os = require('node:os');
+    const { spawnSync } = require('node:child_process');
+    const copy = fs.mkdtempSync(path.join(os.tmpdir(), 'manifests-check-'));
+    for (const rel of ['scripts/build-manifests.js', 'devocionales/manifest.webmanifest']) {
+        fs.mkdirSync(path.dirname(path.join(copy, rel)), { recursive: true });
+        fs.copyFileSync(path.join(ROOT, rel), path.join(copy, rel));
+    }
+    fs.cpSync(path.join(ROOT, 'lang/devocionales'), path.join(copy, 'lang/devocionales'), { recursive: true });
+
+    const result = spawnSync(process.execPath, [path.join(copy, 'scripts/build-manifests.js'), '--check'], { encoding: 'utf8' });
+
+    assert.equal(result.status, 1, 'missing manifests must fail the check');
+    assert.equal(fs.existsSync(path.join(copy, OUTPUT_DIR)), false, '--check must not create the folder');
+});

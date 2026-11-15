@@ -44,7 +44,7 @@ function render(code) {
 function main(argv) {
     const check = argv.includes('--check');
     const stale = [];
-    fs.mkdirSync(path.join(ROOT, OUTPUT_DIR), { recursive: true });
+    if (!check) fs.mkdirSync(path.join(ROOT, OUTPUT_DIR), { recursive: true });
     for (const code of languages()) {
         const file = path.join(ROOT, OUTPUT_DIR, `${code}.webmanifest`);
         const next = render(code);
