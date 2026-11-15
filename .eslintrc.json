@@ -20,6 +20,8 @@
     "DevotionalTts": "readonly",
     "DevotionalRenderDom": "readonly",
     "DevotionalSalvationModal": "readonly",
+    "DevotionalInstall": "readonly",
+    "DevotionalSwRegister": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",

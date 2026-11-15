@@ -79,15 +79,17 @@ jobs:
       - name: Validate JavaScript
         run: eslint "**/*.js" --ignore-pattern "node_modules/"
 
-      - name: Tailwind output is up to date
-        # devocionales/vendor/tailwind.css is committed (GitHub Pages has no build step). Rebuild it
-        # and fail if a Tailwind class was added or removed without regenerating the file. Uses
-        # `git status` rather than `git diff` so a file that was never committed fails too.
+      - name: Generated files are up to date
+        # devocionales/vendor/tailwind.css and devocionales/sw.js are committed (GitHub Pages has no
+        # build step). Rebuild both, in this order because the worker's version hashes the
+        # stylesheet, and fail if either differs from what is committed. Uses `git status` rather
+        # than `git diff` so a file that was never committed fails too.
         run: |
           bash scripts/build-tailwind.sh
-          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css)"
+          node scripts/build-sw.js
+          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css devocionales/sw.js)"
           if [ -n "${changes}" ]; then
-            echo "devocionales/vendor/tailwind.css is stale or uncommitted. Run: bash scripts/build-tailwind.sh"
+            echo "Generated files are stale or uncommitted. Run: bash scripts/build-tailwind.sh && node scripts/build-sw.js"
             echo "${changes}"
             exit 1
           fi

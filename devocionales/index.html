@@ -15,6 +15,9 @@
     <title>Devocional de Hoy - Devocionales Cristianos</title>
     <meta name="description" content="Tu devocional diario: versículo, reflexión, y oración para nutrir tu alma hoy.">
     <link rel="canonical" href="https://develop4god.github.io/devocionales/">
+    <link rel="manifest" href="/devocionales/manifest.webmanifest">
+    <meta name="theme-color" content="#26414d">
+    <link rel="apple-touch-icon" href="/devocionales/icons/apple-touch-icon.png">
 
     <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="/devocionales/vendor/lucide.min.js"></script>
@@ -381,7 +384,7 @@
                     <li><a href="/habitus/">Habitus+Faith</a></li>
                 </ul>
             </nav>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-center gap-3">
                 <!-- Hidden for now ("hidden" replaces "flex"): restore "flex" to re-enable. -->
                 <!-- [html-validate-disable-next wcag/h30] -->
                 <!-- text set by devotional-loader.js's applyStaticUiText() after page load -->
@@ -389,6 +392,11 @@
                     <i data-lucide="heart" class="w-4 h-4 support-btn-icon" fill="currentColor"></i>
                     <span id="support-ministry-label"></span>
                 </a>
+                <!-- Shown by devotional-install.js only when the browser offers to install the app. -->
+                <button type="button" id="install-app-btn" data-install class="btn-primary px-4 py-2 hidden items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span data-i18n="devotionals.installApp">Install app</span>
+                </button>
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
                 <!-- [html-validate-disable-next no-redundant-for] -->
@@ -603,8 +611,12 @@
     <script src="/devocionales/js/devotional-render-dom.js"></script>
     <script src="/devocionales/js/devotional-salvation-modal.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
+    <script src="/devocionales/js/devotional-install.js"></script>
+    <script src="/devocionales/js/devotional-sw-register.js"></script>
     <script>
         lucide.createIcons();
+        DevotionalInstall.init(document, window);
+        DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/');
 
         (function () {
             const toggle = document.getElementById('theme-toggle');
