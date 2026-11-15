@@ -139,7 +139,10 @@
         }
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
-        if (localStorage.getItem('appBannerDismissed') !== '1') {
+        // App banner: Android only (native app via Google Play); every other platform has the PWA.
+        if (global.DevotionalInstall
+            && global.DevotionalInstall.isAndroid(global.navigator)
+            && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');

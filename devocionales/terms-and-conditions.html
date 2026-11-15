@@ -17,13 +17,13 @@
     <meta name="description" content="Términos y Condiciones de Uso de la aplicación Devocionales Cristianos. Normativas y condiciones de uso de la aplicación móvil.">
     <link rel="canonical" href="https://develop4god.com/devocionales/terms-and-conditions">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="/devocionales/vendor/lucide.min.js"></script>
     <link rel="stylesheet" href="/devocionales/css/modern.css">
     <link rel="stylesheet" href="/devocionales/css/language-selector.css">
     <script src="/js/rtl-helper.js"></script>
     <script src="/js/site-footer.js"></script>
+    <script src="/devocionales/js/devotional-standalone.js"></script>
     <script src="/devocionales/js/i18n.js"></script>
     <script>
         (function () {
@@ -144,13 +144,15 @@
         .legal-card h2 { color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: .5rem; margin-top: 2rem; }
         .legal-card h3 { color: var(--text); margin-top: 1.25rem; }
         .legal-card p, .legal-card ul, .legal-card ol { color: var(--text-muted); margin-bottom: 1em; overflow-wrap: break-word; }
-        .legal-card a { color: var(--accent); overflow-wrap: break-word; }
+        .legal-card a:not(.btn-primary) { color: var(--accent); overflow-wrap: break-word; }
 
         /* modern.css has a blanket "footer, footer * { color: white !important }"
            rule for other pages' dark footers — override it here so this page's
            theme-aware footer text stays readable in light mode. */
         footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
     </style>
+    <!-- Last in <head>, like the Tailwind CDN's injected <style> was, so the cascade order is unchanged. -->
+    <link rel="stylesheet" href="/devocionales/vendor/tailwind.css">
 </head>
 <body>
 
@@ -212,6 +214,7 @@
     <script src="/devocionales/js/modern.js"></script>
     <script>
         lucide.createIcons();
+        if (window.DevotionalStandalone) DevotionalStandalone.apply(document, window); // the installed app stays inside /devocionales/
 
         (function () {
             const toggle = document.getElementById('theme-toggle');

@@ -214,6 +214,8 @@
     "appBannerText": "Méditations Chrétiennes — 4.9 ★★★★★ · Plus de {downloads} téléchargements. Application gratuite, 100 % hors ligne.",
     "appBannerCta": "Disponible sur Google Play",
     "appBannerClose": "Fermer",
+    "installApp": "Installer l'app",
+    "iosInstallHint": "Pour installer l’app : touchez Partager, puis « Sur l’écran d’accueil ».",
     "navDevotional": "Méditation du Jour",
     "supportMinistry": "Faire un don",
     "supportMinistryTitle": "Soutenez notre ministère pour lancer l'app sur iOS et couvrir les coûts d'infrastructure.\n\nEt la garder gratuite et sans publicité pour tous les utilisateurs.",

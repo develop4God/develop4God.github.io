@@ -1,3 +1,15 @@
 /.well-known/assetlinks.json
   Content-Type: application/json
   Cache-Control: no-cache
+
+/devocionales/sw.js
+  Cache-Control: no-cache
+
+/devocionales/js/devotional-pwa-config.js
+  Cache-Control: no-cache
+
+/devocionales/manifest.webmanifest
+  Content-Type: application/manifest+json
+
+/devocionales/manifests/*
+  Content-Type: application/manifest+json

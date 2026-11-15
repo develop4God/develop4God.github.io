@@ -15,10 +15,12 @@
     <title>Devocional de Hoy - Devocionales Cristianos</title>
     <meta name="description" content="Tu devocional diario: versículo, reflexión, y oración para nutrir tu alma hoy.">
     <link rel="canonical" href="https://develop4god.com/devocionales/">
+    <link rel="manifest" href="/devocionales/manifest.webmanifest">
+    <meta name="theme-color" content="#26414d">
+    <link rel="apple-touch-icon" href="/devocionales/icons/apple-touch-icon.png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="/devocionales/vendor/lucide.min.js"></script>
     <link rel="stylesheet" href="/devocionales/css/modern.css">
     <link rel="stylesheet" href="/devocionales/css/language-selector.css">
     <script src="/js/rtl-helper.js"></script>
@@ -134,6 +136,26 @@
         }
         .btn-primary:hover { opacity: 0.85; }
 
+        /* A light band sweeps across the install button 5 times, to draw the eye to it, then stops. */
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 40%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-150%) skewX(-20deg);
+            animation: btn-shine-sweep 3.5s ease-in-out 5;
+            pointer-events: none;
+        }
+        @keyframes btn-shine-sweep {
+            0%, 55% { transform: translateX(-150%) skewX(-20deg); }
+            100% { transform: translateX(400%) skewX(-20deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-shine::after { animation: none; }
+        }
+
         .support-btn-icon { animation: support-heartbeat 1.8s ease-in-out infinite; }
         @keyframes support-heartbeat {
             0%, 100% { transform: scale(1); }
@@ -145,6 +167,10 @@
         @media (prefers-reduced-motion: reduce) {
             .support-btn-icon { animation: none; }
         }
+
+        /* The installed app lives inside /devocionales/ (manifest scope), so the links to the rest
+           of the site are switched off there (DevotionalStandalone sets `is-standalone` on <html> and makes the home links inert). The elements stay in the page: cached scripts read them. */
+        .is-standalone #back-link { display: none; }
 
         .btn-secondary {
             background: transparent;
@@ -364,6 +390,8 @@
             padding: 0.6rem;
         }
     </style>
+    <!-- Last in <head>, like the Tailwind CDN's injected <style> was, so the cascade order is unchanged. -->
+    <link rel="stylesheet" href="/devocionales/vendor/tailwind.css">
 </head>
 <body>
 
@@ -377,10 +405,9 @@
                          "previous cached render script" and its fixture once that cache window has long passed. -->
                     <li hidden><span id="nav-vision-label"></span></li>
                     <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
-                    <li><a href="/habitus/">Habitus+Faith</a></li>
                 </ul>
             </nav>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center justify-center gap-3 md:flex-nowrap md:justify-normal">
                 <!-- Hidden for now ("hidden" replaces "flex"): restore "flex" to re-enable. -->
                 <!-- [html-validate-disable-next wcag/h30] -->
                 <!-- text set by devotional-loader.js's applyStaticUiText() after page load -->
@@ -388,6 +415,11 @@
                     <i data-lucide="heart" class="w-4 h-4 support-btn-icon" fill="currentColor"></i>
                     <span id="support-ministry-label"></span>
                 </a>
+                <!-- Shown by devotional-install.js only when the browser offers to install the app. -->
+                <button type="button" id="install-app-btn" data-install class="btn-primary btn-shine px-4 py-2 hidden items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span data-i18n="devotionals.installApp">Install app</span>
+                </button>
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
                 <!-- [html-validate-disable-next no-redundant-for] -->
@@ -414,6 +446,18 @@
             </span>
             <button type="button" id="app-banner-close" class="app-banner-close" aria-label="Cerrar">
                 <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Shown by devotional-ios-hint.js only on iOS, where the app can be installed but there is no install button. -->
+    <div id="ios-install-hint" data-ios-hint class="app-banner hidden">
+        <div class="app-banner-inner max-w-5xl mx-auto">
+            <i data-lucide="share" class="w-4 h-4 flex-shrink-0"></i>
+            <span class="app-banner-text" data-i18n="devotionals.iosInstallHint">To install this app: tap Share, then “Add to Home Screen”.</span>
+            <button type="button" data-ios-hint-close class="app-banner-close">
+                <i data-lucide="x" class="w-4 h-4"></i>
+                <span class="sr-only" data-i18n="devotionals.appBannerClose">Close</span>
             </button>
         </div>
     </div>
@@ -469,7 +513,8 @@
                         <i data-lucide="volume-2" class="w-4 h-4"></i>
                         <span class="tts-label">Escuchar</span>
                     </button>
-                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="btn-secondary px-5 py-2 flex items-center gap-2">
+                    <!-- Android only (devotional-install.js); every other platform gets the PWA install button. -->
+                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" id="download-app-android-btn" class="btn-secondary px-5 py-2 hidden items-center gap-2">
                         <i data-lucide="download" class="w-4 h-4"></i>
                         <span id="download-app-label">Descarga la App</span>
                     </a>
@@ -602,6 +647,13 @@
     <script src="/devocionales/js/devotional-render-dom.js"></script>
     <script src="/devocionales/js/devotional-salvation-modal.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>
+    <script src="/devocionales/js/devotional-pwa-config.js"></script>
+    <script src="/devocionales/js/devotional-standalone.js"></script>
+    <script src="/devocionales/js/devotional-manifest.js"></script>
+    <script src="/devocionales/js/devotional-install.js"></script>
+    <script src="/devocionales/js/devotional-ios-hint.js"></script>
+    <script src="/devocionales/js/devotional-build.js"></script>
+    <script src="/devocionales/js/devotional-sw-register.js"></script>
     <script>
         lucide.createIcons();
 
@@ -641,6 +693,24 @@
                 localStorage.setItem('appBannerDismissed', '1');
             });
         })();
+
+        // Last, so nothing above can be stopped by it. window.DevotionalPwaConfig is undefined if
+        // its script failed to load, and the modules then fall back to their defaults. Each step
+        // is independent: one that fails (a script that did not load) must not stop the others,
+        // above all the service worker registration, which also carries the kill switch.
+        [
+            () => DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig),
+            () => DevotionalInstall.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalStandalone.apply(document, window),
+            () => DevotionalManifest.init(document, window),
+        ].forEach((step) => {
+            try {
+                step();
+            } catch (error) {
+                console.error('PWA setup step failed', error);
+            }
+        });
     </script>
 </body>
 </html>
