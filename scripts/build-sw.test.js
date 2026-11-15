@@ -123,6 +123,44 @@ test('collectPrecache fails when another page references a file that does not ex
     assert.throws(() => collectPrecache(root), /legal-missing\.js/);
 });
 
+test('collectPrecache covers same-origin images and url() references inside inline styles', () => {
+    const { root, write } = makeSite();
+    write('devocionales/icons/pic.png', 'pic');
+    write('devocionales/icons/bg.png', 'bg');
+    write('devocionales/index.html', INDEX_HTML
+        .replace('<body>', '<body><img src="/devocionales/icons/pic.png" alt="">')
+        .replace('</head>', '<style>.x{background:url(/devocionales/icons/bg.png)}</style></head>'));
+    const urls = collectPrecache(root);
+    assert.ok(urls.includes('/devocionales/icons/pic.png'));
+    assert.ok(urls.includes('/devocionales/icons/bg.png'));
+});
+
+test('collectPrecache resolves a relative url() in an inline style against the page', () => {
+    const { root, write } = makeSite();
+    write('devocionales/icons/bg.png', 'bg');
+    write('devocionales/index.html', INDEX_HTML.replace('</head>', '<style>.x{background:url(icons/bg.png)}</style></head>'));
+    assert.ok(collectPrecache(root).includes('/devocionales/icons/bg.png'));
+});
+
+test('collectPrecache ignores an <img> with an empty or external src (the reader sets its image later)', () => {
+    const { root, write } = makeSite();
+    write('devocionales/index.html', INDEX_HTML.replace('<body>', '<body><img src="" alt=""><img src="https://example.com/a.png" alt="">'));
+    assert.doesNotThrow(() => collectPrecache(root));
+});
+
+test('collectPrecache fails when an image or an inline-style url() points at a missing file', () => {
+    const { root, write } = makeSite();
+    write('devocionales/index.html', INDEX_HTML.replace('<body>', '<body><img src="/devocionales/icons/missing-pic.png" alt="">'));
+    assert.throws(() => collectPrecache(root), /missing-pic\.png/);
+    write('devocionales/index.html', INDEX_HTML.replace('</head>', '<style>.x{background:url(/devocionales/icons/missing-bg.png)}</style></head>'));
+    assert.throws(() => collectPrecache(root), /missing-bg\.png/);
+});
+
+test('the config fetch wait is shorter than the data wait, because the page blocks on it', () => {
+    const { config } = buildSw(makeSite().root);
+    assert.ok(config.freshTimeoutMs > 0 && config.freshTimeoutMs < config.timeoutMs);
+});
+
 test('buildSw lists the extra pages for the worker, and none when there are none', () => {
     const { root, write } = makeSite();
     assert.deepEqual(buildSw(root).config.pages, []);

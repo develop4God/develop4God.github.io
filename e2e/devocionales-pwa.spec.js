@@ -99,8 +99,12 @@ test.describe('offline', () => {
     test('the legal pages open styled with no network', async ({ page, context }) => {
         await installWorker(page);
         await context.setOffline(true);
-        for (const legal of ['privacy-policy', 'terms-and-conditions']) {
-            await page.goto(`/devocionales/${legal}.html?lang=en`, { waitUntil: 'domcontentloaded' });
+        // Both URL forms: production redirects `page.html` to the extensionless `page`, so a reload
+        // or a bookmark lands on the second form.
+        for (const legal of [
+            'privacy-policy.html', 'privacy-policy', 'terms-and-conditions.html', 'terms-and-conditions',
+        ]) {
+            await page.goto(`/devocionales/${legal}?lang=en`, { waitUntil: 'domcontentloaded' });
             const icon = page.locator('svg.lucide.w-4').first();
             await expect(icon).toBeVisible();
             await expect(icon).toHaveCSS('width', '16px'); // a Tailwind rule, so the stylesheet came from cache

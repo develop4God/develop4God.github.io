@@ -1,0 +1,9 @@
+{
+  "name": "devocionales-tailwind-build",
+  "private": true,
+  "description": "Pinned install for scripts/build-tailwind.sh only. The site itself has no dependencies.",
+  "dependencies": {
+    "tailwindcss": "3.4.19",
+    "postcss": "8.5.33"
+  }
+}

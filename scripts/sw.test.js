@@ -22,6 +22,7 @@ const ASSETS_URL = `https://${DATA_HOST}/develop4God/Devocionales-assets/main/im
 const CONFIG = {
     version: 'v1',
     timeoutMs: 40,
+    freshTimeoutMs: 20, // the page blocks on the config script, so its wait is shorter than the data wait
     maxDataEntries: 3,
     dataHost: DATA_HOST,
     dataPathPrefixes: [
@@ -472,6 +473,37 @@ test('the config script falls back to the build copy when the network fails, is 
         else mode = how;
         assert.equal(await (await worker.fetchEvent(CONFIG_URL).answer).text(), 'config v1', how);
     }
+});
+
+test('the config fetch waits only freshTimeoutMs, because the page blocks on it', async () => {
+    let calls = 0;
+    // The first call is the install; later ones take 30 ms: slower than freshTimeoutMs (20),
+    // faster than timeoutMs (40), so only the short wait falls back to the build copy.
+    const route = () => (++calls === 1
+        ? response('config v1', JS)
+        : new Promise((resolve) => setTimeout(() => resolve(response('late', JS)), 30)));
+    const worker = await installed({ [CONFIG_URL]: route });
+    assert.equal(await (await worker.fetchEvent(CONFIG_URL).answer).text(), 'config v1');
+});
+
+test('a stood-down worker still revalidates the config script, so switching back on is not held up by the HTTP cache', async () => {
+    const worker = await installed();
+    await worker.caches.open('devocionales-disabled');
+    worker.requests.length = 0;
+    await worker.fetchEvent(CONFIG_URL).answer;
+    assert.equal(worker.requests.at(-1).cache, 'no-cache');
+});
+
+test('the legal pages also open offline through their extensionless URL, which the host redirects to', async () => {
+    const worker = await installed();
+    worker.net.offline = true;
+    const event = worker.fetchEvent(`${ORIGIN}/devocionales/privacy-policy`, { mode: 'navigate' });
+    assert.equal(await (await event.answer).text(), '<html>privacy v1</html>');
+});
+
+test('an extensionless URL of a page that is not listed is left to the browser', async () => {
+    const worker = await installed();
+    assert.equal(worker.fetchEvent(`${ORIGIN}/devocionales/terms-and-conditions`, { mode: 'navigate' }).answer, undefined);
 });
 
 // ---------------------------------------------------------------------------- hero images

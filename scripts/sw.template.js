@@ -35,7 +35,12 @@ const IMAGE_CACHE = `${CACHE_PREFIX}images`;
 const DISABLED_CACHE = `${CACHE_PREFIX}disabled`;
 const SHELL_PATH = '/devocionales/';
 const SHELL_PATHS = new Set([SHELL_PATH, `${SHELL_PATH}index.html`]);
-const PAGE_PATHS = new Set([...SHELL_PATHS, ...CONFIG.pages]);
+// The host redirects `page.html` to the extensionless `page`, so both forms must be served offline.
+const PAGE_PATHS = new Set([...SHELL_PATHS, ...CONFIG.pages, ...CONFIG.pages.map((page) => page.replace(/\.html$/, ''))]);
+const pageKey = (pathname) => {
+  if (SHELL_PATHS.has(pathname)) return SHELL_PATH;
+  return pathname.endsWith('.html') ? pathname : `${pathname}.html`;
+};
 const SLOW = Symbol('slow');
 const FAILED = Symbol('failed');
 
@@ -78,8 +83,8 @@ self.addEventListener('activate', (event) => {
 // the open page until that closes, so it checks the marker and passes requests to the network,
 // creating no cache. The marker is explicit on purpose: a build cache evicted by the browser must
 // not be mistaken for the kill switch. An enabled page deletes the marker before registering.
-async function unlessDisabled(request, handle) {
-  if (await caches.has(DISABLED_CACHE)) return fetch(request);
+async function unlessDisabled(request, handle, passThrough = () => fetch(request)) {
+  if (await caches.has(DISABLED_CACHE)) return passThrough();
   return handle();
 }
 
@@ -91,7 +96,7 @@ async function fromBuild(request, url) {
 async function networkThenBuild(request, url) {
   let timer;
   const slow = new Promise((resolve) => {
-    timer = setTimeout(() => resolve(SLOW), CONFIG.timeoutMs);
+    timer = setTimeout(() => resolve(SLOW), CONFIG.freshTimeoutMs);
   });
   const network = fetch(new Request(url, { cache: 'no-cache' })).catch(() => FAILED);
   const first = await Promise.race([network, slow]);
@@ -182,10 +187,15 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === siteOrigin) {
     const key = absolute(url.pathname);
     if (request.mode === 'navigate' && PAGE_PATHS.has(url.pathname)) {
-      const page = SHELL_PATHS.has(url.pathname) ? absolute(SHELL_PATH) : key;
+      const page = absolute(pageKey(url.pathname));
       event.respondWith(unlessDisabled(request, () => fromBuild(request, page)));
     } else if (CONFIG.freshFirst.includes(url.pathname)) {
-      event.respondWith(unlessDisabled(request, () => networkThenBuild(request, key)));
+      // Even stood down, the config is revalidated: the HTTP cache must not delay switching back on.
+      event.respondWith(unlessDisabled(
+        request,
+        () => networkThenBuild(request, key),
+        () => fetch(new Request(key, { cache: 'no-cache' })),
+      ));
     } else if (url.pathname !== SHELL_PATH && precached.has(key)) {
       event.respondWith(unlessDisabled(request, () => fromBuild(request, key)));
     } else if (CONFIG.sameOriginData.includes(url.pathname)) {

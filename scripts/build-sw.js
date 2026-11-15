@@ -30,6 +30,7 @@ const LINK_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'manifest',
 // Runtime behaviour that is not derived from the page.
 const RUNTIME = {
     timeoutMs: 4000,
+    freshTimeoutMs: 1000, // the page blocks on the config script, so it waits less than the data does
     maxDataEntries: 24, // year files kept: a few languages and versions, current and previous year
     // Hero images: saved on first view. Their list (index.json, above) is data; the images are not.
     imagePathPrefix: '/develop4God/Devocionales-assets/main/images/devotionals/',
@@ -63,13 +64,18 @@ function attribute(tag, name) {
     return match ? (match[1] ?? match[2]) : null;
 }
 
-function htmlReferences(html) {
+// Everything a page loads by tag: scripts, images, the link rels that matter, and the url()
+// references inside its inline <style> blocks (resolved against the page's own URL).
+function htmlReferences(html, pageUrl) {
     const live = html.replace(/<!--[\s\S]*?-->/g, ''); // a commented-out tag is not part of the page
     const scripts = [...live.matchAll(/<script\b[^>]*>/g)].map((m) => attribute(m[0], 'src'));
+    const images = [...live.matchAll(/<img\b[^>]*>/g)].map((m) => attribute(m[0], 'src'));
     const links = [...live.matchAll(/<link\b[^>]*>/g)]
         .filter((m) => (attribute(m[0], 'rel') || '').split(/\s+/).some((rel) => LINK_RELS.has(rel)))
         .map((m) => attribute(m[0], 'href'));
-    return [...scripts, ...links].filter(Boolean);
+    const inlineStyles = [...live.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+        .flatMap((m) => cssReferences(m[1], pageUrl));
+    return [...scripts, ...images, ...links, ...inlineStyles].filter(Boolean);
 }
 
 // url(...) targets inside a stylesheet, resolved against the stylesheet's own URL.
@@ -104,7 +110,8 @@ function collectPrecache(root) {
     // itself and so is everything it loads.
     for (const page of pageFiles(root)) {
         if (page !== SHELL_FILE) urls.add(`/${page}`);
-        for (const reference of htmlReferences(read(page))) {
+        const pageUrl = page === SHELL_FILE ? SHELL_URL : `/${page}`;
+        for (const reference of htmlReferences(read(page), pageUrl)) {
             const url = localPath(reference);
             if (url && url !== WORKER_URL) requireFile(url, page);
         }
