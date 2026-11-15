@@ -519,3 +519,26 @@ test.describe('install button shine', () => {
         expect((await shine(page)).animation).toBe('none');
     });
 });
+
+test.describe('legal pages', () => {
+    for (const url of ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html']) {
+        for (const theme of ['light', 'dark']) {
+            test(`${url}: the back button label is readable in ${theme} mode`, async ({ page }) => {
+                await page.addInitScript((t) => localStorage.setItem('theme', t), theme);
+                await page.goto(url, { waitUntil: 'networkidle' });
+                const colors = await page.locator('main a.btn-primary').evaluate((el) => ({
+                    text: getComputedStyle(el).color,
+                    background: getComputedStyle(el).backgroundColor,
+                }));
+                expect(colors.text).not.toBe(colors.background);
+            });
+        }
+
+        test(`${url}: nothing scrolls sideways on a small phone`, async ({ page }) => {
+            await page.setViewportSize({ width: 360, height: 780 });
+            await page.goto(url, { waitUntil: 'networkidle' });
+            const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+            expect(overflow).toBeLessThanOrEqual(0);
+        });
+    }
+});
