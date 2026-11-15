@@ -12,8 +12,7 @@ function loadModule() {
     return win.DevotionalInstall;
 }
 
-const DevotionalInstallApi = loadModule();
-const { init, isAndroid } = DevotionalInstallApi;
+const { init, isAndroid, showAndroidDownload } = loadModule();
 
 function fakeButton() {
     const classes = new Set(['hidden']);
@@ -264,7 +263,7 @@ function playRig(ua) {
 test('play button: shown on Android phones, tablets and Firefox', () => {
     for (const ua of [UA.androidPhone, UA.androidTablet, UA.androidFirefox]) {
         const rig = playRig(ua);
-        DevotionalInstallApi.showAndroidDownload(rig.document, rig.win);
+        showAndroidDownload(rig.document, rig.win);
         assert.equal(rig.button.shown, true, ua);
     }
 });
@@ -272,14 +271,14 @@ test('play button: shown on Android phones, tablets and Firefox', () => {
 test('play button: stays hidden on iOS, Mac, Windows and Linux (they use the PWA)', () => {
     for (const ua of [UA.iphone, UA.mac, UA.windows, UA.linuxDesktop]) {
         const rig = playRig(ua);
-        DevotionalInstallApi.showAndroidDownload(rig.document, rig.win);
+        showAndroidDownload(rig.document, rig.win);
         assert.equal(rig.button.shown, false, ua);
     }
 });
 
 test('play button: a missing element is a safe no-op', () => {
     const win = fakeWindow({ userAgent: UA.androidPhone });
-    assert.doesNotThrow(() => DevotionalInstallApi.showAndroidDownload({ getElementById: () => null }, win));
+    assert.doesNotThrow(() => showAndroidDownload({ getElementById: () => null }, win));
 });
 
 test('play button: init shows it on Android even when the PWA feature is off', () => {

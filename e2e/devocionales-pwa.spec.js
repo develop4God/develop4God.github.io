@@ -420,3 +420,60 @@ test.describe('install button', () => {
         });
     }
 });
+
+test.describe('Google Play download button', () => {
+    const ANDROID = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Mobile Safari/537.36';
+    const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+
+    test.describe('on Android', () => {
+        test.use({ userAgent: ANDROID, hasTouch: true });
+
+        test('the button and the banner are shown', async ({ page }) => {
+            await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+            await expect(page.locator('#download-app-android-btn')).toBeVisible();
+            await expect(page.locator('#app-banner')).toBeVisible();
+        });
+    });
+
+    test.describe('on iOS', () => {
+        test.use({ userAgent: IPHONE, hasTouch: true });
+
+        test('the button and the banner stay hidden (they get the PWA)', async ({ page }) => {
+            await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+            await expect(page.locator('#download-app-android-btn')).toBeHidden();
+            await expect(page.locator('#app-banner')).toBeHidden();
+        });
+    });
+
+    test('the button and the banner stay hidden on a laptop', async ({ page }) => {
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await expect(page.locator('#download-app-android-btn')).toBeHidden();
+        await expect(page.locator('#app-banner')).toBeHidden();
+    });
+});
+
+test.describe('installed app keeps the visitor inside /devocionales/', () => {
+    const leavingLinks = (page) => page.locator('a[href="/"]');
+
+    // Chromium cannot emulate display-mode, so the page is told it was launched from the home screen
+    // the way iOS does it.
+    async function standalone(page) {
+        await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { value: true }));
+    }
+
+    test('in a browser tab the links to the home page work', async ({ page }) => {
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await expect(page.locator('#back-link')).toBeVisible();
+        const brand = page.locator('header a[href="/"]');
+        expect(await brand.evaluate((el) => getComputedStyle(el).pointerEvents)).not.toBe('none');
+    });
+
+    test('in the installed app no link leads out of the scope', async ({ page }) => {
+        await standalone(page);
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await expect(page.locator('#back-link')).toBeHidden();
+        const brand = page.locator('header a[href="/"]');
+        expect(await brand.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
+        expect(await leavingLinks(page).count()).toBeGreaterThan(0); // elements stay: cached scripts still read them
+    });
+});
