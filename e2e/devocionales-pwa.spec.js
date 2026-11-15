@@ -555,3 +555,40 @@ test.describe('legal pages', () => {
         });
     }
 });
+
+test.describe('installed app name follows the language', () => {
+    const NAMES = {
+        en: 'Christian Devotionals',
+        es: 'Devocionales Cristianos',
+        zh: '基督徒灵修',
+        hi: 'ईसाई भक्ति',
+        ja: 'クリスチャン・デボーション',
+    };
+
+    // Asks Chrome which manifest it parsed for the page: the name it would give an installed app.
+    async function parsedManifest(page) {
+        const cdp = await page.context().newCDPSession(page);
+        await cdp.send('Page.enable');
+        const { url, data } = await cdp.send('Page.getAppManifest');
+        return { url, manifest: JSON.parse(data) };
+    }
+
+    for (const [lang, name] of Object.entries(NAMES)) {
+        test(`?lang=${lang} gives the app the name "${name}", same identity`, async ({ page }) => {
+            await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
+            await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', `/devocionales/manifests/${lang}.webmanifest`);
+            const { manifest } = await parsedManifest(page);
+            expect(manifest.name).toBe(name);
+            expect(manifest.id).toBe('/devocionales/');
+            expect(manifest.scope).toBe('/devocionales/');
+        });
+    }
+
+    test('switching the language in the page renames the app', async ({ page }) => {
+        await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+        await page.locator('.language-selector-button').click();
+        await page.locator('.language-option[data-lang="zh"]').click();
+        await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', '/devocionales/manifests/zh.webmanifest');
+        expect((await parsedManifest(page)).manifest.name).toBe('基督徒灵修');
+    });
+});

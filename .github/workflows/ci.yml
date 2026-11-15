@@ -90,10 +90,11 @@ jobs:
         # than `git diff` so a file that was never committed fails too.
         run: |
           bash scripts/build-tailwind.sh
+          node scripts/build-manifests.js
           node scripts/build-sw.js
-          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css devocionales/sw.js devocionales/js/devotional-build.js)"
+          changes="$(git status --porcelain -- devocionales/vendor/tailwind.css devocionales/manifests devocionales/sw.js devocionales/js/devotional-build.js)"
           if [ -n "${changes}" ]; then
-            echo "Generated files are stale or uncommitted. Run: bash scripts/build-tailwind.sh && node scripts/build-sw.js"
+            echo "Generated files are stale or uncommitted. Run: bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js"
             echo "${changes}"
             exit 1
           fi

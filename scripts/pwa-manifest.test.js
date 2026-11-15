@@ -89,6 +89,7 @@ test('_headers: the worker is never cached and the manifest has its own media ty
     // The config is the kill switch, so a browser that is not behind the worker must revalidate it too.
     assert.equal(headersFor(headers, '/devocionales/js/devotional-pwa-config.js')['cache-control'], 'no-cache');
     assert.equal(headersFor(headers, MANIFEST_PATH)['content-type'], 'application/manifest+json');
+    assert.equal(headersFor(headers, '/devocionales/manifests/*')['content-type'], 'application/manifest+json');
 });
 
 test('the existing assetlinks.json header block is untouched', () => {
