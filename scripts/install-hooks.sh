@@ -5,4 +5,4 @@ set -e
 cd "$(git rev-parse --show-toplevel)"
 ln -sf ../../scripts/pre-push .git/hooks/pre-push
 chmod +x scripts/pre-push
-echo "Installed pre-push hook -> scripts/validator.py"
+echo "Installed pre-push hook -> scripts/validator.py --fast"
