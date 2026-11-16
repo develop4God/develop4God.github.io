@@ -27,6 +27,7 @@
     "DevotionalBuild": "readonly",
     "DiscoveryData": "readonly",
     "DiscoveryStore": "readonly",
+    "DiscoveryCache": "readonly",
     "DiscoveryListPage": "readonly",
     "DiscoveryListDom": "readonly",
     "DiscoveryCardDom": "readonly",

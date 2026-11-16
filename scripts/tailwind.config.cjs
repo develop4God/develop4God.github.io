@@ -4,6 +4,7 @@
 module.exports = {
   content: [
     'devocionales/*.html', // the reader and the legal pages
+    'devocionales/estudios/*.html', // the Bible-studies page
     'devocionales/js/*.js',
     '!devocionales/js/*.test.js',
     // Shared scripts the devocionales page also loads.

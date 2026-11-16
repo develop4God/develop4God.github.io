@@ -12,6 +12,7 @@
         const listDom = deps.listDomFactory({ h, t, cardDom });
 
         let studies = [];
+        let loaded = false;
         let confirmingId = null;
         let loadSeq = 0;
         let filter = readFilter();
@@ -111,11 +112,13 @@
         async function reload() {
             const seq = ++loadSeq;
             confirmingId = null;
+            loaded = false;
             showMessage('loading');
             try {
-                const loaded = await data.loadIndex(lang());
+                const result = await data.loadIndex(lang());
                 if (seq !== loadSeq) return;
-                studies = loaded;
+                studies = result;
+                loaded = true;
                 render();
             } catch (_) {
                 if (seq !== loadSeq) return;
@@ -123,7 +126,12 @@
             }
         }
 
-        return { init: reload, reload };
+        // Re-render from the stores (another tab changed favourites, seen or progress); a no-op until the index is loaded.
+        function refresh() {
+            if (loaded) render();
+        }
+
+        return { init: reload, reload, refresh };
     }
 
     global.DiscoveryListPage = { createListPage };

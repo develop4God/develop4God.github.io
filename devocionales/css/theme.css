@@ -2,7 +2,7 @@
    Bible-studies page (previously duplicated inline in each). */
 :root {
     --bg: #f5f2fb;
-    --surface: #ffffff;
+    --surface: #fff;
     --text: #1c1730;
     --text-muted: #6b6280;
     --border: #ded4ef;
@@ -10,6 +10,7 @@
     --accent-soft: #ece5f7;
     --highlight: #a8461c;
 }
+
 :root[data-theme="dark"] {
     --bg: #0b0b0a;
     --surface: #151412;
@@ -20,6 +21,7 @@
     --accent-soft: #16302d;
     --highlight: #e08a5c;
 }
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         --bg: #0b0b0a;
@@ -41,6 +43,7 @@
     user-select: none;
 }
 .theme-switch input { display: none; }
+
 .theme-switch .theme-switch-icon {
     width: 1.25rem;
     height: 1.25rem;
@@ -48,6 +51,7 @@
     transition: color .15s ease;
 }
 .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+
 .theme-switch-track {
     position: relative;
     width: 2.25rem;
@@ -57,6 +61,7 @@
     transition: background .15s ease;
 }
 .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+
 .theme-switch-dot {
     position: absolute;
     top: 0.15rem;

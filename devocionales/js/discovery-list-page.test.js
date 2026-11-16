@@ -259,3 +259,21 @@ test('reload: results of a superseded load never overwrite the newer one (rapid 
     await first;
     assert.deepEqual(cardIds(view), ['new']);
 });
+
+test('refresh: re-renders from the stores without reloading the index (storage changed elsewhere)', async () => {
+    let loads = 0;
+    const storage = memoryStorage();
+    const { page, view } = setup({ storage, loadIndex: async () => { loads += 1; return idx(['a', 'b']); } });
+    await page.init();
+    assert.ok(view.body.querySelector('[data-study-id="a"] .badge-new'));
+    W.DiscoveryStore.createDiscoveryStore(storage).markSeen('a');
+    page.refresh();
+    assert.equal(view.body.querySelector('[data-study-id="a"] .badge-new'), null);
+    assert.equal(loads, 1);
+});
+
+test('refresh: before any study is loaded it keeps the current message instead of throwing', async () => {
+    const { page } = setup({ loadIndex: () => new Promise(() => {}) });
+    page.init();
+    assert.doesNotThrow(() => page.refresh());
+});
