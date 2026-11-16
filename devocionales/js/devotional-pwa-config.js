@@ -8,8 +8,6 @@
         // Master switch. false = no service worker, no install button, no manifest, and any worker
         // or cache already installed in a reader's browser is removed on their next visit.
         enabled: true,
-        // The native Android app is the offer on Android. Set true to offer the web app there too.
-        installOnAndroid: false,
         // Kill switch for daily push notifications. false = the enable button is hidden, no Firebase
         // code is ever loaded, and a reader who had opted in is unsubscribed on their next visit.
         pushEnabled: false,

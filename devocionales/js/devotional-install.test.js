@@ -4,6 +4,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
+function loadStandalone() {
+    const filename = path.join(__dirname, 'devotional-standalone.js');
+    const source = fs.readFileSync(filename, 'utf8');
+    const win = {};
+    vm.runInThisContext(`(function(window){${source}\n})`, { filename })(win);
+    return win.DevotionalStandalone;
+}
+
 function loadModule() {
     const filename = path.join(__dirname, 'devotional-install.js');
     const source = fs.readFileSync(filename, 'utf8');
@@ -12,7 +20,8 @@ function loadModule() {
     return win.DevotionalInstall;
 }
 
-const { init, isAndroid, showAndroidDownload } = loadModule();
+const { init, showAndroidDownload } = loadModule();
+const platform = loadStandalone();
 
 function fakeButton() {
     const classes = new Set(['hidden']);
@@ -34,6 +43,7 @@ function fakeWindow(navigator) {
     return {
         listeners,
         navigator,
+        DevotionalStandalone: platform,
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
 }
@@ -160,15 +170,6 @@ for (const [label, ua] of [['phone', UA.androidPhone], ['tablet', UA.androidTabl
     });
 }
 
-test('Android is also recognised from the client-hints platform, even with a desktop-style user agent', () => {
-    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'Android' } }), true);
-});
-
-test('the client-hints platform is compared without regard to case', () => {
-    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'android' } }), true);
-    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'ANDROID' } }), true);
-});
-
 for (const [label, ua] of [['Linux desktop', UA.linuxDesktop], ['Windows', UA.windows], ['macOS', UA.mac], ['iPhone', UA.iphone]]) {
     test(`${label}: the button is offered`, () => {
         const button = fakeButton();
@@ -181,28 +182,10 @@ for (const [label, ua] of [['Linux desktop', UA.linuxDesktop], ['Windows', UA.wi
 
 // ------------------------------------------------------------------------------------ config
 
-test('config.installOnAndroid: true offers the button on Android too', () => {
-    const button = fakeButton();
-    const win = fakeWindow({ userAgent: UA.androidPhone });
-    init(doc(button), win, { enabled: true, installOnAndroid: true });
-    win.listeners.beforeinstallprompt(promptEvent());
-    assert.equal(button.shown, true);
-});
-
-test('config.installOnAndroid: false (or absent) keeps Android on the native app', () => {
-    for (const config of [{ installOnAndroid: false }, {}, undefined]) {
-        const button = fakeButton();
-        const win = fakeWindow({ userAgent: UA.androidPhone });
-        init(doc(button), win, config);
-        win.listeners.beforeinstallprompt(promptEvent());
-        assert.equal(button.shown, false, JSON.stringify(config));
-    }
-});
-
 test('config.enabled: false registers nothing, so no browser banner is suppressed and no button appears', () => {
     const button = fakeButton();
     const win = fakeWindow({ userAgent: UA.windows });
-    init(doc(button), win, { enabled: false, installOnAndroid: true });
+    init(doc(button), win, { enabled: false });
     assert.deepEqual(Object.keys(win.listeners), []);
     assert.equal(button.shown, false);
 });
@@ -215,13 +198,6 @@ test('config.enabled: anything but an explicit false means enabled', () => {
         win.listeners.beforeinstallprompt(promptEvent());
         assert.equal(button.shown, true, JSON.stringify(config));
     }
-});
-
-test('isAndroid: unknown or missing navigator data is not Android', () => {
-    assert.equal(isAndroid(undefined), false);
-    assert.equal(isAndroid({}), false);
-    assert.equal(isAndroid({ userAgent: '' }), false);
-    assert.equal(isAndroid({ userAgent: UA.linuxDesktop, userAgentData: { platform: 'Linux' } }), false);
 });
 
 test('a page without the button registers nothing and does not throw', () => {
@@ -291,4 +267,36 @@ test('play button: init leaves it hidden on iOS', () => {
     const rig = playRig(UA.iphone);
     init(rig.document, rig.win, {});
     assert.equal(rig.button.shown, false);
+});
+
+test('Android never gets the button, even with a stale installOnAndroid: true in the config', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    init(doc(button), win, { enabled: true, installOnAndroid: true });
+    const event = promptEvent();
+    win.listeners.beforeinstallprompt(event);
+    assert.equal(event.defaultPrevented, true);
+    assert.equal(button.shown, false);
+});
+
+test('DevotionalInstall no longer exposes isAndroid (it lives in DevotionalStandalone)', () => {
+    assert.equal(loadModule().isAndroid, undefined);
+});
+
+test('without DevotionalStandalone nothing throws and the platform is treated as not Android', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    delete win.DevotionalStandalone;
+    assert.doesNotThrow(() => init(doc(button), win));
+    win.listeners.beforeinstallprompt(promptEvent());
+    assert.equal(button.shown, true);
+});
+
+test('an older DevotionalStandalone without isAndroid does not throw and counts as not Android', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    win.DevotionalStandalone = { isStandalone: () => false };
+    assert.doesNotThrow(() => init(doc(button), win));
+    win.listeners.beforeinstallprompt(promptEvent());
+    assert.equal(button.shown, true);
 });

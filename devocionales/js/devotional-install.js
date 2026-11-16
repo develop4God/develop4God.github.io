@@ -1,13 +1,12 @@
 (function (global) {
     'use strict';
 
-    // Android users have the native app (see the Google Play banner), so the web app is offered
-    // everywhere else. Client hints give the platform when the browser reports it; the user agent
-    // covers Chrome, Firefox and Samsung Internet on Android.
-    function isAndroid(nav) {
-        if (!nav) return false;
-        if (nav.userAgentData && String(nav.userAgentData.platform).toLowerCase() === 'android') return true;
-        return /Android/i.test(nav.userAgent || '');
+    // Platform detection lives in DevotionalStandalone. If that script failed to load, the platform
+    // is treated as not Android and nothing here throws.
+    function isAndroid(win) {
+        const standalone = win.DevotionalStandalone;
+        // typeof: a cached older devotional-standalone.js has no isAndroid.
+        return Boolean(standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(win.navigator));
     }
 
     function reveal(element) {
@@ -18,22 +17,21 @@
 
     // Google Play download button: Android only (every other platform gets the PWA instead).
     function showAndroidDownload(doc, win) {
-        if (isAndroid(win.navigator)) reveal(doc.getElementById('download-app-android-btn'));
+        if (isAndroid(win)) reveal(doc.getElementById('download-app-android-btn'));
     }
 
     // "Install app" button. It is hidden in the HTML and shown only once the browser reports that
     // the page is installable (`beforeinstallprompt`), so it never appears where installing is
     // impossible or after the app is already installed. A tap opens the browser's own prompt.
-    // `config` is DevotionalPwaConfig: `enabled` false turns the feature off entirely, and
-    // `installOnAndroid` true offers the web app on Android as well. Both default to the
-    // behaviour described above when absent.
+    // `config` is DevotionalPwaConfig: `enabled` false turns the feature off entirely; absent, the
+    // feature is on. Android never gets the button: the native app is the offer there.
     function init(doc, win, config) {
         // First, so nothing below (no install button, PWA switched off) can keep it from running.
         showAndroidDownload(doc, win);
         const button = doc.querySelector('[data-install]');
         if (!button) return;
         if (config && config.enabled === false) return;
-        const withheld = isAndroid(win.navigator) && !(config && config.installOnAndroid === true);
+        const withheld = isAndroid(win);
         let deferred = null;
         const show = () => reveal(button);
         const hide = () => {
@@ -67,5 +65,5 @@
         });
     }
 
-    global.DevotionalInstall = { init, isAndroid, showAndroidDownload };
+    global.DevotionalInstall = { init, showAndroidDownload };
 })(window);
