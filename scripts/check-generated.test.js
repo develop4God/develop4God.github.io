@@ -25,7 +25,8 @@ const MANIFEST = 'devocionales/manifests/en.webmanifest';
 
 // What each stub "build" generates. A stub for a --check mode compares its committed output to it.
 const STUBS = {
-  'scripts/build-tailwind.sh': 'printf "css\\n" > "$1"\n',
+  'scripts/build-tailwind.sh':
+    'if [ -f scripts/fail-tailwind ]; then echo "tailwind exploded" >&2; exit 3; fi\nprintf "css\\n" > "$1"\n',
   'scripts/build-manifests.js': checkStub(MANIFEST, 'manifest\n', 'node scripts/build-manifests.js'),
   'scripts/build-sw.js': checkStub(SW, 'sw\n', 'node scripts/build-sw.js'),
 };
@@ -64,9 +65,20 @@ function tempRepo(t, { committed = {}, gitRepo = true } = {}) {
   return dir;
 }
 
-function check(dir) {
-  const result = spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh')], { cwd: dir, encoding: 'utf8', env: ENV });
+// `input` is what a pre-push hook would write to stdin. GIT_CEILING_DIRECTORIES keeps git from finding
+// a repository above the temp dir (TMPDIR inside a checkout), and LC_ALL=C pins git's messages.
+function check(dir, input = '') {
+  const result = spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh')], {
+    cwd: dir,
+    encoding: 'utf8',
+    input,
+    env: { ...ENV, GIT_CEILING_DIRECTORIES: path.dirname(dir), LC_ALL: 'C' },
+  });
   return { ...result, output: result.stdout + result.stderr };
+}
+
+function head(dir) {
+  return spawnSync('git', ['rev-parse', 'HEAD'], { cwd: dir, encoding: 'utf8', env: ENV }).stdout.trim();
 }
 
 function status(dir) {
@@ -126,4 +138,73 @@ test('check-generated: fails instead of passing outside a git repository', (t) =
   const result = check(dir);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /not a git repository/i);
+});
+
+test('check-generated: a build that cannot run is reported with the rebuild hint, not a bare abort', (t) => {
+  const dir = tempRepo(t, { committed: { 'scripts/fail-tailwind': '' } });
+  const result = check(dir);
+  assert.equal(result.status, 1);
+  assert.match(result.output, /tailwind exploded/);
+  assert.match(result.output, /tailwind\.css/);
+  assert.ok(result.output.includes(REBUILD), result.output);
+});
+
+const ZERO = '0'.repeat(40);
+const pushLines = (...shas) => shas.map((sha) => `refs/heads/x ${sha} refs/heads/x ${ZERO}\n`).join('');
+
+test('check-generated: checks the commit that is pushed, not HEAD', (t) => {
+  const dir = tempRepo(t, { committed: { [CSS]: 'old css\n' } });
+  const stale = head(dir);
+  write(dir, CSS, 'css\n');
+  git(dir, 'commit', '-qam', 'fix css'); // HEAD is up to date; the pushed commit is not
+  assert.equal(check(dir).status, 0);
+  const result = check(dir, pushLines(stale));
+  assert.equal(result.status, 1, result.output);
+  assert.ok(result.output.includes(REBUILD), result.output);
+});
+
+test('check-generated: every pushed commit is checked, deletions are skipped', (t) => {
+  const dir = tempRepo(t, { committed: { [CSS]: 'old css\n' } });
+  const stale = head(dir);
+  write(dir, CSS, 'css\n');
+  git(dir, 'commit', '-qam', 'fix css');
+  const good = head(dir);
+  assert.equal(check(dir, pushLines(good)).status, 0);
+  assert.equal(check(dir, `(delete) ${ZERO} refs/heads/gone ${good}\n${pushLines(good)}`).status, 0);
+  assert.equal(check(dir, pushLines(good, stale)).status, 1);
+});
+
+// build-tailwind.sh with a stub CLI in a pre-seeded cache, so no install or network is needed.
+test('build-tailwind: a relative output path is resolved against the caller, not the repo root', (t) => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'build-tailwind-'));
+  t.after(() => fs.rmSync(repo, { recursive: true, force: true }));
+  write(repo, 'scripts/build-tailwind.sh', fs.readFileSync(path.join(__dirname, 'build-tailwind.sh'), 'utf8'));
+  for (const file of ['package.json', 'package-lock.json']) {
+    write(repo, `scripts/tailwind/${file}`, fs.readFileSync(path.join(__dirname, 'tailwind', file), 'utf8'));
+  }
+  const lock = fs.readFileSync(path.join(repo, 'scripts/tailwind/package-lock.json'));
+  const lockSha = require('node:crypto').createHash('sha256').update(lock).digest('hex').slice(0, 16);
+  const tools = path.join(repo, 'cache');
+  write(tools, '.lock-sha', `${lockSha}\n`);
+  const bin = 'node_modules/.bin/tailwindcss';
+  write(tools, bin, '#!/usr/bin/env bash\nwhile [ $# -gt 0 ]; do [ "$1" = --output ] && out="$2"; shift; done\nprintf built > "$out"\n');
+  fs.chmodSync(path.join(tools, bin), 0o755);
+  const caller = fs.mkdtempSync(path.join(os.tmpdir(), 'caller-'));
+  t.after(() => fs.rmSync(caller, { recursive: true, force: true }));
+  const run = (...args) =>
+    spawnSync('bash', [path.join(repo, 'scripts/build-tailwind.sh'), ...args], {
+      cwd: caller,
+      encoding: 'utf8',
+      env: { ...ENV, TAILWIND_TOOLS_DIR: tools },
+    });
+
+  const result = run('out.css');
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(fs.readFileSync(path.join(caller, 'out.css'), 'utf8'), 'built');
+  assert.equal(fs.existsSync(path.join(repo, 'out.css')), false);
+
+  // No argument: the default stays relative to the repo root.
+  write(repo, 'devocionales/vendor/.keep', '');
+  assert.equal(run().status, 0);
+  assert.equal(fs.readFileSync(path.join(repo, 'devocionales/vendor/tailwind.css'), 'utf8'), 'built');
 });

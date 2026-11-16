@@ -73,10 +73,13 @@ class Phase:
 
 
 PHASES: list[Phase] = []
+# What a git pre-push hook writes to stdin (one line per pushed ref); empty for manual runs.
+PUSHED_REFS = ''
 
 
 def run_cmd(cmd, cwd=REPO_ROOT):
-    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
+    # stdin is closed so no phase can swallow the pushed refs the pre-push hook feeds this process.
+    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True, stdin=subprocess.DEVNULL)
     return result.returncode, result.stdout, result.stderr
 
 
@@ -126,21 +129,25 @@ def print_summary():
 
 # ── Phase 1: node --check ────────────────────────────────────────────────
 
-def phase_node_check():
+def phase_node_check(root=REPO_ROOT):
     # Tracked files only: skips node_modules, worktrees and test output without an exclusion list.
-    _rc, out, _err = run_cmd(['git', 'ls-files', '*.js'])
-    js_files = [REPO_ROOT / f for f in out.split()]
+    # NUL-separated so names with spaces survive; a file deleted from disk but still tracked is skipped.
+    rc, out, err = run_cmd(['git', 'ls-files', '-z', '*.js'], cwd=root)
+    if rc != 0:
+        print(f"  ❌ git ls-files failed: {err.strip()}")
+        return False, 'could not list tracked .js files'
+    js_files = sorted(root / f for f in out.split('\0') if f and (root / f).is_file())
     if not js_files:
         return True, 'no .js files found'
     ok = True
     for f in js_files:
         rc, _out, err = run_cmd(['node', '--check', str(f)])
         if rc != 0:
-            print(f"  ❌ {f.relative_to(REPO_ROOT)}")
+            print(f"  ❌ {f.relative_to(root)}")
             print(f"     {err.strip()}")
             ok = False
         else:
-            print(f"  ✓ {f.relative_to(REPO_ROOT)}")
+            print(f"  ✓ {f.relative_to(root)}")
     return ok, ''
 
 
@@ -273,11 +280,11 @@ def phase_devotionals_manifest():
 # ── Phase 9: generated files are up to date (mirrors CI) ─────────────────
 
 def phase_generated_files():
-    rc, out, err = run_cmd(['bash', 'scripts/check-generated.sh'])
-    print(out)
-    if err.strip():
-        print(err)
-    return rc == 0, ''
+    print('  The first run may install the pinned Tailwind CLI (needs the network); output streams below.')
+    sys.stdout.flush()
+    # Not captured, so a cold-cache install is visible. The pushed refs (if any) go to the script's stdin.
+    result = subprocess.run(['bash', 'scripts/check-generated.sh'], cwd=REPO_ROOT, text=True, input=PUSHED_REFS)
+    return result.returncode == 0, ''
 
 
 def skipped_in_fast_mode():
@@ -288,6 +295,9 @@ def main():
     parser = argparse.ArgumentParser(description='Phased validator for develop4God.github.io.')
     parser.add_argument('--fast', action='store_true', help='skip c8 coverage and Playwright e2e (the pre-push hook)')
     fast = parser.parse_args().fast
+    global PUSHED_REFS
+    if not sys.stdin.isatty():
+        PUSHED_REFS = sys.stdin.read()
 
     print("develop4God.github.io — pre-commit validation" + (" (fast)" if fast else ""))
     print(f"Repo: {REPO_ROOT}")

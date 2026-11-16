@@ -10,9 +10,15 @@
 # scripts/check-generated.sh passes a temp file so the check never writes into the work tree)
 set -euo pipefail
 
-OUTPUT="${1:-devocionales/vendor/tailwind.css}"
+# An explicit output path is relative to the caller, so resolve it before moving to the repo root.
+OUTPUT="${1:-}"
+case "${OUTPUT}" in
+  '' | /*) ;;
+  *) OUTPUT="${PWD}/${OUTPUT}" ;;
+esac
 
 cd "$(dirname "$0")/.."
+OUTPUT="${OUTPUT:-devocionales/vendor/tailwind.css}"
 
 LOCK_DIR="scripts/tailwind"
 TAILWIND_VERSION="$(node -p "require('./${LOCK_DIR}/package.json').dependencies.tailwindcss")"

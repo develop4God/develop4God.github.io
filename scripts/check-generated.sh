@@ -3,11 +3,15 @@
 # scripts/validator.py. devocionales/vendor/tailwind.css, the manifests, devocionales/sw.js and the
 # build stamp devocionales/js/devotional-build.js are committed (GitHub Pages has no build step).
 #
-# Read-only, and checks what is committed: it exports HEAD (`git archive`) into a temp directory
-# and runs the read-only checks there, so uncommitted edits neither block nor fool it, a generated
-# file that was never committed fails, and the work tree is never written. Tailwind has no --check
-# mode, so it is built to a temp file and compared. The first run may need the network:
-# build-tailwind.sh installs the pinned Tailwind CLI into a user cache when it is missing.
+# Read-only, and checks what is committed: it exports a commit (`git archive`) into a temp
+# directory and runs the read-only checks there, so uncommitted edits neither block nor fool it, a
+# generated file that was never committed fails, and the work tree is never written. Tailwind has no
+# --check mode, so it is built to a temp file and compared.
+# Which commit: as a git pre-push hook it reads the pushed refs from stdin ("<local ref> <local sha>
+# <remote ref> <remote sha>" per line; deletions are skipped) and checks every pushed sha; with no
+# refs on stdin (a manual or CI run) it checks HEAD.
+# The first run may need the network: build-tailwind.sh installs the pinned Tailwind CLI into a user
+# cache when it is missing.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -15,23 +19,44 @@ cd "$(dirname "$0")/.."
 REBUILD='bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js'
 CSS=devocionales/vendor/tailwind.css
 
+shas=()
+if [ ! -t 0 ]; then
+  while read -r _local_ref local_sha _rest; do
+    case "${local_sha}" in
+      '' | *[!0]*) [ -n "${local_sha}" ] && shas+=("${local_sha}") ;;  # all zeros = deletion
+    esac
+  done
+fi
+[ "${#shas[@]}" -gt 0 ] || shas=("$(git rev-parse HEAD)")
+
 TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
-git archive HEAD | tar -x -C "${TMP}"
-cd "${TMP}"
 
 stale=0
-bash scripts/build-tailwind.sh "${TMP}/tailwind.check.css"
-if ! cmp -s "${TMP}/tailwind.check.css" "${CSS}"; then
-  echo "${CSS} out of date." >&2
-  stale=1
-fi
-node scripts/build-manifests.js --check || stale=1
-node scripts/build-sw.js --check || stale=1
+for sha in "${shas[@]}"; do
+  dir="${TMP}/${sha}"
+  mkdir -p "${dir}"
+  git archive "${sha}" | tar -x -C "${dir}"
+  echo "Checking generated files at ${sha}"
+  (
+    cd "${dir}"
+    failed=0
+    if ! bash scripts/build-tailwind.sh "${dir}/tailwind.check.css"; then
+      echo "${CSS}: the Tailwind build failed." >&2
+      failed=1
+    elif ! cmp -s "${dir}/tailwind.check.css" "${CSS}"; then
+      echo "${CSS} out of date." >&2
+      failed=1
+    fi
+    node scripts/build-manifests.js --check || failed=1
+    node scripts/build-sw.js --check || failed=1
+    exit "${failed}"
+  ) || stale=1
+done
 
 if [ "${stale}" -ne 0 ]; then
-  echo "Committed generated files (at HEAD) are stale or missing. Rebuild, commit and push:" >&2
+  echo "Committed generated files are stale, missing or could not be built. Rebuild, commit and push:" >&2
   echo "  ${REBUILD}" >&2
   exit 1
 fi
-echo "Generated files at HEAD are up to date."
+echo "Generated files are up to date."
