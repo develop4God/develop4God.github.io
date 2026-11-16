@@ -9,7 +9,7 @@ const vm = require('node:vm');
 global.window = global.window || {};
 const filename = path.join(__dirname, 'discovery-nav.js');
 vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
-const { parseRoute, buildStudyUrl, classifySwipe, keyAction } = global.window.DiscoveryNav;
+const { parseRoute, buildStudyUrl, classifySwipe, keyAction, isTypingTarget } = global.window.DiscoveryNav;
 
 test('parseRoute: ?id= selects a study, anything else is the list', () => {
     assert.deepEqual(parseRoute('?id=foot_washing&lang=en'), { studyId: 'foot_washing' });
@@ -56,4 +56,13 @@ test('keyAction: arrows page (mirrored in RTL), other keys do nothing', () => {
     assert.equal(keyAction('ArrowLeft', { rtl: true }), 'next');
     assert.equal(keyAction('Enter'), null);
     assert.equal(keyAction(undefined), null);
+});
+
+test('isTypingTarget: arrow keys belong to inputs, selects, textareas, editable content and sliders, not to paging', () => {
+    for (const tag of ['INPUT', 'SELECT', 'TEXTAREA']) assert.equal(isTypingTarget({ tagName: tag }), true, tag);
+    assert.equal(isTypingTarget({ tagName: 'DIV', isContentEditable: true }), true);
+    assert.equal(isTypingTarget({ tagName: 'DIV', getAttribute: (k) => (k === 'role' ? 'slider' : null) }), true);
+    assert.equal(isTypingTarget({ tagName: 'BODY' }), false);
+    assert.equal(isTypingTarget({ tagName: 'BUTTON' }), false);
+    assert.equal(isTypingTarget(null), false);
 });

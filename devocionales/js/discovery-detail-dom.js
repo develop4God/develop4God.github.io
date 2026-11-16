@@ -100,11 +100,11 @@
             return h('section', { class: 'study-page' }, cardSections(page.card));
         }
 
-        function buildProgress(total, index) {
+        function buildProgress(total, index, label) {
             const segments = Array.from({ length: total }, (_, i) => h('span', { class: `study-seg${i <= index ? ' is-done' : ''}` }));
             return h('div', {
                 class: 'study-segments',
-                attrs: { role: 'progressbar', 'aria-valuemin': '1', 'aria-valuemax': String(total), 'aria-valuenow': String(index + 1) },
+                attrs: { role: 'progressbar', 'aria-label': label, 'aria-valuemin': '1', 'aria-valuemax': String(total), 'aria-valuenow': String(index + 1) },
             }, segments);
         }
 

@@ -113,11 +113,15 @@
         global.addEventListener('pageshow', (e) => { if (e.persisted && !router.current()) listPage.refresh(); });
 
         // Paging by keyboard and swipe, only while a study is open.
-        doc.addEventListener('keydown', (e) => { if (router.current() && !e.altKey && !e.ctrlKey && !e.metaKey) detailPage.onKey(e.key); });
+        doc.addEventListener('keydown', (e) => {
+            const modified = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+            if (router.current() && !modified && !e.defaultPrevented && !global.DiscoveryNav.isTypingTarget(e.target)) detailPage.onKey(e.key);
+        });
         let touchStart = null;
         detailView.addEventListener('touchstart', (e) => { touchStart = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }; }, { passive: true });
+        detailView.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
         detailView.addEventListener('touchend', (e) => {
-            if (!touchStart) return;
+            if (!touchStart || e.changedTouches.length !== 1) { touchStart = null; return; } // a second finger (pinch) is never a swipe
             detailPage.onSwipe({ dx: e.changedTouches[0].clientX - touchStart.x, dy: e.changedTouches[0].clientY - touchStart.y });
             touchStart = null;
         }, { passive: true });

@@ -222,3 +222,32 @@ test('close: a later open supersedes an earlier slow load', async () => {
     await first;
     assert.equal(root.querySelector('.study-detail-title').textContent, 'New');
 });
+
+test('review: keys and swipes are ignored while loading, after an error, and after not-found (no stale pages)', async () => {
+    let fail = false;
+    const { page, root } = setup({ loadStudy: async () => { if (fail) throw new Error('offline'); return study(); } });
+    await page.open(summary);
+    fail = true;
+    await page.open({ ...summary, id: 'other' });
+    assert.ok(root.textContent.includes('Load error'));
+    page.onKey('ArrowRight');
+    page.onSwipe({ dx: -90, dy: 0 });
+    assert.ok(root.textContent.includes('Load error'), 'the error message is not replaced by the previous study');
+    page.showNotFound();
+    page.onKey('ArrowRight');
+    assert.ok(root.textContent.includes('Study not found.'));
+});
+
+test('review: completing keeps keyboard focus inside the reader (on the page) instead of dropping to <body>', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    page.goTo(3);
+    root.querySelector('.study-complete').click();
+    assert.equal(root.ownerDocument.activeElement, root.querySelector('.study-page'));
+});
+
+test('review: the segmented progress bar has an accessible name (the study title)', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    assert.equal(root.querySelector('.study-segments').getAttribute('aria-label'), 'Love');
+});

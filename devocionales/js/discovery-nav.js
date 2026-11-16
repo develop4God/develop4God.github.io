@@ -30,5 +30,13 @@
         return (key === 'ArrowRight') !== rtl ? 'next' : 'prev';
     }
 
-    global.DiscoveryNav = { parseRoute, buildStudyUrl, classifySwipe, keyAction };
+    // Arrow keys belong to the control when the user is typing or driving a form widget.
+    function isTypingTarget(el) {
+        if (!el) return false;
+        if (['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName) || el.isContentEditable) return true;
+        const role = el.getAttribute ? el.getAttribute('role') : null;
+        return ['slider', 'spinbutton', 'listbox', 'combobox', 'radiogroup', 'tablist'].includes(role);
+    }
+
+    global.DiscoveryNav = { parseRoute, buildStudyUrl, classifySwipe, keyAction, isTypingTarget };
 })(window);

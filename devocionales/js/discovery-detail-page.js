@@ -43,7 +43,7 @@
             const isCompleted = store.getProgress(summary.id, lang()).isCompleted;
             view.root.replaceChildren(
                 detailDom.buildHeader({ emoji: summary.emoji, title: summary.title, subtitle: summary.subtitle }),
-                detailDom.buildProgress(pages.length, index),
+                detailDom.buildProgress(pages.length, index, summary.title),
                 pageEl,
                 ...(page.isLast ? [detailDom.buildFooter({
                     isCompleted,
@@ -56,7 +56,7 @@
         }
 
         function goTo(target) {
-            if (!pages.length || target < 0 || target >= pages.length || target === index) return;
+            if (!study || !pages.length || target < 0 || target >= pages.length || target === index) return;
             index = target;
             recordView();
             render({ focusPage: true });
@@ -70,13 +70,14 @@
             if (store.getProgress(summary.id, lang()).isCompleted) return;
             store.completeStudy(summary.id, lang());
             toast.show(t('studyCompleted'));
-            render();
+            render({ focusPage: true }); // the button that had focus was replaced; keep the reader's place
         }
 
         async function open(target) {
             const seq = ++loadSeq;
             summary = target;
             study = null;
+            pages = []; // keys and swipes must not page a previous study while this one loads
             showMessage('loading');
             try {
                 const loaded = await data.loadStudy(target, lang());
@@ -98,6 +99,7 @@
 
         function showNotFound() {
             loadSeq += 1; // a late load must not replace this message
+            pages = [];
             view.root.replaceChildren(detailDom.buildNotFound({ onBack: onExit }));
         }
 
