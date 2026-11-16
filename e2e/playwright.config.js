@@ -30,7 +30,7 @@ module.exports = defineConfig({
   projects: [
     { name: 'chromium' },
     // Safari's engine, for the PWA specs only: service workers, storage and install behave
-    // differently on iOS. Opt-in (E2E_WEBKIT=1, set in CI) so the local pre-push hook does not
+    // differently on iOS. Opt-in (E2E_WEBKIT=1, set in CI) so a local run does not
     // need WebKit installed. Firefox is not run: Playwright's offline emulation there blocks even
     // navigations a service worker would answer, so its offline results would not be real.
     ...(process.env.E2E_WEBKIT
