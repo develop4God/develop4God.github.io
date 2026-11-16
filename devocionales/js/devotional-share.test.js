@@ -76,3 +76,7 @@ test('omits the whole download footer (divider, Play Store link) when not on And
         assert.ok(text.includes('Prayer body'));
     }
 });
+
+test('PLAY_STORE_URL is exported so other share builders reuse the same link', () => {
+    assert.match(loadModule().PLAY_STORE_URL, /^https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.develop4god\.devocional_nuevo/);
+});
