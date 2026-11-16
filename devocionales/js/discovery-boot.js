@@ -77,7 +77,7 @@
         function applyStaticText() {
             doc.title = `${t('title')} - Devocionales Cristianos`;
             byId('studies-title').textContent = t('title');
-            byId('studies-back-label').textContent = i18n.t('devotionals.navDevotional', '');
+            byId('studies-nav').setAttribute('aria-label', i18n.t('shell.nav_label', 'Main navigation'));
         }
 
         function showList() {

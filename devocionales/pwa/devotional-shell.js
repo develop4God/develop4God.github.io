@@ -2,8 +2,8 @@
     'use strict';
 
     // The installed-app shell: Home, Studies and Settings tabs as a bottom bar (phone) or a labelled
-    // rail (tablet and desktop). Home and Settings are panels of the reader page; Studies is a link
-    // tab (`data-shell-link`) to the Bible-studies page, which shows the same bar with its own tab current. It only reveals markup already in index.html and toggles classes and
+    // rail (tablet and desktop). The bar is generated from ONE tab table (devotional-shell-core.js): on the
+    // reader Home and Settings are panels and Studies is a link; on the Bible-studies page all are links. It only reveals markup already in index.html and toggles classes and
     // attributes on <html>; the rules live in devotional-shell-core.js and the look in shell.css.
     // Nothing is persisted: the app always opens on Home.
 
@@ -41,60 +41,87 @@
         }
     }
 
-    // A link tab whose name the config does not list (the remote kill switch) is removed, never shown.
-    function pruneLinkTabs(buttons, allowedTabs) {
-        buttons.filter((b) => b.hasAttribute('data-shell-link') && !allowedTabs.includes(b.dataset.shellTab)).forEach((b) => b.remove());
-        return buttons.filter((b) => b.isConnected !== false);
+    // The bar is generated from the one tab table (devotional-shell-core.js tabsForPage), so the
+    // reader and the Bible-studies page always show the same shell. Labels use data-i18n (kept in
+    // step by the page's language switch) plus the current text for the first paint.
+    function renderNav(doc, win, nav, tabs) {
+        const t = global.DevotionalI18n && typeof global.DevotionalI18n.t === 'function' ? global.DevotionalI18n.t : null;
+        const label = doc.createElement('span');
+        label.id = 'shell-nav-label';
+        label.className = 'sr-only';
+        label.setAttribute('data-i18n', 'shell.nav_label');
+        label.textContent = t ? t('shell.nav_label', 'App navigation') : 'App navigation';
+        const items = tabs.map((tab) => {
+            const el = doc.createElement(tab.kind === 'panel' ? 'button' : 'a');
+            el.className = 'shell-tab';
+            el.setAttribute('data-shell-tab', tab.name);
+            if (tab.kind === 'panel') {
+                el.setAttribute('type', 'button');
+                el.setAttribute('aria-controls', tab.controls);
+            } else {
+                el.setAttribute('href', tab.href);
+                if (tab.current) el.setAttribute('aria-current', 'page');
+            }
+            const icon = doc.createElement('i');
+            icon.setAttribute('data-lucide', tab.icon);
+            icon.className = 'shell-tab-icon';
+            const text = doc.createElement('span');
+            text.setAttribute('data-i18n', tab.labelKey);
+            text.textContent = t ? t(tab.labelKey, tab.fallback) : tab.fallback;
+            el.append(icon, text);
+            return el;
+        });
+        nav.removeAttribute('aria-label'); // the static name only exists for the HTML validator and a no-JS reader
+        nav.setAttribute('aria-labelledby', label.id);
+        nav.replaceChildren(label, ...items);
+        if (win.lucide && typeof win.lucide.createIcons === 'function') win.lucide.createIcons();
+        return items;
     }
 
-    // Returns whether the shell was started. A page without the shell markup (an older cached
-    // index.html) stays as it is.
+    // Returns whether the shell was started. A page without the shell placeholder (an older
+    // cached HTML) stays as it is.
     function init(doc, win, config) {
         const core = global.DevotionalShellCore;
         if (!core || !core.isShellSurface(win, config)) return false;
         const nav = doc.querySelector('[data-shell-nav]');
-        if (!nav) return false;
+        if (!nav || !nav.dataset.shellPage) return false;
 
         const shell = config.surfaces.shell;
         const root = doc.documentElement;
         const layout = shell.layout || {};
-        const allowedTabs = shell.tabs || [];
+        const tabs = core.tabsForPage(nav.dataset.shellPage, shell.tabs);
+        if (!tabs.length) return false;
         const settings = doc.querySelector('[data-shell-settings]');
-        const buttons = pruneLinkTabs(Array.from(nav.querySelectorAll('[data-shell-tab]')), allowedTabs);
+        const isReader = nav.dataset.shellPage === 'reader';
+        if (isReader && !settings) return false;
 
-        // The studies page has no Settings panel: it only shows the bar, with its own tab marked.
-        if (!settings) {
-            const current = nav.querySelector('[data-shell-current]');
-            if (!current) return false;
-            current.setAttribute('aria-current', 'page');
-            if (layout.contentMaxWidth) root.style.setProperty('--shell-content-max', `${layout.contentMaxWidth}px`);
-            applyLayout(root, win, layout);
-            root.classList.add('shell-active');
-            return true;
+        const panelTabs = tabs.filter((tab) => tab.kind === 'panel').map((tab) => tab.name);
+        const state = core.createTabState(panelTabs, core.resolveInitialTab(win.location && win.location.hash, panelTabs));
+        // The reader needs a panel to show; a page of links only needs the bar.
+        if (isReader && state.current() === null) return false;
+
+        const elements = renderNav(doc, win, nav, tabs);
+        const panelButtons = elements.filter((el) => el.tagName === 'BUTTON');
+        if (layout.contentMaxWidth) root.style.setProperty('--shell-content-max', `${layout.contentMaxWidth}px`);
+
+        if (isReader) {
+            const renderTab = () => {
+                root.dataset.shellView = state.current();
+                panelButtons.forEach((button) => {
+                    if (button.dataset.shellTab === state.current()) button.setAttribute('aria-current', 'page');
+                    else button.removeAttribute('aria-current');
+                });
+            };
+            renderTab();
+            panelButtons.forEach((button) => button.addEventListener('click', () => {
+                if (!state.select(button.dataset.shellTab)) return;
+                renderTab();
+                track(win, state.current());
+            }));
+            moveControlsToSettings(doc);
         }
 
-        const panelButtons = buttons.filter((b) => !b.hasAttribute('data-shell-link'));
-        const panelTabs = allowedTabs.filter((tab) => panelButtons.some((b) => b.dataset.shellTab === tab));
-        const state = core.createTabState(panelTabs, core.resolveInitialTab(win.location && win.location.hash, panelTabs));
-        if (state.current() === null) return false;
-
-        if (layout.contentMaxWidth) root.style.setProperty('--shell-content-max', `${layout.contentMaxWidth}px`);
-        const renderTab = () => {
-            root.dataset.shellView = state.current();
-            panelButtons.forEach((button) => {
-                if (button.dataset.shellTab === state.current()) button.setAttribute('aria-current', 'page');
-                else button.removeAttribute('aria-current');
-            });
-        };
-        renderTab();
-        panelButtons.forEach((button) => button.addEventListener('click', () => {
-            if (!state.select(button.dataset.shellTab)) return;
-            renderTab();
-            track(win, state.current());
-        }));
-
         applyLayout(root, win, layout);
-        moveControlsToSettings(doc);
         root.classList.add('shell-active');
         return true;
     }

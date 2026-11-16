@@ -103,6 +103,9 @@ a.shell-tab { text-decoration: none; }
 
 .shell-active[data-shell-view="settings"] main { display: none; }
 
+/* The browser-tab header links to Studies; the installed app has the Studies tab in its bar instead. */
+.shell-active #nav-studies-item { display: none; }
+
 /* Google Play is for Android, which has no installed web app. */
 .shell-active #app-banner,
 .shell-active #download-app-android-btn { display: none; }

@@ -567,7 +567,7 @@ test.describe('Studies tab in the installed app', () => {
         expect(Math.round(box.y + box.height)).toBe(PHONE.height);
         await expect(page.locator('[data-shell-tab="studies"]')).toHaveAttribute('aria-current', 'page');
         await expect(page.locator('[data-shell-tab="home"]')).not.toHaveAttribute('aria-current', 'page');
-        await expect(page.locator('.studies-back')).toBeHidden();
+        await expect(page.locator('#studies-nav')).toBeHidden(); // the bar replaces the web header links
         expect(await noHorizontalScroll(page)).toBe(true);
         await shot(page, 'ios-phone-studies');
         expect(errors).toEqual([]);
@@ -641,7 +641,7 @@ test.describe('Studies tab: surfaces where it must not appear, and the kill swit
         await openStudies(page, PHONE);
         await expect(page.locator('html')).not.toHaveClass(/shell-active/);
         await expect(page.locator('[data-shell-nav]')).toBeHidden();
-        await expect(page.locator('.studies-back')).toBeVisible();
+        await expect(page.locator('#studies-nav')).toBeVisible();
     });
 
     test.describe('Android', () => {

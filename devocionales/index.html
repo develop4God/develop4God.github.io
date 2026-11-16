@@ -309,6 +309,8 @@
                          "previous cached render script" and its fixture once that cache window has long passed. -->
                     <li hidden><span id="nav-vision-label"></span></li>
                     <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
+                    <!-- Browser tab only: the installed app has the Studies tab in its bottom bar (shell.css hides this one). -->
+                    <li id="nav-studies-item"><a href="/devocionales/estudios/" id="nav-studies-label" data-i18n="shell.studies">Estudios Bíblicos</a></li>
                 </ul>
             </nav>
             <div class="flex flex-wrap items-center justify-center gap-3 md:flex-nowrap md:justify-normal">
@@ -582,21 +584,7 @@
     </div>
 
     <!-- Installed app only (iOS and desktop): revealed by devotional-shell.js, hidden by shell.css everywhere else. -->
-    <nav id="shell-nav" data-shell-nav aria-labelledby="shell-nav-label">
-        <span id="shell-nav-label" class="sr-only" data-i18n="shell.nav_label">App navigation</span>
-        <button type="button" class="shell-tab" data-shell-tab="home" aria-controls="shell-home-panel">
-            <i data-lucide="house" class="w-5 h-5"></i>
-            <span data-i18n="shell.home">Home</span>
-        </button>
-        <a class="shell-tab" data-shell-tab="studies" data-shell-link href="/devocionales/estudios/">
-            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
-            <span data-i18n="shell.studies">Bible Studies</span>
-        </a>
-        <button type="button" class="shell-tab" data-shell-tab="settings" aria-controls="shell-settings">
-            <i data-lucide="settings" class="w-5 h-5"></i>
-            <span data-i18n="shell.settings">Settings</span>
-        </button>
-    </nav>
+    <nav id="shell-nav" data-shell-nav data-shell-page="reader" aria-label="App navigation"></nav>
 
     <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
         <a id="footer-contact-mail" href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;">
