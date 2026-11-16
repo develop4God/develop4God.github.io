@@ -127,12 +127,9 @@ def print_summary():
 # ── Phase 1: node --check ────────────────────────────────────────────────
 
 def phase_node_check():
-    # Relative parts: a worktree lives under .claude/worktrees/, so absolute parts would exclude everything.
-    excluded = {'node_modules', '.claude', 'test-results', 'playwright-report'}
-    js_files = sorted(
-        f for f in REPO_ROOT.rglob('*.js')
-        if not excluded & set(f.relative_to(REPO_ROOT).parts)
-    )
+    # Tracked files only: skips node_modules, worktrees and test output without an exclusion list.
+    _rc, out, _err = run_cmd(['git', 'ls-files', '*.js'])
+    js_files = [REPO_ROOT / f for f in out.split()]
     if not js_files:
         return True, 'no .js files found'
     ok = True
