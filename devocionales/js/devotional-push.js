@@ -11,6 +11,9 @@
     const KEY_OPTED_IN = 'devotionalPush.optedIn';
     const KEY_TOKEN = 'devotionalPush.token';
     const KEY_HOUR = 'devotionalPush.hour';
+    // Status keys of the blocked-state help; cleared again once the permission is not denied. The generic
+    // push.status_denied means "prompt dismissed" and is not one of them.
+    const BLOCKED_KEYS = ['push.blocked_ios', 'push.blocked_desktop'];
 
     // The scheduler ignores minutes, so a reminder time is always a whole hour, shown as "HH:00".
     const formatHour = (hour) => `${String(hour).padStart(2, '0')}:00`;
@@ -135,6 +138,7 @@
                 const text = statusKey ? t(statusKey) : '';
                 status.textContent = text && statusDetail ? `${text} ${statusDetail}` : text;
             },
+            messageKey: () => statusKey,
             rerender() { this.message(statusKey, statusDetail); },
             hide: () => setShown(container, false),
             showInstallHint() {
@@ -246,6 +250,12 @@
                 return true;
             };
 
+            // Platform steps for a browser-level block; the generic line where no steps exist.
+            const showBlocked = () => {
+                const help = global.DevotionalPushHelp;
+                view.message((help && help.helpKey(win.navigator)) || 'push.status_denied');
+            };
+
             const enable = async () => {
                 // The permission request runs before any other await, so the browser still sees the tap.
                 let permission;
@@ -256,7 +266,8 @@
                     return;
                 }
                 if (permission !== 'granted') {
-                    view.message('push.status_denied');
+                    if (permission === 'denied') showBlocked();
+                    else view.message('push.status_denied');
                     return;
                 }
                 try {
@@ -342,8 +353,32 @@
                 }
             };
 
+            // The offer card and the blocked help follow the opt-in state and the browser permission.
+            const offerModule = global.DevotionalPushOffer;
+            const offer = offerModule && offerModule.create(doc, {
+                storage,
+                isEligible: () => !isOptedIn() && adapter.permission() === 'default',
+                onEnable: () => { run(enable); },
+            });
+            const refreshPermissionUi = () => {
+                if (adapter.permission() === 'denied') showBlocked();
+                else if (BLOCKED_KEYS.includes(view.messageKey())) view.message(null);
+                if (offer) offer.update();
+            };
+            // A flow already set its own message, so afterwards only the card is re-evaluated.
+            const run = (flow) => exclusive(flow).then(() => { if (offer) offer.update(); });
+            // Back from the system settings: the permission may have changed without a reload. Revoked while
+            // opted in is the same path as at load; nothing runs while another flow is in progress.
+            if (typeof doc.addEventListener === 'function') {
+                doc.addEventListener('visibilitychange', () => {
+                    if (doc.visibilityState !== 'visible' || busy) return;
+                    if (isOptedIn() && adapter.permission() !== 'granted') exclusive(disableRevoked).then(refreshPermissionUi);
+                    else refreshPermissionUi();
+                });
+            }
+
             // One switch: off -> enable (asks for the permission inside this tap), on -> disable.
-            if (view.switchButton) view.switchButton.addEventListener('click', () => { exclusive(isOptedIn() ? disable : enable); });
+            if (view.switchButton) view.switchButton.addEventListener('click', () => { run(isOptedIn() ? disable : enable); });
             if (view.hourSelect) {
                 view.hourSelect.addEventListener('change', () => {
                     // Busy, or notifications are off (the row is disabled then, so this is only a guard).
@@ -364,14 +399,17 @@
 
             if (!isOptedIn()) {
                 view.showState(false);
+                refreshPermissionUi();
                 return;
             }
             // Revoked in the browser settings since the last visit: same path as disabling.
             if (adapter.permission() !== 'granted') {
                 await exclusive(disableRevoked);
+                refreshPermissionUi();
                 return;
             }
             view.showState(true);
+            refreshPermissionUi();
             await exclusive(enterWhileOptedIn);
         } catch (err) {
             // init never throws: the page works the same without push.
