@@ -15,8 +15,8 @@
     // push.status_denied means "prompt dismissed" and is not one of them.
     const BLOCKED_KEYS = ['push.blocked_ios', 'push.blocked_desktop'];
 
-    // The scheduler ignores minutes, so a reminder time is always a whole hour, shown as "HH:00".
-    const formatHour = (hour) => `${String(hour).padStart(2, '0')}:00`;
+    // The one hour formatter lives in the store (it writes "HH:00" to Firestore); the screen shows the same text.
+    const formatHour = (hour) => global.DevotionalPushStore.formatHour(hour);
 
     function parseHour(value) {
         const hour = Number.parseInt(value, 10);
@@ -136,7 +136,8 @@
                 statusDetail = detail || '';
                 if (!status) return;
                 const text = statusKey ? t(statusKey) : '';
-                status.textContent = text && statusDetail ? `${text} ${statusDetail}` : text;
+                // The language file decides where the hour goes: "{time}" in the text.
+                status.textContent = text.replace('{time}', statusDetail);
             },
             messageKey: () => statusKey,
             rerender() { this.message(statusKey, statusDetail); },
@@ -319,7 +320,7 @@
 
             const disable = async () => {
                 if (await disableFlow(resolved)) view.showState(false);
-                else view.message('push.status_error');
+                else view.message('push.status_error_off');
             };
 
             // Revoked permission: the browser already dropped the subscription, so the UI is "off"

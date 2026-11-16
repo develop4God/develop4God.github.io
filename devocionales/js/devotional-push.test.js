@@ -119,7 +119,8 @@ function fakeAdapter(overrides = {}) {
     return adapter;
 }
 
-const t = (key) => `T:${key}`;
+// time_set carries the {time} placeholder, as the language files do.
+const t = (key) => (key === 'push.time_set' ? 'T:push.time_set {time}' : `T:${key}`);
 const CONFIG = { enabled: true, pushEnabled: true };
 const OPTED = { 'devotionalPush.optedIn': '1', 'devotionalPush.token': 'tok1' };
 // The app's order on every entry: lastLogin, token, settings.
@@ -395,8 +396,31 @@ test('A5: a failed settings write keeps the flags and the UI on with an error, s
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], '1');
     assert.equal(ctx.storage.data['devotionalPush.token'], 'tok1');
     assertOn(ctx);
-    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_error_off');
     assert.equal(ctx.el('switch').disabled, false);
+});
+
+test('OFF-ERR: a failing turn-on still says it could not be turned on', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ getToken: () => Promise.reject(new Error('x')) }) });
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+});
+
+test('TIME: the confirmation fills the {time} placeholder wherever the language puts it', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    ctx.deps.t = (key) => (key === 'push.time_set' ? '{time} \u2190 set' : key);
+    await ctx.run();
+    ctx.el('hour').value = '4';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.equal(ctx.el('status').textContent, '04:00 \u2190 set');
+});
+
+test('FORMAT: the store exposes the one hour formatter and the facade does not carry a copy', () => {
+    assert.equal(typeof globals.DevotionalPushStore.formatHour, 'function');
+    assert.equal(globals.DevotionalPushStore.formatHour(4), '04:00');
+    assert.doesNotMatch(fs.readFileSync(path.join(__dirname, 'devotional-push.js'), 'utf8'), /padStart/);
 });
 
 test('A5: disable with no signed-in user skips Firestore but still deletes the token and clears the flags', async () => {
