@@ -1,6 +1,12 @@
 (function (global) {
     'use strict';
 
+    // typeof: a cached older devotional-standalone.js has no isAndroid.
+    function isAndroidDevice() {
+        const standalone = global.DevotionalStandalone;
+        return Boolean(standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(global.navigator));
+    }
+
     function showError(onRetry) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
@@ -62,8 +68,11 @@
     let shareData = null;
     let shareHandlerBound = false;
 
+    // Canonical link shared with every message, never the visitor's current (possibly local or query-laden) URL.
+    const SHARE_URL = 'https://develop4god.com/devocionales';
+
     function renderShareLinks(entry) {
-        const url = window.location.href;
+        const url = SHARE_URL;
         const eyebrow = DevotionalI18n.t('devotionals.eyebrow', '');
         const labels = {
             eyebrow,
@@ -71,18 +80,13 @@
             reflexion: DevotionalI18n.t('devotionals.reflexion', ''),
             oracion: DevotionalI18n.t('devotionals.oracion', ''),
             readMore: DevotionalI18n.t('devotionals.shareReadMore', ''),
-            footerTitle: DevotionalI18n.t('devotionals.shareFooterTitle', ''),
-            footerCompleteApp: DevotionalI18n.t('devotionals.shareFooterCompleteApp', ''),
-            footerDailyDevotionals: DevotionalI18n.t('devotionals.shareFooterDailyDevotionals', ''),
-            footerAudioReading: DevotionalI18n.t('devotionals.shareFooterAudioReading', ''),
-            footerBibleStudies: DevotionalI18n.t('devotionals.shareFooterBibleStudies', ''),
-            footerBibleVersions: DevotionalI18n.t('devotionals.shareFooterBibleVersions', ''),
-            footerAndMore: DevotionalI18n.t('devotionals.shareFooterAndMore', ''),
             footerDownload: DevotionalI18n.t('devotionals.shareFooterDownload', ''),
             footerBenefits: DevotionalI18n.t('devotionals.shareFooterBenefits', ''),
             footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
         };
-        const shareText = DevotionalShare.buildShareText(entry, labels, url);
+        const shareText = DevotionalShare.buildShareText(entry, labels, url, {
+            includeAppFooter: isAndroidDevice(),
+        });
         // No separate `url` field here: shareText already embeds the link
         // (via the "read more" line), and some share targets append a
         // provided `url` a second time on top of `text`, duplicating it.
@@ -140,9 +144,7 @@
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
         // App banner: Android only (native app via Google Play); every other platform has the PWA.
-        if (global.DevotionalStandalone
-            && typeof global.DevotionalStandalone.isAndroid === 'function' // an older cached script lacks it
-            && global.DevotionalStandalone.isAndroid(global.navigator)
+        if (isAndroidDevice()
             && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }

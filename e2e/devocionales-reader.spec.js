@@ -123,15 +123,13 @@ test.describe('devocionales reader share feature', () => {
     expect(calls[0].text).toContain('Prayer:*');
     expect(calls[0].text).toContain(oracionText.trim());
     expect(calls[0].text).toContain('More devotional content here:');
-    expect(calls[0].text).toContain(page.url());
+    expect(calls[0].text).toContain('https://develop4god.com/devocionales');
+    expect(calls[0].text).not.toContain(page.url());
 
-    // FOMO footer, mirroring devocional_nuevo's DevotionalShareHelper —
-    // turns each share into a potential new visitor + app install, not just
-    // a link back to the same page.
-    expect(calls[0].text).toContain('*This is just the beginning...*');
-    expect(calls[0].text).toContain('The complete app includes:');
-    expect(calls[0].text).toContain('*Download: Christian Devotionals*');
-    expect(calls[0].text).toContain('https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo');
+    // The Play Store download footer is Android-only; this run is desktop Chromium.
+    expect(calls[0].text).not.toContain('play.google.com');
+    expect(calls[0].text).not.toContain('Download: Christian Devotionals');
+    expect(calls[0].text).not.toContain('just the beginning');
 
     // Clicking again after this should still fire exactly once more — not
     // stack additional listeners across the module-level shareHandlerBound
@@ -140,6 +138,28 @@ test.describe('devocionales reader share feature', () => {
     await nativeBtn.click();
     const callsAfterSecondClick = await page.evaluate(() => window.__shareCalls);
     expect(callsAfterSecondClick).toHaveLength(2);
+  });
+
+  test('shared message includes the Play Store download footer on Android only', async ({ browser }) => {
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    });
+    const page = await context.newPage();
+    await page.addInitScript(() => {
+      window.__shareCalls = [];
+      Object.defineProperty(navigator, 'share', {
+        value: (data) => { window.__shareCalls.push(data); return Promise.resolve(); },
+        configurable: true,
+      });
+    });
+    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+    await page.locator('#share-native').click();
+    const calls = await page.evaluate(() => window.__shareCalls);
+    expect(calls).toHaveLength(1);
+    expect(calls[0].text).toContain('*Download: Christian Devotionals*');
+    expect(calls[0].text).toContain('https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo');
+    expect(calls[0].text).not.toContain('just the beginning');
+    await context.close();
   });
 
   test('native share button is hidden when navigator.share is unsupported', async ({ page }) => {
