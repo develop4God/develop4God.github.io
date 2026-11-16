@@ -230,7 +230,13 @@
     "switch_label": "Enable/Disable notifications",
     "time_label": "Daily notification time",
     "time_set": "Notification time set to",
-    "time_error": "Error setting notification time"
+    "time_error": "Error setting notification time",
+    "offer_title": "Daily reminder",
+    "offer_body": "Get one notification a day with the new devotional.",
+    "offer_enable": "Enable",
+    "offer_later": "Not now",
+    "blocked_ios": "Notifications are blocked. On iPhone or iPad open Settings > Notifications > this app and turn on Allow Notifications.",
+    "blocked_desktop": "Notifications are blocked. Open the app menu > App info (or Site settings) > Notifications and choose Allow."
   },
   "shell": {
     "nav_label": "App navigation",
@@ -239,7 +245,8 @@
     "settings": "Settings",
     "language": "Language",
     "theme": "Theme",
-    "font_size": "Font size"
+    "font_size": "Font size",
+    "app_version": "App version"
   },
   "discovery": {
     "title": "Bible Studies",

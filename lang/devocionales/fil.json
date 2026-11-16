@@ -230,7 +230,13 @@
     "switch_label": "Paganahin/Huwag paganahin ang mga notipikasyon",
     "time_label": "Araw-araw na oras ng notipikasyon",
     "time_set": "Itinakda ang oras ng notipikasyon sa",
-    "time_error": "Error sa pagtatakda ng oras ng notipikasyon"
+    "time_error": "Error sa pagtatakda ng oras ng notipikasyon",
+    "offer_title": "Pang-araw-araw na paalala",
+    "offer_body": "Makatanggap ng isang notipikasyon bawat araw kasama ang bagong debosyonal.",
+    "offer_enable": "I-on",
+    "offer_later": "Huwag muna",
+    "blocked_ios": "Naka-block ang mga notipikasyon. Sa iPhone o iPad, buksan ang Settings > Notifications > ang app na ito at i-on ang Allow Notifications.",
+    "blocked_desktop": "Naka-block ang mga notipikasyon. Buksan ang menu ng app > App info (o Site settings) > Notifications at piliin ang Allow."
   },
   "shell": {
     "nav_label": "Nabigasyon ng app",
@@ -239,7 +245,8 @@
     "settings": "Mga Setting",
     "language": "Wika",
     "theme": "Tema",
-    "font_size": "Laki ng font"
+    "font_size": "Laki ng font",
+    "app_version": "Bersyon ng app"
   },
   "discovery": {
     "title": "Mga Pag-aaral sa Biblia",
