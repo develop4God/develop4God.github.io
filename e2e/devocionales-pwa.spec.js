@@ -377,6 +377,10 @@ test.describe('install button on small phones', () => {
             test(`keeps every header control on screen at ${width}px — ${lang}`, async ({ page }) => {
                 await page.setViewportSize({ width, height: 800 });
                 await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'load' });
+                // 'load' does not wait for the translation fetch or the icons: measure the final,
+                // localized header (the language selector renders after the fetch, Lucide swaps <i> for <svg>).
+                await expect(page.locator('#language-selector .language-selector-button')).toBeVisible();
+                await expect(page.locator('header i[data-lucide]')).toHaveCount(0);
                 await page.evaluate(() => {
                     const offer = new Event('beforeinstallprompt', { cancelable: true });
                     offer.prompt = () => Promise.resolve();
