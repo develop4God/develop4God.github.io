@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# pre-push — runs scripts/validator.py --fast (lint, unit tests, SOT manifest, generated files) before a push.
+# pre-push — runs scripts/validator.py --fast --pushed-refs (lint, unit tests, SOT manifest, generated files) before a push.
 # The full e2e suite runs in CI on every PR; run `python3 scripts/validator.py` for the complete local run.
 # Installed via scripts/install-hooks.sh; not auto-installed by git itself.
 set -e
 cd "$(git rev-parse --show-toplevel)"
-python3 scripts/validator.py --fast
+python3 scripts/validator.py --fast --pushed-refs

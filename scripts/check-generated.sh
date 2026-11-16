@@ -7,9 +7,10 @@
 # directory and runs the read-only checks there, so uncommitted edits neither block nor fool it, a
 # generated file that was never committed fails, and the work tree is never written. Tailwind has no
 # --check mode, so it is built to a temp file and compared.
-# Which commit: as a git pre-push hook it reads the pushed refs from stdin ("<local ref> <local sha>
+# Which commit: with --pushed-refs (the pre-push hook) it reads the pushed refs from stdin ("<local ref> <local sha>
 # <remote ref> <remote sha>" per line; deletions are skipped) and checks every pushed sha; with no
-# refs on stdin (a manual or CI run) it checks HEAD.
+# flag, or no refs on stdin (a manual or CI run), it checks HEAD. Stdin is only read when asked, so
+# a CI step with an idle open pipe can never hang here.
 # The first run may need the network: build-tailwind.sh installs the pinned Tailwind CLI into a user
 # cache when it is missing.
 set -euo pipefail
@@ -20,7 +21,7 @@ REBUILD='bash scripts/build-tailwind.sh && node scripts/build-manifests.js && no
 CSS=devocionales/vendor/tailwind.css
 
 shas=()
-if [ ! -t 0 ]; then
+if [ "${1:-}" = --pushed-refs ]; then
   while read -r _local_ref local_sha _rest; do
     case "${local_sha}" in
       '' | *[!0]*) [ -n "${local_sha}" ] && shas+=("${local_sha}") ;;  # all zeros = deletion

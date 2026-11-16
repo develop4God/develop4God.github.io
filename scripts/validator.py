@@ -283,7 +283,10 @@ def phase_generated_files():
     print('  The first run may install the pinned Tailwind CLI (needs the network); output streams below.')
     sys.stdout.flush()
     # Not captured, so a cold-cache install is visible. The pushed refs (if any) go to the script's stdin.
-    result = subprocess.run(['bash', 'scripts/check-generated.sh'], cwd=REPO_ROOT, text=True, input=PUSHED_REFS)
+    result = subprocess.run(
+        ['bash', 'scripts/check-generated.sh'] + (['--pushed-refs'] if PUSHED_REFS else []),
+        cwd=REPO_ROOT, text=True, input=PUSHED_REFS or None, stdin=None if PUSHED_REFS else subprocess.DEVNULL,
+    )
     return result.returncode == 0, ''
 
 
@@ -294,9 +297,11 @@ def skipped_in_fast_mode():
 def main():
     parser = argparse.ArgumentParser(description='Phased validator for develop4God.github.io.')
     parser.add_argument('--fast', action='store_true', help='skip c8 coverage and Playwright e2e (the pre-push hook)')
-    fast = parser.parse_args().fast
+    parser.add_argument('--pushed-refs', action='store_true', help='read the pushed refs from stdin (the pre-push hook) so phase 9 checks the pushed commits, not HEAD')
+    args = parser.parse_args()
+    fast = args.fast
     global PUSHED_REFS
-    if not sys.stdin.isatty():
+    if args.pushed_refs:
         PUSHED_REFS = sys.stdin.read()
 
     print("develop4God.github.io — pre-commit validation" + (" (fast)" if fast else ""))

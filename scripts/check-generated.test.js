@@ -67,11 +67,12 @@ function tempRepo(t, { committed = {}, gitRepo = true } = {}) {
 
 // `input` is what a pre-push hook would write to stdin. GIT_CEILING_DIRECTORIES keeps git from finding
 // a repository above the temp dir (TMPDIR inside a checkout), and LC_ALL=C pins git's messages.
-function check(dir, input = '') {
-  const result = spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh')], {
+function check(dir, input = null) {
+  const args = input === null ? [] : ['--pushed-refs'];
+  const result = spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh'), ...args], {
     cwd: dir,
     encoding: 'utf8',
-    input,
+    input: input === null ? '' : input,
     env: { ...ENV, GIT_CEILING_DIRECTORIES: path.dirname(dir), LC_ALL: 'C' },
   });
   return { ...result, output: result.stdout + result.stderr };
