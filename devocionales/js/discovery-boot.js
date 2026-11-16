@@ -11,6 +11,8 @@
         const doc = global.document;
         // The installed app has its own bottom bar: DevotionalStandalone hides the links back to the site (is-standalone).
         if (global.DevotionalStandalone) global.DevotionalStandalone.apply(doc, global);
+        // The installed app's bottom bar (Home / Studies / Settings); a no-op in a browser tab and on Android.
+        if (global.DevotionalShell) global.DevotionalShell.init(doc, global, global.DevotionalPwaConfig);
         const i18n = global.DevotionalI18n;
         const supported = Object.keys(global.i18n.supportedLanguages);
         const lang = () => i18n.getLanguage(supported, 'en');
@@ -75,7 +77,7 @@
         function applyStaticText() {
             doc.title = `${t('title')} - Devocionales Cristianos`;
             byId('studies-title').textContent = t('title');
-            byId('studies-back-label').textContent = i18n.t('devotionals.navDevotional', '');
+            byId('studies-nav').setAttribute('aria-label', i18n.t('shell.nav_label', 'Main navigation'));
         }
 
         function showList() {

@@ -36,6 +36,14 @@
 
 .shell-tab:hover { color: var(--text); }
 
+a.shell-tab { text-decoration: none; }
+
+.shell-tab-icon,
+.shell-tab svg {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+}
+
 .shell-tab[aria-current="page"] { color: var(--accent); }
 
 .shell-tab:focus-visible {
@@ -97,6 +105,9 @@
 .shell-active[data-shell-view="home"] [data-shell-settings] { display: none; }
 
 .shell-active[data-shell-view="settings"] main { display: none; }
+
+/* The browser-tab header links to Studies; the installed app has the Studies tab in its bar instead. */
+.shell-active #nav-studies-item { display: none; }
 
 /* Google Play is for Android, which has no installed web app. */
 .shell-active #app-banner,

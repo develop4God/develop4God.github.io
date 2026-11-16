@@ -165,3 +165,63 @@ test('createTabState: duplicate names collapse, and the tabs list is a copy', ()
     input.push('x');
     assert.deepEqual(state.tabs, ['home', 'settings']);
 });
+
+// ---- resolveInitialTab: the studies page links to Settings with #settings ----
+
+test('resolveInitialTab: #settings opens Settings when that tab exists, anything else opens Home', () => {
+    const { resolveInitialTab } = loadCore();
+    assert.equal(resolveInitialTab('#settings', ['home', 'settings']), 'settings');
+    assert.equal(resolveInitialTab('', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab('#other', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab('#SETTINGS', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab(undefined, ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab(null, ['home', 'settings']), 'home');
+});
+
+test('resolveInitialTab: a hash for a tab the kill switch removed falls back to Home (or the first tab)', () => {
+    const { resolveInitialTab } = loadCore();
+    assert.equal(resolveInitialTab('#settings', ['home']), 'home');
+    assert.equal(resolveInitialTab('#settings', ['settings']), 'settings');
+    assert.equal(resolveInitialTab('#settings', []), 'home');
+    assert.equal(resolveInitialTab('#settings', 'settings'), 'home');
+});
+
+// ---- tabsForPage: ONE tab table drives the bar on every page of the app ----
+
+test('tabsForPage (reader): Home and Settings are panels of the page, Studies is a link; config order wins', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('reader', ['home', 'studies', 'settings']);
+    assert.deepEqual(tabs.map((t) => [t.name, t.kind]), [['home', 'panel'], ['studies', 'link'], ['settings', 'panel']]);
+    assert.equal(tabs[0].controls, 'shell-home-panel');
+    assert.equal(tabs[2].controls, 'shell-settings');
+    assert.equal(tabs[1].href, '/devocionales/estudios/');
+    assert.deepEqual(tabs.map((t) => t.icon), ['house', 'graduation-cap', 'settings']);
+    assert.deepEqual(tabsForPage('reader', ['settings', 'home']).map((t) => t.name), ['settings', 'home']);
+});
+
+test('tabsForPage (studies page): every tab is a link, Studies is the current one, Settings opens #settings', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('studies', ['home', 'studies', 'settings']);
+    assert.deepEqual(tabs.map((t) => [t.name, t.kind, t.href, t.current]), [
+        ['home', 'link', '/devocionales/', false],
+        ['studies', 'link', '/devocionales/estudios/', true],
+        ['settings', 'link', '/devocionales/#settings', false],
+    ]);
+});
+
+test('tabsForPage: the kill switch removes a tab; unknown names, duplicates, bad input and unknown pages give nothing extra', () => {
+    const { tabsForPage } = loadCore();
+    assert.deepEqual(tabsForPage('reader', ['home', 'settings']).map((t) => t.name), ['home', 'settings']);
+    assert.deepEqual(tabsForPage('reader', ['home', 'ghost', 'home']).map((t) => t.name), ['home']);
+    for (const bad of [undefined, null, 'home', 5, {}]) assert.deepEqual(tabsForPage('reader', bad), []);
+    assert.deepEqual(tabsForPage('unknown', ['home']), []);
+    assert.deepEqual(tabsForPage(undefined, ['home']), []);
+});
+
+test('tabsForPage: every tab carries its i18n key and an English fallback label', () => {
+    const { tabsForPage } = loadCore();
+    for (const tab of tabsForPage('reader', ['home', 'studies', 'settings'])) {
+        assert.match(tab.labelKey, /^shell\./);
+        assert.ok(tab.fallback.length > 0);
+    }
+});
