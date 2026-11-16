@@ -220,5 +220,17 @@
     "salvationContinue": "继续",
     "salvationAlreadyPrayed": "已经完成 🙏",
     "salvationDontShowAgain": "不再显示"
+  },
+  "push": {
+    "title": "每日提醒",
+    "description": "在你选择的时间收到当天灵修的通知。",
+    "consent": "开启后，此浏览器每天会收到一条通知。我们会保存一个匿名标识符、你的时区、语言和所选时间。你可以随时关闭。",
+    "enable": "开启通知",
+    "disable": "关闭通知",
+    "hour_label": "提醒时间",
+    "status_enabled": "通知已开启。",
+    "status_denied": "此浏览器已屏蔽通知。请在网站设置中允许后再开启。",
+    "status_error": "无法开启通知，请稍后再试。",
+    "status_ios_install": "要在 iPhone 或 iPad 上接收通知，请先安装应用：点按“分享”，然后选择“添加到主屏幕”。"
   }
 }

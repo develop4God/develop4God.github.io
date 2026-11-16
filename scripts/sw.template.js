@@ -191,6 +191,9 @@ self.addEventListener('message', (event) => {
   );
 });
 
+// Push notifications: scripts/sw-push.js is inlined here by scripts/build-sw.js.
+/* __SW_PUSH__ */
+
 async function fromBuild(request, url) {
   const saved = await caches.match(url, { cacheName: BUILD_CACHE });
   return saved || fetch(request);

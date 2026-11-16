@@ -621,6 +621,46 @@
         </div>
     </div>
 
+    <!-- Daily push notifications. Hidden by default; devotional-push.js reveals it only when pushEnabled
+         is true and the browser supports push. No existing id is touched, so an older cached script is unaffected. -->
+    <section data-push class="hidden mx-auto max-w-2xl px-4 py-4 text-center text-sm" style="color: var(--text-muted);" aria-labelledby="push-title">
+        <h2 id="push-title" class="text-lg font-semibold mb-2" style="color: var(--text);" data-i18n="push.title">Daily reminder</h2>
+        <p class="mb-3" data-i18n="push.description">Get a notification with your daily devotional at the time you choose.</p>
+        <div class="flex flex-wrap items-center justify-center gap-3 mb-3">
+            <label for="push-hour" class="text-sm" data-i18n="push.hour_label">Reminder time</label>
+            <select id="push-hour" data-push-hour class="px-3 py-1.5 rounded-lg border" style="background: var(--surface); color: var(--text); border-color: var(--border);">
+                    <option value="0">00:00</option>
+                    <option value="1">01:00</option>
+                    <option value="2">02:00</option>
+                    <option value="3">03:00</option>
+                    <option value="4">04:00</option>
+                    <option value="5">05:00</option>
+                    <option value="6">06:00</option>
+                    <option value="7">07:00</option>
+                    <option value="8">08:00</option>
+                    <option value="9">09:00</option>
+                    <option value="10">10:00</option>
+                    <option value="11">11:00</option>
+                    <option value="12">12:00</option>
+                    <option value="13">13:00</option>
+                    <option value="14">14:00</option>
+                    <option value="15">15:00</option>
+                    <option value="16">16:00</option>
+                    <option value="17">17:00</option>
+                    <option value="18">18:00</option>
+                    <option value="19">19:00</option>
+                    <option value="20">20:00</option>
+                    <option value="21">21:00</option>
+                    <option value="22">22:00</option>
+                    <option value="23">23:00</option>
+            </select>
+            <button type="button" id="push-enable-btn" data-push-enable class="btn-primary px-4 py-2" data-i18n="push.enable">Turn on notifications</button>
+            <button type="button" id="push-disable-btn" data-push-disable class="btn-primary px-4 py-2" data-i18n="push.disable">Turn off notifications</button>
+        </div>
+        <p class="text-xs mb-2" data-i18n="push.consent">When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.</p>
+        <p id="push-status" data-push-status role="status" aria-live="polite"></p>
+    </section>
+
     <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
         <a id="footer-contact-mail" href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;">
             <i data-lucide="mail" class="w-4 h-4"></i>
@@ -654,6 +694,9 @@
     <script src="/devocionales/js/devotional-ios-hint.js"></script>
     <script src="/devocionales/js/devotional-build.js"></script>
     <script src="/devocionales/js/devotional-sw-register.js"></script>
+    <script src="/devocionales/js/devotional-push-store.js"></script>
+    <script src="/devocionales/js/devotional-push-firebase.js"></script>
+    <script src="/devocionales/js/devotional-push.js"></script>
     <script>
         lucide.createIcons();
 
@@ -704,6 +747,10 @@
             () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
             () => DevotionalStandalone.apply(document, window),
             () => DevotionalManifest.init(document, window),
+            // Off unless pushEnabled is true; loads no Firebase code until the reader taps enable.
+            () => DevotionalPush.init(document, window, window.DevotionalPwaConfig, {
+                adapter: DevotionalPushFirebase.create(window, window.DevotionalPwaConfig),
+            }),
         ].forEach((step) => {
             try {
                 step();

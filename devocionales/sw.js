@@ -48,7 +48,7 @@
 // independent of the page build. Each keeps only the newest entries (the data cache never evicts
 // the small index and stats files).
 
-const CONFIG = JSON.parse("{\"version\":\"81c98acc2252\",\"claimTimeoutMs\":1000,\"installAttempts\":3,\"installRetryDelayMs\":500,\"timeoutMs\":4000,\"freshTimeoutMs\":1000,\"maxDataEntries\":24,\"imagePathPrefix\":\"/develop4God/Devocionales-assets/main/images/devotionals/\",\"maxImageEntries\":30,\"freshFirst\":[\"/devocionales/js/devotional-pwa-config.js\"],\"sameOriginData\":[\"/data/app-stats.json\"],\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"pages\":[\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-build.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-ios-hint.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-manifest.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-pwa-config.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-standalone.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
+const CONFIG = JSON.parse("{\"version\":\"e773fe6d0e0d\",\"claimTimeoutMs\":1000,\"installAttempts\":3,\"installRetryDelayMs\":500,\"timeoutMs\":4000,\"freshTimeoutMs\":1000,\"maxDataEntries\":24,\"imagePathPrefix\":\"/develop4God/Devocionales-assets/main/images/devotionals/\",\"maxImageEntries\":30,\"freshFirst\":[\"/devocionales/js/devotional-pwa-config.js\"],\"sameOriginData\":[\"/data/app-stats.json\"],\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"pages\":[\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-build.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-ios-hint.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-manifest.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-push-firebase.js\",\"/devocionales/js/devotional-push-store.js\",\"/devocionales/js/devotional-push.js\",\"/devocionales/js/devotional-pwa-config.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-standalone.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
 
 const CACHE_PREFIX = 'devocionales-';
 const BUILD_CACHE = `${CACHE_PREFIX}${CONFIG.version}`;
@@ -190,6 +190,93 @@ self.addEventListener('message', (event) => {
     }),
   );
 });
+
+// Push notifications: scripts/sw-push.js is inlined here by scripts/build-sw.js.
+/* eslint-env serviceworker */
+// Push handlers of the /devocionales/ worker. build-sw.js inlines this file into the generated
+// worker at the __SW_PUSH__ marker of sw.template.js and hashes it into the worker version, so a
+// change here ships a new worker.
+//
+// Why no Firebase SDK here: FCM delivers a standard Web Push message, so the browser needs only a
+// `push` listener to show it. The SDK stays on the page (loaded after opt-in). These handlers
+// never touch the network or the caches, so they cannot interfere with the fetch/message/install
+// handlers or with the kill switch.
+(function () {
+  const SHELL_PATH = '/devocionales/';
+  const ICON = `${SHELL_PATH}icons/icon-192.png`;
+  // Shown when a message carries no title (a data-only or malformed payload): a push must always
+  // show exactly one notification, or the browser shows its own generic one.
+  const FALLBACK_TITLE = 'Devocionales Cristianos';
+
+  const isObject = (value) => value !== null && typeof value === 'object';
+
+  // The payload as an object; plain text becomes the body, anything unreadable becomes empty.
+  function readPayload(data) {
+    if (!data) return {};
+    try {
+      const parsed = data.json();
+      return isObject(parsed) ? parsed : {};
+    } catch (err) {
+      try {
+        const text = data.text();
+        return text ? { notification: { body: String(text) } } : {};
+      } catch (err2) {
+        return {};
+      }
+    }
+  }
+
+  const text = (value) => (typeof value === 'string' && value ? value : undefined);
+
+  function toNotification(payload) {
+    const notification = isObject(payload.notification) ? payload.notification : {};
+    const data = isObject(payload.data) ? payload.data : {};
+    const options = {
+      body: text(notification.body) || text(data.body),
+      icon: ICON,
+      // One slot: pushes queued while the device was offline collapse into the latest one.
+      tag: 'daily-devotional',
+      renotify: true,
+      data: { url: SHELL_PATH },
+    };
+    const lang = text(data.lang);
+    if (lang) options.lang = lang;
+    return { title: text(notification.title) || text(data.title) || FALLBACK_TITLE, options };
+  }
+
+  self.addEventListener('push', (event) => {
+    const { title, options } = toNotification(readPayload(event.data));
+    event.waitUntil(self.registration.showNotification(title, options));
+  });
+
+  // Only the reader itself: the legal pages live under the same path but are not what a click is for.
+  const isReaderWindow = (client) => {
+    try {
+      const { pathname } = new URL(client.url);
+      return pathname === SHELL_PATH || pathname === `${SHELL_PATH}index.html`;
+    } catch (err) {
+      return false;
+    }
+  };
+
+  async function showReader() {
+    try {
+      const reader = (await self.clients.matchAll({ type: 'window', includeUncontrolled: true })).find(isReaderWindow);
+      if (reader) {
+        await reader.focus();
+        return undefined;
+      }
+    } catch (err) {
+      // Fall through: opening the reader is better than doing nothing.
+    }
+    return self.clients.openWindow(SHELL_PATH);
+  }
+
+  self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    event.waitUntil(showReader());
+  });
+}());
 
 async function fromBuild(request, url) {
   const saved = await caches.match(url, { cacheName: BUILD_CACHE });
