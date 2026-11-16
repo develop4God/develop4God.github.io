@@ -10,6 +10,8 @@
 
     function boot() {
         const doc = global.document;
+        // The installed app has its own bottom bar: DevotionalStandalone hides the links back to the site (is-standalone).
+        if (global.DevotionalStandalone) global.DevotionalStandalone.apply(doc, global);
         const i18n = global.DevotionalI18n;
         const supported = Object.keys(global.i18n.supportedLanguages);
         const lang = () => i18n.getLanguage(supported, 'en');

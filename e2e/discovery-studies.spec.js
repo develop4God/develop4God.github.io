@@ -258,14 +258,13 @@ test.describe('language, theme and layout', () => {
     });
   }
 
-  test('the theme toggle switches and persists, shared with the reader', async ({ page }) => {
+  test('the stored theme is applied; the page has no language or theme controls of its own (they live in Settings)', async ({ page }) => {
     await mockData(page);
+    await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
     await open(page);
-    await page.locator('.theme-switch').click();
-    const saved = await page.evaluate(() => localStorage.getItem('theme'));
-    expect(['dark', 'light']).toContain(saved);
-    await page.reload({ waitUntil: 'networkidle' });
-    await expect(page.locator('html')).toHaveAttribute('data-theme', saved);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.locator('.theme-switch')).toHaveCount(0);
+    await expect(page.locator('.language-selector-button')).toHaveCount(0);
   });
 
   test('no horizontal overflow and the grid column count follows the viewport', async ({ page }) => {

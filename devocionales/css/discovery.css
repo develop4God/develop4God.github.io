@@ -17,11 +17,13 @@ body {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;
 }
 
-.studies-header-tools {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.studies-back-icon,
+.studies-back svg {
+    inline-size: 1rem;
+    block-size: 1rem;
 }
+
+.is-standalone .studies-back { display: none; }
 
 .studies-back {
     display: inline-flex;
