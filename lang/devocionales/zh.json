@@ -256,6 +256,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "继续上次阅读的位置",
     "startHere": "从这里开始",
-    "studiesCount": "{count} 个查经"
+    "studiesCount": "{count} 个查经",
+    "previous": "上一个",
+    "next": "下一个",
+    "exit": "退出",
+    "markCompleted": "完成研究",
+    "completedStudy": "已完成的研究",
+    "studyCompleted": "研究成功完成",
+    "studyNotFound": "未找到研究。",
+    "keyVerse": "核心经文",
+    "meaning": "意义",
+    "strongNumber": "斯特朗编号",
+    "reference": "经文出处",
+    "application": "应用",
+    "activationPrayer": "结束祷告"
   }
 }

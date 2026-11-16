@@ -256,6 +256,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "続きから読む",
     "startHere": "ここから始める",
-    "studiesCount": "{count}件の学び"
+    "studiesCount": "{count}件の学び",
+    "previous": "前へ",
+    "next": "次へ",
+    "exit": "終了",
+    "markCompleted": "研究を完了する",
+    "completedStudy": "完了した研究",
+    "studyCompleted": "研究が正常に完了しました",
+    "studyNotFound": "研究が見つかりません。",
+    "keyVerse": "中心となる聖句",
+    "meaning": "意味",
+    "strongNumber": "ストロング番号",
+    "reference": "参照箇所",
+    "application": "適用",
+    "activationPrayer": "締めくくりの祈り"
   }
 }

@@ -256,6 +256,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "Continúa donde lo dejaste",
     "startHere": "Empieza aquí",
-    "studiesCount": "{count} estudios"
+    "studiesCount": "{count} estudios",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "exit": "Salir",
+    "markCompleted": "Completar estudio",
+    "completedStudy": "Estudio completado",
+    "studyCompleted": "Estudio completado exitosamente",
+    "studyNotFound": "Estudio no encontrado.",
+    "keyVerse": "VERSÍCULO CLAVE",
+    "meaning": "Significado",
+    "strongNumber": "Número Strong",
+    "reference": "Referencia",
+    "application": "Aplicación",
+    "activationPrayer": "Oración de cierre"
   }
 }
