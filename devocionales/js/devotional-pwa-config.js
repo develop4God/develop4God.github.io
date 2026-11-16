@@ -21,8 +21,9 @@
             shell: {
                 // false = the installed app keeps the plain page, without tabs.
                 enabled: true,
-                // Tab names; each needs a [data-shell-tab] button in index.html.
-                tabs: ['home', 'settings'],
+                // Tab names; each needs a [data-shell-tab] element in index.html. 'studies' is a link to the
+                // Bible-studies page; leaving it out removes that tab from the bar.
+                tabs: ['home', 'studies', 'settings'],
                 layout: {
                     // At or above this viewport width the tabs are a labelled rail, below it a bottom bar.
                     railMinWidth: 768,

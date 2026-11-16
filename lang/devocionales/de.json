@@ -235,6 +235,7 @@
   "shell": {
     "nav_label": "App-Navigation",
     "home": "Start",
+    "studies": "Bibelstudien",
     "settings": "Einstellungen",
     "language": "Sprache",
     "theme": "Design",

@@ -165,3 +165,23 @@ test('createTabState: duplicate names collapse, and the tabs list is a copy', ()
     input.push('x');
     assert.deepEqual(state.tabs, ['home', 'settings']);
 });
+
+// ---- resolveInitialTab: the studies page links to Settings with #settings ----
+
+test('resolveInitialTab: #settings opens Settings when that tab exists, anything else opens Home', () => {
+    const { resolveInitialTab } = loadCore();
+    assert.equal(resolveInitialTab('#settings', ['home', 'settings']), 'settings');
+    assert.equal(resolveInitialTab('', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab('#other', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab('#SETTINGS', ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab(undefined, ['home', 'settings']), 'home');
+    assert.equal(resolveInitialTab(null, ['home', 'settings']), 'home');
+});
+
+test('resolveInitialTab: a hash for a tab the kill switch removed falls back to Home (or the first tab)', () => {
+    const { resolveInitialTab } = loadCore();
+    assert.equal(resolveInitialTab('#settings', ['home']), 'home');
+    assert.equal(resolveInitialTab('#settings', ['settings']), 'settings');
+    assert.equal(resolveInitialTab('#settings', []), 'home');
+    assert.equal(resolveInitialTab('#settings', 'settings'), 'home');
+});

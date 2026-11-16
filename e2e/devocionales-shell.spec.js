@@ -516,3 +516,168 @@ test.describe('Settings screen: a plain list in the installed app', () => {
         }
     });
 });
+
+// ---- the Studies tab: a link tab to the Bible-studies page, which shows the same bar ----
+
+const STUDIES = '/devocionales/estudios/?lang=en';
+const STUDY_DATA = /raw\.githubusercontent\.com\/develop4God\/Devocionales-json\/.*\/discovery\//;
+const STUDY_INDEX = { studies: [{ id: 's1', version: '1', emoji: '🧎', files: { en: 's1_en.json', es: 's1_es.json' }, titles: { en: 'Title s1', es: 'Título s1' }, subtitles: { en: 'Sub' }, estimated_reading_minutes: { en: 5, es: 5 } }] };
+
+async function mockStudies(page) {
+    await page.route(STUDY_DATA, (route) => (route.request().url().endsWith('/discovery/index.json')
+        ? route.fulfill({ json: STUDY_INDEX })
+        : route.fulfill({ json: { cards: [{ order: 1, title: 'C1', content: 'x' }] } })));
+}
+
+async function openStudies(page, viewport, query = STUDIES) {
+    await page.setViewportSize(viewport);
+    await page.goto(query, { waitUntil: 'networkidle' });
+    await expect(page.locator('.study-card').first()).toBeVisible();
+}
+
+test.describe('Studies tab in the installed app', () => {
+    test('the reader bar is Home, Studies, Settings; Studies has the graduation-cap icon and links to the studies page', async ({ page }) => {
+        const errors = trackErrors(page);
+        await installedIos(page);
+        await open(page, PHONE);
+        const tabs = page.locator('[data-shell-nav] [data-shell-tab]');
+        await expect(tabs).toHaveCount(3);
+        expect(await tabs.evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'settings']);
+        const studies = page.locator('[data-shell-tab="studies"]');
+        await expect(studies).toContainText('Bible Studies');
+        await expect(studies).toHaveAttribute('href', '/devocionales/estudios/');
+        await expect(studies.locator('svg.lucide-graduation-cap')).toBeVisible();
+        expect(await noHorizontalScroll(page)).toBe(true);
+        await shot(page, 'ios-phone-home-with-studies');
+        expect(errors).toEqual([]);
+    });
+
+    test('tapping Studies opens the studies page with the same bar and Studies marked current', async ({ page }) => {
+        const errors = trackErrors(page);
+        await installedIos(page);
+        await mockStudies(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="studies"]').click();
+        await expect(page).toHaveURL(/\/devocionales\/estudios\//);
+        await expect(page.locator('.study-card').first()).toBeVisible();
+        await expect(page.locator('html')).toHaveClass(/shell-active/);
+        const nav = page.locator('[data-shell-nav]');
+        await expect(nav).toBeVisible();
+        const box = await nav.boundingBox();
+        expect(Math.round(box.y + box.height)).toBe(PHONE.height);
+        await expect(page.locator('[data-shell-tab="studies"]')).toHaveAttribute('aria-current', 'page');
+        await expect(page.locator('[data-shell-tab="home"]')).not.toHaveAttribute('aria-current', 'page');
+        await expect(page.locator('.studies-back')).toBeHidden();
+        expect(await noHorizontalScroll(page)).toBe(true);
+        await shot(page, 'ios-phone-studies');
+        expect(errors).toEqual([]);
+    });
+
+    test('from the studies page, Home returns to the reader and Settings opens the Settings tab', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await openStudies(page, PHONE);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page).toHaveURL(/\/devocionales\/#settings/);
+        await expect(page.locator('[data-shell-settings]')).toBeVisible();
+        await expect(page.locator('[data-shell-tab="settings"]')).toHaveAttribute('aria-current', 'page');
+        await page.goBack();
+        await expect(page.locator('.study-card').first()).toBeVisible();
+        await page.locator('[data-shell-tab="home"]').click();
+        await expect(page).toHaveURL(/\/devocionales\/$/);
+        await expect(page.locator('main')).toBeVisible();
+        await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+    });
+
+    test('a plain reader URL still opens on Home (only #settings selects Settings, nothing is stored)', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+        await page.goto('/devocionales/?lang=en#unknown', { waitUntil: 'networkidle' });
+        await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+    });
+
+    test('on desktop the studies page shows the labelled rail on the left', async ({ page }) => {
+        await installedDesktop(page);
+        await mockStudies(page);
+        await openStudies(page, DESKTOP);
+        expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
+        const box = await page.locator('[data-shell-nav]').boundingBox();
+        expect(Math.round(box.x)).toBe(0);
+        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Bible Studies');
+        await shot(page, 'desktop-studies');
+    });
+
+    test('tab labels follow the language on both pages (Spanish)', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await openStudies(page, PHONE, '/devocionales/estudios/?lang=es');
+        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Estudios Bíblicos');
+        await expect(page.locator('[data-shell-tab="home"]')).toContainText('Inicio');
+        await expect(page.locator('[data-shell-tab="settings"]')).toContainText('Ajustes');
+    });
+
+    test('the bar keeps the content clear: the last card is not covered by it', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await openStudies(page, PHONE);
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        const footer = await page.locator('#page-footer').boundingBox();
+        const nav = await page.locator('[data-shell-nav]').boundingBox();
+        expect(footer.y + footer.height).toBeLessThanOrEqual(nav.y + 1);
+    });
+
+    test('every reachable link on the studies page stays in /devocionales/', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await openStudies(page, PHONE);
+        expect(await disallowedLinks(page)).toEqual([]);
+    });
+});
+
+test.describe('Studies tab: surfaces where it must not appear, and the kill switch', () => {
+    test('a browser tab: the studies page has no bar and the reader no extra tab', async ({ page }) => {
+        await mockStudies(page);
+        await openStudies(page, PHONE);
+        await expect(page.locator('html')).not.toHaveClass(/shell-active/);
+        await expect(page.locator('[data-shell-nav]')).toBeHidden();
+        await expect(page.locator('.studies-back')).toBeVisible();
+    });
+
+    test.describe('Android', () => {
+        test.use({ userAgent: ANDROID_UA, hasTouch: true });
+        test('installed on Android the studies page keeps the plain page, no bar', async ({ page }) => {
+            await installedIos(page);
+            await mockStudies(page);
+            await openStudies(page, PHONE);
+            await expect(page.locator('html')).not.toHaveClass(/shell-active/);
+            await expect(page.locator('[data-shell-nav]')).toBeHidden();
+        });
+    });
+
+    test('leaving "studies" out of the config tabs removes the Studies tab from both pages', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+            const response = await route.fetch();
+            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'settings']", "tabs: ['home', 'settings']") });
+        });
+        await open(page, PHONE);
+        await expect(page.locator('[data-shell-tab="studies"]')).toHaveCount(0);
+        await expect(page.locator('[data-shell-tab]')).toHaveCount(2);
+        await page.goto(STUDIES, { waitUntil: 'networkidle' });
+        await expect(page.locator('[data-shell-tab="studies"]')).toHaveCount(0);
+    });
+
+    test('the previous config (tabs: home, settings) with the new HTML shows no Studies tab and no errors', async ({ page }) => {
+        const errors = trackErrors(page);
+        await installedIos(page);
+        await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+            const response = await route.fetch();
+            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'settings']", "tabs: ['home', 'settings']") });
+        });
+        await open(page, PHONE);
+        await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+        expect(errors).toEqual([]);
+    });
+});

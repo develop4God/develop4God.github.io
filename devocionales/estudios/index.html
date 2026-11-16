@@ -25,6 +25,7 @@
     <script src="/devocionales/js/devotional-theme.js"></script>
     <link rel="stylesheet" href="/devocionales/css/theme.css">
     <link rel="stylesheet" href="/devocionales/css/chrome.css">
+    <link rel="stylesheet" href="/devocionales/pwa/shell.css">
     <link rel="stylesheet" href="/devocionales/css/discovery.css">
 </head>
 <body>
@@ -50,6 +51,23 @@
         </div>
         <div id="studies-detail-view" hidden></div>
     </main>
+
+    <!-- Installed app only (iOS and desktop): revealed by devotional-shell.js, hidden by shell.css everywhere else. -->
+    <nav id="shell-nav" data-shell-nav aria-labelledby="shell-nav-label">
+        <span id="shell-nav-label" class="sr-only" data-i18n="shell.nav_label">App navigation</span>
+        <a class="shell-tab" data-shell-tab="home" data-shell-link href="/devocionales/">
+            <i data-lucide="house" class="shell-tab-icon"></i>
+            <span data-i18n="shell.home">Home</span>
+        </a>
+        <a class="shell-tab" data-shell-tab="studies" data-shell-link data-shell-current href="/devocionales/estudios/">
+            <i data-lucide="graduation-cap" class="shell-tab-icon"></i>
+            <span data-i18n="shell.studies">Bible Studies</span>
+        </a>
+        <a class="shell-tab" data-shell-tab="settings" data-shell-link href="/devocionales/#settings">
+            <i data-lucide="settings" class="shell-tab-icon"></i>
+            <span data-i18n="shell.settings">Settings</span>
+        </a>
+    </nav>
 
     <footer id="page-footer" class="studies-footer">
         <p>
@@ -81,6 +99,9 @@
     <script src="/devocionales/js/discovery-detail-dom.js"></script>
     <script src="/devocionales/js/discovery-detail-page.js"></script>
     <script src="/devocionales/js/discovery-router.js"></script>
+    <script src="/devocionales/js/devotional-pwa-config.js"></script>
+    <script src="/devocionales/pwa/devotional-shell-core.js"></script>
+    <script src="/devocionales/pwa/devotional-shell.js"></script>
     <script src="/devocionales/js/discovery-boot.js"></script>
 </body>
 </html>

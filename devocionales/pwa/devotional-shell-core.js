@@ -79,5 +79,11 @@
         };
     }
 
-    global.DevotionalShellCore = { isShellSurface, isAllowedLink, createTabState };
+    // The app opens on Home, except when another page of the app links straight to Settings
+    // (`/devocionales/#settings`, the bottom bar of the Bible-studies page). Nothing is stored.
+    function resolveInitialTab(hash, tabs) {
+        return hash === '#settings' && Array.isArray(tabs) && tabs.includes('settings') ? 'settings' : 'home';
+    }
+
+    global.DevotionalShellCore = { isShellSurface, isAllowedLink, createTabState, resolveInitialTab };
 })(window);
