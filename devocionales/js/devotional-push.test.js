@@ -626,6 +626,103 @@ test('LANG: a language change before opting in writes nothing', async () => {
     assert.deepEqual(ctx.adapter.log, []);
 });
 
+test('RACE: a second hour pick while a save runs is shown, then saved after it; the stored, shown and written hours agree', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.deepEqual(ctx.adapter.writes.map((w) => w.data.notificationTime), ['12:00', '15:00']);
+    assert.equal(ctx.storage.data['devotionalPush.hour'], '15');
+    assert.equal(ctx.el('hour').value, '15');
+    assert.equal(ctx.el('time-value').textContent, '15:00');
+});
+
+test('RACE: the running save writes the hour that was chosen, not what the picker shows at that moment', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    ctx.adapter.db.set = (p, data) => { ctx.adapter.writes.push({ path: p, data }); return Promise.resolve(); };
+    release();
+    await tick();
+    assert.equal(ctx.adapter.writes[0].data.notificationTime, '12:00');
+});
+
+test('RACE: a pick made while the switch is being turned off is dropped and the row returns to the saved hour', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('switch').listeners.click();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.equal(ctx.el('hour').value, '9');
+    assert.ok(!ctx.adapter.writes.some((w) => w.data && w.data.notificationTime));
+});
+
+test('LANG-BUSY: a language change while a save is in flight is written once the flow ends', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    const realSet = ctx.adapter.db.set;
+    ctx.adapter.db.set = (...args) => { ctx.adapter.db.set = realSet; return gate.then(() => realSet(...args)); };
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.i18nState.lang = 'en';
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    release();
+    await tick();
+    const last = ctx.adapter.writes[ctx.adapter.writes.length - 1];
+    assert.equal(last.data.preferredLanguage, 'en');
+    assert.equal(last.data.notificationTime, '12:00');
+});
+
+test('LANG-BUSY: several language changes while busy cause one rewrite; none when notifications ended up off', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('switch').listeners.click();
+    await tick();
+    ctx.i18nState.lang = 'en';
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.equal(ctx.adapter.writes.filter((w) => w.data && w.data.preferredLanguage).length, 0);
+    assertOff(ctx);
+});
+
 // Surface gate: pushEnabled && isStandalone && !isAndroid. Browser tabs and Android never write.
 const SDK_CALLS = ['requestPermission', 'load', 'signInAnonymously', 'registration', 'getToken', 'currentUid', 'deleteToken'];
 function assertUntouched(ctx, stored) {
