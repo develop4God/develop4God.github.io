@@ -296,24 +296,26 @@
 
             const rewriteSettings = async () => {
                 try {
-                    await adapter.load();
-                    const uid = await adapter.currentUid();
-                    if (!uid) throw new Error('push: no signed-in user');
-                    await store.saveSettings(uid, settings());
+                    await saveSettingsNow();
                     view.message('push.status_enabled');
                 } catch (err) {
                     view.message('push.status_error');
                 }
             };
 
+            // Writes the settings document for the signed-in reader; throws when it cannot.
+            const saveSettingsNow = async () => {
+                await adapter.load();
+                const uid = await adapter.currentUid();
+                if (!uid) throw new Error('push: no signed-in user');
+                await store.saveSettings(uid, settings());
+            };
+
             // Saves the picked hour. A failure puts the row back on the last saved hour, so the screen
             // never shows a time the server does not have.
             const changeHour = async (next) => {
                 try {
-                    await adapter.load();
-                    const uid = await adapter.currentUid();
-                    if (!uid) throw new Error('push: no signed-in user');
-                    await store.saveSettings(uid, settings());
+                    await saveSettingsNow();
                     savedHour = next;
                     storage.set(KEY_HOUR, next);
                     view.message('push.time_set', formatHour(next));
@@ -344,19 +346,14 @@
             if (view.switchButton) view.switchButton.addEventListener('click', () => { exclusive(isOptedIn() ? disable : enable); });
             if (view.hourSelect) {
                 view.hourSelect.addEventListener('change', () => {
-                    if (busy) {
+                    // Busy, or notifications are off (the row is disabled then, so this is only a guard).
+                    if (busy || !isOptedIn()) {
                         view.selectHour(savedHour);
                         return;
                     }
                     const next = parseHour(view.hourSelect.value);
-                    view.selectHour(next);
                     if (next === savedHour) return;
-                    if (!isOptedIn()) {
-                        // Nothing to save yet: only remembered for when the reader turns notifications on.
-                        savedHour = next;
-                        storage.set(KEY_HOUR, next);
-                        return;
-                    }
+                    view.selectHour(next);
                     exclusive(() => changeHour(next));
                 });
             }

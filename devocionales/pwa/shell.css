@@ -126,13 +126,17 @@
 }
 
 /* On a phone the language list is a scrollable sheet that ends just above the bottom bar. As the page's own
-   dropdown it opens downwards from the row and ran under the bar, so the last languages could not be reached. */
+   dropdown it opens downwards from the row and ran under the bar, so the last languages could not be reached.
+   i18n.js builds the dropdown with utility classes (absolute top-full left-0 right-0 overflow-hidden), so this
+   rule must stay more specific than a single class: the e2e spec "every language can be chosen" guards it. */
 .shell-active[data-shell-layout="bar"] .language-dropdown {
     position: fixed;
     inset-inline: 1rem;
     top: auto;
     bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
+    margin-top: 0;
     max-height: calc(100vh - 12rem);
+    max-height: calc(100dvh - 12rem);
     overflow-y: auto;
 }
 

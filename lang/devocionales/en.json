@@ -229,12 +229,7 @@
     "salvationDontShowAgain": "Don't show again"
   },
   "push": {
-    "title": "Daily reminder",
-    "description": "Get a notification with your daily devotional at the time you choose.",
     "consent": "When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.",
-    "enable": "Turn on notifications",
-    "disable": "Turn off notifications",
-    "hour_label": "Reminder time",
     "status_enabled": "Notifications are on.",
     "status_denied": "Notifications are blocked in this browser. Allow them in the site settings to turn them on.",
     "status_error": "Notifications could not be turned on. Please try again later.",
@@ -248,7 +243,6 @@
     "nav_label": "App navigation",
     "home": "Home",
     "settings": "Settings",
-    "settings_intro": "Reminders and preferences for this app.",
     "language": "Language",
     "theme": "Theme",
     "font_size": "Font size"

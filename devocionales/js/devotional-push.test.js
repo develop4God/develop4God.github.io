@@ -417,14 +417,16 @@ test('hour change while opted in writes only the settings document with the new 
     assert.equal(ctx.storage.data['devotionalPush.hour'], '21');
 });
 
-test('hour change before opting in only remembers the choice', async () => {
+test('hour change while the switch is off (the row is disabled, so this is only a guard) is ignored and the row stays on the saved hour', async () => {
     const ctx = setup();
     await ctx.run();
     ctx.el('hour').value = '5';
     ctx.el('hour').listeners.change();
     await tick();
     assert.deepEqual(ctx.adapter.log, []);
-    assert.equal(ctx.storage.data['devotionalPush.hour'], '5');
+    assert.equal(ctx.el('hour').value, '9');
+    assert.equal(ctx.el('time-value').textContent, '09:00');
+    assert.equal(ctx.storage.data['devotionalPush.hour'], undefined);
 });
 
 test('hour change while busy is ignored and the select returns to the stored hour', async () => {

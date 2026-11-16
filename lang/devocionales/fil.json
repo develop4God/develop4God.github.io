@@ -229,12 +229,7 @@
     "salvationDontShowAgain": "Huwag nang ipakita muli"
   },
   "push": {
-    "title": "Pang-araw-araw na paalala",
-    "description": "Makatanggap ng abiso na may kasamang debosyonal ng araw sa oras na pipiliin mo.",
     "consent": "Kapag in-on mo ito, makakatanggap ang browser na ito ng isang abiso bawat araw. Iniimbak namin ang isang anonymous na identifier, ang iyong timezone, wika at ang napiling oras. Maaari mo itong i-off anumang oras.",
-    "enable": "I-on ang mga abiso",
-    "disable": "I-off ang mga abiso",
-    "hour_label": "Oras ng paalala",
     "status_enabled": "Naka-on na ang mga abiso.",
     "status_denied": "Naka-block ang mga abiso sa browser na ito. Payagan ang mga ito sa mga setting ng site para ma-on.",
     "status_error": "Hindi na-on ang mga abiso. Pakisubukang muli mamaya.",
@@ -248,7 +243,6 @@
     "nav_label": "Nabigasyon ng app",
     "home": "Home",
     "settings": "Mga Setting",
-    "settings_intro": "Mga paalala at kagustuhan para sa app na ito.",
     "language": "Wika",
     "theme": "Tema",
     "font_size": "Laki ng font"
