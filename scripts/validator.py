@@ -130,9 +130,10 @@ def print_summary():
 # ── Phase 1: node --check ────────────────────────────────────────────────
 
 def phase_node_check(root=REPO_ROOT):
-    # Tracked files only: skips node_modules, worktrees and test output without an exclusion list.
+    # Tracked plus new-but-not-ignored files (a new file must pass before it is committed); .gitignore
+    # skips node_modules, worktrees and test output without an exclusion list.
     # NUL-separated so names with spaces survive; a file deleted from disk but still tracked is skipped.
-    rc, out, err = run_cmd(['git', 'ls-files', '-z', '*.js'], cwd=root)
+    rc, out, err = run_cmd(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '*.js'], cwd=root)
     if rc != 0:
         print(f"  ❌ git ls-files failed: {err.strip()}")
         return False, 'could not list tracked .js files'

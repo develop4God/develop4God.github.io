@@ -74,3 +74,13 @@ test('phase 1: passes when every tracked file parses', (t) => {
   const dir = repoWith(t, { 'a.js': 'let a = 1;\n', 'b c.js': 'let b = 2;\n' });
   assert.match(nodeCheck(dir), /RESULT True/);
 });
+
+test('phase 1: a new uncommitted .js file is checked, an ignored one is not', (t) => {
+  const dir = repoWith(t, { '.gitignore': 'ignored.js\n', 'a.js': 'let a = 1;\n' });
+  fs.writeFileSync(path.join(dir, 'new.js'), 'let = ;\n'); // never added to git
+  fs.writeFileSync(path.join(dir, 'ignored.js'), 'let = ;\n');
+  const out = nodeCheck(dir);
+  assert.match(out, /RESULT False/);
+  assert.match(out, /new\.js/);
+  assert.doesNotMatch(out, /ignored\.js/);
+});

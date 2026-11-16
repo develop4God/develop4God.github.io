@@ -138,7 +138,7 @@ test('check-generated: fails instead of passing outside a git repository', (t) =
   const dir = tempRepo(t, { gitRepo: false });
   const result = check(dir);
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /not a git repository/i);
+  assert.match(result.stderr, /check-generated: cannot read the git history/);
 });
 
 test('check-generated: a build that cannot run is reported with the rebuild hint, not a bare abort', (t) => {
@@ -208,4 +208,19 @@ test('build-tailwind: a relative output path is resolved against the caller, not
   write(repo, 'devocionales/vendor/.keep', '');
   assert.equal(run().status, 0);
   assert.equal(fs.readFileSync(path.join(repo, 'devocionales/vendor/tailwind.css'), 'utf8'), 'built');
+});
+
+test('check-generated: a deletion-only push has nothing to check and passes', (t) => {
+  const dir = tempRepo(t, { committed: { [CSS]: 'old css\n' } }); // HEAD is stale: must not be checked
+  const result = check(dir, `(delete) ${ZERO} refs/heads/gone ${head(dir)}\n`);
+  assert.equal(result.status, 0, result.output);
+  assert.match(result.output, /nothing to check/i);
+});
+
+test('check-generated: a sha pushed to several refs is built once', (t) => {
+  const dir = tempRepo(t);
+  const sha = head(dir);
+  const result = check(dir, pushLines(sha, sha));
+  assert.equal(result.status, 0, result.output);
+  assert.equal(result.stdout.split('Checking generated files at').length - 1, 1);
 });

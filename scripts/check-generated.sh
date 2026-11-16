@@ -21,14 +21,31 @@ REBUILD='bash scripts/build-tailwind.sh && node scripts/build-manifests.js && no
 CSS=devocionales/vendor/tailwind.css
 
 shas=()
+pushed=0
 if [ "${1:-}" = --pushed-refs ]; then
+  pushed=1
   while read -r _local_ref local_sha _rest; do
     case "${local_sha}" in
       '' | *[!0]*) [ -n "${local_sha}" ] && shas+=("${local_sha}") ;;  # all zeros = deletion
     esac
   done
 fi
-[ "${#shas[@]}" -gt 0 ] || shas=("$(git rev-parse HEAD)")
+if [ "${pushed}" -eq 1 ]; then
+  # A deletion-only push has no commit to check.
+  if [ "${#shas[@]}" -eq 0 ]; then
+    echo "Nothing to check: no commits are being pushed."
+    exit 0
+  fi
+  # The same commit pushed to several refs is built once.
+  mapfile -t shas < <(printf '%s\n' "${shas[@]}" | awk '!seen[$0]++')
+else
+  head_sha="$(git rev-parse HEAD)" || {
+    echo "check-generated: cannot read the git history (not a git repository, or no commits yet)." >&2
+    echo "  ${REBUILD}" >&2
+    exit 1
+  }
+  shas=("${head_sha}")
+fi
 
 TMP="$(mktemp -d)"
 trap 'rm -rf "${TMP}"' EXIT
