@@ -27,6 +27,7 @@
     "DevotionalBuild": "readonly",
     "DiscoveryData": "readonly",
     "DiscoveryStore": "readonly",
+    "DiscoverySortFilter": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",
