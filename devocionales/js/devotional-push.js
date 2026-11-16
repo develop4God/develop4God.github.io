@@ -7,10 +7,13 @@
     // tested with fakes. Nothing is loaded, no Firebase request is made and no permission is asked
     // unless the reader tapped enable (or opted in earlier and the permission is still granted).
 
-    const DEFAULT_HOUR = 8;
+    const DEFAULT_HOUR = 9;
     const KEY_OPTED_IN = 'devotionalPush.optedIn';
     const KEY_TOKEN = 'devotionalPush.token';
     const KEY_HOUR = 'devotionalPush.hour';
+
+    // The scheduler ignores minutes, so a reminder time is always a whole hour, shown as "HH:00".
+    const formatHour = (hour) => `${String(hour).padStart(2, '0')}:00`;
 
     function parseHour(value) {
         const hour = Number.parseInt(value, 10);
@@ -83,50 +86,72 @@
         return hint.canAddToHomeScreen(win.navigator) && !standalone.isStandalone(win);
     }
 
+    // Push exists only in the installed app, and never on Android (native app there). Unlike the
+    // manifest and install modules, a missing or broken helper is an UNKNOWN surface, not "not
+    // Android": an old cached standalone script on an installed Android PWA must not show push.
+    function isAppSurface(win) {
+        const standalone = global.DevotionalStandalone;
+        if (!standalone || typeof standalone.isStandalone !== 'function' || typeof standalone.isAndroid !== 'function') return false;
+        return standalone.isStandalone(win) && !standalone.isAndroid(win.navigator);
+    }
+
     function createView(doc, t) {
         const container = doc.querySelector('[data-push]');
-        const enableButton = doc.querySelector('[data-push-enable]');
-        const disableButton = doc.querySelector('[data-push-disable]');
+        // The switch row and the time row are optional: an older cached page does not have them.
+        const switchButton = doc.querySelector('[data-push-switch]');
+        const switchRow = doc.querySelector('[data-push-switch-row]');
+        const timeRow = doc.querySelector('[data-push-time-row]');
+        const timeValue = doc.querySelector('[data-push-time-value]');
         const hourSelect = doc.querySelector('[data-push-hour]');
         const status = doc.querySelector('[data-push-status]');
-        // The key, not the text, is what the view remembers: the text is rendered again whenever
-        // translations become ready or the language changes.
+        // The key (and the hour that goes after it), not the text, is what the view remembers: the
+        // text is rendered again whenever translations become ready or the language changes.
         let statusKey = null;
+        let statusDetail = '';
         const setShown = (element, shown) => {
             if (!element) return;
             if (shown) element.classList.remove('hidden');
             else element.classList.add('hidden');
         };
+        // On: the reader is opted in. Off: the time row is greyed out and cannot be opened.
+        const setOn = (on) => {
+            if (switchButton) switchButton.setAttribute('aria-checked', String(on));
+            if (hourSelect) hourSelect.disabled = !on;
+            if (timeRow) timeRow.classList[on ? 'remove' : 'add']('is-off');
+        };
         return {
-            enableButton,
-            disableButton,
+            switchButton,
             hourSelect,
             // The 24 options live in the static HTML (single source); this only preselects one.
-            selectHour(hour) { if (hourSelect) hourSelect.value = String(hour); },
-            selectedHour: () => (hourSelect ? parseHour(hourSelect.value) : null),
-            message(key) {
-                statusKey = key || null;
-                if (status) status.textContent = statusKey ? t(statusKey) : '';
+            selectHour(hour) {
+                if (hourSelect) hourSelect.value = String(hour);
+                if (timeValue) timeValue.textContent = formatHour(hour);
             },
-            rerender() { this.message(statusKey); },
+            selectedHour: () => (hourSelect ? parseHour(hourSelect.value) : null),
+            message(key, detail) {
+                statusKey = key || null;
+                statusDetail = detail || '';
+                if (!status) return;
+                const text = statusKey ? t(statusKey) : '';
+                status.textContent = text && statusDetail ? `${text} ${statusDetail}` : text;
+            },
+            rerender() { this.message(statusKey, statusDetail); },
             hide: () => setShown(container, false),
             showInstallHint() {
                 setShown(container, true);
-                setShown(enableButton, false);
-                setShown(disableButton, false);
-                setShown(hourSelect, false);
+                setShown(switchRow, false);
+                setShown(timeRow, false);
                 this.message('push.status_ios_install');
             },
             showState(optedIn) {
                 setShown(container, true);
-                setShown(enableButton, !optedIn);
-                setShown(disableButton, optedIn);
-                setShown(hourSelect, true);
+                setShown(switchRow, true);
+                setShown(timeRow, true);
+                setOn(optedIn);
                 this.message(optedIn ? 'push.status_enabled' : null);
             },
             busy(isBusy) {
-                if (enableButton) enableButton.disabled = isBusy;
-                if (disableButton) disableButton.disabled = isBusy;
+                if (switchButton) switchButton.disabled = isBusy;
             },
         };
     }
@@ -174,6 +199,13 @@
 
             // No config object at all (its script failed to load) is "unknown", not "off".
             if (!config) return;
+            // Surface gate first: a browser tab or Android never writes, unsubscribes or asks for
+            // permission, even with a stale opted-in flag (a desktop tab shares storage with the app).
+            if (!isAppSurface(win)) {
+                if (config.pushEnabled === true && needsInstallFirst(win)) view.showInstallHint();
+                else view.hide();
+                return;
+            }
             if (config.pushEnabled !== true || config.enabled === false) {
                 view.hide();
                 if (isOptedIn()) await disableFlow(resolved);
@@ -185,7 +217,9 @@
             }
             if (!adapter.supported()) return;
 
-            view.selectHour(parseHour(storage.get(KEY_HOUR)));
+            // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
+            let savedHour = parseHour(storage.get(KEY_HOUR));
+            view.selectHour(savedHour);
             // The select is the source of truth; storage only remembers it for the next visit.
             const hour = () => (view.selectedHour() === null ? parseHour(storage.get(KEY_HOUR)) : view.selectedHour());
             const settings = () => ({ notificationsEnabled: true, hour: hour(), timezone: browserTimezone(), language: siteLanguage(i18n) });
@@ -234,7 +268,8 @@
                     await writeAll(uid, token);
                     storage.set(KEY_OPTED_IN, '1');
                     storage.set(KEY_TOKEN, token);
-                    storage.set(KEY_HOUR, hour());
+                    savedHour = hour();
+                    storage.set(KEY_HOUR, savedHour);
                     // Without a persisted flag there would be no way to turn it off again: undo.
                     if (!isOptedIn()) {
                         await disableFlow(resolved, token);
@@ -261,13 +296,32 @@
 
             const rewriteSettings = async () => {
                 try {
-                    await adapter.load();
-                    const uid = await adapter.currentUid();
-                    if (!uid) throw new Error('push: no signed-in user');
-                    await store.saveSettings(uid, settings());
+                    await saveSettingsNow();
                     view.message('push.status_enabled');
                 } catch (err) {
                     view.message('push.status_error');
+                }
+            };
+
+            // Writes the settings document for the signed-in reader; throws when it cannot.
+            const saveSettingsNow = async () => {
+                await adapter.load();
+                const uid = await adapter.currentUid();
+                if (!uid) throw new Error('push: no signed-in user');
+                await store.saveSettings(uid, settings());
+            };
+
+            // Saves the picked hour. A failure puts the row back on the last saved hour, so the screen
+            // never shows a time the server does not have.
+            const changeHour = async (next) => {
+                try {
+                    await saveSettingsNow();
+                    savedHour = next;
+                    storage.set(KEY_HOUR, next);
+                    view.message('push.time_set', formatHour(next));
+                } catch (err) {
+                    view.selectHour(savedHour);
+                    view.message('push.time_error');
                 }
             };
 
@@ -288,16 +342,19 @@
                 }
             };
 
-            if (view.enableButton) view.enableButton.addEventListener('click', () => { exclusive(enable); });
-            if (view.disableButton) view.disableButton.addEventListener('click', () => { exclusive(disable); });
+            // One switch: off -> enable (asks for the permission inside this tap), on -> disable.
+            if (view.switchButton) view.switchButton.addEventListener('click', () => { exclusive(isOptedIn() ? disable : enable); });
             if (view.hourSelect) {
                 view.hourSelect.addEventListener('change', () => {
-                    if (busy) {
-                        view.selectHour(parseHour(storage.get(KEY_HOUR)));
+                    // Busy, or notifications are off (the row is disabled then, so this is only a guard).
+                    if (busy || !isOptedIn()) {
+                        view.selectHour(savedHour);
                         return;
                     }
-                    storage.set(KEY_HOUR, parseHour(view.hourSelect.value));
-                    if (isOptedIn()) exclusive(rewriteSettings);
+                    const next = parseHour(view.hourSelect.value);
+                    if (next === savedHour) return;
+                    view.selectHour(next);
+                    exclusive(() => changeHour(next));
                 });
             }
 

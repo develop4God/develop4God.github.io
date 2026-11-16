@@ -26,6 +26,8 @@
     "DevotionalSwRegister": "readonly",
     "DevotionalBuild": "readonly",
     "DevotionalPush": "readonly",
+    "DevotionalShell": "readonly",
+    "DevotionalShellCore": "readonly",
     "DevotionalPushStore": "readonly",
     "DevotionalPushFirebase": "readonly",
     "AppStats": "readonly",
