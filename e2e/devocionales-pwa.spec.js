@@ -652,6 +652,23 @@ test.describe('manifest link by platform', () => {
             expect(errors).toEqual([]);
         });
 
+        test.describe('previous devotional-standalone.js (no isAndroid) with the new scripts and HTML', () => {
+            for (const [label, ua] of [['desktop', undefined], ['Android', ANDROID_UA]]) {
+                test(`${label}: renders with no console errors`, async ({ browser }) => {
+                    const context = await browser.newContext(ua ? { userAgent: ua, hasTouch: true } : {});
+                    const page = await context.newPage();
+                    const errors = trackErrors(page);
+                    const file = 'devocionales/js/devotional-standalone.js';
+                    await page.route(`**/${file}`, (route) => route.fulfill({ contentType: 'text/javascript', body: old(file) }));
+                    await page.goto(READER, { waitUntil: 'networkidle' });
+                    await expect(page.locator('h1').first()).not.toHaveText('');
+                    expect(await page.locator('link[rel="manifest"]').count()).toBeLessThanOrEqual(1);
+                    expect(errors).toEqual([]);
+                    await context.close();
+                });
+            }
+        });
+
         test('new scripts against the previous HTML still render, with at most one link', async ({ page }) => {
             const errors = trackErrors(page);
             await page.route('**/devocionales/?*', (route) => route.fulfill({ contentType: 'text/html', body: old('index.html') }));
@@ -663,6 +680,17 @@ test.describe('manifest link by platform', () => {
 
         test.describe('on Android', () => {
             test.use({ userAgent: ANDROID_UA, hasTouch: true });
+
+            test('previous scripts against the new HTML still render, with at most one link', async ({ page }) => {
+                const errors = trackErrors(page);
+                for (const file of OLD_SCRIPTS) {
+                    await page.route(`**/${file}`, (route) => route.fulfill({ contentType: 'text/javascript', body: old(file) }));
+                }
+                await page.goto(READER, { waitUntil: 'networkidle' });
+                await expect(page.locator('h1').first()).not.toHaveText('');
+                expect(await page.locator('link[rel="manifest"]').count()).toBeLessThanOrEqual(1);
+                expect(errors).toEqual([]);
+            });
 
             test('new scripts against the previous HTML still show the Google Play banner and button, with no manifest link', async ({ page }) => {
                 const errors = trackErrors(page);

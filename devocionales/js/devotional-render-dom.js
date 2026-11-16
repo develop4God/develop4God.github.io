@@ -141,6 +141,7 @@
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
         // App banner: Android only (native app via Google Play); every other platform has the PWA.
         if (global.DevotionalStandalone
+            && typeof global.DevotionalStandalone.isAndroid === 'function' // an older cached script lacks it
             && global.DevotionalStandalone.isAndroid(global.navigator)
             && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');

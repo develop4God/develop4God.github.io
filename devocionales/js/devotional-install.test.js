@@ -291,3 +291,12 @@ test('without DevotionalStandalone nothing throws and the platform is treated as
     win.listeners.beforeinstallprompt(promptEvent());
     assert.equal(button.shown, true);
 });
+
+test('an older DevotionalStandalone without isAndroid does not throw and counts as not Android', () => {
+    const button = fakeButton();
+    const win = fakeWindow({ userAgent: UA.androidPhone });
+    win.DevotionalStandalone = { isStandalone: () => false };
+    assert.doesNotThrow(() => init(doc(button), win));
+    win.listeners.beforeinstallprompt(promptEvent());
+    assert.equal(button.shown, true);
+});

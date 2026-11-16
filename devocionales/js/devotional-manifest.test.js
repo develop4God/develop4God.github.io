@@ -164,3 +164,10 @@ test('a window without navigator is treated as not Android', () => {
     assert.doesNotThrow(() => init(r.doc, r.win, {}));
     assert.equal(r.state.present, true);
 });
+
+test('an older DevotionalStandalone without isAndroid does not throw and the link is kept', () => {
+    const r = rig({ navigator: ANDROID });
+    r.win.DevotionalStandalone = { isStandalone: () => false };
+    assert.doesNotThrow(() => init(r.doc, r.win));
+    assert.equal(r.state.present, true);
+});

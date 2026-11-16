@@ -17,7 +17,9 @@
     function init(doc, win) {
         const link = doc.querySelector('link[rel="manifest"]');
         if (!link) return;
-        if (win.DevotionalStandalone && win.DevotionalStandalone.isAndroid(win.navigator)) {
+        const standalone = win.DevotionalStandalone;
+        // typeof: a cached older devotional-standalone.js has no isAndroid.
+        if (standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(win.navigator)) {
             link.remove();
             return;
         }

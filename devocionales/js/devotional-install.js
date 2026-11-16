@@ -4,7 +4,9 @@
     // Platform detection lives in DevotionalStandalone. If that script failed to load, the platform
     // is treated as not Android and nothing here throws.
     function isAndroid(win) {
-        return Boolean(win.DevotionalStandalone && win.DevotionalStandalone.isAndroid(win.navigator));
+        const standalone = win.DevotionalStandalone;
+        // typeof: a cached older devotional-standalone.js has no isAndroid.
+        return Boolean(standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(win.navigator));
     }
 
     function reveal(element) {
