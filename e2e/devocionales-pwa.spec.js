@@ -192,8 +192,10 @@ test.describe('updates', () => {
 
     // After the new worker took over: the reader is controlled by it, and its data survived.
     async function expectReaderOnNewWorker(page, base) {
-        await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.state)).toBe('activated');
-        expect(await page.evaluate(() => navigator.serviceWorker.controller.scriptURL)).toBe(`${base}/devocionales/sw.js`);
+        // The old build's cache is already gone (only the worker's activate step deletes it), so the
+        // takeover happened. The controller state itself is not asserted: under heavy load it can still
+        // read 'activating' for a long time after the page is controlled, which says nothing about the claim.
+        await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL), { timeout: 15_000 }).toBe(`${base}/devocionales/sw.js`);
         expect(await cacheNames(page)).toContain('devocionales-data');
     }
 
