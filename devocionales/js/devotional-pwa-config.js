@@ -8,13 +8,16 @@
         // Master switch. false = no service worker, no install button, no manifest, and any worker
         // or cache already installed in a reader's browser is removed on their next visit.
         enabled: true,
+        // The version shown in the installed app's Settings, like the Flutter app's pubspec "1.0.1+1" (semantic
+        // version + build number). Bump it by hand on each release; it is not derived from the build id.
+        appVersion: '1.0.1+1',
         // Kill switch for daily push notifications. false = the enable button is hidden, no Firebase
         // code is ever loaded, and a reader who had opted in is unsubscribed on their next visit.
         // This client kill switch is cleanup only: it runs when the installed app is reopened, so a
         // reader who never reopens it keeps a live token. The emergency stop is pushEnabled:false
         // PLUS a manual Firestore cleanup of tokens with platform == 'web' (the web store writes
         // platform:'web'; the Flutter app writes TargetPlatform.android).
-        pushEnabled: false,
+        pushEnabled: true,
         // The installed app (iOS and desktop only, never Android, never a browser tab). The kill
         // switches above stay on top: enabled:false also removes the shell.
         surfaces: {

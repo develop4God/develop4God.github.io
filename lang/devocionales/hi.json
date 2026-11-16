@@ -238,6 +238,7 @@
     "settings": "सेटिंग्स",
     "language": "भाषा",
     "theme": "थीम",
-    "font_size": "फ़ॉन्ट आकार"
+    "font_size": "फ़ॉन्ट आकार",
+    "app_version": "ऐप संस्करण"
   }
 }

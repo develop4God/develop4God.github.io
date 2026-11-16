@@ -16,14 +16,19 @@ function watchFirebase(page) {
     return hits;
 }
 
+// Serves the real config with pushEnabled forced to `value`, so a test never depends on the shipped default.
+async function forcePushEnabled(page, value) {
+    await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+        const response = await route.fetch();
+        const body = (await response.text()).replace(/pushEnabled: (true|false)/, `pushEnabled: ${value}`);
+        await route.fulfill({ response, body });
+    });
+}
+
 // Serves the real config with pushEnabled forced on, and an adapter stub in place of the Firebase
 // adapter file, so production code is untouched and no real Firebase call is possible.
 async function enablePushWithStubAdapter(page, { permission = 'denied' } = {}) {
-    await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
-        const response = await route.fetch();
-        const body = (await response.text()).replace('pushEnabled: false', 'pushEnabled: true');
-        await route.fulfill({ response, body });
-    });
+    await forcePushEnabled(page, true);
     await page.route('**/devocionales/js/devotional-push-firebase.js', (route) => route.fulfill({
         contentType: 'text/javascript',
         body: `window.__adapterCalls = [];
@@ -68,8 +73,9 @@ async function launchAsInstalledApp(page) {
     await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
 }
 
-test('the push block is hidden and Firebase is never contacted with the default config', async ({ page }) => {
+test('the kill switch: with pushEnabled false the push block is hidden and Firebase is never contacted', async ({ page }) => {
     const hits = watchFirebase(page);
+    await forcePushEnabled(page, false);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await expect(page.locator('[data-push]')).toBeHidden();
     expect(await page.evaluate(() => window.DevotionalPwaConfig.pushEnabled)).toBe(false);
@@ -114,6 +120,7 @@ test('tapping the switch asks for permission first; a denial shows the message, 
 });
 
 test('with pushEnabled off, a stale opted-in flag does not reveal the block', async ({ page }) => {
+    await forcePushEnabled(page, false);
     // The unsubscribe the kill switch runs may legitimately contact Firebase to erase the reader's data.
     await page.addInitScript(() => localStorage.setItem('devotionalPush.optedIn', '1'));
     await page.goto(READER, { waitUntil: 'networkidle' });

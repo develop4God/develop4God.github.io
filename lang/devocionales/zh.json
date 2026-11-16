@@ -238,6 +238,7 @@
     "settings": "设置",
     "language": "语言",
     "theme": "主题",
-    "font_size": "字体大小"
+    "font_size": "字体大小",
+    "app_version": "应用版本"
   }
 }

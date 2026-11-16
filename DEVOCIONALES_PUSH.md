@@ -120,9 +120,9 @@ automated tests, any change to the Flutter app or the Cloud Functions.
 | Proven live (throwaway spike) | Background display, production scheduler payload (twice), real click opens the page |
 | Installed-PWA click with the app closed and open | **Open** (needs a person at the desktop) |
 | Android Chrome, installed iOS PWA | **Open** (needs real devices) |
-| `pushEnabled: true` | **Open**, only after the three checks above |
+| `pushEnabled: true` | **Set on 2026-11-16 at the owner's explicit instruction, to test the real behavior and the Firebase saves.** The real-device checks above are still open and are run by the owner afterwards. |
 | Known intermittent e2e: `devocionales-pwa.spec.js` worker-update test fails in roughly 4 of 10 full-suite runs on this branch (passes alone, passed 3 of 3 on `main`); under load the 45 s test budget is exceeded. A hero-image reader test that loads a remote image can also fail on a network hiccup. | **Open**, under investigation; CI passed. |
 
 ## Merge gate
 
-Do not merge, and do not enable `pushEnabled`, until C1 to C5 are proven on a real device.
+`pushEnabled` was switched on 2026-11-16 by the owner's explicit decision, ahead of the real-device checks C1 to C5, to verify the behavior and the Firestore writes. Those checks remain open; if one fails, the emergency stop is `pushEnabled: false` plus the manual token cleanup described above.

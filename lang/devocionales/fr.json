@@ -238,6 +238,7 @@
     "settings": "Réglages",
     "language": "Langue",
     "theme": "Thème",
-    "font_size": "Taille de police"
+    "font_size": "Taille de police",
+    "app_version": "Version de l'app"
   }
 }

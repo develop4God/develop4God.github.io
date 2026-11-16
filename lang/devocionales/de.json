@@ -238,6 +238,7 @@
     "settings": "Einstellungen",
     "language": "Sprache",
     "theme": "Design",
-    "font_size": "Schriftgröße"
+    "font_size": "Schriftgröße",
+    "app_version": "App-Version"
   }
 }

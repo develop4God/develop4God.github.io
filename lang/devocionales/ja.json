@@ -238,6 +238,7 @@
     "settings": "設定",
     "language": "言語",
     "theme": "テーマ",
-    "font_size": "フォントサイズ"
+    "font_size": "フォントサイズ",
+    "app_version": "アプリのバージョン"
   }
 }

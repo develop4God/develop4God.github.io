@@ -238,6 +238,7 @@
     "settings": "Mga Setting",
     "language": "Wika",
     "theme": "Tema",
-    "font_size": "Laki ng font"
+    "font_size": "Laki ng font",
+    "app_version": "Bersyon ng app"
   }
 }

@@ -238,6 +238,7 @@
     "settings": "الإعدادات",
     "language": "اللغة",
     "theme": "المظهر",
-    "font_size": "حجم الخط"
+    "font_size": "حجم الخط",
+    "app_version": "إصدار التطبيق"
   }
 }
