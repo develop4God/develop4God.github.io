@@ -1,6 +1,12 @@
 (function (global) {
     'use strict';
 
+    // typeof: a cached older devotional-standalone.js has no isAndroid.
+    function isAndroidDevice() {
+        const standalone = global.DevotionalStandalone;
+        return Boolean(standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(global.navigator));
+    }
+
     function showError(onRetry) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
@@ -79,7 +85,7 @@
             footerDeveloper: DevotionalI18n.t('devotionals.shareFooterDeveloper', ''),
         };
         const shareText = DevotionalShare.buildShareText(entry, labels, url, {
-            includeAppFooter: Boolean(global.DevotionalInstall && global.DevotionalInstall.isAndroid(global.navigator)),
+            includeAppFooter: isAndroidDevice(),
         });
         // No separate `url` field here: shareText already embeds the link
         // (via the "read more" line), and some share targets append a
@@ -138,9 +144,7 @@
         document.getElementById('app-banner-cta').textContent = DevotionalI18n.t('devotionals.appBannerCta', '');
         document.getElementById('app-banner-close').setAttribute('aria-label', DevotionalI18n.t('devotionals.appBannerClose', ''));
         // App banner: Android only (native app via Google Play); every other platform has the PWA.
-        if (global.DevotionalStandalone
-            && typeof global.DevotionalStandalone.isAndroid === 'function' // an older cached script lacks it
-            && global.DevotionalStandalone.isAndroid(global.navigator)
+        if (isAndroidDevice()
             && localStorage.getItem('appBannerDismissed') !== '1') {
             document.getElementById('app-banner').classList.remove('hidden');
         }
