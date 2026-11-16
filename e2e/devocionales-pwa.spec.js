@@ -376,7 +376,7 @@ test.describe('install button on small phones', () => {
         for (const lang of ['en', 'de', 'pt', 'fr', 'ar', 'hi']) {
             test(`keeps every header control on screen at ${width}px — ${lang}`, async ({ page }) => {
                 await page.setViewportSize({ width, height: 800 });
-                await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
+                await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'load' });
                 await page.evaluate(() => {
                     const offer = new Event('beforeinstallprompt', { cancelable: true });
                     offer.prompt = () => Promise.resolve();
