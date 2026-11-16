@@ -20,37 +20,21 @@
     <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <script src="/devocionales/vendor/lucide.min.js"></script>
     <link rel="stylesheet" href="/devocionales/css/modern.css">
-    <link rel="stylesheet" href="/devocionales/css/language-selector.css">
     <script src="/js/rtl-helper.js"></script>
     <script src="/devocionales/js/i18n.js"></script>
     <script src="/devocionales/js/devotional-theme.js"></script>
     <link rel="stylesheet" href="/devocionales/css/theme.css">
     <link rel="stylesheet" href="/devocionales/css/chrome.css">
     <link rel="stylesheet" href="/devocionales/css/discovery.css">
-    <!-- Last in <head>, like the other pages: the language selector's markup uses Tailwind classes. -->
-    <link rel="stylesheet" href="/devocionales/vendor/tailwind.css">
 </head>
 <body>
 
     <header class="site-nav studies-header">
         <div class="studies-header-inner">
             <a href="/devocionales/" class="btn-secondary studies-back">
-                <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
+                <i data-lucide="arrow-left" class="studies-back-icon" aria-hidden="true"></i>
                 <span id="studies-back-label">Today's Devotional</span>
             </a>
-            <div class="studies-header-tools">
-                <div id="language-selector"></div>
-                <!-- label wraps its own input; for attribute kept for clarity -->
-                <!-- [html-validate-disable-next no-redundant-for] -->
-                <label class="theme-switch" for="theme-toggle" aria-label="Theme">
-                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="theme-switch-track">
-                        <span class="theme-switch-dot"></span>
-                    </span>
-                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
-                </label>
-            </div>
         </div>
     </header>
 
@@ -75,6 +59,7 @@
         </p>
     </footer>
 
+    <script src="/devocionales/js/devotional-standalone.js"></script>
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
     <script src="/devocionales/js/devotional-fetch.js"></script>
     <script src="/devocionales/js/devotional-share.js"></script>

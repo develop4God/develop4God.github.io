@@ -4,7 +4,6 @@
 module.exports = {
   content: [
     'devocionales/*.html', // the reader and the legal pages
-    'devocionales/estudios/*.html', // the Bible-studies page
     'devocionales/js/*.js',
     '!devocionales/js/*.test.js',
     'devocionales/pwa/*.js', // installed-app shell
