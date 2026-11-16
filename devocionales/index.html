@@ -495,6 +495,17 @@
                 <img id="hero-image" src="" alt="">
             </div>
 
+            <!-- First-launch offer, installed app only: devotional-push-offer.js reveals it (hidden by default,
+                 every element optional for the script). Enable runs the same flow as the Settings switch. -->
+            <section data-push-offer class="push-offer hidden" aria-labelledby="push-offer-title">
+                <h2 id="push-offer-title" class="push-offer-title" data-i18n="push.offer_title">Daily reminder</h2>
+                <p class="push-offer-body" data-i18n="push.offer_body">Get one notification a day with the new devotional.</p>
+                <div class="push-offer-actions">
+                    <button type="button" class="btn-primary px-5 py-2" data-push-offer-enable data-i18n="push.offer_enable">Enable</button>
+                    <button type="button" class="btn-secondary px-5 py-2" data-push-offer-later data-i18n="push.offer_later">Not now</button>
+                </div>
+            </section>
+
             <div class="text-center max-w-2xl mx-auto mb-6">
                 <div id="eyebrow-label" class="eyebrow mb-2">Devocional Diario</div>
                 <!-- text set by devotional-loader.js after page load -->
@@ -730,6 +741,8 @@
     <script src="/devocionales/js/devotional-sw-register.js"></script>
     <script src="/devocionales/js/devotional-push-store.js"></script>
     <script src="/devocionales/js/devotional-push-firebase.js"></script>
+    <script src="/devocionales/js/devotional-push-help.js"></script>
+    <script src="/devocionales/js/devotional-push-offer.js"></script>
     <script src="/devocionales/js/devotional-push.js"></script>
     <script src="/devocionales/pwa/devotional-shell-core.js"></script>
     <script src="/devocionales/pwa/devotional-shell.js"></script>

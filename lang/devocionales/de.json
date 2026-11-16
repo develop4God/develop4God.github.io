@@ -230,7 +230,13 @@
     "switch_label": "Benachrichtigungen aktivieren/deaktivieren",
     "time_label": "Tägliche Benachrichtigungszeit",
     "time_set": "Benachrichtigungszeit eingestellt auf",
-    "time_error": "Fehler beim Einstellen der Benachrichtigungszeit"
+    "time_error": "Fehler beim Einstellen der Benachrichtigungszeit",
+    "offer_title": "Tägliche Erinnerung",
+    "offer_body": "Erhalte täglich eine Benachrichtigung mit der neuen Andacht.",
+    "offer_enable": "Aktivieren",
+    "offer_later": "Jetzt nicht",
+    "blocked_ios": "Benachrichtigungen sind blockiert. Öffne auf dem iPhone oder iPad Einstellungen > Mitteilungen > diese App und aktiviere Mitteilungen erlauben.",
+    "blocked_desktop": "Benachrichtigungen sind blockiert. Öffne das App-Menü > App-Info (oder Website-Einstellungen) > Benachrichtigungen und wähle Zulassen."
   },
   "shell": {
     "nav_label": "App-Navigation",

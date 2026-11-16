@@ -30,6 +30,8 @@
     "DevotionalShellCore": "readonly",
     "DevotionalPushStore": "readonly",
     "DevotionalPushFirebase": "readonly",
+    "DevotionalPushHelp": "readonly",
+    "DevotionalPushOffer": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",

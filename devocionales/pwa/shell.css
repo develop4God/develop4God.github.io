@@ -256,6 +256,34 @@
 
 .settings-status:empty { display: none; }
 
+/* First-launch notification offer on Home (installed app only; revealed by devotional-push-offer.js). */
+.push-offer {
+    margin: 1rem 0 1.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    color: var(--text);
+}
+
+.push-offer-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.push-offer-body {
+    margin: 0 0 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.push-offer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
 /* Home in the installed app on a phone: the hero runs edge to edge and up under the status bar (the page
    header is hidden above), with a round share button floating in its top-right corner. Tablet and desktop
    keep the card, because their rail would shift an edge-to-edge image. The share button keeps its id and its

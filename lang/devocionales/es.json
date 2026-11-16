@@ -230,7 +230,13 @@
     "switch_label": "Activar/Desactivar notificaciones",
     "time_label": "Hora de notificación diaria",
     "time_set": "Hora de confirmación ajustada a",
-    "time_error": "Error al establecer la hora de notificación"
+    "time_error": "Error al establecer la hora de notificación",
+    "offer_title": "Recordatorio diario",
+    "offer_body": "Recibe una notificación al día con el nuevo devocional.",
+    "offer_enable": "Activar",
+    "offer_later": "Ahora no",
+    "blocked_ios": "Las notificaciones están bloqueadas. En iPhone o iPad abre Ajustes > Notificaciones > esta app y activa Permitir notificaciones.",
+    "blocked_desktop": "Las notificaciones están bloqueadas. Abre el menú de la app > Información de la app (o Configuración del sitio) > Notificaciones y elige Permitir."
   },
   "shell": {
     "nav_label": "Navegación de la app",
