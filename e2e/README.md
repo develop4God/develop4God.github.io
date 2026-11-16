@@ -17,7 +17,7 @@ Run from the repo root:
 /tmp/pw-tools/node_modules/.bin/playwright test -c e2e/
 ```
 
-The config's `webServer` block starts `python3 -m http.server 8791` for you
+The config's `webServer` block starts `python3 scripts/e2e-server.py 8791` for you
 and waits for it to be ready — no manual server/Chrome process management,
 no port-collision cleanup needed between runs.
 
