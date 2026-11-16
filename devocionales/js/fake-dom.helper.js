@@ -70,7 +70,21 @@ class FakeElement {
         if (attr) return attr[2] === undefined ? this.hasAttribute(attr[1]) : this.getAttribute(attr[1]) === attr[2];
         return this.tagName === sel.toUpperCase();
     }
-    querySelectorAll(sel) { return this.all().filter((e) => e.matches(sel)); }
+    // Supports simple selectors and descendant chains ("[data-id=\"a\"] .fav").
+    querySelectorAll(sel) {
+        const parts = sel.trim().split(/\s+/);
+        const last = parts.pop();
+        return this.all().filter((e) => {
+            if (!e.matches(last)) return false;
+            let node = e.parentElement;
+            for (let i = parts.length - 1; i >= 0; i--) {
+                while (node && node !== this && !node.matches(parts[i])) node = node.parentElement;
+                if (!node || node === this) return false;
+                node = node.parentElement;
+            }
+            return true;
+        });
+    }
     querySelector(sel) { return this.querySelectorAll(sel)[0] || null; }
 }
 
