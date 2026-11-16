@@ -1,6 +1,11 @@
 // Daily push notifications on the reader: dormant by default, and when switched on it only offers
 // the button. Nothing talks to Firebase and no permission is requested before an explicit tap.
+const fs = require('node:fs');
+const path = require('node:path');
 const { test, expect } = require('/tmp/pw-tools/node_modules/@playwright/test');
+
+// A script of the previous deploy, committed as a fixture (see devocionales-shell.spec.js).
+const old = (file) => fs.readFileSync(path.join(__dirname, 'fixtures', 'previous-deploy', `${file}.txt`), 'utf8');
 
 const READER = '/devocionales/?lang=en';
 const FIREBASE_HOST = /firebase|gstatic|googleapis|fcm\./i;
@@ -16,14 +21,19 @@ function watchFirebase(page) {
     return hits;
 }
 
+// Serves the real config with pushEnabled forced to `value`, so a test never depends on the shipped default.
+async function forcePushEnabled(page, value) {
+    await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+        const response = await route.fetch();
+        const body = (await response.text()).replace(/pushEnabled: (true|false)/, `pushEnabled: ${value}`);
+        await route.fulfill({ response, body });
+    });
+}
+
 // Serves the real config with pushEnabled forced on, and an adapter stub in place of the Firebase
 // adapter file, so production code is untouched and no real Firebase call is possible.
 async function enablePushWithStubAdapter(page, { permission = 'denied' } = {}) {
-    await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
-        const response = await route.fetch();
-        const body = (await response.text()).replace('pushEnabled: false', 'pushEnabled: true');
-        await route.fulfill({ response, body });
-    });
+    await forcePushEnabled(page, true);
     await page.route('**/devocionales/js/devotional-push-firebase.js', (route) => route.fulfill({
         contentType: 'text/javascript',
         body: `window.__adapterCalls = [];
@@ -32,8 +42,8 @@ window.DevotionalPushFirebase = { create: function () {
     var log = function (name) { window.__adapterCalls.push(name); };
     return {
         supported: function () { return true; },
-        permission: function () { return 'default'; },
-        requestPermission: function () { log('requestPermission'); return Promise.resolve('${permission}'); },
+        permission: function () { return window.__permission || 'default'; },
+        requestPermission: function () { log('requestPermission'); window.__permission = '${permission}'; return Promise.resolve('${permission}'); },
         load: function () { log('load'); return Promise.resolve(); },
         signInAnonymously: function () { log('signInAnonymously'); window.__uid = 'uid'; return Promise.resolve('uid'); },
         currentUid: function () { return Promise.resolve(window.__uid || null); },
@@ -68,8 +78,9 @@ async function launchAsInstalledApp(page) {
     await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
 }
 
-test('the push block is hidden and Firebase is never contacted with the default config', async ({ page }) => {
+test('the kill switch: with pushEnabled false the push block is hidden and Firebase is never contacted', async ({ page }) => {
     const hits = watchFirebase(page);
+    await forcePushEnabled(page, false);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await expect(page.locator('[data-push]')).toBeHidden();
     expect(await page.evaluate(() => window.DevotionalPwaConfig.pushEnabled)).toBe(false);
@@ -114,6 +125,7 @@ test('tapping the switch asks for permission first; a denial shows the message, 
 });
 
 test('with pushEnabled off, a stale opted-in flag does not reveal the block', async ({ page }) => {
+    await forcePushEnabled(page, false);
     // The unsubscribe the kill switch runs may legitimately contact Firebase to erase the reader's data.
     await page.addInitScript(() => localStorage.setItem('devotionalPush.optedIn', '1'));
     await page.goto(READER, { waitUntil: 'networkidle' });
@@ -238,4 +250,119 @@ test('the time row has an accessible name, and the whole row opens the native pi
     expect(rowBox.height).toBeGreaterThanOrEqual(44);
     expect(selectBox.width).toBeGreaterThanOrEqual(rowBox.width - 1);
     expect(selectBox.height).toBeGreaterThanOrEqual(rowBox.height - 1);
+});
+
+// ---- First-launch offer card (Home) and blocked-state help ----
+
+const IPHONE_UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
+
+// An installed iPhone app: iOS user agent, launched from the home screen, on a phone or tablet-width screen.
+async function installedIphonePage(browser, width = 390, height = 844) {
+    const context = await browser.newContext({ userAgent: IPHONE_UA, viewport: { width, height } });
+    const page = await context.newPage();
+    await launchAsInstalledApp(page);
+    return { context, page };
+}
+
+const noHorizontalOverflow = (page) => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+
+test('the offer card shows on first launch of the installed app and fits a 390px phone', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page);
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    const card = page.locator('[data-push-offer]');
+    await expect(card).toBeVisible();
+    await expect(card).toContainText('Daily reminder');
+    expect(await noHorizontalOverflow(page)).toBe(true);
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
+    await context.close();
+});
+
+test('the offer card fits the 800px tablet rail', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser, 800, 1000);
+    await enablePushWithStubAdapter(page);
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push-offer]')).toBeVisible();
+    expect(await noHorizontalOverflow(page)).toBe(true);
+    await context.close();
+});
+
+test('the offer card in Arabic (RTL) does not overflow at 390px', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page);
+    await page.goto('/devocionales/?lang=ar', { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push-offer]')).toBeVisible();
+    expect(await noHorizontalOverflow(page)).toBe(true);
+    await context.close();
+});
+
+test('Not now hides the card and it stays hidden after a reload', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page);
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await page.locator('[data-push-offer-later]').click();
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    expect(await page.evaluate(() => localStorage.getItem('devotionalPush.offerDismissed'))).toBe('1');
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    await context.close();
+});
+
+test('Enable on the card opts in with the same flow, hides the card and turns the Settings switch on', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page, { permission: 'granted' });
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await page.locator('[data-push-offer-enable]').click();
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    await openSettings(page);
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'true');
+    expect((await page.evaluate(() => window.__adapterCalls))[0]).toBe('requestPermission');
+    expect(await page.evaluate(() => localStorage.getItem('devotionalPush.optedIn'))).toBe('1');
+    await context.close();
+});
+
+test('denying on the card hides it and Settings shows the iPhone steps, with no Firebase writes', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    const hits = watchFirebase(page);
+    await enablePushWithStubAdapter(page, { permission: 'denied' });
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await page.locator('[data-push-offer-enable]').click();
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    await openSettings(page);
+    await expect(page.locator('[data-push-status]')).toContainText('Allow Notifications');
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual(['requestPermission']);
+    expect(hits).toEqual([]);
+    await context.close();
+});
+
+test('with the permission already denied the help shows on load and no card; granting it in the system settings clears it', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page);
+    await page.addInitScript(() => { window.__permission = 'denied'; });
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    await openSettings(page);
+    await expect(page.locator('[data-push-status]')).toContainText('Allow Notifications');
+    await page.evaluate(() => {
+        window.__permission = 'default';
+        document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect(page.locator('[data-push-status]')).toHaveText('');
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
+    await context.close();
+});
+
+test('the previous push script (cached) with the new html leaves the card hidden and the switch working', async ({ browser }) => {
+    const { context, page } = await installedIphonePage(browser);
+    await enablePushWithStubAdapter(page, { permission: 'granted' });
+    // The script as shipped before the card existed, replayed against the new html.
+    const previous = old('devotional-push.js');
+    await page.route('**/devocionales/js/devotional-push.js', (route) => route.fulfill({ contentType: 'text/javascript', body: previous }));
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push-offer]')).toBeHidden();
+    await openSettings(page);
+    await page.locator('[data-push-switch]').click();
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'true');
+    await context.close();
 });
