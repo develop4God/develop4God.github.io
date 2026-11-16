@@ -83,13 +83,13 @@
         return hint.canAddToHomeScreen(win.navigator) && !standalone.isStandalone(win);
     }
 
-    // Push exists only in the installed app, and never on Android (native app there). A missing
-    // helper (old cached page) counts as "not Android"; the check never throws.
+    // Push exists only in the installed app, and never on Android (native app there). Unlike the
+    // manifest and install modules, a missing or broken helper is an UNKNOWN surface, not "not
+    // Android": an old cached standalone script on an installed Android PWA must not show push.
     function isAppSurface(win) {
         const standalone = global.DevotionalStandalone;
-        if (!standalone || typeof standalone.isStandalone !== 'function') return false;
-        if (!standalone.isStandalone(win)) return false;
-        return !(typeof standalone.isAndroid === 'function' && standalone.isAndroid(win.navigator));
+        if (!standalone || typeof standalone.isStandalone !== 'function' || typeof standalone.isAndroid !== 'function') return false;
+        return standalone.isStandalone(win) && !standalone.isAndroid(win.navigator);
     }
 
     function createView(doc, t) {

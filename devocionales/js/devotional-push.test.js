@@ -687,14 +687,35 @@ test('gate 4b: Android standalone with a stale opted-in flag, pushEnabled true o
     }
 });
 
-test('gate: a missing DevotionalStandalone.isAndroid is treated as not Android and never throws', async () => {
+// An unknown surface (helper missing or broken, e.g. an old cached standalone script) is NOT the
+// app: hiding is the safe side, since an installed Android PWA must never see push.
+async function assertHiddenWithStandalone(replacement) {
     const standalone = globals.DevotionalStandalone;
-    globals.DevotionalStandalone = { isStandalone: standalone.isStandalone };
+    globals.DevotionalStandalone = replacement;
     try {
-        const ctx = setup({ win: fakeWin({ ua: UA.android, standalone: true }) });
-        await ctx.run();
-        assert.equal(ctx.el('enable').shown, true);
+        for (const ua of [UA.android, UA.desktop]) {
+            const ctx = setup({ win: fakeWin({ ua, standalone: true }), storage: fakeStorage(OPTED), config: { enabled: true, pushEnabled: false } });
+            await ctx.run();
+            await tick();
+            assert.equal(ctx.el('').shown, false);
+            assertUntouched(ctx, OPTED);
+        }
     } finally {
         globals.DevotionalStandalone = standalone;
     }
+}
+
+test('gate: a missing or non-function isAndroid is an unknown surface: hidden, nothing touched, no throw', async () => {
+    const { isStandalone } = globals.DevotionalStandalone;
+    await assertHiddenWithStandalone({ isStandalone });
+    await assertHiddenWithStandalone({ isStandalone, isAndroid: 'nope' });
+});
+
+test('gate: DevotionalStandalone absent entirely: hidden, nothing touched, no throw', async () => {
+    await assertHiddenWithStandalone(undefined);
+});
+
+test('gate: isStandalone not a function: hidden, nothing touched, no throw', async () => {
+    await assertHiddenWithStandalone({ isAndroid: () => false });
+    await assertHiddenWithStandalone({ isStandalone: true, isAndroid: () => false });
 });
