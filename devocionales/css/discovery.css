@@ -39,6 +39,9 @@ body {
     padding: 0.5rem 0;
     border-bottom: 2px solid transparent;
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
 }
 
 .studies-nav a:hover { color: var(--text); }
@@ -48,7 +51,7 @@ body {
     border-bottom-color: var(--accent);
 }
 
-.is-standalone .studies-nav { display: none; }
+.shell-active .studies-nav { display: none; } /* hidden only where the bottom bar replaces it, never leaving a page without navigation */
 
 .studies-main {
     max-width: 64rem;

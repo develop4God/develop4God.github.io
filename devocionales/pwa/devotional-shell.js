@@ -97,7 +97,7 @@
 
         const panelTabs = tabs.filter((tab) => tab.kind === 'panel').map((tab) => tab.name);
         const state = core.createTabState(panelTabs, core.resolveInitialTab(win.location && win.location.hash, panelTabs));
-        // The reader needs a panel to show; a page of links only needs the bar.
+        // The reader needs at least one panel tab (Home or Settings) to have something to show; a page of links only needs the bar.
         if (isReader && state.current() === null) return false;
 
         const elements = renderNav(doc, win, nav, tabs);
@@ -117,9 +117,16 @@
                 if (!state.select(button.dataset.shellTab)) return;
                 renderTab();
                 track(win, state.current());
+                // Arrived through /devocionales/#settings: leaving Settings must not leave the hash behind, or a reload reopens it.
+                if (state.current() === 'home' && win.location.hash === '#settings') {
+                    win.history.replaceState(win.history.state, '', win.location.pathname + win.location.search);
+                }
             }));
             moveControlsToSettings(doc);
         }
+
+        // A link tab leaves the page, so it is reported on tap (the navigation then proceeds normally).
+        elements.filter((el) => el.tagName === 'A').forEach((link) => link.addEventListener('click', () => track(win, link.dataset.shellTab)));
 
         applyLayout(root, win, layout);
         root.classList.add('shell-active');

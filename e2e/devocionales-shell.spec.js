@@ -681,3 +681,58 @@ test.describe('Studies tab: surfaces where it must not appear, and the kill swit
         expect(errors).toEqual([]);
     });
 });
+
+test.describe('Studies tab: review fixes', () => {
+    test('the web header links stay on the studies page whenever the bar is not shown (kill switch)', async ({ page }) => {
+        await installedIos(page);
+        await mockStudies(page);
+        await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+            const response = await route.fetch();
+            const body = (await response.text()).replace(/(shell: \{\s*\/\/[^\n]*\n\s*enabled: )true/, '$1false');
+            await route.fulfill({ response, body });
+        });
+        await openStudies(page, PHONE);
+        await expect(page.locator('html')).not.toHaveClass(/shell-active/);
+        await expect(page.locator('#studies-nav')).toBeVisible(); // otherwise the page would be a dead end
+        await expect(page.locator('#studies-nav a').first()).toBeVisible();
+    });
+
+    test('leaving Settings through Home drops #settings, so a reload opens Home again', async ({ page }) => {
+        await installedIos(page);
+        await page.setViewportSize(PHONE);
+        await page.goto('/devocionales/?lang=en#settings', { waitUntil: 'networkidle' });
+        await expect(page.locator('[data-shell-tab="settings"]')).toHaveAttribute('aria-current', 'page');
+        await page.locator('[data-shell-tab="home"]').click();
+        await expect(page).not.toHaveURL(/#settings/);
+        await page.reload({ waitUntil: 'networkidle' });
+        await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+    });
+
+    test('taps on link tabs are reported as bottom_bar_action too (reader -> Studies, Studies -> Home)', async ({ page }) => {
+        const events = [];
+        await page.exposeFunction('recordEvent', (event) => events.push(event));
+        // The page defines its own gtag() (it pushes onto dataLayer), so the events are observed at
+        // dataLayer.push and reported out of the page, because each navigation discards its state.
+        await page.addInitScript(() => {
+            window.dataLayer = [];
+            window.dataLayer.push = (args) => { window.recordEvent(Array.from(args)); return 0; };
+        });
+        await installedIos(page);
+        await mockStudies(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="studies"]').click();
+        await expect(page.locator('.study-card').first()).toBeVisible();
+        await page.locator('[data-shell-tab="home"]').click();
+        await expect(page.locator('main')).toBeVisible();
+        const reported = events.filter((event) => event[0] === 'event' && event[1] === 'bottom_bar_action').map((event) => event[2]);
+        expect(reported).toEqual([{ action: 'studies' }, { action: 'home' }]);
+    });
+
+    test('the studies page header links are at least 44px tall', async ({ page }) => {
+        await mockStudies(page);
+        await openStudies(page, PHONE);
+        for (const height of await page.locator('#studies-nav a').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))) {
+            expect(height).toBeGreaterThanOrEqual(43.5);
+        }
+    });
+});
