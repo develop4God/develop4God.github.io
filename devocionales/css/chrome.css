@@ -1,0 +1,35 @@
+/* Page chrome shared by the reader, the legal pages and the Bible-studies page: the language
+   selector restyle and the primary/secondary buttons (previously duplicated inline in each). */
+
+/* Neutralize the shared language-selector's hardcoded purple */
+.language-selector-button.bg-purple-700 {
+    background-color: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+.language-selector-button.bg-purple-700:hover {
+    background-color: var(--accent-soft) !important;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition: opacity .15s ease;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}

@@ -41,5 +41,5 @@
         return lines.join('\n');
     }
 
-    global.DevotionalShare = { buildShareText };
+    global.DevotionalShare = { buildShareText, PLAY_STORE_URL };
 })(window);
