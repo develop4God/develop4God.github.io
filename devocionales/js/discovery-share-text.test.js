@@ -7,8 +7,10 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-const filename = path.join(__dirname, 'discovery-share-text.js');
-vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
+for (const name of ['discovery-cards.js', 'discovery-share-text.js']) {
+    const filename = path.join(__dirname, name);
+    vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
+}
 const { buildStudyShareText, extractKeyPoints } = global.window.DiscoveryShareText;
 
 const labels = {

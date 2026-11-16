@@ -55,13 +55,16 @@
     </header>
 
     <main class="studies-main">
-        <div class="studies-title-row">
-            <h1 id="studies-title" class="studies-title">Bible Studies</h1>
-            <p id="studies-count" class="studies-count"></p>
+        <div id="studies-list-view">
+            <div class="studies-title-row">
+                <h1 id="studies-title" class="studies-title">Bible Studies</h1>
+                <p id="studies-count" class="studies-count"></p>
+            </div>
+            <div id="studies-hero"></div>
+            <div id="studies-chips" class="studies-chips-bar"></div>
+            <div id="studies-body"></div>
         </div>
-        <div id="studies-hero"></div>
-        <div id="studies-chips" class="studies-chips-bar"></div>
-        <div id="studies-body"></div>
+        <div id="studies-detail-view" hidden></div>
     </main>
 
     <footer id="page-footer" class="studies-footer">
@@ -75,6 +78,7 @@
     <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
     <script src="/devocionales/js/devotional-fetch.js"></script>
     <script src="/devocionales/js/devotional-share.js"></script>
+    <script src="/devocionales/js/devotional-version.js"></script>
     <script src="/devocionales/js/dom-builder.js"></script>
     <script src="/devocionales/js/ui-toast.js"></script>
     <script src="/devocionales/js/share-or-copy.js"></script>
@@ -82,10 +86,16 @@
     <script src="/devocionales/js/discovery-cache.js"></script>
     <script src="/devocionales/js/discovery-store.js"></script>
     <script src="/devocionales/js/discovery-sort-filter.js"></script>
+    <script src="/devocionales/js/discovery-cards.js"></script>
+    <script src="/devocionales/js/discovery-nav.js"></script>
+    <script src="/devocionales/js/discovery-copyright.js"></script>
     <script src="/devocionales/js/discovery-share-text.js"></script>
     <script src="/devocionales/js/discovery-card-dom.js"></script>
     <script src="/devocionales/js/discovery-list-dom.js"></script>
     <script src="/devocionales/js/discovery-list-page.js"></script>
+    <script src="/devocionales/js/discovery-detail-dom.js"></script>
+    <script src="/devocionales/js/discovery-detail-page.js"></script>
+    <script src="/devocionales/js/discovery-router.js"></script>
     <script src="/devocionales/js/discovery-boot.js"></script>
 </body>
 </html>
