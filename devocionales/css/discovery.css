@@ -23,8 +23,6 @@ body {
     block-size: 1rem;
 }
 
-.is-standalone .studies-back { display: none; }
-
 .studies-back {
     display: inline-flex;
     align-items: center;
@@ -34,6 +32,8 @@ body {
     min-block-size: 2.75rem;
     text-decoration: none;
 }
+
+.is-standalone .studies-back { display: none; }
 
 .studies-main {
     max-width: 64rem;
