@@ -15,6 +15,8 @@ const globals = {};
 loadInto(globals, 'devotional-standalone.js');
 loadInto(globals, 'devotional-ios-hint.js');
 loadInto(globals, 'devotional-push-store.js');
+loadInto(globals, 'devotional-push-help.js');
+loadInto(globals, 'devotional-push-offer.js');
 loadInto(globals, 'devotional-push.js');
 const { init } = globals.DevotionalPush;
 
@@ -54,6 +56,9 @@ function fakeDoc({ withButtons = true } = {}) {
         '[data-push-time-value]': fakeEl(false),
         '[data-push-hour]': Object.assign(fakeEl(false), { options: [] }),
         '[data-push-status]': fakeEl(false),
+        '[data-push-offer]': fakeEl(),
+        '[data-push-offer-enable]': fakeEl(false),
+        '[data-push-offer-later]': fakeEl(false),
     };
     return {
         els,
@@ -131,6 +136,7 @@ function setup({ adapter, storage, win, doc, config = CONFIG } = {}) {
     ctx.deps = { adapter: ctx.adapter, storage: ctx.storage, t, i18n: ctx.i18nState.i18n, i18nWaitMs: 20 };
     ctx.run = () => init(ctx.doc, ctx.win, config, ctx.deps);
     ctx.el = (name) => ctx.doc.els[`[data-push${name ? `-${name}` : ''}]`];
+    ctx.win.document = ctx.doc;
     ctx.tap = async (name) => { ctx.el(name).listeners.click(); await flush(); };
     // The switch row is what the reader sees: on = notifications are on (opted in), off = one tap away.
     ctx.on = () => ctx.el('switch').getAttribute('aria-checked') === 'true';
@@ -215,7 +221,7 @@ test('A3: denied or dismissed permission shows the denied text and calls no Fire
         const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => Promise.resolve(answer) }) });
         await ctx.run();
         await ctx.tap('switch');
-        assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
+        assert.equal(ctx.el('status').textContent, answer === 'denied' ? 'T:push.blocked_desktop' : 'T:push.status_denied');
         assert.deepEqual(ctx.adapter.log, ['requestPermission']);
         assert.deepEqual(ctx.storage.data, {});
         assertOff(ctx);
@@ -775,7 +781,7 @@ test('S5: denied permission leaves the switch off with the blocked message', asy
     await ctx.run();
     await ctx.tap('switch');
     assertOff(ctx);
-    assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
     assert.equal(ctx.el('hour').disabled, true);
 });
 
@@ -855,4 +861,249 @@ test('S11: older markup without the switch or the time row (an earlier cached pa
     const ctx = setup({ doc });
     await assert.doesNotReject(ctx.run());
     assert.equal(ctx.el('').shown, true);
+});
+
+// ---- First-launch offer card and blocked-state help ----
+
+const offerCard = (ctx) => ctx.doc.els['[data-push-offer]'];
+const tapOffer = async (ctx, which) => { ctx.doc.els[`[data-push-offer-${which}]`].listeners.click(); await flush(); };
+const DISMISSED = { 'devotionalPush.offerDismissed': '1' };
+
+// A fake document that also records visibilitychange handlers and the visibility state.
+function withVisibility(ctx) {
+    const handlers = [];
+    ctx.doc.visibilityState = 'visible';
+    ctx.doc.addEventListener = (type, handler) => { if (type === 'visibilitychange') handlers.push(handler); };
+    ctx.becomeVisible = async (state = 'visible') => { ctx.doc.visibilityState = state; handlers.forEach((h) => h()); await flush(); };
+    return ctx;
+}
+
+test('O1: the offer shows only when every condition holds', async () => {
+    const ctx = setup();
+    await ctx.run();
+    assert.equal(offerCard(ctx).shown, true);
+});
+
+test('O1: each single missing condition hides the offer', async () => {
+    const cases = {
+        'opted in': { storage: fakeStorage(OPTED), adapter: fakeAdapter({ permission: () => 'granted' }) },
+        'permission granted': { adapter: fakeAdapter({ permission: () => 'granted' }) },
+        'permission denied': { adapter: fakeAdapter({ permission: () => 'denied' }) },
+        'unsupported': { adapter: fakeAdapter({ supported: () => false }) },
+        'dismissed': { storage: fakeStorage(DISMISSED) },
+        'flag off': { config: { enabled: true, pushEnabled: false } },
+        'browser tab': { win: fakeWin({ standalone: false, i18nLang: 'es' }) },
+        'android app': { win: fakeWin({ ua: UA.android, standalone: true, i18nLang: 'es' }) },
+    };
+    for (const [name, options] of Object.entries(cases)) {
+        const ctx = setup(options);
+        await ctx.run();
+        assert.equal(offerCard(ctx).shown, false, name);
+    }
+});
+
+test('O2: Enable on the card runs the same flow: permission first, then the three writes; card hides, switch is on', async () => {
+    const ctx = setup();
+    await ctx.run();
+    await tapOffer(ctx, 'enable');
+    assert.deepEqual(ctx.adapter.log.slice(0, 1), ['requestPermission']);
+    assert.deepEqual(ctx.adapter.writes.map((w) => `${w.op} ${w.path}`), WRITES);
+    assert.equal(offerCard(ctx).shown, false);
+    assert.equal(ctx.on(), true);
+    assert.equal(ctx.storage.data['devotionalPush.offerDismissed'], undefined);
+});
+
+test('O2: the card is gone and the permission request is the first await inside the tap', async () => {
+    const order = [];
+    const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => { order.push('permission'); return Promise.resolve('granted'); } }) });
+    await ctx.run();
+    ctx.doc.els['[data-push-offer-enable]'].listeners.click();
+    assert.deepEqual(order, ['permission']);
+    await flush();
+});
+
+test('O3: denied on the card hides it and shows the blocked help in Settings, with no Firebase calls', async () => {
+    // Like the browser, the permission reads 'denied' once the reader denied it.
+    let permission = 'default';
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => permission, requestPermission: () => { permission = 'denied'; return Promise.resolve('denied'); } }) });
+    await ctx.run();
+    await tapOffer(ctx, 'enable');
+    assert.equal(offerCard(ctx).shown, false);
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+    assert.deepEqual(ctx.adapter.log, ['requestPermission']);
+    assertOff(ctx);
+});
+
+test('O3: an error while asking brings the card back afterwards (retry), with the error shown', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => Promise.reject(new Error('boom')) }) });
+    await ctx.run();
+    await tapOffer(ctx, 'enable');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+    assert.equal(offerCard(ctx).shown, true);
+    assert.equal(ctx.storage.data['devotionalPush.offerDismissed'], undefined);
+});
+
+test('O3: a dismissed system prompt hides the card while it runs and brings it back, without persisting anything', async () => {
+    let answer;
+    const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => new Promise((resolve) => { answer = resolve; }) }) });
+    await ctx.run();
+    ctx.doc.els['[data-push-offer-enable]'].listeners.click();
+    assert.equal(offerCard(ctx).shown, false);
+    answer('default');
+    await flush();
+    assert.equal(offerCard(ctx).shown, true);
+    assert.equal(ctx.storage.data['devotionalPush.offerDismissed'], undefined);
+    assertOff(ctx);
+});
+
+test('O3: granted and opted in keeps the card hidden after the flow', async () => {
+    const ctx = setup();
+    await ctx.run();
+    await tapOffer(ctx, 'enable');
+    assert.equal(offerCard(ctx).shown, false);
+});
+
+test('O4: Not now hides the card, remembers it, writes nothing and does not ask for the permission', async () => {
+    const ctx = setup();
+    await ctx.run();
+    await tapOffer(ctx, 'later');
+    assert.equal(offerCard(ctx).shown, false);
+    assert.equal(ctx.storage.data['devotionalPush.offerDismissed'], '1');
+    assert.deepEqual(ctx.adapter.log, []);
+    const next = setup({ storage: ctx.storage });
+    await next.run();
+    assert.equal(offerCard(next).shown, false);
+});
+
+test('O4: a storage that throws does not break Not now', async () => {
+    const storage = { get: () => { throw new Error('x'); }, set: () => { throw new Error('x'); }, remove: () => { throw new Error('x'); } };
+    const ctx = setup({ storage });
+    await ctx.run();
+    assert.equal(offerCard(ctx).shown, true);
+    await tapOffer(ctx, 'later');
+    assert.equal(offerCard(ctx).shown, false);
+});
+
+test('O5: the card hides once the reader opts in from the Settings switch', async () => {
+    const ctx = setup();
+    await ctx.run();
+    assert.equal(offerCard(ctx).shown, true);
+    await ctx.tap('switch');
+    assert.equal(ctx.on(), true);
+    assert.equal(offerCard(ctx).shown, false);
+});
+
+test('O6: old html (no card elements) with the new script: no error, the switch still works', async () => {
+    const ctx = setup();
+    for (const key of ['[data-push-offer]', '[data-push-offer-enable]', '[data-push-offer-later]']) delete ctx.doc.els[key];
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.equal(ctx.on(), true);
+});
+
+test('H1: permission already denied on load shows the blocked help for the platform; not for default or granted', async () => {
+    const iphone = setup({ win: fakeWin({ ua: UA.iphone, standalone: true, i18nLang: 'es' }), adapter: fakeAdapter({ permission: () => 'denied' }) });
+    await iphone.run();
+    assert.equal(iphone.el('status').textContent, 'T:push.blocked_ios');
+    const desktop = setup({ adapter: fakeAdapter({ permission: () => 'denied' }) });
+    await desktop.run();
+    assert.equal(desktop.el('status').textContent, 'T:push.blocked_desktop');
+    for (const permission of ['default', 'granted']) {
+        const ctx = setup({ adapter: fakeAdapter({ permission: () => permission }) });
+        await ctx.run();
+        assert.equal(ctx.el('status').textContent, '');
+    }
+});
+
+test('H1: a reader who was opted in and revoked the permission sees the help, switched off', async () => {
+    const ctx = setup({ storage: fakeStorage(OPTED), adapter: fakeAdapter({ permission: () => 'denied' }) });
+    await ctx.run();
+    assertOff(ctx);
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+});
+
+test('H2: returning to the app after the permission was granted clears the help, and the switch works again', async () => {
+    let permission = 'denied';
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ permission: () => permission }) }));
+    await ctx.run();
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+    permission = 'default';
+    await ctx.becomeVisible();
+    assert.equal(ctx.el('status').textContent, '');
+    await ctx.tap('switch');
+    assert.equal(ctx.on(), true);
+});
+
+test('H2: the card is evaluated again when the app becomes visible', async () => {
+    let permission = 'denied';
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ permission: () => permission }) }));
+    await ctx.run();
+    assert.equal(offerCard(ctx).shown, false);
+    permission = 'default';
+    await ctx.becomeVisible();
+    assert.equal(offerCard(ctx).shown, true);
+});
+
+test('H2: repeated visibility events while denied or while a flow runs do not throw or run a flow', async () => {
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ permission: () => 'denied' }) }));
+    await ctx.run();
+    await ctx.becomeVisible();
+    await ctx.becomeVisible();
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+    assert.deepEqual(ctx.adapter.log, []);
+});
+
+test('H2: a visibility event leaves other status messages alone when the permission is not denied', async () => {
+    const ctx = withVisibility(setup({ storage: fakeStorage(OPTED), adapter: fakeAdapter({ permission: () => 'granted' }) }));
+    await ctx.run();
+    assert.equal(ctx.el('status').textContent, 'T:push.status_enabled');
+    await ctx.becomeVisible();
+    assert.equal(ctx.el('status').textContent, 'T:push.status_enabled');
+});
+
+test('H2: going to the background changes nothing', async () => {
+    let permission = 'denied';
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ permission: () => permission }) }));
+    await ctx.run();
+    permission = 'default';
+    await ctx.becomeVisible('hidden');
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+});
+
+test('H3: Android keeps the generic denied text when a denial happens (no platform steps)', async () => {
+    // The surface gate stops Android earlier; the key resolver alone must never return text for it.
+    assert.equal(globals.DevotionalPushHelp.helpKey({ userAgent: UA.android }), null);
+});
+
+test('H4: opted in and the permission is revoked while the app is in the background: the switch goes off, flags are cleared, help shown', async () => {
+    let permission = 'granted';
+    const ctx = withVisibility(setup({ storage: fakeStorage(OPTED), adapter: fakeAdapter({ permission: () => permission }) }));
+    await ctx.run();
+    assertOn(ctx);
+    permission = 'denied';
+    await ctx.becomeVisible();
+    assertOff(ctx);
+    assert.deepEqual(ctx.storage.data, {});
+    assert.equal(ctx.el('status').textContent, 'T:push.blocked_desktop');
+});
+
+test('H5: a visibility event while a flow is running does nothing', async () => {
+    let answer;
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ permission: () => 'denied', requestPermission: () => new Promise((resolve) => { answer = resolve; }) }) }));
+    await ctx.run();
+    ctx.el('switch').listeners.click();
+    ctx.el('status').textContent = 'sentinel';
+    await ctx.becomeVisible();
+    assert.equal(ctx.el('status').textContent, 'sentinel');
+    answer('denied');
+    await flush();
+});
+
+test('H6: the generic denied text (prompt dismissed) is not treated as the blocked help and survives a visibility event', async () => {
+    const ctx = withVisibility(setup({ adapter: fakeAdapter({ requestPermission: () => Promise.resolve('default') }) }));
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
+    await ctx.becomeVisible();
+    assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
 });

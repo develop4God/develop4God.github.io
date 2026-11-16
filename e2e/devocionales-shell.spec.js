@@ -47,7 +47,7 @@ const installedDesktop = (page) => page.addInitScript(() => {
 async function pushOnWithStubAdapter(page) {
     await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
         const response = await route.fetch();
-        await route.fulfill({ response, body: (await response.text()).replace('pushEnabled: false', 'pushEnabled: true') });
+        await route.fulfill({ response, body: (await response.text()).replace(/pushEnabled: (true|false)/, 'pushEnabled: true') });
     });
     await page.route('**/devocionales/js/devotional-push-firebase.js', (route) => route.fulfill({
         contentType: 'text/javascript',
@@ -130,9 +130,18 @@ test.describe('browser tab: the plain page, no shell', () => {
         });
     }
 
-    test('push stays out of the way: no block with the default config, and no Settings heading', async ({ page }) => {
+    test('push stays out of the way: no block with the kill switch on, and no Settings heading', async ({ page }) => {
+        await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+            const response = await route.fetch();
+            await route.fulfill({ response, body: (await response.text()).replace(/pushEnabled: (true|false)/, 'pushEnabled: false') });
+        });
         await open(page, PHONE);
         await expect(page.locator('[data-push]')).toBeHidden();
+    });
+
+    test('the app version row is not shown in a browser tab', async ({ page }) => {
+        await open(page, PHONE);
+        await expect(page.locator('[data-app-version-row]')).toBeHidden();
     });
 });
 
@@ -164,6 +173,10 @@ test.describe('installed iOS app on a phone (390px)', () => {
         await page.locator('[data-shell-tab="settings"]').click();
         await expect(page.locator('[data-shell-settings]')).toBeVisible();
         await expect(page.locator('#shell-settings-title')).toHaveText('Settings');
+        const appVersion = await page.evaluate(() => window.DevotionalPwaConfig.appVersion);
+        await expect(page.locator('[data-app-version-row]')).toBeVisible();
+        await expect(page.locator('[data-app-version]')).toHaveText(appVersion);
+        await expect(page.locator('[data-app-build]')).toHaveText(await page.evaluate(() => window.DevotionalBuild.id));
         await expect(page.locator('main')).toBeHidden();
         await expect(page.locator('[data-shell-tab="settings"]')).toHaveAttribute('aria-current', 'page');
         await expect(page.locator('[data-shell-tab="home"]')).not.toHaveAttribute('aria-current', 'page');
@@ -514,5 +527,72 @@ test.describe('Settings screen: a plain list in the installed app', () => {
                 expect(await page.locator('.settings-chevron').evaluate((el) => getComputedStyle(el).transform)).toBe('matrix(-1, 0, 0, 1, 0, 0)');
             }
         }
+    });
+});
+
+test.describe('installed app Home: header, edge-to-edge hero and floating share', () => {
+    // Playwright's Chromium has no navigator.share, so the cases that need it define it.
+    const withShare = (page) => page.addInitScript(() => { navigator.share = () => Promise.resolve(); });
+    const withoutShare = (page) => page.addInitScript(() => { Object.defineProperty(navigator, 'share', { value: undefined, configurable: true }); });
+
+    test('the page header is hidden in the installed app, on a phone and on a desktop', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        await expect(page.locator('.site-nav')).toBeHidden();
+        await open(page, DESKTOP);
+        await expect(page.locator('.site-nav')).toBeHidden();
+    });
+
+    test('on a phone the hero spans the full width from the very top, with no horizontal overflow', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        const hero = await page.locator('.hero-devotional').boundingBox();
+        expect(hero.x).toBe(0);
+        expect(hero.y).toBe(0);
+        // The visible width, not the viewport: desktop WebKit's classic scrollbar takes 8px of it.
+        expect(hero.width).toBe(await page.evaluate(() => document.documentElement.clientWidth));
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    });
+
+    test('on a phone the share button floats in the hero top-right corner and the bottom share row is gone', async ({ page }) => {
+        await installedIos(page);
+        await withShare(page);
+        await open(page, PHONE);
+        const hero = await page.locator('.hero-devotional').boundingBox();
+        const share = page.locator('#share-native');
+        await expect(share).toBeVisible();
+        const box = await share.boundingBox();
+        expect(box.y).toBeGreaterThanOrEqual(hero.y);
+        expect(box.y + box.height).toBeLessThan(hero.y + hero.height);
+        const visibleWidth = await page.evaluate(() => document.documentElement.clientWidth);
+        expect(box.x + box.width).toBeLessThanOrEqual(visibleWidth);
+        expect(visibleWidth - (box.x + box.width)).toBeLessThan(24);
+        await expect(page.locator('#comparte-label')).toBeHidden();
+    });
+
+    test('where the browser cannot share, the floating button stays hidden', async ({ page }) => {
+        await installedIos(page);
+        await withoutShare(page);
+        await open(page, PHONE);
+        await expect(page.locator('#share-native')).toBeHidden();
+    });
+
+    test('on a desktop rail the hero keeps its card (no edge-to-edge shift) and the page does not overflow', async ({ page }) => {
+        await installedIos(page);
+        await open(page, DESKTOP);
+        const radius = await page.locator('.hero-devotional').evaluate((el) => getComputedStyle(el).borderTopLeftRadius);
+        expect(radius).not.toBe('0px');
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    });
+});
+
+test.describe('installed app Settings on a tablet rail', () => {
+    test('the closed language list does not push the page wider than the screen', async ({ page }) => {
+        await installedIos(page);
+        await open(page, TABLET);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('[data-push-switch]')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
+        expect(await noHorizontalScroll(page)).toBe(true);
     });
 });

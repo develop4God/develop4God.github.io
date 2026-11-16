@@ -230,7 +230,13 @@
     "switch_label": "Activer/Désactiver les notifications",
     "time_label": "Heure de notification quotidienne",
     "time_set": "Heure de confirmation ajustée à",
-    "time_error": "Erreur lors du réglage de l'heure de notification"
+    "time_error": "Erreur lors du réglage de l'heure de notification",
+    "offer_title": "Rappel quotidien",
+    "offer_body": "Recevez une notification par jour avec le nouveau devotionnel.",
+    "offer_enable": "Activer",
+    "offer_later": "Pas maintenant",
+    "blocked_ios": "Les notifications sont bloquées. Sur iPhone ou iPad, ouvrez Réglages > Notifications > cette app et activez Autoriser les notifications.",
+    "blocked_desktop": "Les notifications sont bloquées. Ouvrez le menu de l'app > Infos sur l'app (ou Paramètres du site) > Notifications et choisissez Autoriser."
   },
   "shell": {
     "nav_label": "Navigation de l’application",
@@ -238,7 +244,8 @@
     "settings": "Réglages",
     "language": "Langue",
     "theme": "Thème",
-    "font_size": "Taille de police"
+    "font_size": "Taille de police",
+    "app_version": "Version de l'app"
   },
   "discovery": {
     "title": "Études Bibliques",

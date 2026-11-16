@@ -16,6 +16,9 @@
 
 .shell-active [data-shell-settings-header] {
     display: block;
+
+    /* The page header is hidden, so the Settings title clears the status bar itself. */
+    padding-top: calc(env(safe-area-inset-top) + 2rem);
 }
 
 .shell-tab {
@@ -140,9 +143,31 @@
     overflow-y: auto;
 }
 
+/* On a tablet or desktop rail the list opens under the language button, which sits at the end of its row. The page's
+   own left-0 would open it from the button's start edge, and its 160px minimum width then ran past the screen
+   edge even while closed. Opening from the end edge keeps it inside the row, in both text directions. */
+.shell-active[data-shell-layout="rail"] .language-dropdown {
+    inset-inline: auto 0;
+}
+
 /* The three controls moved in from the header and the reading page exist only inside the installed app. */
 [data-shell-slot] { display: none; }
 .shell-active [data-shell-slot] { display: flex; }
+
+/* The installed app has its own bottom bar and Settings title, so the page header (brand and nav link) is
+   hidden there. The nodes stay in the DOM: scripts still read their ids, and a browser tab is unchanged. */
+.shell-active .site-nav { display: none; }
+
+[data-app-version-row] { display: none; }
+.shell-active [data-app-version-row] { display: flex; }
+[data-app-version], [data-app-build] { font-variant-numeric: tabular-nums; }
+
+.settings-build {
+    margin-inline-start: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+.settings-build:not(:empty)::before { content: "\00b7\00a0"; }
 
 .settings-switch {
     position: relative;
@@ -230,3 +255,84 @@
 }
 
 .settings-status:empty { display: none; }
+
+/* First-launch notification offer on Home (installed app only; revealed by devotional-push-offer.js). */
+.push-offer {
+    margin: 1rem 0 1.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    color: var(--text);
+}
+
+.push-offer-title {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.push-offer-body {
+    margin: 0 0 0.9rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.push-offer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+/* Home in the installed app on a phone: the hero runs edge to edge and up under the status bar (the page
+   header is hidden above), with a round share button floating in its top-right corner. Tablet and desktop
+   keep the card, because their rail would shift an edge-to-edge image. The share button keeps its id and its
+   place in the DOM, so a cached older script still finds it; only its position changes. */
+.shell-active[data-shell-layout="bar"] #shell-home-panel { padding-top: 0; }
+
+.shell-active[data-shell-layout="bar"] #devotional-content { position: relative; }
+
+.shell-active[data-shell-layout="bar"] div:has(> #back-link) { display: none; }
+
+.shell-active[data-shell-layout="bar"] .hero-devotional {
+    position: relative;
+
+    /* Cancels the page's side padding (px-4), so the hero spans the whole content width. */
+    margin-inline: -1rem;
+    height: min(calc(52vw + env(safe-area-inset-top)), 420px);
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+}
+
+.shell-active[data-shell-layout="bar"] .hero-devotional::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 40%;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+}
+
+/* :not(.hidden) keeps the button hidden where the browser cannot share (devotional-render-dom.js hides it). */
+.shell-active[data-shell-layout="bar"] #share-native:not(.hidden) {
+    position: absolute;
+    top: calc(env(safe-area-inset-top) + 0.75rem);
+    inset-inline-end: 0;
+    z-index: 5;
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: 50%;
+
+    /* The button carries inline colors for the browser tab, so the installed app needs !important. */
+    background: color-mix(in srgb, var(--surface) 72%, transparent) !important;
+    color: var(--text) !important;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* The bottom share row is gone: its label and rule go with the button. */
+.shell-active[data-shell-layout="bar"] #comparte-label { display: none; }
+.shell-active[data-shell-layout="bar"] div:has(> #share-native) { display: contents; }
