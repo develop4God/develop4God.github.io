@@ -76,15 +76,27 @@ async function shot(page, name) {
 
 const noHorizontalScroll = (page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 
-// Every link a person can reach (rendered, not inert) that breaks the allow-list. Judged twice: by
-// a rule written here, independent of the code under test, and by the production predicate.
+// The link allow-list of the installed app, written out here on purpose and NOT imported from
+// production code (devotional-shell-core.js has its own unit-tested copy of the rule): the audit
+// is the safety net, so it must not share a bug with the code it checks. Navigation stays in
+// /devocionales/; the only other links are the contact mailto (from the config) and the external
+// hosts below (PayPal, share targets, Bible references) in a new tab. Nothing enforces this at runtime: a violation shows up here, as a failing test.
+// The audit judges links a person can reach (rendered, not inert, not hidden), so it also depends
+// on the brand link to "/" being inert and #back-link being hidden in the installed app.
+const ALLOWED_EXTERNAL = [
+    { host: /^(www\.)?paypal\.com$/, pathPrefix: '/paypalme/' },
+    { host: /^wa\.me$/, pathPrefix: '/' },
+    { host: /^(www\.)?facebook\.com$/, pathPrefix: '/sharer' },
+    { host: /^(x|twitter)\.com$/, pathPrefix: '/intent/' },
+    { host: /^t\.me$/, pathPrefix: '/share' },
+    { host: /^(www\.)?(bible|biblegateway)\.com$/, pathPrefix: '/' },
+];
+
+// Returns the reachable links that break the allow-list.
 async function disallowedLinks(page) {
-    return page.evaluate(() => {
+    return page.evaluate((allowedExternal) => {
         const contact = window.DevotionalPwaConfig.surfaces.shell.contactAddress.toLowerCase();
-        const external = [
-            [/^(www\.)?paypal\.com$/, '/paypalme/'], [/^wa\.me$/, '/'], [/^(www\.)?facebook\.com$/, '/sharer'],
-            [/^(x|twitter)\.com$/, '/intent/'], [/^t\.me$/, '/share'], [/^(www\.)?(bible|biblegateway)\.com$/, '/'],
-        ];
+        const external = allowedExternal.map((rule) => ({ host: new RegExp(rule.host.source), pathPrefix: rule.pathPrefix }));
         const reachable = (a) => !a.closest('[inert]') && a.getClientRects().length > 0 && getComputedStyle(a).visibility !== 'hidden';
         const bad = [];
         for (const a of document.querySelectorAll('a[href]')) {
@@ -95,13 +107,12 @@ async function disallowedLinks(page) {
             else if (url.origin === location.origin) fine = url.pathname === '/devocionales' || url.pathname.startsWith('/devocionales/');
             else {
                 fine = url.protocol === 'https:' && a.target === '_blank' && /\bnoopener\b/.test(a.rel)
-                    && external.some(([host, prefix]) => host.test(url.hostname) && url.pathname.startsWith(prefix));
+                    && external.some((rule) => rule.host.test(url.hostname) && url.pathname.startsWith(rule.pathPrefix));
             }
-            const production = window.DevotionalShellCore.isAllowedLink({ href: a.getAttribute('href'), target: a.target, rel: a.rel }, location.origin, contact);
-            if (!fine || !production) bad.push(a.href);
+            if (!fine) bad.push(a.href);
         }
         return bad;
-    });
+    }, ALLOWED_EXTERNAL.map((rule) => ({ host: { source: rule.host.source }, pathPrefix: rule.pathPrefix })));
 }
 
 test.describe('browser tab: the plain page, no shell', () => {
@@ -306,9 +317,10 @@ test.describe('link allow-list in the installed shell', () => {
         });
     }
 
-    test('the audit goes red when a Google Play, foreign, home or unsafe external link is reachable', async ({ page }) => {
+    test('a link appended after load is caught when the audit re-runs (Google Play, foreign, home, unsafe external)', async ({ page }) => {
         await installedIos(page);
         await open(page, PHONE);
+        expect(await disallowedLinks(page)).toEqual([]);
         await page.evaluate(() => {
             const add = (href, attrs) => {
                 const a = document.createElement('a');
@@ -322,6 +334,7 @@ test.describe('link allow-list in the installed shell', () => {
             add('/habitus/', {});
             add('https://www.paypal.com/paypalme/develop4godOfficial', {});
         });
+        // Appended after the first audit passed, so the re-run is what catches them.
         const bad = (await disallowedLinks(page)).join(' ');
         for (const part of ['play.google.com', 'example.com', '/habitus/', 'paypal.com']) expect(bad).toContain(part);
     });
@@ -357,4 +370,58 @@ test.describe('replay across a deploy', () => {
             'push-hour', 'push-enable-btn', 'push-disable-btn', 'push-status', 'back-link'];
         for (const id of ids) await expect(page.locator(`#${id}`)).toHaveCount(1);
     });
+});
+
+test.describe('accessibility wiring', () => {
+    test('each tab controls an existing panel', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        for (const tab of ['home', 'settings']) {
+            const target = await page.locator(`[data-shell-tab="${tab}"]`).getAttribute('aria-controls');
+            expect(target).toBeTruthy();
+            await expect(page.locator(`#${target}`)).toHaveCount(1);
+        }
+        expect(await page.locator('[data-shell-tab="home"]').getAttribute('aria-controls')).toBe('shell-home-panel');
+        expect(await page.locator('[data-shell-tab="settings"]').getAttribute('aria-controls')).toBe('shell-settings');
+    });
+});
+
+test.describe('right-to-left and narrow screens', () => {
+    test('Arabic at 1280px: the rail mirrors to the right edge', async ({ page }) => {
+        await installedDesktop(page);
+        await page.setViewportSize(DESKTOP);
+        await page.goto('/devocionales/?lang=ar', { waitUntil: 'networkidle' });
+        await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+        await expect(page.locator('html')).toHaveClass(/shell-active/);
+        const nav = await page.locator('[data-shell-nav]').boundingBox();
+        // Within a classic scrollbar (WebKit: 8px) of the right edge, and clearly not on the left.
+        expect(nav.x).toBeGreaterThan(DESKTOP.width / 2);
+        expect(DESKTOP.width - Math.round(nav.x + nav.width)).toBeLessThanOrEqual(8);
+        const main = await page.locator('main').boundingBox();
+        expect(main.x + main.width).toBeLessThanOrEqual(nav.x);
+        expect(await noHorizontalScroll(page)).toBe(true);
+        await shot(page, 'ar-desktop-1280-rtl');
+    });
+
+    for (const lang of ['de', 'fil']) {
+        test(`320px with the ${lang} labels: no horizontal scroll and every tab inside the screen`, async ({ page }) => {
+            await installedIos(page);
+            await page.setViewportSize({ width: 320, height: 640 });
+            await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
+            await expect(page.locator('html')).toHaveClass(/shell-active/);
+            const width = await page.evaluate(() => document.documentElement.clientWidth);
+            for (const tab of ['home', 'settings']) {
+                const button = page.locator(`[data-shell-tab="${tab}"]`);
+                await expect(button).toBeVisible();
+                const box = await button.boundingBox();
+                expect(box.x).toBeGreaterThanOrEqual(0);
+                expect(box.x + box.width).toBeLessThanOrEqual(width);
+                const label = await button.locator('span').boundingBox();
+                expect(label.x + label.width).toBeLessThanOrEqual(box.x + box.width + 1);
+            }
+            await page.locator('[data-shell-tab="settings"]').click();
+            expect(await noHorizontalScroll(page)).toBe(true);
+            await shot(page, `320-${lang}-settings`);
+        });
+    }
 });

@@ -6,8 +6,16 @@
 
     const SCOPE_PATH = '/devocionales';
 
-    // External links the installed app may hold. They open in a new tab (the app keeps its own
-    // window) and never lead to the Google Play store: Android has the native app, not this one.
+    // The allow-list of the installed app: links stay inside /devocionales/, plus the contact
+    // mailto and the external hosts below. It is test-only on purpose: nothing enforces it at
+    // runtime, so a link that breaks it shows up as a failing e2e audit
+    // (e2e/devocionales-shell.spec.js) instead of being silently neutralised. The audit judges
+    // only links a person can reach: the brand link to "/" is made inert by
+    // DevotionalStandalone.apply and #back-link is hidden under .is-standalone, so both are out
+    // of reach; if either stops being so, the audit fails.
+    // External links open in a new tab (the app keeps its own window) and never lead to Google
+    // Play: Android has the native app, not this one. Rows for links that are not in the DOM yet
+    // (share targets, Bible references) are intentional: they are part of the confirmed allow-list.
     const EXTERNAL_RULES = [
         { hosts: ['www.paypal.com', 'paypal.com'], pathPrefix: '/paypalme/' },
         { hosts: ['wa.me'], pathPrefix: '/' },

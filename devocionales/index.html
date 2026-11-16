@@ -463,7 +463,7 @@
         </div>
     </div>
 
-    <main class="max-w-5xl mx-auto px-4 py-8">
+    <main id="shell-home-panel" class="max-w-5xl mx-auto px-4 py-8">
 
         <!-- Loading skeleton -->
         <div id="loading-state" class="space-y-4">
@@ -673,11 +673,11 @@
     <!-- Installed app only (iOS and desktop): revealed by devotional-shell.js, hidden by shell.css everywhere else. -->
     <nav id="shell-nav" data-shell-nav aria-labelledby="shell-nav-label">
         <span id="shell-nav-label" class="sr-only" data-i18n="shell.nav_label">App navigation</span>
-        <button type="button" class="shell-tab" data-shell-tab="home">
+        <button type="button" class="shell-tab" data-shell-tab="home" aria-controls="shell-home-panel">
             <i data-lucide="house" class="w-5 h-5"></i>
             <span data-i18n="shell.home">Home</span>
         </button>
-        <button type="button" class="shell-tab" data-shell-tab="settings">
+        <button type="button" class="shell-tab" data-shell-tab="settings" aria-controls="shell-settings">
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span data-i18n="shell.settings">Settings</span>
         </button>

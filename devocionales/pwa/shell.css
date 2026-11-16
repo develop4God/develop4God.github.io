@@ -2,7 +2,9 @@
    only the installed app on iOS and desktop gets, so a browser tab renders exactly as before. */
 
 [data-shell-nav],
-[data-shell-settings-header] { display: none; }
+[data-shell-settings-header] {
+    display: none;
+}
 
 .shell-active [data-shell-nav] {
     position: fixed;
@@ -12,7 +14,9 @@
     border: 0 solid var(--border);
 }
 
-.shell-active [data-shell-settings-header] { display: block; }
+.shell-active [data-shell-settings-header] {
+    display: block;
+}
 
 .shell-tab {
     display: flex;
@@ -53,13 +57,14 @@
 
 /* Tablet and desktop: labelled rail. */
 .shell-active[data-shell-layout="rail"] [data-shell-nav] {
-    inset: 0 auto 0 0;
+    inset-block: 0;
+    inset-inline: 0 auto;
     width: 12rem;
     flex-direction: column;
     justify-content: flex-start;
     gap: 0.25rem;
     padding: 1rem 0.5rem;
-    border-right-width: 1px;
+    border-inline-end-width: 1px;
 }
 
 .shell-active[data-shell-layout="rail"] .shell-tab {
@@ -72,10 +77,11 @@
 
 .shell-active[data-shell-layout="rail"] .shell-tab[aria-current="page"] { background: var(--accent-soft); }
 
-.shell-active[data-shell-layout="rail"] body { padding-left: 12rem; }
+.shell-active[data-shell-layout="rail"] body { padding-inline-start: 12rem; }
 
-/* The reading column: capped and, beside the rail, a single column (the page's own two-column
-   grid is keyed to the viewport width, which the rail has already narrowed). */
+/* The reading column: capped and a single column. The page's own two-column grid (md:grid) is keyed
+   to the viewport width, which the rail has already narrowed, so beside the rail it would squeeze the
+   sidebar into a few hundred px; one column in DOM order is also the phone reading order. */
 .shell-active main,
 .shell-active [data-shell-settings] {
     max-width: var(--shell-content-max, 720px);
