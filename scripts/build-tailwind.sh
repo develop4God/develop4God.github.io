@@ -6,9 +6,19 @@
 # is byte-identical until the lockfile changes.
 # Run it again whenever a Tailwind class is added or removed in the files listed in
 # scripts/tailwind.config.cjs; CI rebuilds it and fails when the committed file is stale.
+# Usage: bash scripts/build-tailwind.sh [output]   (default: devocionales/vendor/tailwind.css;
+# scripts/check-generated.sh passes a temp file so the check never writes into the work tree)
 set -euo pipefail
 
+# An explicit output path is relative to the caller, so resolve it before moving to the repo root.
+OUTPUT="${1:-}"
+case "${OUTPUT}" in
+  '' | /*) ;;
+  *) OUTPUT="${PWD}/${OUTPUT}" ;;
+esac
+
 cd "$(dirname "$0")/.."
+OUTPUT="${OUTPUT:-devocionales/vendor/tailwind.css}"
 
 LOCK_DIR="scripts/tailwind"
 TAILWIND_VERSION="$(node -p "require('./${LOCK_DIR}/package.json').dependencies.tailwindcss")"
@@ -30,5 +40,5 @@ fi
 "${BIN}" \
   --config scripts/tailwind.config.cjs \
   --input scripts/tailwind.input.css \
-  --output devocionales/vendor/tailwind.css \
+  --output "${OUTPUT}" \
   --minify
