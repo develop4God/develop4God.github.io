@@ -58,6 +58,11 @@ window.DevotionalPushFirebase = { create: function () {
     });
 }
 
+// Push only exists in the installed app: pretend to be launched from the home screen.
+async function launchAsInstalledApp(page) {
+    await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
+}
+
 test('the push block is hidden and Firebase is never contacted with the default config', async ({ page }) => {
     const hits = watchFirebase(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
@@ -78,6 +83,7 @@ test('the push block keeps every id an older cached script reads', async ({ page
 
 test('with pushEnabled on, the enable button shows and nothing runs before it is tapped', async ({ page }) => {
     const hits = watchFirebase(page);
+    await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await expect(page.locator('[data-push]')).toBeVisible();
@@ -89,6 +95,7 @@ test('with pushEnabled on, the enable button shows and nothing runs before it is
 
 test('tapping enable asks for permission first; a denial shows the message and loads no SDK', async ({ page }) => {
     const hits = watchFirebase(page);
+    await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await page.locator('[data-push-enable]').click();
@@ -105,6 +112,7 @@ test('with pushEnabled off, a stale opted-in flag does not reveal the block', as
 });
 
 test('granted path: requestPermission first, then load, sign-in, registration, token and the three writes', async ({ page }) => {
+    await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page, { permission: 'granted' });
     await page.goto(READER, { waitUntil: 'networkidle' });
     await page.locator('[data-push-enable]').click();
@@ -120,4 +128,29 @@ test('granted path: requestPermission first, then load, sign-in, registration, t
         'db.set users/uid/settings/notifications',
     ]);
     expect(await page.evaluate(() => localStorage.getItem('devotionalPush.optedIn'))).toBe('1');
+});
+
+test('a browser tab with pushEnabled on shows no push block and never reaches Firebase', async ({ page }) => {
+    const hits = watchFirebase(page);
+    await page.addInitScript(() => localStorage.setItem('devotionalPush.optedIn', '1'));
+    await enablePushWithStubAdapter(page);
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push]')).toBeHidden();
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
+    expect(await page.evaluate(() => window.__prompts)).toBe(0);
+    expect(hits).toEqual([]);
+});
+
+test('an installed app on Android shows no push block and never reaches Firebase', async ({ browser }) => {
+    const context = await browser.newContext({ userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Mobile Safari/537.36' });
+    const page = await context.newPage();
+    const hits = watchFirebase(page);
+    await page.addInitScript(() => localStorage.setItem('devotionalPush.optedIn', '1'));
+    await launchAsInstalledApp(page);
+    await enablePushWithStubAdapter(page);
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await expect(page.locator('[data-push]')).toBeHidden();
+    expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
+    expect(hits).toEqual([]);
+    await context.close();
 });

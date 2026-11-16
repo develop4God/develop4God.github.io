@@ -20,6 +20,7 @@ const { init } = globals.DevotionalPush;
 
 const UA = {
     desktop: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36',
+    android: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Mobile Safari/537.36',
     iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
 };
 
@@ -58,7 +59,8 @@ function fakeDoc({ withButtons = true } = {}) {
     };
 }
 
-function fakeWin({ ua = UA.desktop, standalone = false, i18nLang } = {}) {
+// Defaults to the installed app: the push UI only exists there. Browser-tab cases pass standalone: false.
+function fakeWin({ ua = UA.desktop, standalone = true, i18nLang } = {}) {
     const win = Object.create(globals);
     win.navigator = { userAgent: ua, standalone: standalone ? true : undefined };
     win.matchMedia = () => ({ matches: false });
@@ -184,7 +186,7 @@ test('A2: unsupported browser keeps the container hidden and touches nothing', a
 });
 
 test('A2: iOS Safari outside standalone shows only the install text', async () => {
-    const ctx = setup({ win: fakeWin({ ua: UA.iphone }), adapter: fakeAdapter({ supported: () => false }) });
+    const ctx = setup({ win: fakeWin({ ua: UA.iphone, standalone: false }), adapter: fakeAdapter({ supported: () => false }) });
     await ctx.run();
     assert.equal(ctx.el('').shown, true);
     assert.equal(ctx.el('status').textContent, 'T:push.status_ios_install');
@@ -604,4 +606,95 @@ test('LANG: a language change before opting in writes nothing', async () => {
     ctx.i18nState.langHandlers.forEach((h) => h());
     await tick();
     assert.deepEqual(ctx.adapter.log, []);
+});
+
+// Surface gate: pushEnabled && isStandalone && !isAndroid. Browser tabs and Android never write.
+const SDK_CALLS = ['requestPermission', 'load', 'signInAnonymously', 'registration', 'getToken', 'currentUid', 'deleteToken'];
+function assertUntouched(ctx, stored) {
+    assert.deepEqual(ctx.adapter.log, []);
+    assert.deepEqual(ctx.adapter.writes, []);
+    for (const call of SDK_CALLS) assert.ok(!ctx.adapter.log.includes(call));
+    assert.deepEqual(ctx.storage.data, stored);
+}
+
+test('gate 1a: iOS Safari browser tab with pushEnabled shows the install hint, no toggle, nothing touched', async () => {
+    const ctx = setup({ win: fakeWin({ ua: UA.iphone, standalone: false }) });
+    await ctx.run();
+    assert.equal(ctx.el('').shown, true);
+    assert.equal(ctx.el('status').textContent, 'T:push.status_ios_install');
+    for (const name of ['enable', 'disable', 'hour']) assert.equal(ctx.el(name).shown, false);
+    assertUntouched(ctx, {});
+});
+
+test('gate 1b: desktop browser tab with pushEnabled hides the section: no hint, no toggle, nothing touched', async () => {
+    const ctx = setup({ win: fakeWin({ standalone: false }) });
+    await ctx.run();
+    assert.equal(ctx.el('').shown, false);
+    for (const name of ['enable', 'disable']) assert.equal(ctx.el(name).shown, false);
+    assert.notEqual(ctx.el('status').textContent, 'T:push.status_ios_install');
+    assertUntouched(ctx, {});
+});
+
+test('gate 2: browser tab with a stale opted-in flag, pushEnabled true or false: no writes, no unsubscribe, no prompt', async () => {
+    for (const pushEnabled of [true, false]) {
+        for (const ua of [UA.desktop, UA.iphone]) {
+            const ctx = setup({ win: fakeWin({ ua, standalone: false }), storage: fakeStorage(OPTED), config: { enabled: true, pushEnabled } });
+            await ctx.run();
+            await tick();
+            assertUntouched(ctx, OPTED);
+            assert.equal(ctx.el('enable').shown, false);
+            assert.equal(ctx.el('disable').shown, false);
+        }
+    }
+});
+
+test('gate 2b: installed app opted in with pushEnabled false still unsubscribes (kill switch kept), iOS and desktop', async () => {
+    const wins = {
+        ios: fakeWin({ ua: UA.iphone, standalone: true }),
+        desktop: (() => { const w = fakeWin({ standalone: false }); w.matchMedia = () => ({ matches: true }); return w; })(),
+    };
+    for (const [name, win] of Object.entries(wins)) {
+        const ctx = setup({ win, config: { enabled: true, pushEnabled: false }, storage: fakeStorage(OPTED) });
+        await ctx.run();
+        assert.equal(ctx.el('').shown, false, name);
+        assert.deepEqual(ctx.adapter.log, ['load', 'currentUid', 'set users/uid1/settings/notifications', 'delete users/uid1/fcmTokens/tok1', 'deleteToken'], name);
+        assert.equal(ctx.storage.data['devotionalPush.optedIn'], undefined, name);
+    }
+});
+
+test('gate 3: iOS home-screen app (navigator.standalone true, matchMedia false) shows push', async () => {
+    const ctx = setup({ win: fakeWin({ ua: UA.iphone, standalone: true }) });
+    await ctx.run();
+    assert.equal(ctx.el('').shown, true);
+    assert.equal(ctx.el('enable').shown, true);
+});
+
+test('gate 4: Android standalone hides push', async () => {
+    const ctx = setup({ win: fakeWin({ ua: UA.android, standalone: true }) });
+    await ctx.run();
+    assert.equal(ctx.el('').shown, false);
+    assert.equal(ctx.el('enable').shown, false);
+    assertUntouched(ctx, {});
+});
+
+test('gate 4b: Android standalone with a stale opted-in flag, pushEnabled true or false: hidden, no writes, no disable flow', async () => {
+    for (const pushEnabled of [true, false]) {
+        const ctx = setup({ win: fakeWin({ ua: UA.android, standalone: true }), storage: fakeStorage(OPTED), config: { enabled: true, pushEnabled } });
+        await ctx.run();
+        await tick();
+        assert.equal(ctx.el('').shown, false);
+        assertUntouched(ctx, OPTED);
+    }
+});
+
+test('gate: a missing DevotionalStandalone.isAndroid is treated as not Android and never throws', async () => {
+    const standalone = globals.DevotionalStandalone;
+    globals.DevotionalStandalone = { isStandalone: standalone.isStandalone };
+    try {
+        const ctx = setup({ win: fakeWin({ ua: UA.android, standalone: true }) });
+        await ctx.run();
+        assert.equal(ctx.el('enable').shown, true);
+    } finally {
+        globals.DevotionalStandalone = standalone;
+    }
 });

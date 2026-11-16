@@ -10,6 +10,10 @@
         enabled: true,
         // Kill switch for daily push notifications. false = the enable button is hidden, no Firebase
         // code is ever loaded, and a reader who had opted in is unsubscribed on their next visit.
+        // This client kill switch is cleanup only: it runs when the installed app is reopened, so a
+        // reader who never reopens it keeps a live token. The emergency stop is pushEnabled:false
+        // PLUS a manual Firestore cleanup of tokens with platform == 'web' (the web store writes
+        // platform:'web'; the Flutter app writes TargetPlatform.android).
         pushEnabled: false,
         // The Firebase WEB config. It is public by design (it ships to every browser); what protects
         // the backend is the API key's HTTP-referrer restriction and the Firestore security rules.

@@ -83,6 +83,15 @@
         return hint.canAddToHomeScreen(win.navigator) && !standalone.isStandalone(win);
     }
 
+    // Push exists only in the installed app, and never on Android (native app there). A missing
+    // helper (old cached page) counts as "not Android"; the check never throws.
+    function isAppSurface(win) {
+        const standalone = global.DevotionalStandalone;
+        if (!standalone || typeof standalone.isStandalone !== 'function') return false;
+        if (!standalone.isStandalone(win)) return false;
+        return !(typeof standalone.isAndroid === 'function' && standalone.isAndroid(win.navigator));
+    }
+
     function createView(doc, t) {
         const container = doc.querySelector('[data-push]');
         const enableButton = doc.querySelector('[data-push-enable]');
@@ -174,6 +183,13 @@
 
             // No config object at all (its script failed to load) is "unknown", not "off".
             if (!config) return;
+            // Surface gate first: a browser tab or Android never writes, unsubscribes or asks for
+            // permission, even with a stale opted-in flag (a desktop tab shares storage with the app).
+            if (!isAppSurface(win)) {
+                if (config.pushEnabled === true && needsInstallFirst(win)) view.showInstallHint();
+                else view.hide();
+                return;
+            }
             if (config.pushEnabled !== true || config.enabled === false) {
                 view.hide();
                 if (isOptedIn()) await disableFlow(resolved);
