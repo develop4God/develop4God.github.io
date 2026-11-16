@@ -10,12 +10,21 @@ versions, same file globs) so a local pass means CI will pass too.
   PHASE 1: node --check      — syntax, every tracked .js file
   PHASE 2: eslint             — devocionales/js, js, habitus/js
   PHASE 3: stylelint          — every .css file
-  PHASE 4: html-validate      — root/devocionales/habitus .html
+  PHASE 4: html-validate      — root/legacy/devocionales/habitus .html
   PHASE 5: node --test        — unit tests (bible-text-formatter, devotional-progress, devotional-tts)
   PHASE 6: c8 coverage        — report-only, no enforced threshold (npx, scratch-installed)
   PHASE 7: Playwright e2e     — full browser runtime verification (e2e/)
   PHASE 8: SOT manifest       — fetches Devocionales-assets' devotionals
                                  index.json and validates its shape
+  PHASE 9: generated files    — scripts/check-generated.sh, the same script CI
+                                 runs: rebuilds tailwind.css, manifests, sw.js and
+                                 the build stamp, fails if any differs from git
+
+`--fast` (what scripts/pre-push runs) skips the slow phases 6 (c8 coverage) and
+7 (Playwright e2e), shown as SKIP in the summary: CI runs both on every PR. It
+keeps phase 8 (one small fetch; CI has no equivalent check). Phase 9 may need the
+network on its first run, to install the pinned Tailwind CLI into a user cache.
+Run `python3 scripts/validator.py` without the flag for the complete local run.
 
 Lint tools are expected globally installed at the CI-pinned versions
 (html-validate@8, stylelint@15, stylelint-config-standard@34, eslint@8) —
@@ -28,6 +37,7 @@ Exit codes: 0 = all phases passed, 1 = a phase failed (or a required tool
 is missing).
 """
 
+import argparse
 import json
 import shutil
 import subprocess
@@ -63,10 +73,13 @@ class Phase:
 
 
 PHASES: list[Phase] = []
+# What a git pre-push hook writes to stdin (one line per pushed ref); empty for manual runs.
+PUSHED_REFS = ''
 
 
 def run_cmd(cmd, cwd=REPO_ROOT):
-    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
+    # stdin is closed so no phase can swallow the pushed refs the pre-push hook feeds this process.
+    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True, stdin=subprocess.DEVNULL)
     return result.returncode, result.stdout, result.stderr
 
 
@@ -116,25 +129,26 @@ def print_summary():
 
 # ── Phase 1: node --check ────────────────────────────────────────────────
 
-def phase_node_check():
-    js_files = sorted(
-        f for f in REPO_ROOT.rglob('*.js')
-        if 'node_modules' not in f.parts
-        and '.claude' not in f.parts
-        and 'test-results' not in f.parts
-        and 'playwright-report' not in f.parts
-    )
+def phase_node_check(root=REPO_ROOT):
+    # Tracked plus new-but-not-ignored files (a new file must pass before it is committed); .gitignore
+    # skips node_modules, worktrees and test output without an exclusion list.
+    # NUL-separated so names with spaces survive; a file deleted from disk but still tracked is skipped.
+    rc, out, err = run_cmd(['git', 'ls-files', '-z', '--cached', '--others', '--exclude-standard', '*.js'], cwd=root)
+    if rc != 0:
+        print(f"  ❌ git ls-files failed: {err.strip()}")
+        return False, 'could not list tracked .js files'
+    js_files = sorted(root / f for f in out.split('\0') if f and (root / f).is_file())
     if not js_files:
         return True, 'no .js files found'
     ok = True
     for f in js_files:
         rc, _out, err = run_cmd(['node', '--check', str(f)])
         if rc != 0:
-            print(f"  ❌ {f.relative_to(REPO_ROOT)}")
+            print(f"  ❌ {f.relative_to(root)}")
             print(f"     {err.strip()}")
             ok = False
         else:
-            print(f"  ✓ {f.relative_to(REPO_ROOT)}")
+            print(f"  ✓ {f.relative_to(root)}")
     return ok, ''
 
 
@@ -167,7 +181,7 @@ def phase_stylelint():
 def phase_html_validate():
     if _tool_missing('html-validate'):
         return False, 'html-validate not found on PATH — npm install -g html-validate@8'
-    rc, out, err = run_cmd(['html-validate', '*.html', 'devocionales/*.html', 'habitus/*.html'])
+    rc, out, err = run_cmd(['html-validate', '*.html', 'legacy/*.html', 'devocionales/*.html', 'habitus/*.html'])
     print(out)
     if err.strip():
         print(err)
@@ -264,8 +278,34 @@ def phase_devotionals_manifest():
     return ok, ''
 
 
+# ── Phase 9: generated files are up to date (mirrors CI) ─────────────────
+
+def phase_generated_files():
+    print('  The first run may install the pinned Tailwind CLI (needs the network); output streams below.')
+    sys.stdout.flush()
+    # Not captured, so a cold-cache install is visible. The pushed refs (if any) go to the script's stdin.
+    result = subprocess.run(
+        ['bash', 'scripts/check-generated.sh'] + (['--pushed-refs'] if PUSHED_REFS else []),
+        cwd=REPO_ROOT, text=True, input=PUSHED_REFS or None, stdin=None if PUSHED_REFS else subprocess.DEVNULL,
+    )
+    return result.returncode == 0, ''
+
+
+def skipped_in_fast_mode():
+    return True, 'skipped (--fast); CI runs it on every PR'
+
+
 def main():
-    print("develop4God.github.io — pre-commit validation")
+    parser = argparse.ArgumentParser(description='Phased validator for develop4God.github.io.')
+    parser.add_argument('--fast', action='store_true', help='skip c8 coverage and Playwright e2e (the pre-push hook)')
+    parser.add_argument('--pushed-refs', action='store_true', help='read the pushed refs from stdin (the pre-push hook) so phase 9 checks the pushed commits, not HEAD')
+    args = parser.parse_args()
+    fast = args.fast
+    global PUSHED_REFS
+    if args.pushed_refs:
+        PUSHED_REFS = sys.stdin.read()
+
+    print("develop4God.github.io — pre-commit validation" + (" (fast)" if fast else ""))
     print(f"Repo: {REPO_ROOT}")
 
     gate('1. node --check (syntax)', phase_node_check)
@@ -273,9 +313,10 @@ def main():
     gate('3. stylelint', phase_stylelint)
     gate('4. html-validate', phase_html_validate)
     gate('5. node --test', phase_node_test)
-    gate('6. c8 coverage', phase_c8_coverage)
-    gate('7. Playwright e2e', phase_playwright)
+    gate('6. c8 coverage', skipped_in_fast_mode if fast else phase_c8_coverage)
+    gate('7. Playwright e2e', skipped_in_fast_mode if fast else phase_playwright)
     gate('8. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
+    gate('9. Generated files up to date', phase_generated_files)
 
     print_summary()
     sys.exit(0 if all(p.passed for p in PHASES) else 1)
