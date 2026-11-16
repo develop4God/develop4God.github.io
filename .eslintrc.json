@@ -25,6 +25,7 @@
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",
     "DevotionalBuild": "readonly",
+    "DiscoveryData": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",
