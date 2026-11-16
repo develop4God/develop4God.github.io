@@ -32,6 +32,9 @@ function fakeEl(startHidden = true) {
         textContent: '',
         disabled: false,
         value: '',
+        attrs: {},
+        setAttribute(name, value) { this.attrs[name] = String(value); },
+        getAttribute(name) { return name in this.attrs ? this.attrs[name] : null; },
         classList: {
             add: (n) => classes.add(n),
             remove: (n) => classes.delete(n),
@@ -45,8 +48,10 @@ function fakeEl(startHidden = true) {
 function fakeDoc({ withButtons = true } = {}) {
     const els = {
         '[data-push]': fakeEl(),
-        '[data-push-enable]': fakeEl(),
-        '[data-push-disable]': fakeEl(),
+        '[data-push-switch-row]': fakeEl(),
+        '[data-push-switch]': fakeEl(false),
+        '[data-push-time-row]': fakeEl(),
+        '[data-push-time-value]': fakeEl(false),
         '[data-push-hour]': Object.assign(fakeEl(false), { options: [] }),
         '[data-push-status]': fakeEl(false),
     };
@@ -127,8 +132,13 @@ function setup({ adapter, storage, win, doc, config = CONFIG } = {}) {
     ctx.run = () => init(ctx.doc, ctx.win, config, ctx.deps);
     ctx.el = (name) => ctx.doc.els[`[data-push${name ? `-${name}` : ''}]`];
     ctx.tap = async (name) => { ctx.el(name).listeners.click(); await flush(); };
+    // The switch row is what the reader sees: on = notifications are on (opted in), off = one tap away.
+    ctx.on = () => ctx.el('switch').getAttribute('aria-checked') === 'true';
     return ctx;
 }
+
+const assertOff = (ctx) => { assert.equal(ctx.el('switch-row').shown, true); assert.equal(ctx.on(), false); };
+const assertOn = (ctx) => { assert.equal(ctx.el('switch-row').shown, true); assert.equal(ctx.on(), true); };
 
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 const tick = async () => { for (let i = 0; i < 20; i += 1) await flush(); };
@@ -137,8 +147,7 @@ test('A1: init for a new reader shows the enable button; no prompt, no SDK, no F
     const ctx = setup();
     await ctx.run();
     assert.equal(ctx.el('').shown, true);
-    assert.equal(ctx.el('enable').shown, true);
-    assert.equal(ctx.el('disable').shown, false);
+    assertOff(ctx);
     assert.deepEqual(ctx.adapter.log, []);
     assert.deepEqual(ctx.storage.data, {});
 });
@@ -190,14 +199,14 @@ test('A2: iOS Safari outside standalone shows only the install text', async () =
     await ctx.run();
     assert.equal(ctx.el('').shown, true);
     assert.equal(ctx.el('status').textContent, 'T:push.status_ios_install');
-    for (const name of ['enable', 'disable', 'hour']) assert.equal(ctx.el(name).shown, false);
+    for (const name of ['switch-row', 'time-row']) assert.equal(ctx.el(name).shown, false);
     assert.deepEqual(ctx.adapter.log, []);
 });
 
 test('A2: iOS installed (standalone) gets the normal enable button', async () => {
     const ctx = setup({ win: fakeWin({ ua: UA.iphone, standalone: true }) });
     await ctx.run();
-    assert.equal(ctx.el('enable').shown, true);
+    assertOff(ctx);
     assert.notEqual(ctx.el('status').textContent, 'T:push.status_ios_install');
 });
 
@@ -205,18 +214,18 @@ test('A3: denied or dismissed permission shows the denied text and calls no Fire
     for (const answer of ['denied', 'default']) {
         const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => Promise.resolve(answer) }) });
         await ctx.run();
-        await ctx.tap('enable');
+        await ctx.tap('switch');
         assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
         assert.deepEqual(ctx.adapter.log, ['requestPermission']);
         assert.deepEqual(ctx.storage.data, {});
-        assert.equal(ctx.el('enable').shown, true);
+        assertOff(ctx);
     }
 });
 
 test('enable: permission is requested synchronously inside the click, before any await', async () => {
     const ctx = setup();
     await ctx.run();
-    ctx.el('enable').listeners.click();
+    ctx.el('switch').listeners.click();
     assert.deepEqual(ctx.adapter.log, ['requestPermission']);
     await flush();
 });
@@ -224,15 +233,15 @@ test('enable: permission is requested synchronously inside the click, before any
 test('enable: a rejecting requestPermission shows the error and leaves the button usable', async () => {
     const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => Promise.reject(new Error('x')) }) });
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.equal(ctx.el('status').textContent, 'T:push.status_error');
-    assert.equal(ctx.el('enable').disabled, false);
+    assert.equal(ctx.el('switch').disabled, false);
 });
 
 test('enable: happy path in the app write order, with the raw token, hour, timezone and language', async () => {
     const ctx = setup({ storage: fakeStorage({ 'devotionalPush.hour': '7' }) });
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.deepEqual(ctx.adapter.log, ['requestPermission', 'load', 'signInAnonymously', 'registration', 'getToken', ...WRITES]);
     const settings = ctx.adapter.writes[2].data;
     assert.equal(settings.notificationsEnabled, true);
@@ -242,8 +251,7 @@ test('enable: happy path in the app write order, with the raw token, hour, timez
     assert.equal(ctx.adapter.writes[1].data.token, 'tok1');
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], '1');
     assert.equal(ctx.storage.data['devotionalPush.token'], 'tok1');
-    assert.equal(ctx.el('disable').shown, true);
-    assert.equal(ctx.el('enable').shown, false);
+    assertOn(ctx);
     assert.equal(ctx.el('status').textContent, 'T:push.status_enabled');
 });
 
@@ -251,18 +259,18 @@ test('enable: the language is omitted until i18n has finished loading', async ()
     const ctx = setup();
     ctx.i18nState.ready = false;
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.equal('preferredLanguage' in ctx.adapter.writes[2].data, false);
 });
 
 test('enable: no service worker registration (null) is an error and writes nothing', async () => {
     const ctx = setup({ adapter: fakeAdapter({ registration: () => Promise.resolve(null) }) });
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.equal(ctx.el('status').textContent, 'T:push.status_error');
     assert.deepEqual(ctx.adapter.writes, []);
     assert.deepEqual(ctx.storage.data, {});
-    assert.equal(ctx.el('enable').disabled, false);
+    assert.equal(ctx.el('switch').disabled, false);
 });
 
 test('enable: a failing step (registration, token, sign-in or write) is an error and the button is usable again', async () => {
@@ -274,16 +282,16 @@ test('enable: a failing step (registration, token, sign-in or write) is an error
     for (const overrides of failing) {
         const ctx = setup({ adapter: fakeAdapter(overrides) });
         await ctx.run();
-        await ctx.tap('enable');
+        await ctx.tap('switch');
         assert.equal(ctx.el('status').textContent, 'T:push.status_error');
         assert.equal(ctx.storage.data['devotionalPush.optedIn'], undefined);
-        assert.equal(ctx.el('enable').disabled, false);
-        assert.equal(ctx.el('enable').shown, true);
+        assert.equal(ctx.el('switch').disabled, false);
+        assertOff(ctx);
     }
     const ctx = setup();
     ctx.adapter.db.set = () => Promise.reject(new Error('rules'));
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.equal(ctx.el('status').textContent, 'T:push.status_error');
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], undefined);
 });
@@ -293,16 +301,16 @@ test('enable: a double tap while busy is ignored and the button is disabled mean
     const gate = new Promise((resolve) => { release = resolve; });
     const ctx = setup({ adapter: fakeAdapter({ getToken: () => gate.then(() => 'tok1') }) });
     await ctx.run();
-    ctx.el('enable').listeners.click();
+    ctx.el('switch').listeners.click();
     await tick();
-    assert.equal(ctx.el('enable').disabled, true);
-    ctx.el('enable').listeners.click();
+    assert.equal(ctx.el('switch').disabled, true);
+    ctx.el('switch').listeners.click();
     await tick();
     assert.equal(ctx.adapter.log.filter((c) => c === 'requestPermission').length, 1);
     release();
     await tick();
     assert.equal(ctx.adapter.writes.length, 3);
-    assert.equal(ctx.el('enable').disabled, false);
+    assert.equal(ctx.el('switch').disabled, false);
 });
 
 test('opted in and granted: every entry does the three writes in order with no reads and no prompt', async () => {
@@ -311,7 +319,7 @@ test('opted in and granted: every entry does the three writes in order with no r
     assert.deepEqual(ctx.adapter.log, ['load', 'currentUid', 'registration', 'getToken', ...WRITES]);
     assert.equal(ctx.adapter.writes[2].data.notificationTime, '06:00');
     assert.equal('lastNotificationSentDate' in ctx.adapter.writes[2].data, false);
-    assert.equal(ctx.el('disable').shown, true);
+    assertOn(ctx);
     // The next entry writes again: there is no throttle.
     const again = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: ctx.storage });
     await again.run();
@@ -342,15 +350,14 @@ test('opted in: a failing write is silent and keeps the opted-in state for the n
     await assert.doesNotReject(ctx.run());
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], '1');
     assert.equal(ctx.el('status').textContent, 'T:push.status_enabled');
-    assert.equal(ctx.el('disable').disabled, false);
+    assert.equal(ctx.el('switch').disabled, false);
 });
 
 test('A4: permission revoked while opted in runs the disable flow and shows the enable button', async () => {
     const ctx = setup({ adapter: fakeAdapter({ permission: () => 'denied' }), storage: fakeStorage(OPTED) });
     await ctx.run();
     assert.deepEqual(ctx.adapter.log, ['load', 'currentUid', 'set users/uid1/settings/notifications', 'delete users/uid1/fcmTokens/tok1', 'deleteToken']);
-    assert.equal(ctx.el('enable').shown, true);
-    assert.equal(ctx.el('disable').shown, false);
+    assertOff(ctx);
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], undefined);
 });
 
@@ -359,13 +366,13 @@ test('A5: disable tap writes notificationsEnabled false, removes this token, del
     await ctx.run();
     ctx.adapter.log.length = 0;
     ctx.adapter.writes.length = 0;
-    await ctx.tap('disable');
+    await ctx.tap('switch');
     assert.deepEqual(ctx.adapter.log, ['load', 'currentUid', 'set users/uid1/settings/notifications', 'delete users/uid1/fcmTokens/tok1', 'deleteToken']);
     assert.deepEqual(Object.keys(ctx.adapter.writes[0].data).sort(), ['lastUpdated', 'notificationsEnabled']);
     assert.deepEqual(ctx.adapter.writes[0].options, { merge: true });
     assert.ok(!ctx.adapter.writes.some((w) => w.path === 'users/uid1' || (w.op === 'delete' && !w.path.includes('/fcmTokens/'))));
     assert.deepEqual(ctx.storage.data, {});
-    assert.equal(ctx.el('enable').shown, true);
+    assertOff(ctx);
 });
 
 test('A5: a failed settings write keeps the flags and the UI on with an error, so the reader can retry; every other step is still tried', async () => {
@@ -377,13 +384,13 @@ test('A5: a failed settings write keeps the flags and the UI on with an error, s
     ctx.adapter.db.delete = () => Promise.reject(new Error('offline'));
     await ctx.run();
     ctx.adapter.log.length = 0;
-    await ctx.tap('disable');
+    await ctx.tap('switch');
     assert.ok(ctx.adapter.log.includes('deleteToken'));
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], '1');
     assert.equal(ctx.storage.data['devotionalPush.token'], 'tok1');
-    assert.equal(ctx.el('disable').shown, true);
+    assertOn(ctx);
     assert.equal(ctx.el('status').textContent, 'T:push.status_error');
-    assert.equal(ctx.el('disable').disabled, false);
+    assert.equal(ctx.el('switch').disabled, false);
 });
 
 test('A5: disable with no signed-in user skips Firestore but still deletes the token and clears the flags', async () => {
@@ -391,7 +398,7 @@ test('A5: disable with no signed-in user skips Firestore but still deletes the t
     await ctx.run();
     ctx.adapter.writes.length = 0;
     ctx.adapter.log.length = 0;
-    await ctx.tap('disable');
+    await ctx.tap('switch');
     assert.deepEqual(ctx.adapter.writes, []);
     assert.ok(ctx.adapter.log.includes('deleteToken'));
     assert.deepEqual(ctx.storage.data, {});
@@ -425,7 +432,7 @@ test('hour change while busy is ignored and the select returns to the stored hou
     const gate = new Promise((resolve) => { release = resolve; });
     const ctx = setup({ adapter: fakeAdapter({ getToken: () => gate.then(() => 'tok1') }), storage: fakeStorage({ 'devotionalPush.hour': '8' }) });
     await ctx.run();
-    ctx.el('enable').listeners.click();
+    ctx.el('switch').listeners.click();
     await tick();
     ctx.el('hour').value = '12';
     ctx.el('hour').listeners.change();
@@ -435,14 +442,17 @@ test('hour change while busy is ignored and the select returns to the stored hou
     assert.equal(ctx.adapter.writes[2].data.notificationTime, '08:00');
 });
 
-test('hour change failure shows the error text and does not throw', async () => {
-    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+test('hour change failure reverts the row to the last saved hour, shows the time error and does not throw', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '14' }) });
     await ctx.run();
     ctx.adapter.db.set = () => Promise.reject(new Error('offline'));
     ctx.el('hour').value = '3';
     ctx.el('hour').listeners.change();
     await tick();
-    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_error');
+    assert.equal(ctx.el('hour').value, '14');
+    assert.equal(ctx.el('time-value').textContent, '14:00');
+    assert.equal(ctx.storage.data['devotionalPush.hour'], '14');
 });
 
 test('init never throws: missing adapter, throwing storage, missing DOM or throwing permission', async () => {
@@ -472,7 +482,7 @@ test('default storage reads the opted-in flag from localStorage', async () => {
     win.localStorage = { getItem: (k) => (k in data ? data[k] : null), setItem: (k, v) => { data[k] = String(v); }, removeItem: (k) => { delete data[k]; } };
     const doc = fakeDoc();
     await init(doc, win, CONFIG, { adapter: fakeAdapter({ permission: () => 'granted' }), t });
-    assert.equal(doc.els['[data-push-disable]'].shown, true);
+    assert.equal(doc.els['[data-push-switch]'].getAttribute('aria-checked'), 'true');
 });
 
 function fakeI18n(ready = false) {
@@ -521,7 +531,7 @@ test('FIX1: with a storage that cannot persist the hour, enable and hour change 
     ctx.deps.storage = noHour;
     await ctx.run();
     ctx.el('hour').value = '20';
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.equal(ctx.adapter.writes[2].data.notificationTime, '20:00');
     ctx.adapter.writes.length = 0;
     ctx.el('hour').value = '21';
@@ -538,12 +548,12 @@ test('FIX2: a successful hour change clears the error left by an earlier failed 
     ctx.el('hour').value = '3';
     ctx.el('hour').listeners.change();
     await tick();
-    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_error');
     ctx.adapter.db.set = realSet;
     ctx.el('hour').value = '4';
     ctx.el('hour').listeners.change();
     await tick();
-    assert.equal(ctx.el('status').textContent, 'T:push.status_enabled');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set 04:00');
 });
 
 test('kill switch or revoked permission with a failed settings write keeps the flag for the next visit', async () => {
@@ -563,11 +573,11 @@ test('ITEM3: when the opted-in flag does not persist, enable undoes the server w
     const ctx = setup({ storage: noop });
     ctx.deps.storage = noop;
     await ctx.run();
-    await ctx.tap('enable');
+    await ctx.tap('switch');
     assert.deepEqual(ctx.adapter.log.slice(-3), ['set users/uid1/settings/notifications', 'delete users/uid1/fcmTokens/tok1', 'deleteToken']);
     assert.equal(ctx.adapter.writes.find((w) => w.path.endsWith('/settings/notifications') && w.data.notificationsEnabled === false) !== undefined, true);
     assert.equal(ctx.el('status').textContent, 'T:push.status_error');
-    assert.equal(ctx.el('enable').shown, true);
+    assertOff(ctx);
 });
 
 test('LANG: an opted-in entry waits for i18n before the writes and then writes the language', async () => {
@@ -622,7 +632,7 @@ test('gate 1a: iOS Safari browser tab with pushEnabled shows the install hint, n
     await ctx.run();
     assert.equal(ctx.el('').shown, true);
     assert.equal(ctx.el('status').textContent, 'T:push.status_ios_install');
-    for (const name of ['enable', 'disable', 'hour']) assert.equal(ctx.el(name).shown, false);
+    for (const name of ['switch-row', 'time-row']) assert.equal(ctx.el(name).shown, false);
     assertUntouched(ctx, {});
 });
 
@@ -630,7 +640,7 @@ test('gate 1b: desktop browser tab with pushEnabled hides the section: no hint, 
     const ctx = setup({ win: fakeWin({ standalone: false }) });
     await ctx.run();
     assert.equal(ctx.el('').shown, false);
-    for (const name of ['enable', 'disable']) assert.equal(ctx.el(name).shown, false);
+    assert.equal(ctx.el('switch-row').shown, false);
     assert.notEqual(ctx.el('status').textContent, 'T:push.status_ios_install');
     assertUntouched(ctx, {});
 });
@@ -642,8 +652,7 @@ test('gate 2: browser tab with a stale opted-in flag, pushEnabled true or false:
             await ctx.run();
             await tick();
             assertUntouched(ctx, OPTED);
-            assert.equal(ctx.el('enable').shown, false);
-            assert.equal(ctx.el('disable').shown, false);
+            assert.equal(ctx.el('switch-row').shown, false);
         }
     }
 });
@@ -666,14 +675,14 @@ test('gate 3: iOS home-screen app (navigator.standalone true, matchMedia false) 
     const ctx = setup({ win: fakeWin({ ua: UA.iphone, standalone: true }) });
     await ctx.run();
     assert.equal(ctx.el('').shown, true);
-    assert.equal(ctx.el('enable').shown, true);
+    assertOff(ctx);
 });
 
 test('gate 4: Android standalone hides push', async () => {
     const ctx = setup({ win: fakeWin({ ua: UA.android, standalone: true }) });
     await ctx.run();
     assert.equal(ctx.el('').shown, false);
-    assert.equal(ctx.el('enable').shown, false);
+    assert.equal(ctx.el('switch-row').shown, false);
     assertUntouched(ctx, {});
 });
 
@@ -718,4 +727,130 @@ test('gate: DevotionalStandalone absent entirely: hidden, nothing touched, no th
 test('gate: isStandalone not a function: hidden, nothing touched, no throw', async () => {
     await assertHiddenWithStandalone({ isAndroid: () => false });
     await assertHiddenWithStandalone({ isStandalone: true, isAndroid: () => false });
+});
+
+// ---- Settings screen: one switch and one time row (replaces the enable/disable buttons) ----
+
+test('S1: the default hour is 09:00, as in the Flutter app', async () => {
+    const ctx = setup();
+    await ctx.run();
+    assert.equal(ctx.el('hour').value, '9');
+    assert.equal(ctx.el('time-value').textContent, '09:00');
+    await ctx.tap('switch');
+    assert.equal(ctx.adapter.writes[2].data.notificationTime, '09:00');
+});
+
+test('S2: the switch starts off, and the time row is disabled until notifications are on', async () => {
+    const ctx = setup();
+    await ctx.run();
+    assertOff(ctx);
+    assert.equal(ctx.el('hour').disabled, true);
+    assert.deepEqual(ctx.adapter.log, []);
+});
+
+test('S3: tapping the switch while off runs the enable flow and turns it on; the time row opens up', async () => {
+    const ctx = setup();
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.deepEqual(ctx.adapter.log.slice(0, 1), ['requestPermission']);
+    assertOn(ctx);
+    assert.equal(ctx.el('hour').disabled, false);
+});
+
+test('S4: tapping the switch while on runs the disable flow, clears the opt-in and greys the time row again', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    await ctx.run();
+    assertOn(ctx);
+    await ctx.tap('switch');
+    assertOff(ctx);
+    assert.equal(ctx.el('hour').disabled, true);
+    assert.deepEqual(ctx.storage.data, {});
+    assert.ok(ctx.adapter.log.includes('deleteToken'));
+});
+
+test('S5: denied permission leaves the switch off with the blocked message', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ requestPermission: () => Promise.resolve('denied') }) });
+    await ctx.run();
+    await ctx.tap('switch');
+    assertOff(ctx);
+    assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
+    assert.equal(ctx.el('hour').disabled, true);
+});
+
+test('S6: the switch is disabled while a flow runs, so a second tap is ignored', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ getToken: () => gate.then(() => 'tok1') }) });
+    await ctx.run();
+    ctx.el('switch').listeners.click();
+    await tick();
+    assert.equal(ctx.el('switch').disabled, true);
+    ctx.el('switch').listeners.click();
+    release();
+    await tick();
+    assert.equal(ctx.adapter.log.filter((entry) => entry === 'requestPermission').length, 1);
+    assert.equal(ctx.el('switch').disabled, false);
+    assertOn(ctx);
+});
+
+test('S7: picking a new hour while on writes once, shows the new hour and the confirmation text', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.el('hour').value = '18';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.equal(ctx.adapter.writes.length, 1);
+    assert.equal(ctx.adapter.writes[0].data.notificationTime, '18:00');
+    assert.equal(ctx.el('time-value').textContent, '18:00');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set 18:00');
+    assert.equal(ctx.storage.data['devotionalPush.hour'], '18');
+});
+
+test('S8: picking the same hour again writes nothing and says nothing', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    await tick();
+    ctx.adapter.writes.length = 0;
+    const before = ctx.el('status').textContent;
+    ctx.el('hour').value = '9';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.deepEqual(ctx.adapter.writes, []);
+    assert.equal(ctx.el('status').textContent, before);
+});
+
+test('S9: a failed save followed by the same pick retries the save (the failed hour was not remembered)', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    const realSet = ctx.adapter.db.set;
+    ctx.adapter.db.set = () => Promise.reject(new Error('offline'));
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.adapter.db.set = realSet;
+    ctx.adapter.writes.length = 0;
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.equal(ctx.adapter.writes[0].data.notificationTime, '12:00');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set 12:00');
+});
+
+test('S10: the time row shows the stored hour on entry, and the status line carries only a message after a change', async () => {
+    const ctx = setup({ storage: fakeStorage({ 'devotionalPush.hour': '19' }) });
+    await ctx.run();
+    assert.equal(ctx.el('time-value').textContent, '19:00');
+    assert.equal(ctx.el('status').textContent, '');
+});
+
+test('S11: older markup without the switch or the time row (an earlier cached page) does not make init throw', async () => {
+    const doc = fakeDoc();
+    doc.els['[data-push-switch]'] = null;
+    doc.els['[data-push-switch-row]'] = null;
+    doc.els['[data-push-time-row]'] = null;
+    doc.els['[data-push-time-value]'] = null;
+    const ctx = setup({ doc });
+    await assert.doesNotReject(ctx.run());
+    assert.equal(ctx.el('').shown, true);
 });

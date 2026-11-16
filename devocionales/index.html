@@ -11,7 +11,7 @@
     </script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Devocional de Hoy - Devocionales Cristianos</title>
     <meta name="description" content="Tu devocional diario: versículo, reflexión, y oración para nutrir tu alma hoy.">
     <link rel="canonical" href="https://develop4god.com/devocionales/">
@@ -68,7 +68,9 @@
             }
         }
 
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        /* viewport-fit=cover lets the installed app use the whole screen: the side padding keeps text out of
+           the landscape notch, and the bottom bar (shell.css) takes the home indicator's height from env(). */
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 
         .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
         .site-nav a:not(.btn-primary) {
@@ -627,47 +629,55 @@
     <div id="shell-settings" data-shell-settings>
         <div data-shell-settings-header class="mx-auto px-4 pt-8">
             <h1 id="shell-settings-title" class="shell-settings-title" data-i18n="shell.settings">Settings</h1>
-            <p class="shell-settings-intro" data-i18n="shell.settings_intro">Reminders and preferences for this app.</p>
         </div>
-        <!-- Daily push notifications. Hidden by default; devotional-push.js reveals it only when pushEnabled
-             is true and the browser supports push. No existing id is touched, so an older cached script is unaffected. -->
-        <section data-push class="hidden mx-auto max-w-2xl px-4 py-4 text-center text-sm" style="color: var(--text-muted);" aria-labelledby="push-title">
-            <h2 id="push-title" class="text-lg font-semibold mb-2" style="color: var(--text);" data-i18n="push.title">Daily reminder</h2>
-            <p class="mb-3" data-i18n="push.description">Get a notification with your daily devotional at the time you choose.</p>
-            <div class="flex flex-wrap items-center justify-center gap-3 mb-3">
-                <label for="push-hour" class="text-sm" data-i18n="push.hour_label">Reminder time</label>
-                <select id="push-hour" data-push-hour class="px-3 py-1.5 rounded-lg border" style="background: var(--surface); color: var(--text); border-color: var(--border);">
-                        <option value="0">00:00</option>
-                        <option value="1">01:00</option>
-                        <option value="2">02:00</option>
-                        <option value="3">03:00</option>
-                        <option value="4">04:00</option>
-                        <option value="5">05:00</option>
-                        <option value="6">06:00</option>
-                        <option value="7">07:00</option>
-                        <option value="8">08:00</option>
-                        <option value="9">09:00</option>
-                        <option value="10">10:00</option>
-                        <option value="11">11:00</option>
-                        <option value="12">12:00</option>
-                        <option value="13">13:00</option>
-                        <option value="14">14:00</option>
-                        <option value="15">15:00</option>
-                        <option value="16">16:00</option>
-                        <option value="17">17:00</option>
-                        <option value="18">18:00</option>
-                        <option value="19">19:00</option>
-                        <option value="20">20:00</option>
-                        <option value="21">21:00</option>
-                        <option value="22">22:00</option>
-                        <option value="23">23:00</option>
-                </select>
-                <button type="button" id="push-enable-btn" data-push-enable class="btn-primary px-4 py-2" data-i18n="push.enable">Turn on notifications</button>
-                <button type="button" id="push-disable-btn" data-push-disable class="btn-primary px-4 py-2" data-i18n="push.disable">Turn off notifications</button>
-            </div>
-            <p class="text-xs mb-2" data-i18n="push.consent">When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.</p>
-            <p id="push-status" data-push-status role="status" aria-live="polite"></p>
-        </section>
+        <div class="settings-list mx-auto px-4">
+            <!-- Daily push notifications. Hidden by default; devotional-push.js reveals it only when pushEnabled
+                 is true and the browser supports push. The row ids and data attributes are what the script reads. -->
+            <section data-push class="hidden" aria-labelledby="push-switch-label">
+                <div class="settings-row" data-push-switch-row>
+                    <span id="push-switch-label" data-i18n="push.switch_label">Enable/Disable notifications</span>
+                    <button type="button" class="settings-switch" role="switch" aria-checked="false" aria-labelledby="push-switch-label" data-push-switch></button>
+                </div>
+                <label class="settings-row settings-time is-off" data-push-time-row>
+                    <svg class="settings-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    <span class="settings-label" data-i18n="push.time_label">Daily notification time</span>
+                    <span class="settings-value" data-push-time-value>09:00</span>
+                    <svg class="settings-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+                    <select id="push-hour" data-push-hour disabled>
+                    <option value="0">00:00</option>
+                    <option value="1">01:00</option>
+                    <option value="2">02:00</option>
+                    <option value="3">03:00</option>
+                    <option value="4">04:00</option>
+                    <option value="5">05:00</option>
+                    <option value="6">06:00</option>
+                    <option value="7">07:00</option>
+                    <option value="8">08:00</option>
+                    <option value="9" selected>09:00</option>
+                    <option value="10">10:00</option>
+                    <option value="11">11:00</option>
+                    <option value="12">12:00</option>
+                    <option value="13">13:00</option>
+                    <option value="14">14:00</option>
+                    <option value="15">15:00</option>
+                    <option value="16">16:00</option>
+                    <option value="17">17:00</option>
+                    <option value="18">18:00</option>
+                    <option value="19">19:00</option>
+                    <option value="20">20:00</option>
+                    <option value="21">21:00</option>
+                    <option value="22">22:00</option>
+                    <option value="23">23:00</option>
+                    </select>
+                </label>
+                <p id="push-status" data-push-status role="status" aria-live="polite" class="settings-status"></p>
+            </section>
+            <!-- Moved here from the header and the reading page by devotional-shell.js (installed app only); the
+                 elements keep their ids, so every script that reads them is unaffected. Hidden elsewhere. -->
+            <div class="settings-row" data-shell-slot="language"><span class="settings-label" data-i18n="shell.language">Language</span></div>
+            <div class="settings-row" data-shell-slot="theme"><span class="settings-label" data-i18n="shell.theme">Theme</span></div>
+            <div class="settings-row" data-shell-slot="font"><span class="settings-label" data-i18n="shell.font_size">Font size</span></div>
+        </div>
     </div>
 
     <!-- Installed app only (iOS and desktop): revealed by devotional-shell.js, hidden by shell.css everywhere else. -->

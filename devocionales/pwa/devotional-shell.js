@@ -8,6 +8,23 @@
 
     const ANALYTICS_EVENT = 'bottom_bar_action';
 
+    // Controls that live in the header and on the reading page in a browser tab and in Settings in the
+    // installed app. The existing elements are moved, never copied or recreated: the scripts that read
+    // them by id (language selector, theme toggle, font size radios) keep working untouched.
+    const SETTINGS_CONTROLS = [
+        { slot: 'language', selector: '#language-selector' },
+        { slot: 'theme', selector: '.theme-switch' },
+        { slot: 'font', selector: '.text-size-toggle' },
+    ];
+
+    function moveControlsToSettings(doc) {
+        SETTINGS_CONTROLS.forEach(({ slot, selector }) => {
+            const target = doc.querySelector(`[data-shell-slot="${slot}"]`);
+            const control = doc.querySelector(selector);
+            if (target && control && !target.contains(control)) target.appendChild(control);
+        });
+    }
+
     function track(win, tab) {
         if (typeof win.gtag === 'function') win.gtag('event', ANALYTICS_EVENT, { action: tab });
     }
@@ -51,6 +68,7 @@
         } else {
             root.dataset.shellLayout = 'bar';
         }
+        moveControlsToSettings(doc);
         root.classList.add('shell-active');
         return true;
     }

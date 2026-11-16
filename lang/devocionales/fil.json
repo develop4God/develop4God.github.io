@@ -238,12 +238,19 @@
     "status_enabled": "Naka-on na ang mga abiso.",
     "status_denied": "Naka-block ang mga abiso sa browser na ito. Payagan ang mga ito sa mga setting ng site para ma-on.",
     "status_error": "Hindi na-on ang mga abiso. Pakisubukang muli mamaya.",
-    "status_ios_install": "Para makatanggap ng mga abiso sa iPhone o iPad, i-install muna ang app: i-tap ang Share, pagkatapos ay “Add to Home Screen”."
+    "status_ios_install": "Para makatanggap ng mga abiso sa iPhone o iPad, i-install muna ang app: i-tap ang Share, pagkatapos ay “Add to Home Screen”.",
+    "switch_label": "Paganahin/Huwag paganahin ang mga notipikasyon",
+    "time_label": "Araw-araw na oras ng notipikasyon",
+    "time_set": "Itinakda ang oras ng notipikasyon sa",
+    "time_error": "Error sa pagtatakda ng oras ng notipikasyon"
   },
   "shell": {
     "nav_label": "Nabigasyon ng app",
     "home": "Home",
     "settings": "Mga Setting",
-    "settings_intro": "Mga paalala at kagustuhan para sa app na ito."
+    "settings_intro": "Mga paalala at kagustuhan para sa app na ito.",
+    "language": "Wika",
+    "theme": "Tema",
+    "font_size": "Laki ng font"
   }
 }
