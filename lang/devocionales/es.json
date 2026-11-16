@@ -222,21 +222,22 @@
     "salvationDontShowAgain": "No mostrar nuevamente"
   },
   "push": {
-    "title": "Recordatorio diario",
-    "description": "Recibe una notificación con tu devocional del día a la hora que elijas.",
     "consent": "Al activarlo, este navegador recibirá una notificación al día. Guardamos un identificador anónimo, tu zona horaria, tu idioma y la hora elegida. Puedes desactivarlo cuando quieras.",
-    "enable": "Activar notificaciones",
-    "disable": "Desactivar notificaciones",
-    "hour_label": "Hora del recordatorio",
     "status_enabled": "Notificaciones activadas.",
     "status_denied": "Las notificaciones están bloqueadas en este navegador. Permítelas en los ajustes del sitio para activarlas.",
     "status_error": "No se pudieron activar las notificaciones. Inténtalo de nuevo más tarde.",
-    "status_ios_install": "Para recibir notificaciones en iPhone o iPad, primero instala la app: toca Compartir y luego “Añadir a pantalla de inicio”."
+    "status_ios_install": "Para recibir notificaciones en iPhone o iPad, primero instala la app: toca Compartir y luego “Añadir a pantalla de inicio”.",
+    "switch_label": "Activar/Desactivar notificaciones",
+    "time_label": "Hora de notificación diaria",
+    "time_set": "Hora de confirmación ajustada a",
+    "time_error": "Error al establecer la hora de notificación"
   },
   "shell": {
     "nav_label": "Navegación de la app",
     "home": "Inicio",
     "settings": "Ajustes",
-    "settings_intro": "Recordatorios y preferencias de esta app."
+    "language": "Idioma",
+    "theme": "Tema",
+    "font_size": "Tamaño de letra"
   }
 }

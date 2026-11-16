@@ -35,13 +35,13 @@ window.DevotionalPushFirebase = { create: function () {
         permission: function () { return 'default'; },
         requestPermission: function () { log('requestPermission'); return Promise.resolve('${permission}'); },
         load: function () { log('load'); return Promise.resolve(); },
-        signInAnonymously: function () { log('signInAnonymously'); return Promise.resolve('uid'); },
-        currentUid: function () { return Promise.resolve(null); },
+        signInAnonymously: function () { log('signInAnonymously'); window.__uid = 'uid'; return Promise.resolve('uid'); },
+        currentUid: function () { return Promise.resolve(window.__uid || null); },
         registration: function () { log('registration'); return Promise.resolve(window.__registration); },
         getToken: function (reg) { log(reg === window.__registration ? 'getToken' : 'getToken(wrong registration)'); return Promise.resolve('t'); },
         deleteToken: function () { return Promise.resolve(); },
         db: {
-            set: function (path) { log('db.set ' + path); return Promise.resolve(); },
+            set: function (path) { log('db.set ' + path); return window.__failWrites ? Promise.reject(new Error('offline')) : Promise.resolve(); },
             get: function () { return Promise.resolve({ exists: false, data: function () {} }); },
             delete: function () { return Promise.resolve(); },
             serverTimestamp: function () { return 'ts'; }
@@ -86,27 +86,29 @@ test('the push block keeps every id an older cached script reads', async ({ page
     expect(await page.locator('[data-push-hour] option').last().textContent()).toBe('23:00');
 });
 
-test('with pushEnabled on, the enable button shows and nothing runs before it is tapped', async ({ page }) => {
+test('with pushEnabled on, the switch shows off and nothing runs before it is tapped', async ({ page }) => {
     const hits = watchFirebase(page);
     await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await openSettings(page);
     await expect(page.locator('[data-push]')).toBeVisible();
-    await expect(page.locator('[data-push-enable]')).toBeVisible();
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'false');
+    await expect(page.locator('[data-push-hour]')).toBeDisabled();
     expect(await page.evaluate(() => window.__prompts)).toBe(0);
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
     expect(hits).toEqual([]);
 });
 
-test('tapping enable asks for permission first; a denial shows the message and loads no SDK', async ({ page }) => {
+test('tapping the switch asks for permission first; a denial shows the message, leaves it off and loads no SDK', async ({ page }) => {
     const hits = watchFirebase(page);
     await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
     await openSettings(page);
-    await page.locator('[data-push-enable]').click();
+    await page.locator('[data-push-switch]').click();
     await expect(page.locator('[data-push-status]')).toContainText('blocked');
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'false');
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual(['requestPermission']);
     expect(hits).toEqual([]);
 });
@@ -123,8 +125,9 @@ test('granted path: requestPermission first, then load, sign-in, registration, t
     await enablePushWithStubAdapter(page, { permission: 'granted' });
     await page.goto(READER, { waitUntil: 'networkidle' });
     await openSettings(page);
-    await page.locator('[data-push-enable]').click();
-    await expect(page.locator('[data-push-disable]')).toBeVisible();
+    await page.locator('[data-push-switch]').click();
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'true');
+    await expect(page.locator('[data-push-hour]')).toBeEnabled();
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual([
         'requestPermission',
         'load',
@@ -161,4 +164,78 @@ test('an installed app on Android shows no push block and never reaches Firebase
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual([]);
     expect(hits).toEqual([]);
     await context.close();
+});
+
+// ---- Settings screen: one switch and one time row ----
+
+async function openSettingsAndTurnOn(page) {
+    await launchAsInstalledApp(page);
+    await enablePushWithStubAdapter(page, { permission: 'granted' });
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await openSettings(page);
+    await page.locator('[data-push-switch]').click();
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'true');
+    await page.evaluate(() => { window.__adapterCalls.length = 0; });
+}
+
+const settingsWrites = (page) => page.evaluate(() => window.__adapterCalls.filter((call) => call.startsWith('db.set')));
+
+test('the time starts at 09:00; picking 18:00 saves the settings once and says so', async ({ page }) => {
+    await launchAsInstalledApp(page);
+    await enablePushWithStubAdapter(page, { permission: 'granted' });
+    await page.goto(READER, { waitUntil: 'networkidle' });
+    await openSettings(page);
+    await expect(page.locator('[data-push-hour]')).toHaveValue('9');
+    await expect(page.locator('[data-push-time-value]')).toHaveText('09:00');
+    await page.locator('[data-push-switch]').click();
+    await expect(page.locator('[data-push-hour]')).toBeEnabled();
+    await page.evaluate(() => { window.__adapterCalls.length = 0; });
+    await page.locator('[data-push-hour]').selectOption('18');
+    await expect(page.locator('[data-push-status]')).toHaveText('Notification time set to 18:00');
+    await expect(page.locator('[data-push-time-value]')).toHaveText('18:00');
+    expect(await settingsWrites(page)).toEqual(['db.set users/uid/settings/notifications']);
+    expect(await page.evaluate(() => localStorage.getItem('devotionalPush.hour'))).toBe('18');
+});
+
+test('picking the same hour again saves nothing and changes no text', async ({ page }) => {
+    await openSettingsAndTurnOn(page);
+    const before = await page.locator('[data-push-status]').textContent();
+    await page.locator('[data-push-hour]').selectOption('9');
+    expect(await settingsWrites(page)).toEqual([]);
+    await expect(page.locator('[data-push-status]')).toHaveText(before);
+});
+
+test('a failed save puts the row back on the last saved hour and shows the error', async ({ page }) => {
+    await openSettingsAndTurnOn(page);
+    await page.evaluate(() => { window.__failWrites = true; });
+    await page.locator('[data-push-hour]').selectOption('21');
+    await expect(page.locator('[data-push-status]')).toHaveText('Error setting notification time');
+    await expect(page.locator('[data-push-hour]')).toHaveValue('9');
+    await expect(page.locator('[data-push-time-value]')).toHaveText('09:00');
+    expect(await page.evaluate(() => localStorage.getItem('devotionalPush.hour'))).toBe('9');
+    // Back online, the same pick is saved: the failed hour was not remembered as saved.
+    await page.evaluate(() => { window.__failWrites = false; window.__adapterCalls.length = 0; });
+    await page.locator('[data-push-hour]').selectOption('21');
+    await expect(page.locator('[data-push-status]')).toHaveText('Notification time set to 21:00');
+    expect(await settingsWrites(page)).toEqual(['db.set users/uid/settings/notifications']);
+});
+
+test('turning the switch off clears the opt-in and greys the time row again', async ({ page }) => {
+    await openSettingsAndTurnOn(page);
+    await page.locator('[data-push-switch]').click();
+    await expect(page.locator('[data-push-switch]')).toHaveAttribute('aria-checked', 'false');
+    await expect(page.locator('[data-push-hour]')).toBeDisabled();
+    await expect(page.locator('[data-push-time-row]')).toHaveClass(/is-off/);
+    expect(await page.evaluate(() => localStorage.getItem('devotionalPush.optedIn'))).toBeNull();
+});
+
+test('the time row has an accessible name, and the whole row opens the native picker', async ({ page }) => {
+    await openSettingsAndTurnOn(page);
+    const row = page.locator('[data-push-time-row]');
+    await expect(page.locator('[data-push-hour]')).toHaveAccessibleName(/Daily notification time/);
+    const rowBox = await row.boundingBox();
+    const selectBox = await page.locator('[data-push-hour]').boundingBox();
+    expect(rowBox.height).toBeGreaterThanOrEqual(44);
+    expect(selectBox.width).toBeGreaterThanOrEqual(rowBox.width - 1);
+    expect(selectBox.height).toBeGreaterThanOrEqual(rowBox.height - 1);
 });

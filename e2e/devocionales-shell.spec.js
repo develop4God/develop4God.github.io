@@ -188,7 +188,7 @@ test.describe('installed iOS app on a phone (390px)', () => {
         await expect(page.locator('[data-push]')).toBeHidden();
         await page.locator('[data-shell-tab="settings"]').click();
         await expect(page.locator('[data-push]')).toBeVisible();
-        await expect(page.locator('[data-push-enable]')).toBeVisible();
+        await expect(page.locator('[data-push-switch]')).toBeVisible();
         await shot(page, 'ios-phone-settings-push');
         await page.locator('[data-shell-tab="home"]').click();
         await expect(page.locator('[data-push]')).toBeHidden();
@@ -366,8 +366,10 @@ test.describe('replay across a deploy', () => {
 
     test('every id the previous cached scripts read is still in the page, push ids included', async ({ page }) => {
         await page.goto(READER, { waitUntil: 'domcontentloaded' });
+        // The push ids are the ones the current push script reads (the old enable/disable button ids went
+        // away with the switch: no deployed script ever read them, push has not shipped).
         const ids = ['nav-vision-label', 'install-app-btn', 'ios-install-hint', 'page-footer', 'footer-privacy-link', 'app-banner', 'download-app-android-btn',
-            'push-hour', 'push-enable-btn', 'push-disable-btn', 'push-status', 'back-link'];
+            'push-hour', 'push-switch-label', 'push-status', 'back-link', 'language-selector', 'theme-toggle', 'font_normal', 'font_large', 'font_larger', 'version-select'];
         for (const id of ids) await expect(page.locator(`#${id}`)).toHaveCount(1);
     });
 });
@@ -424,4 +426,93 @@ test.describe('right-to-left and narrow screens', () => {
             await shot(page, `320-${lang}-settings`);
         });
     }
+});
+
+test.describe('Settings screen: a plain list in the installed app', () => {
+    test('it holds the switch, the time, language, theme and font, and none of the removed text', async ({ page }) => {
+        await installedIos(page);
+        await pushOnWithStubAdapter(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('[data-push-switch]')).toBeVisible();
+        await expect(page.locator('[data-push-time-row]')).toBeVisible();
+        for (const slot of ['language', 'theme', 'font']) await expect(page.locator(`[data-shell-slot="${slot}"]`)).toBeVisible();
+        const text = await page.locator('[data-shell-settings]').innerText();
+        for (const gone of ['anonymous identifier', 'Get a notification with your daily devotional', 'Reminders and preferences', 'Daily reminder']) expect(text).not.toContain(gone);
+        await shot(page, 'settings-list');
+    });
+
+    test('the footer is hidden on Settings only, and is back on Home', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        await expect(page.locator('#page-footer')).toBeVisible();
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('#page-footer')).toBeHidden();
+        await page.locator('[data-shell-tab="home"]').click();
+        await expect(page.locator('#page-footer')).toBeVisible();
+    });
+
+    test('the moved controls are the same elements: same ids, and they still work from Settings', async ({ page }) => {
+        const errors = trackErrors(page);
+        await installedIos(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('[data-shell-slot="language"] #language-selector')).toHaveCount(1);
+        await expect(page.locator('[data-shell-slot="theme"] #theme-toggle')).toHaveCount(1);
+        await expect(page.locator('[data-shell-slot="font"] #font_large')).toHaveCount(1);
+        // Font size: the reading text follows the radio that now lives in Settings.
+        await page.locator('label[for="font_large"]').click();
+        await expect(page.locator('#font-scope')).toHaveClass(/size-large/);
+        // Theme: the toggle that now lives in Settings flips the page theme.
+        const before = await page.locator('html').getAttribute('data-theme');
+        await page.locator('.theme-switch').click();
+        await expect(page.locator('html')).not.toHaveAttribute('data-theme', before || 'never');
+        // Language: choosing Spanish in Settings relabels the tabs.
+        await page.locator('.language-selector-button').click();
+        await page.locator('.language-option[data-lang="es"]').click();
+        await expect(page.locator('[data-shell-tab="settings"]')).toContainText('Ajustes');
+        expect(errors).toEqual([]);
+    });
+
+    for (const [name, viewport] of [['a phone', PHONE], ['a short phone (iPhone SE)', { width: 320, height: 568 }]]) {
+        test(`every language can be chosen from Settings on ${name}: the list is not hidden by the bottom bar`, async ({ page }) => {
+            await installedIos(page);
+            await open(page, viewport);
+            await page.locator('[data-shell-tab="settings"]').click();
+            await page.locator('.language-selector-button').click();
+            const languages = await page.locator('.language-option').evaluateAll((options) => options.map((option) => option.dataset.lang));
+            expect(languages.length).toBe(10);
+            // The last entries are the ones a bar sitting over the list would swallow.
+            for (const lang of [languages[languages.length - 1], languages[languages.length - 2]]) {
+                await page.locator('.language-option[data-lang="' + lang + '"]').click({ timeout: 5000 });
+                await expect(page.locator('.language-selector-button')).toBeVisible();
+                await page.locator('.language-selector-button').click();
+            }
+        });
+    }
+
+    test('a browser tab is unchanged: the controls stay where they were and the Settings rows stay hidden', async ({ page }) => {
+        await open(page, PHONE);
+        await expect(page.locator('header #language-selector')).toHaveCount(1);
+        await expect(page.locator('header .theme-switch')).toHaveCount(1);
+        await expect(page.locator('main .text-size-toggle')).toHaveCount(1);
+        for (const slot of ['language', 'theme', 'font']) await expect(page.locator(`[data-shell-slot="${slot}"]`)).toBeHidden();
+    });
+
+    test('at 320px the list does not scroll sideways, in German and in Arabic (right to left)', async ({ page }) => {
+        await installedIos(page);
+        await pushOnWithStubAdapter(page);
+        await page.setViewportSize({ width: 320, height: 800 });
+        for (const lang of ['de', 'ar']) {
+            await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
+            await expect(page.locator('#devotional-verse-ref')).not.toHaveText('');
+            await page.locator('[data-shell-tab="settings"]').click();
+            await expect(page.locator('[data-push-switch]')).toBeVisible();
+            expect(await noHorizontalScroll(page)).toBe(true);
+            if (lang === 'ar') {
+                expect(await page.evaluate(() => document.documentElement.dir)).toBe('rtl');
+                expect(await page.locator('.settings-chevron').evaluate((el) => getComputedStyle(el).transform)).toBe('matrix(-1, 0, 0, 1, 0, 0)');
+            }
+        }
+    });
 });
