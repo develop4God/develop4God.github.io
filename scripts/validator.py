@@ -16,6 +16,15 @@ versions, same file globs) so a local pass means CI will pass too.
   PHASE 7: Playwright e2e     — full browser runtime verification (e2e/)
   PHASE 8: SOT manifest       — fetches Devocionales-assets' devotionals
                                  index.json and validates its shape
+  PHASE 9: generated files    — rebuilds tailwind.css, manifests, sw.js and the
+                                 build stamp, fails if any differs from git
+                                 (the same check as CI's "Generated files are up
+                                 to date" step)
+
+`--fast` (what scripts/pre-push runs) keeps phases 1-5 and 9 and skips the slow
+or network ones (6 c8 coverage, 7 Playwright e2e, 8 SOT manifest): CI runs the
+full e2e suite on every PR as a blocking check. Run `python3 scripts/validator.py`
+without the flag for the complete local run.
 
 Lint tools are expected globally installed at the CI-pinned versions
 (html-validate@8, stylelint@15, stylelint-config-standard@34, eslint@8) —
@@ -38,6 +47,13 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+FAST = '--fast' in sys.argv
+GENERATED_PATHS = [
+    'devocionales/vendor/tailwind.css',
+    'devocionales/manifests',
+    'devocionales/sw.js',
+    'devocionales/js/devotional-build.js',
+]
 PW_TOOLS = Path('/tmp/pw-tools/node_modules/.bin/playwright')
 DEVOTIONALS_INDEX_URL = (
     'https://raw.githubusercontent.com/develop4God/Devocionales-assets/'
@@ -264,8 +280,27 @@ def phase_devotionals_manifest():
     return ok, ''
 
 
+# ── Phase 9: generated files are up to date (mirrors CI) ─────────────────
+
+def phase_generated_files():
+    # Same commands and order as .github/workflows/ci.yml: the worker's version hashes the stylesheet.
+    for cmd in (['bash', 'scripts/build-tailwind.sh'], ['node', 'scripts/build-manifests.js'], ['node', 'scripts/build-sw.js']):
+        rc, out, err = run_cmd(cmd)
+        if rc != 0:
+            print(out)
+            print(err)
+            return False, f"{' '.join(cmd)} failed"
+    # `git status` rather than `git diff`, so a generated file that was never committed fails too.
+    rc, out, err = run_cmd(['git', 'status', '--porcelain', '--'] + GENERATED_PATHS)
+    if out.strip():
+        print(out)
+        print('Generated files are stale or uncommitted. The rebuilt files are in your working tree; commit them.')
+        return False, ''
+    return True, ''
+
+
 def main():
-    print("develop4God.github.io — pre-commit validation")
+    print("develop4God.github.io — pre-commit validation" + (" (fast)" if FAST else ""))
     print(f"Repo: {REPO_ROOT}")
 
     gate('1. node --check (syntax)', phase_node_check)
@@ -273,9 +308,11 @@ def main():
     gate('3. stylelint', phase_stylelint)
     gate('4. html-validate', phase_html_validate)
     gate('5. node --test', phase_node_test)
-    gate('6. c8 coverage', phase_c8_coverage)
-    gate('7. Playwright e2e', phase_playwright)
-    gate('8. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
+    if not FAST:
+        gate('6. c8 coverage', phase_c8_coverage)
+        gate('7. Playwright e2e', phase_playwright)
+        gate('8. SOT manifest (devotionals index.json)', phase_devotionals_manifest)
+    gate('9. Generated files up to date', phase_generated_files)
 
     print_summary()
     sys.exit(0 if all(p.passed for p in PHASES) else 1)
