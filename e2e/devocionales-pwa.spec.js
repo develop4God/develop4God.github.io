@@ -14,15 +14,15 @@ const CONTENT_TYPES = {
     '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.woff2': 'font/woff2',
 };
 
-// Serves the repo as a static site; `state.overrides` maps a URL path to JavaScript source served
-// instead of the file on disk, which is how a test simulates a new deploy.
+// Serves the repo as a static site; `state.overrides` maps a URL path to source served instead of
+// the file on disk (typed by its extension, JavaScript by default), which is how a test simulates a new deploy.
 function startSiteServer(state) {
     return new Promise((resolve) => {
         const server = http.createServer((req, res) => {
             let pathname = decodeURIComponent(new URL(req.url, 'http://x').pathname);
             if (pathname.endsWith('/')) pathname += 'index.html';
             if (state.overrides[pathname]) {
-                res.writeHead(200, { 'content-type': 'text/javascript' });
+                res.writeHead(200, { 'content-type': CONTENT_TYPES[path.extname(pathname)] || 'text/javascript' });
                 return res.end(state.overrides[pathname]);
             }
             const file = path.resolve(SITE_ROOT, `.${pathname}`);
@@ -184,34 +184,51 @@ test.describe('updates', () => {
             await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
             expect(await cacheNames(page)).toContain(`devocionales-${oldVersion}`);
             expect(await page.evaluate(() => window.readerSession)).toBe('still-open');
-            await run({ base, oldVersion, newVersion });
+            await run({ base, oldVersion, newVersion, state });
         } finally {
             server.close();
         }
     }
 
-    // After the new worker took over: the reader is controlled by it, and its data survived.
-    async function expectReaderOnNewWorker(page, base) {
-        // The old build's cache is already gone (only the worker's activate step deletes it), so the
-        // takeover happened. The controller state itself is not asserted: under heavy load it can still
-        // read 'activating' for a long time after the page is controlled, which says nothing about the claim.
-        await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller && navigator.serviceWorker.controller.scriptURL), { timeout: 15_000 }).toBe(`${base}/devocionales/sw.js`);
+    // A page outside the worker's scope (/devocionales/), served by the test server itself, so
+    // leaving the reader depends on no other page of the site and no external host.
+    const OUTSIDE_SCOPE = '/outside-scope.html';
+    const OUTSIDE_SCOPE_HTML = '<!doctype html><title>outside the worker scope</title>';
+
+    // Right after the old build was removed: saved data must have survived the update. Checked
+    // before the reader is opened again, whose own fetches would re-create the data cache.
+    async function expectDataKept(page) {
         expect(await cacheNames(page)).toContain('devocionales-data');
     }
 
-    test('a new worker waits for the open reader to close, so builds are never mixed, and keeps saved data', async ({ page }) => {
-        await openReaderWithWaitingWorker(page, async ({ base, oldVersion, newVersion }) => {
+    // The reopened reader is controlled by the new worker. Both workers share the script URL, so
+    // that cannot tell them apart: the controller must be the registration's active worker with
+    // nothing left waiting (the old worker controlling would leave the new one waiting). The state
+    // 'activated' itself is not asserted: under heavy load it can read 'activating' long after the
+    // page is controlled, which says nothing about the takeover.
+    async function expectReaderOnNewWorker(page) {
+        await expect.poll(() => page.evaluate(async () => {
+            const registration = await navigator.serviceWorker.getRegistration();
+            const { controller } = navigator.serviceWorker;
+            return Boolean(controller && registration && registration.active === controller && !registration.waiting);
+        }), { timeout: 15_000 }).toBe(true);
+    }
+
+    test('a new worker waits while the reader is open, takes over once it is left, and keeps saved data', async ({ page }) => {
+        await openReaderWithWaitingWorker(page, async ({ base, oldVersion, newVersion, state }) => {
             // Once no old page is open the new worker activates and removes the old build.
-            // Navigate out of the worker's scope (to a real page that no worker controls) rather
+            // Navigate out of the worker's scope (to a page that no worker controls) rather
             // than closing the tab: a navigation into the scope that starts while the old worker
             // is being replaced can go unanswered in Chromium (see the next test). Leaving the
             // scope leaves the old worker with no controlled page, so the new one must activate.
-            await page.goto(`${base}/legacy/`);
+            state.overrides[OUTSIDE_SCOPE] = OUTSIDE_SCOPE_HTML;
+            await page.goto(`${base}${OUTSIDE_SCOPE}`);
             await expect.poll(() => cacheNames(page), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
             expect(await cacheNames(page)).toContain(`devocionales-${newVersion}`);
+            await expectDataKept(page);
 
             await page.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
-            await expectReaderOnNewWorker(page, base);
+            await expectReaderOnNewWorker(page);
         });
     });
 
@@ -222,14 +239,13 @@ test.describe('updates', () => {
     // bounded (claimTimeoutMs), and bounding or removing its page listing and claim changed
     // nothing, so this reads as a Chromium/Playwright artefact rather than worker behaviour.
     // Kept as a fixme, not dropped, so the path stays documented and can be re-enabled.
-    test.fixme('closing the tab and opening the reader again lands on the new worker', async ({ page, context, browserName }) => {
-        test.skip(browserName !== 'chromium', 'the unanswered navigation was only seen in Chromium');
+    test.fixme('closing the tab and opening the reader again lands on the new worker', async ({ page, context }) => {
         await openReaderWithWaitingWorker(page, async ({ base, oldVersion }) => {
             await page.close();
             const next = await context.newPage();
             await next.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
             await expect.poll(() => cacheNames(next), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
-            await expectReaderOnNewWorker(next, base);
+            await expectReaderOnNewWorker(next);
         });
     });
 });
