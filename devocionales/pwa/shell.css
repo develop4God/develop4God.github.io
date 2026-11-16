@@ -1,0 +1,232 @@
+/* Installed-app shell (devotional-shell.js). Everything is scoped to .shell-active, which
+   only the installed app on iOS and desktop gets, so a browser tab renders exactly as before. */
+
+[data-shell-nav],
+[data-shell-settings-header] {
+    display: none;
+}
+
+.shell-active [data-shell-nav] {
+    position: fixed;
+    z-index: 50;
+    display: flex;
+    background: var(--surface);
+    border: 0 solid var(--border);
+}
+
+.shell-active [data-shell-settings-header] {
+    display: block;
+}
+
+.shell-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.shell-tab:hover { color: var(--text); }
+
+.shell-tab[aria-current="page"] { color: var(--accent); }
+
+.shell-tab:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+/* Phone: bottom bar. */
+.shell-active[data-shell-layout="bar"] [data-shell-nav] {
+    inset: auto 0 0;
+    border-top-width: 1px;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.shell-active[data-shell-layout="bar"] .shell-tab {
+    flex: 1;
+    flex-direction: column;
+    min-height: 3.5rem;
+}
+
+.shell-active[data-shell-layout="bar"] body { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
+
+/* Tablet and desktop: labelled rail. */
+.shell-active[data-shell-layout="rail"] [data-shell-nav] {
+    inset-block: 0;
+    inset-inline: 0 auto;
+    width: 12rem;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    padding: 1rem 0.5rem;
+    border-inline-end-width: 1px;
+}
+
+.shell-active[data-shell-layout="rail"] .shell-tab {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.9375rem;
+}
+
+.shell-active[data-shell-layout="rail"] .shell-tab[aria-current="page"] { background: var(--accent-soft); }
+
+.shell-active[data-shell-layout="rail"] body { padding-inline-start: 12rem; }
+
+/* The reading column: capped and a single column. The page's own two-column grid (md:grid) is keyed
+   to the viewport width, which the rail has already narrowed, so beside the rail it would squeeze the
+   sidebar into a few hundred px; one column in DOM order is also the phone reading order. */
+.shell-active main,
+.shell-active [data-shell-settings] {
+    max-width: var(--shell-content-max, 720px);
+    margin-inline: auto;
+}
+
+.shell-active #font-scope { display: block; }
+
+/* One tab at a time. */
+.shell-active[data-shell-view="home"] [data-shell-settings] { display: none; }
+
+.shell-active[data-shell-view="settings"] main { display: none; }
+
+/* Google Play is for Android, which has no installed web app. */
+.shell-active #app-banner,
+.shell-active #download-app-android-btn { display: none; }
+
+.shell-settings-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+/* The Settings tab is a plain list of rows, like the app's settings page: a label on one side, the
+   control on the other. The footer belongs to the reading page and is hidden here. */
+.shell-active[data-shell-view="settings"] #page-footer { display: none; }
+
+.settings-list {
+    max-width: var(--shell-content-max, 720px);
+    padding-bottom: 2rem;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1.05rem;
+}
+
+/* On a phone the language list is a scrollable sheet that ends just above the bottom bar. As the page's own
+   dropdown it opens downwards from the row and ran under the bar, so the last languages could not be reached.
+   i18n.js builds the dropdown with utility classes (absolute top-full left-0 right-0 overflow-hidden), so this
+   rule must stay more specific than a single class: the e2e spec "every language can be chosen" guards it. */
+.shell-active[data-shell-layout="bar"] .language-dropdown {
+    position: fixed;
+    inset-inline: 1rem;
+    top: auto;
+    bottom: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem);
+    margin-top: 0;
+    max-height: calc(100vh - 12rem);
+    max-height: calc(100dvh - 12rem);
+    overflow-y: auto;
+}
+
+/* The three controls moved in from the header and the reading page exist only inside the installed app. */
+[data-shell-slot] { display: none; }
+.shell-active [data-shell-slot] { display: flex; }
+
+.settings-switch {
+    position: relative;
+    flex: none;
+    width: 3.25rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 1rem;
+    background: var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.settings-switch::after {
+    content: '';
+    position: absolute;
+    top: 0.25rem;
+    inset-inline-start: 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    transition: inset-inline-start 0.15s;
+}
+
+.settings-switch[aria-checked="true"] { background: var(--accent); }
+
+.settings-switch[aria-checked="true"]::after { inset-inline-start: 1.5rem; }
+
+.settings-switch:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+.settings-switch:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* The whole row is the target: the real select sits invisibly over it, so a tap opens the phone's own picker. */
+.settings-time {
+    position: relative;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+.settings-time .settings-label { flex: 1; }
+
+.settings-time .settings-icon,
+.settings-time .settings-value { color: var(--accent); }
+
+.settings-time .settings-value { font-weight: 600; }
+
+.settings-chevron {
+    flex: none;
+    color: var(--text-muted);
+}
+
+[dir="rtl"] .settings-chevron { transform: scaleX(-1); }
+
+.settings-time.is-off { opacity: 0.5; }
+
+.settings-time select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.settings-time select:disabled { cursor: default; }
+
+.settings-time:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.settings-status {
+    min-height: 1.25rem;
+    padding-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.settings-status:empty { display: none; }

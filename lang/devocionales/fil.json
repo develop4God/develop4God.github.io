@@ -221,6 +221,25 @@
     "salvationAlreadyPrayed": "Nanalangin na 🙏",
     "salvationDontShowAgain": "Huwag nang ipakita muli"
   },
+  "push": {
+    "consent": "Kapag in-on mo ito, makakatanggap ang browser na ito ng isang abiso bawat araw. Iniimbak namin ang isang anonymous na identifier, ang iyong timezone, wika at ang napiling oras. Maaari mo itong i-off anumang oras.",
+    "status_enabled": "Naka-on na ang mga abiso.",
+    "status_denied": "Naka-block ang mga abiso sa browser na ito. Payagan ang mga ito sa mga setting ng site para ma-on.",
+    "status_error": "Hindi na-on ang mga abiso. Pakisubukang muli mamaya.",
+    "status_ios_install": "Para makatanggap ng mga abiso sa iPhone o iPad, i-install muna ang app: i-tap ang Share, pagkatapos ay “Add to Home Screen”.",
+    "switch_label": "Paganahin/Huwag paganahin ang mga notipikasyon",
+    "time_label": "Araw-araw na oras ng notipikasyon",
+    "time_set": "Itinakda ang oras ng notipikasyon sa",
+    "time_error": "Error sa pagtatakda ng oras ng notipikasyon"
+  },
+  "shell": {
+    "nav_label": "Nabigasyon ng app",
+    "home": "Home",
+    "settings": "Mga Setting",
+    "language": "Wika",
+    "theme": "Tema",
+    "font_size": "Laki ng font"
+  },
   "discovery": {
     "title": "Mga Pag-aaral sa Biblia",
     "loadError": "Error sa pag-load ng Mga Pag-aaral sa Biblia",

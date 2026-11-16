@@ -13,6 +13,7 @@ const { renderSw } = require('./build-sw.js');
 
 const TEMPLATE_PATH = path.join(__dirname, 'sw.template.js');
 const TEMPLATE = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+const PUSH_SOURCE = fs.readFileSync(path.join(__dirname, 'sw-push.js'), 'utf8');
 const ORIGIN = 'http://localhost';
 const DATA_HOST = 'raw.githubusercontent.com';
 const YEAR_URL = `https://${DATA_HOST}/develop4God/Devocionales-json/refs/heads/main/Devocional_year_2026.json`;
@@ -162,19 +163,22 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
     const realHas = caches.has.bind(caches);
     caches.has = (name) => { hasCalls.count += 1; return realHas(name); };
     const handlers = {};
+    const shown = [];
     const windows = [];
     const spies = { skipWaiting: 0, claim: 0 };
     const self = {
         location: new URL(`${ORIGIN}/devocionales/sw.js`),
+        registration: { showNotification: (title) => { shown.push(title); return Promise.resolve(); } },
         addEventListener: (type, handler) => { handlers[type] = handler; },
         skipWaiting: () => { spies.skipWaiting += 1; return Promise.resolve(); },
         clients: {
+            openWindow: () => Promise.resolve(),
             claim: () => { spies.claim += 1; return Promise.resolve(); },
             matchAll: async () => windows,
         },
     };
     const sandbox = { MessageChannel, self, caches, fetch: fetchImpl, Request, Response, URL, Promise, setTimeout, clearTimeout, JSON, console };
-    vm.runInNewContext(renderSw(TEMPLATE, config), sandbox, { filename: TEMPLATE_PATH });
+    vm.runInNewContext(renderSw(TEMPLATE, config, PUSH_SOURCE), sandbox, { filename: TEMPLATE_PATH });
 
     const lifecycle = async (type) => {
         let pending;
@@ -193,7 +197,7 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
         handlers.message({ data, waitUntil: (promise) => waits.push(promise) });
         await Promise.all(waits);
     };
-    return { caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls, windows };
+    return { handlers, shown, caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls, windows };
 }
 
 const ALL_ROUTES = () => ({
@@ -863,4 +867,17 @@ test('the message types are the same in the worker and in the page script', () =
     const worker = constants('sw.template.js');
     assert.equal(Object.keys(worker).length, 2);
     assert.deepEqual(constants('../devocionales/js/devotional-sw-register.js'), worker);
+});
+
+test('the push handlers ship in the worker next to the existing ones, which stay registered', () => {
+    const worker = loadWorker();
+    assert.deepEqual(Object.keys(worker.handlers).sort(), ['activate', 'fetch', 'install', 'message', 'notificationclick', 'push']);
+});
+
+test('a push event in the full worker shows one notification and touches no cache or network', async () => {
+    const worker = loadWorker();
+    worker.handlers.push({ data: { json: () => ({ notification: { title: 'T', body: 'B' } }) }, waitUntil: () => {} });
+    assert.deepEqual(worker.shown, ['T']);
+    assert.equal(worker.requests.length, 0);
+    assert.equal((await worker.caches.keys()).length, 0);
 });
