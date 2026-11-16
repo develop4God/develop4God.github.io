@@ -8,14 +8,14 @@
 
     const normalizeFilter = (value) => (FILTERS.includes(value) ? value : 'all');
 
-    function toCard(study, { seen, favorites, progressOf, totals }) {
+    function toCard(study, { seen, favorites, progressOf }) {
         const progress = progressOf ? progressOf(study.id) : null;
         const isCompleted = !!(progress && progress.isCompleted);
         const sections = progress && Array.isArray(progress.completedSections) ? progress.completedSections.length : 0;
         const isInProgress = !isCompleted && sections > 0;
         // "New" mirrors the app: not opened yet, and never once completed.
         const isNew = !isCompleted && !(seen && seen.has(study.id));
-        const total = totals ? totals[study.id] : undefined;
+        const total = progress ? progress.totalSections : null;
 
         let percent = null;
         if (isCompleted) percent = 1;

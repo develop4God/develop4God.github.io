@@ -58,6 +58,8 @@
                     : [],
                 isCompleted: r.isCompleted === true,
                 completedAt: typeof r.completedAt === 'string' ? r.completedAt : null,
+                // Web-only field (the app ignores it): lets the list show done/total without loading the study.
+                totalSections: Number.isInteger(r.totalSections) && r.totalSections > 0 ? r.totalSections : null,
             };
         }
 
@@ -71,6 +73,11 @@
             const { completedSections } = getProgress(studyId, lang);
             if (completedSections.includes(index)) return;
             saveProgress(studyId, lang, { completedSections: [...completedSections, index] });
+        }
+
+        function setTotalSections(studyId, total, lang) {
+            if (!Number.isInteger(total) || total <= 0) return;
+            saveProgress(studyId, lang, { totalSections: total });
         }
 
         function completeStudy(studyId, lang) {
@@ -108,7 +115,7 @@
         }
 
         return {
-            getProgress, markSectionCompleted, completeStudy, resetProgress, completionPercentage,
+            getProgress, markSectionCompleted, setTotalSections, completeStudy, resetProgress, completionPercentage,
             loadFavorites, toggleFavorite, loadSeen, markSeen,
         };
     }

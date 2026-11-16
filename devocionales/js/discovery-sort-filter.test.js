@@ -66,8 +66,12 @@ test('buildCards: favourites flag comes from the set; unknown ids in the set are
 });
 
 test('buildCards: percent is null when the section total is unknown (B3), fraction when known, capped at 1', () => {
-    const p = progress({ a: { isCompleted: false, completedSections: [0, 1] }, b: { isCompleted: false, completedSections: [0, 1, 2] } });
-    const cards = build({ progressOf: p, totals: { a: 4, b: 2 } });
+    const p = progress({
+        a: { isCompleted: false, completedSections: [0, 1], totalSections: 4 },
+        b: { isCompleted: false, completedSections: [0, 1, 2], totalSections: 2 },
+        c: { isCompleted: false, completedSections: [0], totalSections: null },
+    });
+    const cards = build({ progressOf: p });
     const by = Object.fromEntries(cards.map((c) => [c.id, c]));
     assert.equal(by.a.percent, 0.5);
     assert.equal(by.b.percent, 1);

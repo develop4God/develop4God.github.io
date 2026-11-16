@@ -46,7 +46,7 @@ test('KEYS.favorites normalises en-US to en like the app', () => {
 test('getProgress: defaults for an unknown study', () => {
     const s = createDiscoveryStore(memoryStorage());
     assert.deepEqual(s.getProgress('a', 'en'), {
-        studyId: 'a', languageCode: 'en', completedSections: [], isCompleted: false, completedAt: null,
+        studyId: 'a', languageCode: 'en', completedSections: [], isCompleted: false, completedAt: null, totalSections: null,
     });
 });
 
@@ -97,6 +97,36 @@ test('completionPercentage: sections / total, 0 for total 0, capped at 1', () =>
     assert.equal(s.completionPercentage('a', 4, 'en'), 0.5);
     assert.equal(s.completionPercentage('a', 0, 'en'), 0);
     assert.equal(s.completionPercentage('a', 1, 'en'), 1);
+});
+
+test('setTotalSections: stores the card count so the list can show 7/14 = 50% without loading the study', () => {
+    const s = createDiscoveryStore(memoryStorage());
+    s.setTotalSections('a', 14, 'en');
+    for (let i = 0; i < 7; i++) s.markSectionCompleted('a', i, 'en');
+    assert.equal(s.getProgress('a', 'en').totalSections, 14);
+    assert.equal(s.completionPercentage('a', s.getProgress('a', 'en').totalSections, 'en'), 0.5);
+});
+
+test('setTotalSections: ignores zero, negative, fractional and non-numeric totals', () => {
+    const s = createDiscoveryStore(memoryStorage());
+    for (const bad of [0, -2, 2.5, NaN, '14', null, undefined]) s.setTotalSections('a', bad, 'en');
+    assert.equal(s.getProgress('a', 'en').totalSections, null);
+});
+
+test('setTotalSections: keeps completed sections and survives later writes', () => {
+    const s = createDiscoveryStore(memoryStorage());
+    s.markSectionCompleted('a', 1, 'en');
+    s.setTotalSections('a', 6, 'en');
+    s.markSectionCompleted('a', 2, 'en');
+    const p = s.getProgress('a', 'en');
+    assert.deepEqual(p.completedSections, [1, 2]);
+    assert.equal(p.totalSections, 6);
+});
+
+test('getProgress: a non-numeric stored totalSections reads as null', () => {
+    const key = KEYS.progress('a', 'en');
+    const s = createDiscoveryStore(memoryStorage({ [key]: JSON.stringify({ totalSections: 'many' }) }));
+    assert.equal(s.getProgress('a', 'en').totalSections, null);
 });
 
 test('getProgress: corrupt JSON, wrong shapes and wrong types fall back to defaults', () => {
