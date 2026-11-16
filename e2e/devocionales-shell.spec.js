@@ -585,3 +585,14 @@ test.describe('installed app Home: header, edge-to-edge hero and floating share'
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
     });
 });
+
+test.describe('installed app Settings on a tablet rail', () => {
+    test('the closed language list does not push the page wider than the screen', async ({ page }) => {
+        await installedIos(page);
+        await open(page, TABLET);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('[data-push-switch]')).toBeVisible();
+        expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
+        expect(await noHorizontalScroll(page)).toBe(true);
+    });
+});

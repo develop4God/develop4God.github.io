@@ -143,6 +143,13 @@
     overflow-y: auto;
 }
 
+/* On a tablet or desktop rail the list opens under the language button, which sits at the end of its row. The page's
+   own left-0 would open it from the button's start edge, and its 160px minimum width then ran past the screen
+   edge even while closed. Opening from the end edge keeps it inside the row, in both text directions. */
+.shell-active[data-shell-layout="rail"] .language-dropdown {
+    inset-inline: auto 0;
+}
+
 /* The three controls moved in from the header and the reading page exist only inside the installed app. */
 [data-shell-slot] { display: none; }
 .shell-active [data-shell-slot] { display: flex; }
