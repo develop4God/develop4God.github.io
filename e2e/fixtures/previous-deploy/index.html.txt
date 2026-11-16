@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devocional de Hoy - Devocionales Cristianos</title>
+    <meta name="description" content="Tu devocional diario: versículo, reflexión, y oración para nutrir tu alma hoy.">
+    <link rel="canonical" href="https://develop4god.com/devocionales/">
+    <link rel="manifest" href="/devocionales/manifest.webmanifest">
+    <meta name="theme-color" content="#26414d">
+    <link rel="apple-touch-icon" href="/devocionales/icons/apple-touch-icon.png">
+
+    <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="/devocionales/vendor/lucide.min.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/modern.css">
+    <link rel="stylesheet" href="/devocionales/css/language-selector.css">
+    <script src="/js/rtl-helper.js"></script>
+    <script src="/devocionales/js/i18n.js"></script>
+    <script src="/js/app-stats.js"></script>
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: #f5f2fb;
+            --surface: #ffffff;
+            --text: #1c1730;
+            --text-muted: #6b6280;
+            --border: #ded4ef;
+            --accent: #6d4aa8;
+            --accent-soft: #ece5f7;
+            --highlight: #a8461c;
+        }
+        :root[data-theme="dark"] {
+            --bg: #0b0b0a;
+            --surface: #151412;
+            --text: #f2f0ea;
+            --text-muted: #a39e91;
+            --border: #2a2822;
+            --accent: #5fb8ae;
+            --accent-soft: #16302d;
+            --highlight: #e08a5c;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0b0b0a;
+                --surface: #151412;
+                --text: #f2f0ea;
+                --text-muted: #a39e91;
+                --border: #2a2822;
+                --accent: #5fb8ae;
+                --accent-soft: #16302d;
+                --highlight: #e08a5c;
+            }
+        }
+
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+        .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
+        .site-nav a:not(.btn-primary) {
+            color: var(--text-muted);
+            font-weight: 500;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        .site-nav a:not(.btn-primary):hover { color: var(--text); }
+        .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+        .theme-switch {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .theme-switch input { display: none; }
+        .theme-switch .theme-switch-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: var(--text-muted);
+            transition: color .15s ease;
+        }
+        .theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+        .theme-switch-track {
+            position: relative;
+            width: 2.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: var(--border);
+            transition: background .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+        .theme-switch-dot {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 0.95rem;
+            height: 0.95rem;
+            border-radius: 50%;
+            background: var(--surface);
+            transition: transform .15s ease;
+        }
+        .theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
+
+        /* Neutralize the shared language-selector's hardcoded purple */
+        .language-selector-button.bg-purple-700 {
+            background-color: var(--surface) !important;
+            border-color: var(--border) !important;
+            color: var(--text) !important;
+        }
+        .language-selector-button.bg-purple-700:hover {
+            background-color: var(--accent-soft) !important;
+        }
+
+        .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: opacity .15s ease;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+
+        /* A light band sweeps across the install button 5 times, to draw the eye to it, then stops. */
+        .btn-shine { position: relative; overflow: hidden; }
+        .btn-shine::after {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 40%;
+            background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(-150%) skewX(-20deg);
+            animation: btn-shine-sweep 3.5s ease-in-out 5;
+            pointer-events: none;
+        }
+        @keyframes btn-shine-sweep {
+            0%, 55% { transform: translateX(-150%) skewX(-20deg); }
+            100% { transform: translateX(400%) skewX(-20deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-shine::after { animation: none; }
+        }
+
+        .support-btn-icon { animation: support-heartbeat 1.8s ease-in-out infinite; }
+        @keyframes support-heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.25); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.2); }
+            60% { transform: scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .support-btn-icon { animation: none; }
+        }
+
+        /* The installed app lives inside /devocionales/ (manifest scope), so the links to the rest
+           of the site are switched off there (DevotionalStandalone sets `is-standalone` on <html> and makes the home links inert). The elements stay in the page: cached scripts read them. */
+        .is-standalone #back-link { display: none; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-secondary:disabled:hover { border-color: var(--border); color: var(--text); }
+
+        /* ---- Reading-options / font sizing (In Touch pattern) ---- */
+        .js--font-sizing { font-size: 1rem; line-height: 1.75; }
+        .js--font-sizing.size-large { font-size: 1.15rem; }
+        .js--font-sizing.size-larger { font-size: 1.35rem; }
+
+        .text-size-toggle input { display: none; }
+        .text-size-toggle label {
+            cursor: pointer;
+            user-select: none;
+            padding: 0 6px;
+            color: var(--text-muted);
+            border-radius: 4px;
+        }
+        .text-size-toggle input:checked + label {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .version-select {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .version-select:hover { border-color: var(--accent); color: var(--accent); }
+
+        .version-select-wrap { position: relative; display: inline-flex; align-items: center; gap: 4px; }
+        .version-info-btn {
+            background: none;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+        }
+        .version-info-btn:hover { color: var(--accent); }
+        .version-info-popover {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            z-index: 20;
+            width: max-content;
+            max-width: 260px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--text);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        /* ---- Accordion (In Touch "Related Scripture" pattern) ---- */
+        .accordion-item { border-bottom: 1px solid var(--border); }
+        .accordion-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 14px 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+        }
+        .accordion-title .chev { transition: transform .2s ease; color: var(--accent); }
+        .accordion-item.open .accordion-title .chev { transform: rotate(180deg); }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height .25s ease;
+        }
+        .accordion-item.open .accordion-content { max-height: 1000px; }
+        .accordion-content-inner { padding-bottom: 14px; color: var(--text-muted); }
+
+        /* ---- Hero ---- */
+        .hero-devotional {
+            aspect-ratio: 16/8;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+        .hero-devotional img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* ---- Sticky sidebar (desktop only) ---- */
+        @media (min-width: 768px) {
+            .sidebar-sticky { position: sticky; top: 5rem; }
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: .75rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 0.25rem;
+            margin: 0 6px 6px 0;
+        }
+
+        #tts-btn.speaking { background: var(--highlight); }
+
+        #share-native:hover, #footer-contact-mail:hover { color: var(--accent); }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface) 25%, var(--accent-soft) 37%, var(--surface) 63%);
+            background-size: 400% 100%;
+            animation: skeleton-loading 1.4s ease infinite;
+            border-radius: .5rem;
+        }
+        @keyframes skeleton-loading { 0%{background-position:100% 50%} 100%{background-position:0 50%} }
+
+        /* ---- App promo banner: discreet, dismissible ---- */
+        .app-banner {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+        .app-banner-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+        .app-banner-text { flex: 1; min-width: 0; }
+        .app-banner-cta {
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+        }
+        .app-banner-cta:hover { border-bottom-color: var(--accent); }
+        .app-banner-close {
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 0;
+            flex-shrink: 0;
+        }
+        .app-banner-close:hover { color: var(--text); }
+
+        /* modern.css has a blanket "footer, footer * { color: white !important }"
+           rule for other pages' dark footers — override it here so this page's
+           theme-aware footer text stays readable in light mode. */
+        footer#page-footer, footer#page-footer * { color: var(--text-muted) !important; }
+
+        /* ---- Salvation prayer modal ---- */
+        .salvation-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 100;
+        }
+        .salvation-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            max-width: 32rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        .salvation-modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+        .salvation-modal-body p {
+            color: var(--text);
+            text-align: justify;
+            margin-bottom: 1rem;
+        }
+        .salvation-modal-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+        .salvation-modal-continue {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 0.6rem;
+        }
+    </style>
+    <!-- Last in <head>, like the Tailwind CDN's injected <style> was, so the cascade order is unchanged. -->
+    <link rel="stylesheet" href="/devocionales/vendor/tailwind.css">
+</head>
+<body>
+
+    <header class="site-nav">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <nav aria-label="Navegación principal">
+                <ul class="flex items-center gap-6 text-sm">
+                    <!-- Temporary: the previous cached devotional-render-dom.js (up to 4 h in a returning visitor's browser)
+                         still writes to #nav-vision-label and fails the whole reader if it is missing. Remove with the test
+                         "previous cached render script" and its fixture once that cache window has long passed. -->
+                    <li hidden><span id="nav-vision-label"></span></li>
+                    <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
+                </ul>
+            </nav>
+            <div class="flex flex-wrap items-center justify-center gap-3 md:flex-nowrap md:justify-normal">
+                <!-- Hidden for now ("hidden" replaces "flex"): restore "flex" to re-enable. -->
+                <!-- [html-validate-disable-next wcag/h30] -->
+                <!-- text set by devotional-loader.js's applyStaticUiText() after page load -->
+                <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" id="support-ministry-btn" class="btn-primary px-5 py-2 hidden items-center gap-2">
+                    <i data-lucide="heart" class="w-4 h-4 support-btn-icon" fill="currentColor"></i>
+                    <span id="support-ministry-label"></span>
+                </a>
+                <!-- Shown by devotional-install.js only when the browser offers to install the app. -->
+                <button type="button" id="install-app-btn" data-install class="btn-primary btn-shine px-4 py-2 hidden items-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span data-i18n="devotionals.installApp">Install app</span>
+                </button>
+                <div id="language-selector"></div>
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <div id="app-banner" class="app-banner hidden">
+        <div class="app-banner-inner max-w-5xl mx-auto">
+            <i data-lucide="smartphone" class="w-4 h-4 flex-shrink-0"></i>
+            <span class="app-banner-text">
+                <span id="app-banner-message"></span>
+                <!-- text set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next wcag/h30] -->
+                <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" class="app-banner-cta" id="app-banner-cta"></a>
+            </span>
+            <button type="button" id="app-banner-close" class="app-banner-close" aria-label="Cerrar">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Shown by devotional-ios-hint.js only on iOS, where the app can be installed but there is no install button. -->
+    <div id="ios-install-hint" data-ios-hint class="app-banner hidden">
+        <div class="app-banner-inner max-w-5xl mx-auto">
+            <i data-lucide="share" class="w-4 h-4 flex-shrink-0"></i>
+            <span class="app-banner-text" data-i18n="devotionals.iosInstallHint">To install this app: tap Share, then “Add to Home Screen”.</span>
+            <button type="button" data-ios-hint-close class="app-banner-close">
+                <i data-lucide="x" class="w-4 h-4"></i>
+                <span class="sr-only" data-i18n="devotionals.appBannerClose">Close</span>
+            </button>
+        </div>
+    </div>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+
+        <!-- Loading skeleton -->
+        <div id="loading-state" class="space-y-4">
+            <div class="skeleton h-64 w-full"></div>
+            <div class="skeleton h-8 w-2/3 mx-auto"></div>
+            <div class="skeleton h-4 w-1/3 mx-auto"></div>
+        </div>
+
+        <!-- Error state -->
+        <div id="error-state" class="hidden text-center py-16">
+            <p style="color: var(--text-muted);">No pudimos cargar el devocional de hoy. Intenta de nuevo más tarde.</p>
+            <!-- [html-validate-disable-next text-content] -->
+            <!-- text set by devotional-loader.js's showError() after page load -->
+            <button id="error-retry" type="button" class="btn-secondary mt-4"></button>
+        </div>
+
+        <!-- Content -->
+        <article id="devotional-content" class="hidden">
+
+            <div class="mb-4">
+                <a href="/" id="back-link" class="text-sm" style="color: var(--text-muted);">&larr; Devocionales</a>
+            </div>
+
+            <div class="hero-devotional mb-2">
+                <!-- src set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next attribute-allowed-values] -->
+                <img id="hero-image" src="" alt="">
+            </div>
+
+            <div class="text-center max-w-2xl mx-auto mb-6">
+                <div id="eyebrow-label" class="eyebrow mb-2">Devocional Diario</div>
+                <!-- text set by devotional-loader.js after page load -->
+                <!-- [html-validate-disable-next empty-heading] -->
+                <h1 id="devotional-verse-ref" class="text-3xl sm:text-4xl font-extrabold mb-3" style="color: var(--text);"></h1>
+
+                <div class="flex items-center justify-center gap-3">
+                    <button id="nav-prev" type="button" aria-label="Devocional anterior" class="btn-secondary w-8 h-8 flex items-center justify-center p-0">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <time id="devotional-date" class="text-sm" style="color: var(--text-muted);"></time>
+                    <button id="nav-next" type="button" aria-label="Devocional siguiente" class="btn-secondary w-8 h-8 flex items-center justify-center p-0">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                    <button id="tts-btn" type="button" class="btn-primary px-5 py-2 flex items-center gap-2">
+                        <i data-lucide="volume-2" class="w-4 h-4"></i>
+                        <span class="tts-label">Escuchar</span>
+                    </button>
+                    <!-- Android only (devotional-install.js); every other platform gets the PWA install button. -->
+                    <a href="https://play.google.com/store/apps/details?id=com.develop4god.devocional_nuevo&pcampaignid=web_share" id="download-app-android-btn" class="btn-secondary px-5 py-2 hidden items-center gap-2">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span id="download-app-label">Descarga la App</span>
+                    </a>
+                </div>
+
+                <div class="mt-6 flex flex-col items-center gap-2">
+                    <div id="reading-options-label" class="eyebrow">Opciones de Lectura</div>
+                    <div class="flex items-center gap-3">
+                        <div class="text-size-toggle flex items-center gap-1 text-lg">
+                            <input type="radio" id="font_normal" name="fontsize" value="" checked>
+                            <label for="font_normal">A</label>
+                            <input type="radio" id="font_large" name="fontsize" value="size-large">
+                            <label for="font_large" style="font-size:1.2em">A</label>
+                            <input type="radio" id="font_larger" name="fontsize" value="size-larger">
+                            <label for="font_larger" style="font-size:1.4em">A</label>
+                        </div>
+                        <div class="version-select-wrap">
+                            <select id="version-select" class="version-select"></select>
+                            <button id="version-info-btn" type="button" class="version-info-btn" aria-label="Nombre completo de la versión" aria-haspopup="true" aria-expanded="false">
+                                <i data-lucide="info" class="w-4 h-4"></i>
+                            </button>
+                            <div id="version-info-popover" class="version-info-popover hidden" role="tooltip"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--
+              4 explicit grid items (not 2) so mobile reading order can be
+              set independently of desktop's sidebar/article visual split:
+              mobile order (via order-N, source order below is irrelevant
+              once md: grid is active): verse+reflexion, para-meditar,
+              oracion, temas. Desktop keeps its existing column placement
+              via md:col-span/lg:col-start (order-* has no effect once an
+              explicit grid-column/row isn't set, and Tailwind's default
+              `order` utilities only apply where `order` is unset on the
+              wider breakpoints below, so desktop position is unchanged).
+            -->
+            <div class="md:grid md:grid-cols-12 md:gap-8 js--font-sizing" id="font-scope">
+
+                <!-- Verse + Reflexión -->
+                <div class="order-1 md:order-none md:col-span-8 lg:col-start-5">
+                    <div class="prose max-w-none">
+                        <div id="versiculo-label" class="eyebrow mb-2">Versículo</div>
+                        <p id="devotional-verse-quote" class="italic mb-6 pl-4" style="color: var(--text); border-left: 2px solid var(--accent);"></p>
+
+                        <h2 id="reflexion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Reflexión</h2>
+                        <p id="devotional-reflexion" class="whitespace-pre-line mb-8" style="color: var(--text-muted);"></p>
+                    </div>
+                </div>
+
+                <!-- Para Meditar: mobile order-2 (between reflexión and oración), desktop sidebar -->
+                <aside class="order-2 md:order-none md:col-span-4 lg:col-span-3 md:row-start-1 mb-8 md:mb-0">
+                    <div class="sidebar-sticky">
+                        <div id="para-meditar-label" class="eyebrow mb-2">Para Meditar</div>
+                        <div id="meditar-accordion"></div>
+                    </div>
+                </aside>
+
+                <!-- Oración + share row -->
+                <div class="order-3 md:order-none md:col-span-8 lg:col-start-5">
+                    <div class="prose max-w-none">
+                        <h2 id="oracion-label" class="text-lg font-bold mb-2" style="color: var(--text);">Oración</h2>
+                        <p id="devotional-oracion" class="whitespace-pre-line italic pl-4 mb-8" style="color: var(--text-muted); border-left: 2px solid var(--accent);"></p>
+                    </div>
+
+                    <!-- Share row: navigator.share() (native share sheet, covers email itself). Contact-us mailto lives in the page footer, not here. -->
+                    <div class="mt-10 pt-4" style="border-top: 1px solid var(--border);">
+                        <span id="comparte-label" class="text-sm font-semibold" style="color: var(--text-muted);">Comparte:</span>
+                        <button id="share-native" type="button" aria-label="Compartir" style="color: var(--text-muted); background: none; border: none; cursor: pointer;"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+                    </div>
+                </div>
+
+                <!-- Temas: mobile order-4 (last), desktop sidebar under Para Meditar -->
+                <div id="tags-wrap" class="order-4 md:order-none md:col-span-4 lg:col-span-3 md:row-start-2">
+                    <div id="temas-label" class="eyebrow mb-2">Temas</div>
+                    <div id="tags-list"></div>
+                </div>
+
+                <!-- Bible version copyright/attribution — legally required per-version notice,
+                     always visible (not tap-to-expand), last on mobile and full-width on desktop -->
+                <p id="version-copyright" class="order-5 md:order-none md:col-span-12 text-xs text-center mt-8 pt-4" style="color: var(--text-muted); border-top: 1px solid var(--border);"></p>
+            </div>
+        </article>
+    </main>
+
+    <div id="salvation-prayer-modal" class="salvation-modal-overlay hidden">
+        <div class="salvation-modal" role="dialog" aria-modal="true" aria-labelledby="salvation-modal-title">
+            <!-- text set by devotional-loader.js after page load -->
+            <!-- [html-validate-disable-next empty-heading] -->
+            <h2 id="salvation-modal-title" class="salvation-modal-title"></h2>
+            <div class="salvation-modal-body">
+                <p id="salvation-modal-intro"></p>
+                <p id="salvation-modal-prayer" class="whitespace-pre-line font-bold"></p>
+                <p id="salvation-modal-promise" class="whitespace-pre-line"></p>
+            </div>
+            <label class="salvation-modal-checkbox">
+                <input type="checkbox" id="salvation-modal-dont-show">
+                <span id="salvation-modal-already-prayed"></span>
+            </label>
+            <!-- text set by devotional-loader.js after page load -->
+            <!-- [html-validate-disable-next text-content] -->
+            <button type="button" id="salvation-modal-continue" class="btn-primary salvation-modal-continue"></button>
+        </div>
+    </div>
+
+    <!-- Daily push notifications. Hidden by default; devotional-push.js reveals it only when pushEnabled
+         is true and the browser supports push. No existing id is touched, so an older cached script is unaffected. -->
+    <section data-push class="hidden mx-auto max-w-2xl px-4 py-4 text-center text-sm" style="color: var(--text-muted);" aria-labelledby="push-title">
+        <h2 id="push-title" class="text-lg font-semibold mb-2" style="color: var(--text);" data-i18n="push.title">Daily reminder</h2>
+        <p class="mb-3" data-i18n="push.description">Get a notification with your daily devotional at the time you choose.</p>
+        <div class="flex flex-wrap items-center justify-center gap-3 mb-3">
+            <label for="push-hour" class="text-sm" data-i18n="push.hour_label">Reminder time</label>
+            <select id="push-hour" data-push-hour class="px-3 py-1.5 rounded-lg border" style="background: var(--surface); color: var(--text); border-color: var(--border);">
+                    <option value="0">00:00</option>
+                    <option value="1">01:00</option>
+                    <option value="2">02:00</option>
+                    <option value="3">03:00</option>
+                    <option value="4">04:00</option>
+                    <option value="5">05:00</option>
+                    <option value="6">06:00</option>
+                    <option value="7">07:00</option>
+                    <option value="8">08:00</option>
+                    <option value="9">09:00</option>
+                    <option value="10">10:00</option>
+                    <option value="11">11:00</option>
+                    <option value="12">12:00</option>
+                    <option value="13">13:00</option>
+                    <option value="14">14:00</option>
+                    <option value="15">15:00</option>
+                    <option value="16">16:00</option>
+                    <option value="17">17:00</option>
+                    <option value="18">18:00</option>
+                    <option value="19">19:00</option>
+                    <option value="20">20:00</option>
+                    <option value="21">21:00</option>
+                    <option value="22">22:00</option>
+                    <option value="23">23:00</option>
+            </select>
+            <button type="button" id="push-enable-btn" data-push-enable class="btn-primary px-4 py-2" data-i18n="push.enable">Turn on notifications</button>
+            <button type="button" id="push-disable-btn" data-push-disable class="btn-primary px-4 py-2" data-i18n="push.disable">Turn off notifications</button>
+        </div>
+        <p class="text-xs mb-2" data-i18n="push.consent">When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.</p>
+        <p id="push-status" data-push-status role="status" aria-live="polite"></p>
+    </section>
+
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <a id="footer-contact-mail" href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 8px;">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+            <span id="footer-contact-label">Contáctanos</span>
+        </a>
+        <p style="margin-top: 8px;">
+            <a id="footer-privacy-link" href="/devocionales/privacy-policy.html" style="color: var(--text-muted);">Política de Privacidad</a>
+            &nbsp;&middot;&nbsp;
+            <a id="footer-terms-link" href="/devocionales/terms-and-conditions.html" style="color: var(--text-muted);">Términos y Condiciones</a>
+        </p>
+    </footer>
+
+    <script src="/js/site-footer.js"></script>
+    <script src="/devocionales/js/modern.js"></script>
+    <script src="/devocionales/js/bible-text-formatter.js"></script>
+    <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
+    <script src="/devocionales/js/devotional-share.js"></script>
+    <script src="/devocionales/js/devotional-fetch.js"></script>
+    <script src="/devocionales/js/devotional-error-logger.js"></script>
+    <script src="/devocionales/js/devotional-nav.js"></script>
+    <script src="/devocionales/js/devotional-progress.js"></script>
+    <script src="/devocionales/js/devotional-version.js"></script>
+    <script src="/devocionales/js/devotional-tts.js"></script>
+    <script src="/devocionales/js/devotional-render-dom.js"></script>
+    <script src="/devocionales/js/devotional-salvation-modal.js"></script>
+    <script src="/devocionales/js/devotional-loader.js"></script>
+    <script src="/devocionales/js/devotional-pwa-config.js"></script>
+    <script src="/devocionales/js/devotional-standalone.js"></script>
+    <script src="/devocionales/js/devotional-manifest.js"></script>
+    <script src="/devocionales/js/devotional-install.js"></script>
+    <script src="/devocionales/js/devotional-ios-hint.js"></script>
+    <script src="/devocionales/js/devotional-build.js"></script>
+    <script src="/devocionales/js/devotional-sw-register.js"></script>
+    <script src="/devocionales/js/devotional-push-store.js"></script>
+    <script src="/devocionales/js/devotional-push-firebase.js"></script>
+    <script src="/devocionales/js/devotional-push.js"></script>
+    <script>
+        lucide.createIcons();
+
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const iconDark = toggle.parentElement.querySelector('.theme-icon-dark');
+            const iconLight = toggle.parentElement.querySelector('.theme-icon-light');
+
+            function currentTheme() {
+                const attr = document.documentElement.getAttribute('data-theme');
+                if (attr) return attr;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            function syncSwitch() {
+                const isDark = currentTheme() === 'dark';
+                toggle.checked = isDark;
+                iconDark.classList.toggle('is-active', isDark);
+                iconLight.classList.toggle('is-active', !isDark);
+            }
+
+            toggle.addEventListener('change', () => {
+                const next = toggle.checked ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                localStorage.setItem('theme', next);
+                syncSwitch();
+            });
+
+            syncSwitch();
+        })();
+
+        (function () {
+            const banner = document.getElementById('app-banner');
+            const closeBtn = document.getElementById('app-banner-close');
+            closeBtn.addEventListener('click', () => {
+                banner.classList.add('hidden');
+                localStorage.setItem('appBannerDismissed', '1');
+            });
+        })();
+
+        // Last, so nothing above can be stopped by it. window.DevotionalPwaConfig is undefined if
+        // its script failed to load, and the modules then fall back to their defaults. Each step
+        // is independent: one that fails (a script that did not load) must not stop the others,
+        // above all the service worker registration, which also carries the kill switch.
+        [
+            () => DevotionalSwRegister.start(window, '/devocionales/sw.js', '/devocionales/', window.DevotionalPwaConfig),
+            () => DevotionalInstall.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalIosHint.init(document, window, window.DevotionalPwaConfig),
+            () => DevotionalStandalone.apply(document, window),
+            () => DevotionalManifest.init(document, window),
+            // Off unless pushEnabled is true; loads no Firebase code until the reader taps enable.
+            () => DevotionalPush.init(document, window, window.DevotionalPwaConfig, {
+                adapter: DevotionalPushFirebase.create(window, window.DevotionalPwaConfig),
+            }),
+        ].forEach((step) => {
+            try {
+                step();
+            } catch (error) {
+                console.error('PWA setup step failed', error);
+            }
+        });
+    </script>
+</body>
+</html>

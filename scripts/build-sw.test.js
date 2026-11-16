@@ -9,7 +9,9 @@ const vm = require('node:vm');
 
 const { buildSw, collectPrecache, computeVersion, renderSw, PLACEHOLDER } = require('./build-sw.js');
 
-const TEMPLATE = `const CONFIG = JSON.parse('${PLACEHOLDER}');\n`;
+const PUSH_MARKER = '/* __SW_PUSH__ */';
+const TEMPLATE = `const CONFIG = JSON.parse('${PLACEHOLDER}');\n${PUSH_MARKER}\n`;
+const PUSH_SOURCE = 'const pushFixture = 1;\n';
 
 const INDEX_HTML = `<!DOCTYPE html><html><head>
 <link rel="manifest" href="/devocionales/manifest.webmanifest">
@@ -41,6 +43,7 @@ function makeSite() {
     write('lang/devocionales/en.json', '{"a":1}');
     write('lang/devocionales/es.json', '{"a":2}');
     write('scripts/sw.template.js', TEMPLATE);
+    write('scripts/sw-push.js', PUSH_SOURCE);
     return { root, write };
 }
 
@@ -289,4 +292,43 @@ test('the stamp file is precached but is not part of the version it carries', ()
     assert.equal(buildSw(root).config.version, before.version, 'otherwise the stamp could never match the worker');
     write('js/shared.js', 'changed();');
     assert.notEqual(buildSw(root).config.version, before.version);
+});
+
+test('the generated worker contains the push handlers source in place of the marker', () => {
+    const { root } = makeSite();
+    const { source } = buildSw(root);
+    assert.ok(source.includes(PUSH_SOURCE.trim()));
+    assert.ok(!source.includes('__SW_PUSH__'));
+});
+
+test('the version changes when the push handlers change', () => {
+    const { root, write } = makeSite();
+    const before = buildSw(root).config.version;
+    assert.equal(buildSw(root).config.version, before);
+    write('scripts/sw-push.js', `${PUSH_SOURCE}// edited\n`);
+    assert.notEqual(buildSw(root).config.version, before);
+});
+
+test('the build fails loudly when scripts/sw-push.js is missing', () => {
+    const { root } = makeSite();
+    fs.rmSync(path.join(root, 'scripts/sw-push.js'));
+    assert.throws(() => buildSw(root), /sw-push\.js/);
+});
+
+test('the build fails loudly when the template has no push marker', () => {
+    const { root, write } = makeSite();
+    write('scripts/sw.template.js', `const CONFIG = JSON.parse('${PLACEHOLDER}');\n`);
+    assert.throws(() => buildSw(root), /__SW_PUSH__/);
+});
+
+test('renderSw with a push source requires the marker and inlines the source once', () => {
+    assert.throws(() => renderSw(`const CONFIG = JSON.parse('${PLACEHOLDER}');`, { version: 'x' }, 'push();'), /__SW_PUSH__/);
+    const source = renderSw(TEMPLATE, { version: 'x' }, 'const a = "$&$1";');
+    assert.equal(source.split('const a = "$&$1";').length, 2, '$ sequences are not read as patterns');
+});
+
+test('the real worker template carries the push marker and the real push source exists', () => {
+    const template = fs.readFileSync(path.join(__dirname, 'sw.template.js'), 'utf8');
+    assert.ok(template.includes(PUSH_MARKER));
+    assert.ok(fs.existsSync(path.join(__dirname, 'sw-push.js')));
 });

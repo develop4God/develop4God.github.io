@@ -221,6 +221,25 @@
     "salvationAlreadyPrayed": "Déjà fait 🙏",
     "salvationDontShowAgain": "Ne plus afficher"
   },
+  "push": {
+    "consent": "En l'activant, ce navigateur recevra une notification par jour. Nous conservons un identifiant anonyme, votre fuseau horaire, votre langue et l'heure choisie. Vous pouvez la désactiver à tout moment.",
+    "status_enabled": "Notifications activées.",
+    "status_denied": "Les notifications sont bloquées dans ce navigateur. Autorisez-les dans les réglages du site pour les activer.",
+    "status_error": "Impossible d'activer les notifications. Veuillez réessayer plus tard.",
+    "status_ios_install": "Pour recevoir des notifications sur iPhone ou iPad, installez d'abord l'app : touchez Partager, puis « Sur l'écran d'accueil ».",
+    "switch_label": "Activer/Désactiver les notifications",
+    "time_label": "Heure de notification quotidienne",
+    "time_set": "Heure de confirmation ajustée à",
+    "time_error": "Erreur lors du réglage de l'heure de notification"
+  },
+  "shell": {
+    "nav_label": "Navigation de l’application",
+    "home": "Accueil",
+    "settings": "Réglages",
+    "language": "Langue",
+    "theme": "Thème",
+    "font_size": "Taille de police"
+  },
   "discovery": {
     "title": "Études Bibliques",
     "loadError": "Erreur lors du chargement des Études Bibliques",

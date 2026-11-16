@@ -7,6 +7,8 @@ module.exports = {
     'devocionales/estudios/*.html', // the Bible-studies page
     'devocionales/js/*.js',
     '!devocionales/js/*.test.js',
+    'devocionales/pwa/*.js', // installed-app shell
+    '!devocionales/pwa/*.test.js',
     // Shared scripts the devocionales page also loads.
     'js/site-footer.js',
     'js/rtl-helper.js',

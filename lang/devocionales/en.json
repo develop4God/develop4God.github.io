@@ -221,6 +221,25 @@
     "salvationAlreadyPrayed": "Already prayed 🙏",
     "salvationDontShowAgain": "Don't show again"
   },
+  "push": {
+    "consent": "When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.",
+    "status_enabled": "Notifications are on.",
+    "status_denied": "Notifications are blocked in this browser. Allow them in the site settings to turn them on.",
+    "status_error": "Notifications could not be turned on. Please try again later.",
+    "status_ios_install": "To get notifications on iPhone or iPad, install the app first: tap Share, then “Add to Home Screen”.",
+    "switch_label": "Enable/Disable notifications",
+    "time_label": "Daily notification time",
+    "time_set": "Notification time set to",
+    "time_error": "Error setting notification time"
+  },
+  "shell": {
+    "nav_label": "App navigation",
+    "home": "Home",
+    "settings": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "font_size": "Font size"
+  },
   "discovery": {
     "title": "Bible Studies",
     "loadError": "Error loading Bible Studies",
