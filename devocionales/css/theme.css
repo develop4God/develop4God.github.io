@@ -1,0 +1,70 @@
+/* Light/dark colour tokens and the theme switch, shared by the reader, the legal pages and the
+   Bible-studies page (previously duplicated inline in each). */
+:root {
+    --bg: #f5f2fb;
+    --surface: #ffffff;
+    --text: #1c1730;
+    --text-muted: #6b6280;
+    --border: #ded4ef;
+    --accent: #6d4aa8;
+    --accent-soft: #ece5f7;
+    --highlight: #a8461c;
+}
+:root[data-theme="dark"] {
+    --bg: #0b0b0a;
+    --surface: #151412;
+    --text: #f2f0ea;
+    --text-muted: #a39e91;
+    --border: #2a2822;
+    --accent: #5fb8ae;
+    --accent-soft: #16302d;
+    --highlight: #e08a5c;
+}
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #0b0b0a;
+        --surface: #151412;
+        --text: #f2f0ea;
+        --text-muted: #a39e91;
+        --border: #2a2822;
+        --accent: #5fb8ae;
+        --accent-soft: #16302d;
+        --highlight: #e08a5c;
+    }
+}
+
+.theme-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.theme-switch input { display: none; }
+.theme-switch .theme-switch-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--text-muted);
+    transition: color .15s ease;
+}
+.theme-switch .theme-switch-icon.is-active { color: var(--accent); }
+.theme-switch-track {
+    position: relative;
+    width: 2.25rem;
+    height: 1.25rem;
+    border-radius: 9999px;
+    background: var(--border);
+    transition: background .15s ease;
+}
+.theme-switch input:checked ~ .theme-switch-track { background: var(--accent); }
+.theme-switch-dot {
+    position: absolute;
+    top: 0.15rem;
+    left: 0.15rem;
+    width: 0.95rem;
+    height: 0.95rem;
+    border-radius: 50%;
+    background: var(--surface);
+    transition: transform .15s ease;
+}
+.theme-switch input:checked ~ .theme-switch-track .theme-switch-dot { transform: translateX(1rem); }
