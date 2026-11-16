@@ -277,3 +277,47 @@ test('refresh: before any study is loaded it keeps the current message instead o
     page.init();
     assert.doesNotThrow(() => page.refresh());
 });
+
+test('focus: after toggling a chip or a favourite, focus returns to the equivalent new control', async () => {
+    const { page, view } = setup();
+    await page.init();
+    const doc = view.body.ownerDocument;
+    view.chips.querySelector('[data-filter="pending"]').focus();
+    view.chips.querySelector('[data-filter="pending"]').click();
+    assert.equal(doc.activeElement, view.chips.querySelector('[data-filter="pending"]'), 'focus is on the NEW chip, not the destroyed one');
+    view.chips.querySelector('[data-filter="all"]').click();
+    const star = view.body.querySelector('[data-study-id="b"] .study-fav');
+    star.focus();
+    star.click();
+    assert.equal(doc.activeElement, view.body.querySelector('[data-study-id="b"] .study-fav'));
+});
+
+test('focus: the removal confirmation takes focus on Yes, and Cancel returns focus to the star', async () => {
+    const { page, view } = setup();
+    await page.init();
+    const doc = view.body.ownerDocument;
+    view.body.querySelector('[data-study-id="a"] .study-fav').click();
+    view.body.querySelector('[data-study-id="a"] .study-fav').click();
+    assert.equal(doc.activeElement, view.body.querySelector('.study-confirm-yes'));
+    view.body.querySelector('.study-confirm-no').click();
+    assert.equal(doc.activeElement, view.body.querySelector('[data-study-id="a"] .study-fav'));
+});
+
+test('share: the language is captured once at click time', async () => {
+    let calls = 0;
+    const seen = [];
+    const doc = new FakeDocument();
+    const view = { count: doc.createElement('p'), hero: doc.createElement('div'), chips: doc.createElement('div'), body: doc.createElement('div') };
+    const page = createListPage({
+        view, h: W.DomBuilder.createBuilder(doc), t, lang: () => { calls += 1; return calls > 3 ? 'es' : 'en'; },
+        data: { loadIndex: async () => idx(['a']), loadStudy: async (s, l) => { seen.push(l); return {}; } },
+        store: W.DiscoveryStore.createDiscoveryStore(memoryStorage()), sessionStorage: memoryStorage(),
+        sortFilter: W.DiscoverySortFilter, cardDomFactory: W.DiscoveryCardDom.createCardDom, listDomFactory: W.DiscoveryListDom.createListDom,
+        shareText: W.DiscoveryShareText, playStoreUrl: '', shareOrCopy: async () => 'shared', navigator: {}, toast: { show() {} }, onOpen() {},
+    });
+    await page.init();
+    calls = 10; // every later lang() call would now answer 'es'
+    view.body.querySelector('.study-share').click();
+    await new Promise((r) => setImmediate(r));
+    assert.deepEqual(seen, ['es'], 'one consistent value is used for the whole share');
+});

@@ -39,6 +39,11 @@ test('chips: B4 four filters with live counts, the active one is pressed', () =>
     assert.equal(chips[1].querySelector('.study-chip-label').textContent, 'Pending');
 });
 
+test('chips: the group has an accessible name', () => {
+    const el = list.buildChips({ all: 0, pending: 0, completed: 0, favorites: 0 }, 'all', noop);
+    assert.equal(el.getAttribute('aria-label'), 'title');
+});
+
 test('chips: clicking a chip reports its filter', () => {
     let chosen;
     const el = list.buildChips({ all: 0, pending: 0, completed: 0, favorites: 0 }, 'all', (f) => { chosen = f; });

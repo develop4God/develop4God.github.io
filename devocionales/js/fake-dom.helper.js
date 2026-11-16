@@ -62,6 +62,9 @@ class FakeElement {
         return event;
     }
     click() { return this.dispatch('click'); }
+    focus() { this.ownerDocument.activeElement = this; }
+
+    contains(node) { for (let n = node; n; n = n.parentElement) if (n === this) return true; return false; }
 
     all() { return this.children.flatMap((c) => [c, ...c.all()]); }
     matches(sel) {
@@ -89,7 +92,7 @@ class FakeElement {
 }
 
 class FakeDocument {
-    constructor() { this.body = new FakeElement('body', this); }
+    constructor() { this.body = new FakeElement('body', this); this.activeElement = this.body; }
     createElement(tag) { return new FakeElement(tag, this); }
 }
 

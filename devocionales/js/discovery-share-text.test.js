@@ -101,3 +101,12 @@ test('extractKeyPoints: bullets first (max 3), else the first two lines', () => 
     assert.equal(extractKeyPoints('1️⃣ step\nplain\n💔 hurt'), '1️⃣ step\n💔 hurt');
     assert.equal(extractKeyPoints('plain text here\n- a dash item longer'), '- a dash item longer');
 });
+
+test('an `order` of 0 is a real position, not "missing"', () => {
+    const s = study();
+    s.cards = [
+        { order: 1, type: 'x', title: 'Second' },
+        { order: 0, type: 'x', title: 'Zero first' },
+    ];
+    assert.ok(buildStudyShareText(s, labels, URL).includes('*Zero first*'));
+});

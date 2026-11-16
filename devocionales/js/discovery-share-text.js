@@ -19,11 +19,17 @@
         return (points.length ? points : lines.slice(0, 2)).join('\n');
     }
 
+    // `order` may be a number or a numeric string; 0 is a real position, anything else falls back to array position.
+    function position({ card, index }) {
+        const hasOrder = typeof card.order === 'number' || (typeof card.order === 'string' && card.order.trim() !== '');
+        return hasOrder && Number.isFinite(Number(card.order)) ? Number(card.order) : index;
+    }
+
     function sortedCards(study) {
         const cards = Array.isArray(study.cards) ? study.cards : [];
         return cards
             .map((card, index) => ({ card, index }))
-            .sort((a, b) => (Number(a.card.order) || a.index) - (Number(b.card.order) || b.index))
+            .sort((a, b) => position(a) - position(b))
             .map((x) => x.card);
     }
 

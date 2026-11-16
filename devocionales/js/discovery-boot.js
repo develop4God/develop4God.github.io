@@ -54,7 +54,7 @@
         // Another tab changed favourites / seen / progress: redraw from storage. A language change elsewhere: reload.
         global.addEventListener('storage', (e) => {
             if (e.key === 'develop4God_language') global.location.reload();
-            else if (e.key && e.key.startsWith('discovery_')) page.refresh();
+            else if (e.key === null || e.key.startsWith('discovery_')) page.refresh(); // null: storage cleared elsewhere
         });
         // Coming back through the back/forward cache must show the latest progress.
         global.addEventListener('pageshow', (e) => { if (e.persisted) page.refresh(); });

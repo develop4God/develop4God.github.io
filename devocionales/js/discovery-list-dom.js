@@ -12,7 +12,7 @@
 
     function createListDom({ h, t, cardDom }) {
         function buildChips(counts, active, onSelect) {
-            return h('div', { class: 'study-chips', attrs: { role: 'group' } }, CHIPS.map(({ filter, labelKey }) => h('button', {
+            return h('div', { class: 'study-chips', attrs: { role: 'group', 'aria-label': t('title') } }, CHIPS.map(({ filter, labelKey }) => h('button', {
                 class: 'study-chip',
                 attrs: { type: 'button', 'data-filter': filter, 'aria-pressed': String(filter === active) },
                 on: { click: () => onSelect(filter) },

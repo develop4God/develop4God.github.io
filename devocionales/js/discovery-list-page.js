@@ -40,10 +40,47 @@
             onToggleFavorite: toggleFavorite,
             onShare: share,
             onConfirmRemove: confirmRemove,
-            onCancelRemove: () => { confirmingId = null; render(); },
+            onCancelRemove: (id) => {
+                confirmingId = null;
+                focusRequest = { selector: `[data-study-id="${id}"] .study-fav`, root: view.body };
+                render();
+            },
         };
 
+        // Whole-view re-renders destroy the focused control; remember it and focus its replacement
+        // (keyboard and screen-reader users must not be dropped back to <body> after every action).
+        const FOCUS_CLASSES = ['study-fav', 'study-share', 'study-card-open', 'study-hero-button'];
+        let focusRequest = null;
+
+        function ancestorWith(el, attr) {
+            for (let node = el; node; node = node.parentElement) if (node.getAttribute && node.getAttribute(attr) !== null) return node;
+            return null;
+        }
+
+        function currentFocus() {
+            const active = view.body.ownerDocument.activeElement;
+            if (!active || !active.getAttribute) return null;
+            const filterChip = ancestorWith(active, 'data-filter');
+            if (filterChip && view.chips.contains && view.chips.contains(filterChip)) return { selector: `[data-filter="${filterChip.getAttribute('data-filter')}"]`, root: view.chips };
+            const card = ancestorWith(active, 'data-study-id');
+            const cls = FOCUS_CLASSES.find((c) => active.classList.contains(c));
+            if (card && cls) return { selector: `[data-study-id="${card.getAttribute('data-study-id')}"] .${cls}`, root: view.body };
+            return null;
+        }
+
+        function restoreFocus(request) {
+            const target = request && request.root.querySelector(request.selector);
+            if (target) target.focus();
+        }
+
         function render() {
+            const request = focusRequest || currentFocus();
+            focusRequest = null;
+            renderView();
+            restoreFocus(request);
+        }
+
+        function renderView() {
             if (!studies.length) { showMessage('empty'); return; }
             const language = lang();
             const cards = sortFilter.buildCards(studies, {
@@ -78,6 +115,7 @@
         function toggleFavorite(id) {
             if (store.loadFavorites(lang()).has(id)) {
                 confirmingId = id; // removing asks first (B9)
+                focusRequest = { selector: `[data-study-id="${id}"] .study-confirm-yes`, root: view.body };
                 render();
                 return;
             }
@@ -89,13 +127,15 @@
             confirmingId = null;
             store.toggleFavorite(id, lang());
             toast.show(t('removedFavorite'));
+            focusRequest = { selector: `[data-study-id="${id}"] .study-fav`, root: view.body };
             render();
         }
 
         async function share(id) {
             const summary = studies.find((s) => s.id === id);
+            const language = lang(); // one value for the whole share, even if the language changes meanwhile
             try {
-                const study = await data.loadStudy(summary, lang());
+                const study = await data.loadStudy(summary, language);
                 const text = shareText.buildStudyShareText(study, {
                     eyebrow: t('eyebrow'), revelation: t('revelation'), reflectionQuestions: t('reflectionQuestions'),
                     footerDownload: t('shareFooterDownload'), footerBenefits: t('shareFooterBenefits'), footerDeveloper: t('shareFooterDeveloper'),
