@@ -26,6 +26,7 @@
     "DevotionalSwRegister": "readonly",
     "DevotionalBuild": "readonly",
     "DiscoveryData": "readonly",
+    "DiscoveryStore": "readonly",
     "AppStats": "readonly",
     "RtlHelper": "readonly",
     "SiteFooter": "readonly",
