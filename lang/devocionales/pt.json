@@ -239,5 +239,11 @@
     "status_denied": "As notificações estão bloqueadas neste navegador. Permita-as nas configurações do site para ativá-las.",
     "status_error": "Não foi possível ativar as notificações. Tente novamente mais tarde.",
     "status_ios_install": "Para receber notificações no iPhone ou iPad, primeiro instale o app: toque em Compartilhar e depois em “Adicionar à Tela de Início”."
+  },
+  "shell": {
+    "nav_label": "Navegação do app",
+    "home": "Início",
+    "settings": "Configurações",
+    "settings_intro": "Lembretes e preferências deste app."
   }
 }

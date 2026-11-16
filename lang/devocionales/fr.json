@@ -239,5 +239,11 @@
     "status_denied": "Les notifications sont bloquées dans ce navigateur. Autorisez-les dans les réglages du site pour les activer.",
     "status_error": "Impossible d'activer les notifications. Veuillez réessayer plus tard.",
     "status_ios_install": "Pour recevoir des notifications sur iPhone ou iPad, installez d'abord l'app : touchez Partager, puis « Sur l'écran d'accueil »."
+  },
+  "shell": {
+    "nav_label": "Navigation de l’application",
+    "home": "Accueil",
+    "settings": "Réglages",
+    "settings_intro": "Rappels et préférences de cette application."
   }
 }

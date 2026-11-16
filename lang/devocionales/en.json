@@ -239,5 +239,11 @@
     "status_denied": "Notifications are blocked in this browser. Allow them in the site settings to turn them on.",
     "status_error": "Notifications could not be turned on. Please try again later.",
     "status_ios_install": "To get notifications on iPhone or iPad, install the app first: tap Share, then “Add to Home Screen”."
+  },
+  "shell": {
+    "nav_label": "App navigation",
+    "home": "Home",
+    "settings": "Settings",
+    "settings_intro": "Reminders and preferences for this app."
   }
 }

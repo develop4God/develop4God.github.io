@@ -15,6 +15,24 @@
         // PLUS a manual Firestore cleanup of tokens with platform == 'web' (the web store writes
         // platform:'web'; the Flutter app writes TargetPlatform.android).
         pushEnabled: false,
+        // The installed app (iOS and desktop only, never Android, never a browser tab). The kill
+        // switches above stay on top: enabled:false also removes the shell.
+        surfaces: {
+            shell: {
+                // false = the installed app keeps the plain page, without tabs.
+                enabled: true,
+                // Tab names; each needs a [data-shell-tab] button in index.html.
+                tabs: ['home', 'settings'],
+                layout: {
+                    // At or above this viewport width the tabs are a labelled rail, below it a bottom bar.
+                    railMinWidth: 768,
+                    // The reading column never grows past this many px.
+                    contentMaxWidth: 720,
+                },
+                // The only mailto the installed app may hold (see devotional-shell-core.js).
+                contactAddress: 'develop4God@gmail.com',
+            },
+        },
         // The Firebase WEB config. It is public by design (it ships to every browser); what protects
         // the backend is the API key's HTTP-referrer restriction and the Firestore security rules.
         firebase: {

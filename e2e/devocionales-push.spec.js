@@ -58,6 +58,11 @@ window.DevotionalPushFirebase = { create: function () {
     });
 }
 
+// In the installed app the push block lives in the Settings tab.
+async function openSettings(page) {
+    await page.locator('[data-shell-tab="settings"]').click();
+}
+
 // Push only exists in the installed app: pretend to be launched from the home screen.
 async function launchAsInstalledApp(page) {
     await page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
@@ -86,6 +91,7 @@ test('with pushEnabled on, the enable button shows and nothing runs before it is
     await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
+    await openSettings(page);
     await expect(page.locator('[data-push]')).toBeVisible();
     await expect(page.locator('[data-push-enable]')).toBeVisible();
     expect(await page.evaluate(() => window.__prompts)).toBe(0);
@@ -98,6 +104,7 @@ test('tapping enable asks for permission first; a denial shows the message and l
     await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page);
     await page.goto(READER, { waitUntil: 'networkidle' });
+    await openSettings(page);
     await page.locator('[data-push-enable]').click();
     await expect(page.locator('[data-push-status]')).toContainText('blocked');
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual(['requestPermission']);
@@ -115,6 +122,7 @@ test('granted path: requestPermission first, then load, sign-in, registration, t
     await launchAsInstalledApp(page);
     await enablePushWithStubAdapter(page, { permission: 'granted' });
     await page.goto(READER, { waitUntil: 'networkidle' });
+    await openSettings(page);
     await page.locator('[data-push-enable]').click();
     await expect(page.locator('[data-push-disable]')).toBeVisible();
     expect(await page.evaluate(() => window.__adapterCalls)).toEqual([

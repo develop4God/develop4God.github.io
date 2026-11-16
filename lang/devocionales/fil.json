@@ -239,5 +239,11 @@
     "status_denied": "Naka-block ang mga abiso sa browser na ito. Payagan ang mga ito sa mga setting ng site para ma-on.",
     "status_error": "Hindi na-on ang mga abiso. Pakisubukang muli mamaya.",
     "status_ios_install": "Para makatanggap ng mga abiso sa iPhone o iPad, i-install muna ang app: i-tap ang Share, pagkatapos ay “Add to Home Screen”."
+  },
+  "shell": {
+    "nav_label": "Nabigasyon ng app",
+    "home": "Home",
+    "settings": "Mga Setting",
+    "settings_intro": "Mga paalala at kagustuhan para sa app na ito."
   }
 }
