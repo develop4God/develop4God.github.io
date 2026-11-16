@@ -63,9 +63,19 @@ const BUILD_QUERY_MESSAGE = 'devocionales-build?';
 const SHELL_PATH = '/devocionales/';
 const SHELL_PATHS = new Set([SHELL_PATH, `${SHELL_PATH}index.html`]);
 // The host redirects `page.html` to the extensionless `page`, so both forms must be served offline.
-const PAGE_PATHS = new Set([...SHELL_PATHS, ...CONFIG.pages, ...CONFIG.pages.map((page) => page.replace(/\.html$/, ''))]);
+// A folder page (`<folder>/index.html`) is also reached as `<folder>/` and `<folder>`.
+const FOLDER_PAGES = CONFIG.pages.filter((page) => page.endsWith('/index.html')).map((page) => page.slice(0, -'index.html'.length));
+const PAGE_PATHS = new Set([
+  ...SHELL_PATHS,
+  ...CONFIG.pages,
+  ...CONFIG.pages.map((page) => page.replace(/\.html$/, '')),
+  ...FOLDER_PAGES,
+  ...FOLDER_PAGES.map((folder) => folder.slice(0, -1)),
+]);
 const pageKey = (pathname) => {
   if (SHELL_PATHS.has(pathname)) return SHELL_PATH;
+  if (FOLDER_PAGES.includes(pathname)) return `${pathname}index.html`;
+  if (FOLDER_PAGES.includes(`${pathname}/`)) return `${pathname}/index.html`;
   return pathname.endsWith('.html') ? pathname : `${pathname}.html`;
 };
 const SLOW = Symbol('slow');
@@ -230,12 +240,16 @@ async function trim(cache, limit, counts = () => true) {
   for (const key of keys.slice(0, Math.max(0, keys.length - limit))) await cache.delete(key);
 }
 
-// Only year files are capped: the index and stats files are small and every load needs them.
+// Year files and Bible-study files are capped, each against its own kind: the index and stats files
+// are small and every load needs them, and reading many studies must not evict the devotional.
+const isStudyFile = (url) => url.includes('/discovery/') && !url.endsWith('/discovery/index.json');
+
 async function saveData(request, response) {
   const copy = await cleanCopy(response);
   await writeTo(DATA_CACHE, async (cache) => {
     await cache.put(request, copy);
     await trim(cache, CONFIG.maxDataEntries, (url) => url.includes('/Devocional_year_'));
+    await trim(cache, CONFIG.maxStudyEntries, isStudyFile);
   });
 }
 
