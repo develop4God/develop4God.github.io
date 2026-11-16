@@ -42,7 +42,7 @@ module.exports = defineConfig({
       : []),
   ],
   webServer: {
-    command: `python3 -m http.server ${PORT} --bind 127.0.0.1`,
+    command: `python3 scripts/e2e-server.py ${PORT}`,
     url: `http://127.0.0.1:${PORT}`,
     cwd: '..',
     reuseExistingServer: true,
