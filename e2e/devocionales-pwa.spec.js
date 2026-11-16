@@ -161,7 +161,7 @@ test.describe('updates', () => {
     // Playwright cannot intercept a service worker's own script-update fetch (neither page.route
     // nor context.route sees it), so this test serves the site from a small server whose
     // /devocionales/sw.js can be switched to a "new deploy".
-    test('a new worker waits for the open reader to close, so builds are never mixed, and keeps saved data', async ({ page, context }) => {
+    test('a new worker waits for the open reader to close, so builds are never mixed, and keeps saved data', async ({ page }) => {
         const state = { overrides: {} };
         const server = await startSiteServer(state);
         const base = `http://127.0.0.1:${server.address().port}`;
@@ -176,7 +176,8 @@ test.describe('updates', () => {
             state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, newVersion); // the deploy
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
 
-            await expect.poll(() => cacheNames(page)).toContain(`devocionales-${newVersion}`);
+            // Installing a build fetches every precached file, which takes seconds when many browsers share the machine.
+            await expect.poll(() => cacheNames(page), { timeout: 15_000 }).toContain(`devocionales-${newVersion}`);
             // The open page still runs the old build's scripts, and the tab is visible: the new worker
             // is waiting, and neither the worker nor the page may take it over or reload the page.
             await expect.poll(() => page.evaluate(async () => Boolean((await navigator.serviceWorker.getRegistration()).waiting))).toBe(true);
@@ -184,11 +185,16 @@ test.describe('updates', () => {
             expect(await page.evaluate(() => window.readerSession)).toBe('still-open');
 
             // Once no old page is open the new worker activates and removes the old build.
-            await page.close();
-            const next = await context.newPage();
-            await next.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
-            await expect.poll(() => cacheNames(next), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
-            expect(await cacheNames(next)).toContain('devocionales-data');
+            // Navigate out of the worker's scope instead of closing the tab and opening another:
+            // a navigation into the scope that starts while the old worker is being replaced can
+            // go unanswered (observed in Chromium under load), which is a browser race and not
+            // what this test is about. From an out-of-scope page no worker is a controller, so
+            // the old worker has no page left, and the new one must activate by itself.
+            await page.goto(`${base}/robots.txt`);
+            await expect.poll(() => cacheNames(page), { timeout: 15_000 }).not.toContain(`devocionales-${oldVersion}`);
+            expect(await cacheNames(page)).toContain('devocionales-data');
+            await page.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
+            await expect.poll(() => cacheNames(page)).toContain(`devocionales-${newVersion}`);
         } finally {
             server.close();
         }
@@ -561,6 +567,11 @@ test.describe('legal pages', () => {
 });
 
 test.describe('installed app name follows the language', () => {
+    // Each test loads the page to network idle, then switches language (two language files): with
+    // many browsers sharing the machine that exceeds the 15 s default and the failure surfaced as a
+    // half-finished assertion. Same budget as the other describes that wait on the worker.
+    test.setTimeout(45_000);
+
     const NAMES = {
         en: 'Christian Devotionals',
         es: 'Devocionales Cristianos',
