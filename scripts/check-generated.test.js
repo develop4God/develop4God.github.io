@@ -12,6 +12,11 @@ const { spawnSync } = require('node:child_process');
 
 const SCRIPT = path.join(__dirname, 'check-generated.sh');
 
+// A git hook exports GIT_DIR (and friends) to the processes it starts, so inside the pre-push hook
+// a plain `git init/add/commit` here would act on the real repository. Strip them so every git
+// command below sees only the throwaway repo.
+const ENV = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('GIT_')));
+
 function tempRepo({ git = true } = {}) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'check-generated-'));
   fs.mkdirSync(path.join(dir, 'scripts'));
@@ -19,7 +24,7 @@ function tempRepo({ git = true } = {}) {
   fs.mkdirSync(path.join(dir, 'devocionales'));
   fs.writeFileSync(path.join(dir, 'devocionales', 'sw.js'), 'committed\n');
   if (git) {
-    const run = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8' });
+    const run = (...args) => spawnSync('git', args, { cwd: dir, encoding: 'utf8', env: ENV });
     run('init', '-q');
     run('add', '.');
     run('-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'init');
@@ -28,7 +33,7 @@ function tempRepo({ git = true } = {}) {
 }
 
 function check(dir) {
-  return spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh')], { cwd: dir, encoding: 'utf8' });
+  return spawnSync('bash', [path.join(dir, 'scripts', 'check-generated.sh')], { cwd: dir, encoding: 'utf8', env: ENV });
 }
 
 test('check-generated: refuses to rebuild over uncommitted edits to a generated file, and leaves them intact', () => {
