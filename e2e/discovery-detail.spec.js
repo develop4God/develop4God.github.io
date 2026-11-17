@@ -340,6 +340,16 @@ test.describe('completion celebration', () => {
     await expect(page.locator('.study-complete')).toHaveText('Study completed');
   });
 
+  test('on a phone the completed button stays in view, so the animation is seen', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 600 });
+    await finish(page);
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await page.waitForTimeout(400);
+    const box = await page.locator('.study-complete').boundingBox();
+    expect(box.y, 'top of the button inside the viewport').toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height, 'bottom of the button inside the viewport').toBeLessThanOrEqual(600);
+  });
+
   test('no confetti when the viewer prefers reduced motion; the study still completes', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await finish(page);

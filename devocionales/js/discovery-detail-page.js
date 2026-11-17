@@ -55,7 +55,7 @@
                 })] : []),
                 detailDom.buildNav({ index, total: pages.length, onPrev: prev, onNext: next, onExit }),
             );
-            if (focusPage) pageEl.focus();
+            if (focusPage) pageEl.focus({ preventScroll: true }); // goTo scrolls itself; completing must not scroll the button out of view
         }
 
         function goTo(target) {
