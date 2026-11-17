@@ -5,7 +5,7 @@
     // progress and completion. Collaborators are injected (data, store, DOM builders, nav
     // helpers, copyright, toast), so this file only wires state -> view and actions -> store.
     function createDetailPage(deps) {
-        const { view, t, lang, rtl, data, store, nav, copyright, toast, onExit } = deps;
+        const { view, t, lang, rtl, data, store, nav, copyright, toast, celebrate, onExit } = deps;
         const detailDom = deps.detailDomFactory({ h: deps.h, t });
         const { listDom } = deps;
 
@@ -70,6 +70,7 @@
             if (store.getProgress(summary.id, lang()).isCompleted) return;
             store.completeStudy(summary.id, lang());
             toast.show(t('studyCompleted'));
+            if (celebrate) celebrate.burst();
             render({ focusPage: true }); // the button that had focus was replaced; keep the reader's place
         }
 

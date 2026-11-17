@@ -39,6 +39,7 @@
     "DiscoveryCardDom": "readonly",
     "DiscoveryShareText": "readonly",
     "UiToast": "readonly",
+    "UiCelebration": "readonly",
     "ShareOrCopy": "readonly",
     "DomBuilder": "readonly",
     "DevotionalTheme": "readonly",

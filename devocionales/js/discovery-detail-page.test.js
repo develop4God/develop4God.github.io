@@ -34,13 +34,14 @@ const study = (cards = 3) => ({
     cards: Array.from({ length: cards }, (_, i) => ({ order: i + 1, type: 'x', title: `Card ${i + 1}`, content: `body ${i + 1}` })),
 });
 
-function setup({ loadStudy, storage = memoryStorage(), rtl = false, copyrightFor } = {}) {
+function setup({ loadStudy, storage = memoryStorage(), rtl = false, copyrightFor, celebrate } = {}) {
     const doc = new FakeDocument();
     const root = doc.createElement('div');
     const h = W.DomBuilder.createBuilder(doc);
     const toasts = [];
     const exits = [];
     const scrolls = [];
+    const bursts = [];
     const store = W.DiscoveryStore.createDiscoveryStore(storage);
     const cardDom = W.DiscoveryCardDom.createCardDom({ h, t });
     const page = W.DiscoveryDetailPage.createDetailPage({
@@ -55,10 +56,11 @@ function setup({ loadStudy, storage = memoryStorage(), rtl = false, copyrightFor
         nav: W.DiscoveryNav,
         copyright: { resolve: copyrightFor || ((lang, version) => `copyright:${lang}:${version}`) },
         toast: { show: (m) => toasts.push(m) },
+        celebrate: celebrate === undefined ? { burst: () => bursts.push(1) } : celebrate,
         onExit: () => exits.push(1),
         scrollToTop: () => scrolls.push(1),
     });
-    return { page, root, store, storage, toasts, exits, scrolls };
+    return { page, root, store, storage, toasts, exits, scrolls, bursts };
 }
 
 const title = (root) => root.querySelector('.study-page-title') && root.querySelector('.study-page-title').textContent;
@@ -143,6 +145,32 @@ test('C4 completing marks the study done, toasts, and the button becomes a disab
     assert.deepEqual(toasts, ['Study completed successfully']);
     assert.equal(root.querySelector('.study-complete').textContent, 'Study completed');
     assert.equal(root.querySelector('.study-complete').hasAttribute('disabled'), true);
+});
+
+test('completing a study celebrates exactly once', async () => {
+    const { page, root, bursts } = setup();
+    await page.open(summary);
+    page.goTo(3);
+    root.querySelector('.study-complete').click();
+    assert.equal(bursts.length, 1);
+});
+
+test('an already completed study opens without a celebration', async () => {
+    const storage = memoryStorage();
+    W.DiscoveryStore.createDiscoveryStore(storage).completeStudy('love', 'en');
+    const { page, bursts } = setup({ storage });
+    await page.open(summary);
+    page.goTo(3);
+    assert.equal(bursts.length, 0);
+});
+
+test('completing still works when no celebration is wired', async () => {
+    const { page, root, store, toasts } = setup({ celebrate: null });
+    await page.open(summary);
+    page.goTo(3);
+    root.querySelector('.study-complete').click();
+    assert.equal(store.getProgress('love', 'en').isCompleted, true);
+    assert.deepEqual(toasts, ['Study completed successfully']);
 });
 
 test('an already completed study opens with the disabled button and does not toast again', async () => {

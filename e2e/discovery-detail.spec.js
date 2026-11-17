@@ -234,6 +234,42 @@ test.describe('navigation and back (C6, C7)', () => {
   });
 });
 
+test.describe('completion celebration', () => {
+  async function finish(page) {
+    await mockData(page);
+    await openStudy(page);
+    for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
+    await page.locator('.study-complete').click();
+  }
+
+  test('completing a study throws confetti that clears itself and never blocks taps', async ({ page }) => {
+    await finish(page);
+    const layer = page.locator('.celebration');
+    await expect(layer).toHaveCount(1);
+    await expect(layer).toHaveAttribute('aria-hidden', 'true');
+    expect(await layer.locator('.confetti-piece').count()).toBeGreaterThan(10);
+    expect(await layer.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
+    await expect(layer).toHaveCount(0, { timeout: 5000 });
+  });
+
+  test('no confetti when the viewer prefers reduced motion; the study still completes', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await finish(page);
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.celebration')).toHaveCount(0);
+  });
+
+  test('reopening a completed study does not celebrate again', async ({ page }) => {
+    await finish(page);
+    await expect(page.locator('.celebration')).toHaveCount(0, { timeout: 5000 });
+    await page.reload();
+    await page.waitForSelector('.study-page');
+    for (let i = 0; i < PAGES && !(await page.locator('.study-complete').isVisible()); i++) await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.celebration')).toHaveCount(0);
+  });
+});
+
 test.describe('layout', () => {
   test('no horizontal overflow on any page of a study at 320px, touch targets >= 44px', async ({ page }) => {
     await mockData(page);

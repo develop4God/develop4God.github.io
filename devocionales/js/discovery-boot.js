@@ -26,6 +26,11 @@
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.DiscoveryStore.createDiscoveryStore(global.localStorage);
         const toast = global.UiToast.createToast({ document: doc, container: doc.body });
+        const celebrate = global.UiCelebration.createCelebration({
+            h,
+            container: doc.body,
+            reducedMotion: () => global.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        });
         const data = global.DiscoveryData.createDiscoveryData({
             fetchWithRetry: global.DevotionalFetch.fetchWithRetry,
             cache: global.DiscoveryCache.createCacheStore(global.caches, CACHE_NAME),
@@ -70,6 +75,7 @@
             nav: global.DiscoveryNav,
             copyright: global.DiscoveryCopyright.createCopyright({ versionInfo: global.DevotionalVersion.versionInfo }),
             toast,
+            celebrate,
             onExit: () => router.close(),
             scrollToTop: () => global.scrollTo(0, 0),
         });
