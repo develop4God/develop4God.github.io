@@ -7,6 +7,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const { headersFor } = require('./headers-file');
 
 const ROOT = path.join(__dirname, '..');
 const SCOPE = '/devocionales/';
@@ -20,23 +21,6 @@ function pngSize(file) {
     const buffer = fs.readFileSync(file);
     assert.equal(buffer.toString('ascii', 1, 4), 'PNG', `${file} is not a PNG`);
     return `${buffer.readUInt32BE(16)}x${buffer.readUInt32BE(20)}`;
-}
-
-// The header block that applies to a path in a Cloudflare-style _headers file, as a map.
-function headersFor(headersFile, urlPath) {
-    const result = {};
-    let current = null;
-    for (const line of headersFile.split('\n')) {
-        if (!line.trim()) continue;
-        if (!/^\s/.test(line)) {
-            current = line.trim();
-            continue;
-        }
-        if (current !== urlPath) continue;
-        const [name, ...value] = line.trim().split(':');
-        result[name.toLowerCase()] = value.join(':').trim();
-    }
-    return result;
 }
 
 test('manifest identifies the app and stays inside its scope', () => {

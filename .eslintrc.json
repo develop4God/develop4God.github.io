@@ -86,6 +86,32 @@
       "env": {
         "node": true
       }
+    },
+    {
+      "files": ["devocionales/js/*.js", "devocionales/pwa/*.js"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "AssignmentExpression[left.property.name=/^(innerHTML|outerHTML)$/]",
+            "message": "The reader renders remote content: build nodes with createElement/textContent (or DomBuilder in new modules), never innerHTML/outerHTML."
+          },
+          {
+            "selector": "CallExpression[callee.property.name='insertAdjacentHTML']",
+            "message": "The reader renders remote content: build nodes with createElement/textContent, never insertAdjacentHTML."
+          },
+          {
+            "selector": "CallExpression[callee.object.name='document'][callee.property.name=/^(write|writeln)$/]",
+            "message": "document.write parses its argument as HTML: build nodes with createElement/textContent."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["devocionales/js/i18n.js", "devocionales/js/modern.js"],
+      "rules": {
+        "no-restricted-syntax": "off"
+      }
     }
   ]
 }

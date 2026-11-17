@@ -127,7 +127,14 @@
         const select = document.getElementById('version-select');
         const versions = await availableVersions(getLanguage());
 
-        select.innerHTML = versions.map((v) => `<option value="${v}">${v}</option>`).join('');
+        // Version codes come from the remote index.json: build options as text, never parse them as HTML.
+        // No DomBuilder here: the previous deploy's HTML does not load dom-builder.js (replay test in e2e/devocionales-shell.spec.js).
+        select.replaceChildren(...versions.map((v) => {
+            const option = document.createElement('option');
+            option.value = v;
+            option.textContent = v;
+            return option;
+        }));
         select.value = getVersion();
         updateVersionInfoPopover(getLanguage(), getVersion());
 
