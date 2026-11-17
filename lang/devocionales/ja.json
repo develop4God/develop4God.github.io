@@ -296,6 +296,8 @@
     "strongNumber": "ストロング番号",
     "reference": "参照箇所",
     "application": "適用",
-    "activationPrayer": "締めくくりの祈り"
+    "activationPrayer": "締めくくりの祈り",
+    "pageOf": "{current} / {total} ページ",
+    "swipeHint": "スワイプして続ける"
   }
 }

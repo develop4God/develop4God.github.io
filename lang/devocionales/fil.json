@@ -296,6 +296,8 @@
     "strongNumber": "Numerong Strong",
     "reference": "Sanggunian",
     "application": "Aplikasyon",
-    "activationPrayer": "Panalangin ng Pagsasabuhay"
+    "activationPrayer": "Panalangin ng Pagsasabuhay",
+    "pageOf": "Pahina {current} ng {total}",
+    "swipeHint": "Mag-swipe para magpatuloy"
   }
 }

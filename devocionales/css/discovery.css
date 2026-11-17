@@ -354,20 +354,77 @@ body {
     margin: 0.25rem 0 0;
 }
 
-.study-segments {
-    display: flex;
-    gap: 0.25rem;
-    margin-block-end: 1rem;
+/* A page sliding in (or dragged) overhangs the viewport for a moment: clip it so the page never gains a horizontal scroll */
+#studies-detail-view {
+    overflow-x: clip;
 }
 
-.study-seg {
+/* Carousel dots (UiPagerDots): a 1.75rem tap target around a slim bar; the current dot is wider */
+.pager-dots {
+    display: flex;
+    gap: 0.25rem;
+    margin-block-end: 0.5rem;
+}
+
+.pager-dot {
+    position: relative;
     flex: 1;
+    min-block-size: 1.75rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: flex-grow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pager-dot::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: calc(50% - 0.1875rem);
     block-size: 0.375rem;
     border-radius: 9999px;
     background: var(--border);
+    transition: background-color 0.2s;
 }
 
-.study-seg.is-done { background: var(--accent); }
+.pager-dot.is-done::before {
+    background: var(--accent);
+}
+
+.pager-dot.is-current {
+    flex-grow: 2.4;
+}
+
+/* One-time hint on the first page; only for touch (a mouse has the buttons and arrow keys) */
+.study-swipe-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 0 0 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.study-swipe-chevron {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+    border: solid currentcolor;
+    border-width: 0.125rem 0.125rem 0 0;
+    transform: rotate(45deg);
+    animation: study-nudge 1.4s ease-in-out 3;
+}
+
+:root[dir="rtl"] .study-swipe-chevron {
+    transform: rotate(-135deg);
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .study-swipe-hint {
+        display: none;
+    }
+}
 
 .study-page {
     background: var(--surface);
@@ -377,6 +434,59 @@ body {
     display: grid;
     gap: 0.875rem;
     outline: none;
+    touch-action: pan-y; /* vertical scroll stays native; horizontal belongs to the swipe */
+    transition: transform 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+:root {
+    --slide: 2.5rem; /* distance a new page travels in from; mirrored for RTL */
+}
+
+:root[dir="rtl"] {
+    --slide: -2.5rem;
+}
+
+.study-page.slide-in-next {
+    animation: study-slide-next 0.32s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.study-page.slide-in-prev {
+    animation: study-slide-prev 0.32s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@keyframes study-slide-next {
+    from {
+        opacity: 0;
+        transform: translateX(var(--slide));
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes study-slide-prev {
+    from {
+        opacity: 0;
+        transform: translateX(calc(var(--slide) * -1));
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes study-nudge {
+    0%,
+    100% {
+        translate: 0;
+    }
+
+    50% {
+        translate: calc(var(--slide) * 0.14);
+    }
 }
 
 .study-page > * {
@@ -483,6 +593,13 @@ body {
 }
 
 .study-complete {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     min-block-size: 2.75rem;
     border: 0;
     border-radius: 0.375rem;
@@ -490,11 +607,131 @@ body {
     color: var(--bg);
     font-weight: 700;
     cursor: pointer;
+    transition: transform 0.12s ease;
 }
 
+/* Done state: solid green with a check (dark enough for white text at 4.5:1) */
 .study-complete:disabled {
-    opacity: 0.6;
+    background: #1f7a50;
+    color: #fff;
     cursor: default;
+}
+
+.study-complete:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.study-complete-check {
+    position: relative;
+    order: -1;
+    inline-size: 1rem;
+    block-size: 1rem;
+}
+
+.study-complete-check::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.33rem;
+    inset-block-start: 0.05rem;
+    inline-size: 0.3rem;
+    block-size: 0.62rem;
+    border: solid currentcolor;
+    border-width: 0 0.16rem 0.16rem 0;
+    transform: rotate(45deg);
+}
+
+/* Just completed: a green wipe fills the button, the check draws itself, one spring pop, one gold halo */
+.study-complete.is-just-done {
+    animation: study-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), study-halo 0.8s ease-out;
+}
+
+.study-complete.is-just-done:disabled {
+    background: var(--accent);
+}
+
+.study-complete.is-just-done::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #1f7a50;
+    animation: study-wipe 0.5s ease-out forwards;
+}
+
+.study-complete.is-just-done .study-complete-check::after {
+    animation: study-check 0.35s ease-out 0.3s backwards;
+}
+
+@keyframes study-wipe {
+    from {
+        clip-path: circle(0 at 50% 50%);
+    }
+
+    to {
+        clip-path: circle(80% at 50% 50%);
+    }
+}
+
+@keyframes study-check {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0);
+    }
+}
+
+@keyframes study-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes study-halo {
+    from {
+        box-shadow: 0 0 0 0 rgba(245, 179, 1, 0.6);
+    }
+
+    to {
+        box-shadow: 0 0 0 0.9rem rgba(245, 179, 1, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .study-page,
+    .pager-dot,
+    .pager-dot::before,
+    .study-complete {
+        transition: none;
+    }
+
+    .study-page.slide-in-next,
+    .study-page.slide-in-prev,
+    .study-swipe-chevron {
+        animation: none;
+    }
+
+    .study-complete.is-just-done,
+    .study-complete.is-just-done .study-complete-check::after {
+        animation: none;
+    }
+
+    .study-complete.is-just-done::before {
+        display: none;
+    }
+
+    .study-complete.is-just-done:disabled {
+        background: #1f7a50;
+    }
 }
 
 .study-copyright {
@@ -527,12 +764,19 @@ body {
     cursor: pointer;
 }
 
-.study-next,
 .study-exit,
 .study-back {
     background: var(--accent);
     border-color: var(--accent);
     color: var(--bg);
+}
+
+/* Previous/Next are the fallback to swiping: quiet ghost buttons (still 44px tall) */
+.study-prev,
+.study-next {
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
 }
 
 .study-prev:disabled {
@@ -550,4 +794,237 @@ body {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* Study completion celebration (UiCelebration): confetti falls from the top, each piece styled by position */
+.celebration {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.confetti-piece {
+    position: absolute;
+    inset-block-start: -1rem;
+    inline-size: 0.5rem;
+    block-size: 0.9rem;
+    border-radius: 0.1rem;
+    background: var(--accent);
+    opacity: 0;
+    animation: confetti-fall 2s ease-in forwards;
+}
+
+.confetti-piece:nth-child(5n+1) {
+    background: var(--accent);
+}
+
+.confetti-piece:nth-child(5n+2) {
+    background: var(--highlight);
+}
+
+.confetti-piece:nth-child(5n+3) {
+    background: #f5b301;
+}
+
+.confetti-piece:nth-child(5n+4) {
+    background: #2e9e6b;
+}
+
+.confetti-piece:nth-child(5n) {
+    background: #3b82f6;
+}
+
+.confetti-piece:nth-child(7n+1) {
+    --drift: -9rem;
+    --spin: 540deg;
+}
+
+.confetti-piece:nth-child(7n+2) {
+    --drift: 6rem;
+    --spin: -420deg;
+}
+
+.confetti-piece:nth-child(7n+3) {
+    --drift: -3rem;
+    --spin: 720deg;
+}
+
+.confetti-piece:nth-child(7n+4) {
+    --drift: 10rem;
+    --spin: -600deg;
+}
+
+.confetti-piece:nth-child(7n+5) {
+    --drift: -6rem;
+    --spin: 360deg;
+}
+
+.confetti-piece:nth-child(7n+6) {
+    --drift: 3rem;
+    --spin: -720deg;
+}
+
+.confetti-piece:nth-child(7n) {
+    --drift: 0rem;
+    --spin: 480deg;
+}
+
+.confetti-piece:nth-child(1) {
+    inset-inline-start: 5.7%;
+    animation-delay: 0.07s;
+}
+
+.confetti-piece:nth-child(2) {
+    inset-inline-start: 9.4%;
+    animation-delay: 0.14s;
+}
+
+.confetti-piece:nth-child(3) {
+    inset-inline-start: 13.1%;
+    animation-delay: 0.21s;
+}
+
+.confetti-piece:nth-child(4) {
+    inset-inline-start: 16.8%;
+    animation-delay: 0.28s;
+}
+
+.confetti-piece:nth-child(5) {
+    inset-inline-start: 20.5%;
+    animation-delay: 0.35s;
+}
+
+.confetti-piece:nth-child(6) {
+    inset-inline-start: 24.2%;
+    animation-delay: 0.42s;
+}
+
+.confetti-piece:nth-child(7) {
+    inset-inline-start: 27.9%;
+    animation-delay: 0.49s;
+}
+
+.confetti-piece:nth-child(8) {
+    inset-inline-start: 31.6%;
+    animation-delay: 0.56s;
+}
+
+.confetti-piece:nth-child(9) {
+    inset-inline-start: 35.3%;
+    animation-delay: 0.03s;
+}
+
+.confetti-piece:nth-child(10) {
+    inset-inline-start: 39.0%;
+    animation-delay: 0.1s;
+}
+
+.confetti-piece:nth-child(11) {
+    inset-inline-start: 42.7%;
+    animation-delay: 0.17s;
+}
+
+.confetti-piece:nth-child(12) {
+    inset-inline-start: 46.4%;
+    animation-delay: 0.24s;
+}
+
+.confetti-piece:nth-child(13) {
+    inset-inline-start: 50.1%;
+    animation-delay: 0.31s;
+}
+
+.confetti-piece:nth-child(14) {
+    inset-inline-start: 53.8%;
+    animation-delay: 0.38s;
+}
+
+.confetti-piece:nth-child(15) {
+    inset-inline-start: 57.5%;
+    animation-delay: 0.45s;
+}
+
+.confetti-piece:nth-child(16) {
+    inset-inline-start: 61.2%;
+    animation-delay: 0.52s;
+}
+
+.confetti-piece:nth-child(17) {
+    inset-inline-start: 64.9%;
+    animation-delay: 0.59s;
+}
+
+.confetti-piece:nth-child(18) {
+    inset-inline-start: 68.6%;
+    animation-delay: 0.06s;
+}
+
+.confetti-piece:nth-child(19) {
+    inset-inline-start: 72.3%;
+    animation-delay: 0.13s;
+}
+
+.confetti-piece:nth-child(20) {
+    inset-inline-start: 76.0%;
+    animation-delay: 0.2s;
+}
+
+.confetti-piece:nth-child(21) {
+    inset-inline-start: 79.7%;
+    animation-delay: 0.27s;
+}
+
+.confetti-piece:nth-child(22) {
+    inset-inline-start: 83.4%;
+    animation-delay: 0.34s;
+}
+
+.confetti-piece:nth-child(23) {
+    inset-inline-start: 87.1%;
+    animation-delay: 0.41s;
+}
+
+.confetti-piece:nth-child(24) {
+    inset-inline-start: 90.8%;
+    animation-delay: 0.48s;
+}
+
+.confetti-piece:nth-child(25) {
+    inset-inline-start: 94.5%;
+    animation-delay: 0.55s;
+}
+
+.confetti-piece:nth-child(26) {
+    inset-inline-start: 2.2%;
+    animation-delay: 0.02s;
+}
+
+.confetti-piece:nth-child(27) {
+    inset-inline-start: 5.9%;
+    animation-delay: 0.09s;
+}
+
+.confetti-piece:nth-child(28) {
+    inset-inline-start: 9.6%;
+    animation-delay: 0.16s;
+}
+
+@keyframes confetti-fall {
+    0% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) rotate(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate3d(var(--drift, 0), 105vh, 0) rotate(var(--spin, 360deg));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .celebration {
+        display: none;
+    }
 }

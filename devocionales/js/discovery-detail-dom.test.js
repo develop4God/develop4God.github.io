@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'discovery-cards.js', 'discovery-detail-dom.js']) {
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'discovery-detail-dom.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -18,7 +18,7 @@ const fixture = (name) => JSON.parse(fs.readFileSync(path.join(__dirname, '../..
 const LABELS = {
     keyVerse: 'KEY VERSE', revelation: 'Revelation', meaning: 'Meaning', strongNumber: "Strong's Number", reference: 'Reference',
     application: 'Application', reflectionQuestions: 'Reflection Questions', activationPrayer: 'Closing prayer',
-    previous: 'Previous', next: 'Next', exit: 'Exit', markCompleted: 'Complete study', completedStudy: 'Study completed',
+    pageOf: 'Page {current} of {total}', swipeHint: 'Swipe to continue', previous: 'Previous', next: 'Next', exit: 'Exit', markCompleted: 'Complete study', completedStudy: 'Study completed',
     studyNotFound: 'Study not found.', title: 'Bible Studies',
 };
 const t = (k) => LABELS[k] || k;
@@ -164,14 +164,33 @@ test('E0: remote strings in every field are text, never markup', () => {
 
 // ---- chrome around the pages ----
 
-test('progress: segmented bar with the current page marked (C1)', () => {
-    const el = dom.buildProgress(5, 2);
-    const segs = el.querySelectorAll('.study-seg');
+test('progress: tappable segments, the current one marked, earlier ones filled (C1)', () => {
+    const picked = [];
+    const el = dom.buildProgress(5, 2, 'Love', { onSelect: (i) => picked.push(i) });
+    const segs = el.querySelectorAll('.pager-dot');
     assert.equal(segs.length, 5);
     assert.deepEqual(segs.map((s) => s.classList.contains('is-done')), [true, true, true, false, false]);
-    assert.equal(el.getAttribute('role'), 'progressbar');
-    assert.equal(el.getAttribute('aria-valuenow'), '3');
-    assert.equal(el.getAttribute('aria-valuemax'), '5');
+    assert.deepEqual(segs.map((s) => s.classList.contains('is-current')), [false, false, true, false, false]);
+    assert.equal(el.getAttribute('role'), 'group');
+    assert.equal(el.getAttribute('aria-label'), 'Love');
+    assert.deepEqual(segs.map((s) => s.tagName), Array(5).fill('BUTTON'));
+    assert.equal(segs[2].getAttribute('aria-current'), 'step');
+    assert.equal(segs[0].getAttribute('aria-current'), null);
+    assert.equal(segs[0].getAttribute('aria-label'), 'Page 1 of 5');
+    segs[4].click();
+    segs[0].click();
+    assert.deepEqual(picked, [4, 0]);
+});
+
+test('progress: without a handler the segments are inert, not broken', () => {
+    const el = dom.buildProgress(3, 0, 'Love');
+    assert.doesNotThrow(() => el.querySelectorAll('.pager-dot')[1].click());
+});
+
+test('swipe hint: a short text with a decorative chevron', () => {
+    const el = dom.buildSwipeHint();
+    assert.equal(el.textContent, 'Swipe to continue');
+    assert.equal(el.querySelector('.study-swipe-chevron').getAttribute('aria-hidden'), 'true');
 });
 
 test('nav: Previous disabled on the first page; Next on middle pages; Exit on the last (C2)', () => {
@@ -204,6 +223,15 @@ test('footer (last page): Mark as completed calls back; completed shows a disabl
     const finished = dom.buildFooter({ isCompleted: true, copyright: 'x', onComplete: () => { done += 1; } });
     assert.equal(finished.querySelector('.study-complete').textContent, 'Study completed');
     assert.equal(finished.querySelector('.study-complete').hasAttribute('disabled'), true);
+});
+
+test('footer: a completed button carries a decorative check, an open one does not', () => {
+    const finished = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: noop }).querySelector('.study-complete');
+    const check = finished.querySelector('.study-complete-check');
+    assert.ok(check);
+    assert.equal(check.getAttribute('aria-hidden'), 'true');
+    assert.equal(finished.textContent, 'Study completed', 'the check adds no text for screen readers');
+    assert.equal(dom.buildFooter({ isCompleted: false, copyright: '', onComplete: noop }).querySelector('.study-complete-check'), null);
 });
 
 test('footer: shows the copyright line (C5) and omits it when empty', () => {

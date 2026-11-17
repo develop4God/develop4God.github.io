@@ -46,7 +46,7 @@ test.describe('sanity', () => {
     await openStudy(page);
     await expect(page.locator('.study-detail-title')).toHaveText(ASCENSION.title);
     await expect(page.locator('.study-keyverse-text')).toHaveText(ASCENSION.key_verse.text);
-    await expect(page.locator('.study-seg')).toHaveCount(PAGES);
+    await expect(page.locator('.pager-dot')).toHaveCount(PAGES);
     await expect(page.locator('#studies-list-view')).toBeHidden();
     expect(errors).toEqual([]);
   });
@@ -96,6 +96,79 @@ test.describe('paging', () => {
       touch('touchend', 120);
     });
     await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
+  });
+});
+
+test.describe('carousel', () => {
+  // Plain events carrying changedTouches: the Touch/TouchEvent constructors are missing in some engines.
+  async function touch(page, type, x, y = 300) {
+    await page.evaluate(([t, cx, cy]) => {
+      const event = new Event(t, { bubbles: true });
+      Object.defineProperty(event, 'changedTouches', { value: [{ clientX: cx, clientY: cy }] });
+      document.getElementById('studies-detail-view').dispatchEvent(event);
+    }, [type, x, y]);
+  }
+  const transformOf = (page) => page.locator('.study-page').evaluate((el) => el.style.transform);
+
+  test('tapping a dot jumps to that page and marks it current', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await page.locator('.pager-dot').nth(3).click();
+    await expect(page.locator('.pager-dot').nth(3)).toHaveAttribute('aria-current', 'step');
+    await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[2].title);
+    await expect(page.locator('.pager-dot').nth(3)).toHaveClass(/is-current/);
+  });
+
+  test('the page follows the finger while dragging, and a long drag turns the page with a slide', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 300);
+    await touch(page, 'touchmove', 220);
+    expect(await transformOf(page)).toMatch(/translateX\(-\d+px\)/);
+    await touch(page, 'touchend', 120);
+    await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
+    await expect(page.locator('.study-page')).toHaveClass(/slide-in-next/);
+    expect(await transformOf(page)).toBe('');
+  });
+
+  test('a short drag springs back and keeps the page', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 300);
+    await touch(page, 'touchmove', 270);
+    await touch(page, 'touchend', 270);
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+    expect(await transformOf(page)).toBe('');
+  });
+
+  test('a vertical drag never moves the page', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 200, 100);
+    await touch(page, 'touchmove', 195, 300);
+    expect(await transformOf(page)).toBe('');
+    await touch(page, 'touchend', 195, 300);
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+  });
+
+  test('the swipe hint shows on the first page until the reader pages, then never again', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(1);
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(0);
+    await page.locator('.pager-dot').first().click();
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(0);
+  });
+
+  test('Previous and Next stay available as quiet fallbacks, still 44px tall', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    const next = page.locator('.study-next');
+    await expect(next).toBeVisible();
+    expect((await next.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect(await next.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
   });
 });
 
@@ -231,6 +304,68 @@ test.describe('navigation and back (C6, C7)', () => {
     fail = false;
     await page.locator('.study-retry').click();
     await expect(page.locator('.study-detail-title')).toBeVisible();
+  });
+});
+
+test.describe('completion celebration', () => {
+  async function finish(page) {
+    await mockData(page);
+    await openStudy(page);
+    for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
+    await page.locator('.study-complete').click();
+  }
+
+  test('completing a study throws confetti that clears itself and never blocks taps', async ({ page }) => {
+    await finish(page);
+    const layer = page.locator('.celebration');
+    await expect(layer).toHaveCount(1);
+    await expect(layer).toHaveAttribute('aria-hidden', 'true');
+    expect(await layer.locator('.confetti-piece').count()).toBeGreaterThan(10);
+    expect(await layer.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
+    await expect(layer).toHaveCount(0, { timeout: 5000 });
+  });
+
+  test('the button plays its done animation (wipe, check, pop, halo) and settles on a green check', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
+    const names = await page.evaluate(() => new Promise((resolve) => {
+      document.querySelector('.study-complete').click();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        resolve([...new Set(document.querySelector('.study-complete').getAnimations({ subtree: true }).map((a) => a.animationName))].sort());
+      }));
+    }));
+    expect(names).toEqual(['study-check', 'study-halo', 'study-pop', 'study-wipe']);
+    await expect(page.locator('.study-complete .study-complete-check')).toBeVisible();
+    await expect(page.locator('.study-complete')).toHaveText('Study completed');
+  });
+
+  test('on a phone the completed button stays in view, so the animation is seen', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 600 });
+    await finish(page);
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await page.waitForTimeout(400);
+    const box = await page.locator('.study-complete').boundingBox();
+    expect(box.y, 'top of the button inside the viewport').toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height, 'bottom of the button inside the viewport').toBeLessThanOrEqual(600);
+  });
+
+  test('no confetti when the viewer prefers reduced motion; the study still completes', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await finish(page);
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.celebration')).toHaveCount(0);
+    expect(await page.evaluate(() => document.querySelector('.study-complete').getAnimations({ subtree: true }).length)).toBe(0);
+  });
+
+  test('reopening a completed study does not celebrate again', async ({ page }) => {
+    await finish(page);
+    await expect(page.locator('.celebration')).toHaveCount(0, { timeout: 5000 });
+    await page.reload();
+    await page.waitForSelector('.study-page');
+    for (let i = 0; i < PAGES && !(await page.locator('.study-complete').isVisible()); i++) await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.celebration')).toHaveCount(0);
   });
 });
 

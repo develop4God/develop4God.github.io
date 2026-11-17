@@ -9,7 +9,7 @@
     const isText = (v) => typeof v === 'string' && v.length > 0;
     const list = (v) => (Array.isArray(v) ? v.filter(isObject) : []);
 
-    function createDetailDom({ h, t }) {
+    function createDetailDom({ h, t, pagerDots = global.UiPagerDots.createPagerDots({ h }) }) {
         function emphasis(text) {
             return global.DiscoveryCards.parseEmphasis(text).map((seg) => {
                 if (seg.bold) return h('strong', { text: seg.text });
@@ -100,12 +100,14 @@
             return h('section', { class: 'study-page' }, cardSections(page.card));
         }
 
-        function buildProgress(total, index, label) {
-            const segments = Array.from({ length: total }, (_, i) => h('span', { class: `study-seg${i <= index ? ' is-done' : ''}` }));
-            return h('div', {
-                class: 'study-segments',
-                attrs: { role: 'progressbar', 'aria-label': label, 'aria-valuemin': '1', 'aria-valuemax': String(total), 'aria-valuenow': String(index + 1) },
-            }, segments);
+        // The progress segments are the carousel's dots (generic UiPagerDots): tap one to jump to that page.
+        function buildProgress(total, index, label, { onSelect } = {}) {
+            const pageLabel = (n, count) => t('pageOf').replace('{current}', String(n)).replace('{total}', String(count));
+            return pagerDots.build({ total, index, label, pageLabel, onSelect });
+        }
+
+        function buildSwipeHint() {
+            return h('p', { class: 'study-swipe-hint', text: t('swipeHint') }, [h('span', { class: 'study-swipe-chevron', attrs: { 'aria-hidden': 'true' } })]);
         }
 
         function buildNav({ index, total, onPrev, onNext, onExit }) {
@@ -125,7 +127,7 @@
                     text: t(isCompleted ? 'completedStudy' : 'markCompleted'),
                     attrs: { type: 'button', disabled: isCompleted ? '' : undefined },
                     on: { click: onComplete },
-                }),
+                }, isCompleted ? [h('span', { class: 'study-complete-check', attrs: { 'aria-hidden': 'true' } })] : []),
                 isText(copyright) ? h('p', { class: 'study-copyright', text: copyright }) : null,
             ]);
         }
@@ -147,7 +149,7 @@
             ]);
         }
 
-        return { buildPage, buildProgress, buildNav, buildFooter, buildHeader, buildNotFound };
+        return { buildPage, buildProgress, buildSwipeHint, buildNav, buildFooter, buildHeader, buildNotFound };
     }
 
     global.DiscoveryDetailDom = { createDetailDom };

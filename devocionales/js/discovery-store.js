@@ -9,6 +9,7 @@
         progress: (id, lang) => (lang ? `discovery_progress_${id}_${lang}` : `discovery_progress_${id}`),
         favorites: (lang) => `discovery_favorite_ids_${String(lang || 'es').split('-')[0].toLowerCase()}`,
         seen: 'discovery_seen_studies',
+        swipeHint: 'discovery_swipe_hint_seen',
     };
 
     const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -114,7 +115,11 @@
             write(KEYS.seen, [...seen]);
         }
 
+        const hasSeenSwipeHint = () => read(KEYS.swipeHint) === '1';
+        const markSwipeHintSeen = () => write(KEYS.swipeHint, '1');
+
         return {
+            hasSeenSwipeHint, markSwipeHintSeen,
             getProgress, markSectionCompleted, setTotalSections, completeStudy, resetProgress, completionPercentage,
             loadFavorites, toggleFavorite, loadSeen, markSeen,
         };

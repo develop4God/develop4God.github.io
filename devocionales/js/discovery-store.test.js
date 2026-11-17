@@ -226,3 +226,16 @@ test('missing storage (undefined) behaves like blocked storage', () => {
     assert.equal(s.loadFavorites('en').size, 0);
     assert.doesNotThrow(() => s.markSeen('a'));
 });
+
+test('swipe hint: unseen by default, remembered once marked, and storage failures never throw', () => {
+    const storage = memoryStorage();
+    const s = createDiscoveryStore(storage);
+    assert.equal(s.hasSeenSwipeHint(), false);
+    s.markSwipeHintSeen();
+    s.markSwipeHintSeen();
+    assert.equal(s.hasSeenSwipeHint(), true);
+    assert.equal(createDiscoveryStore(storage).hasSeenSwipeHint(), true, 'survives a new store over the same storage');
+    const broken = createDiscoveryStore(throwingStorage);
+    assert.doesNotThrow(() => broken.markSwipeHintSeen());
+    assert.equal(broken.hasSeenSwipeHint(), false);
+});

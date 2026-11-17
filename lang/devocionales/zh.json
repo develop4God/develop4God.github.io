@@ -296,6 +296,8 @@
     "strongNumber": "斯特朗编号",
     "reference": "经文出处",
     "application": "应用",
-    "activationPrayer": "结束祷告"
+    "activationPrayer": "结束祷告",
+    "pageOf": "第 {current} 页，共 {total} 页",
+    "swipeHint": "滑动继续"
   }
 }

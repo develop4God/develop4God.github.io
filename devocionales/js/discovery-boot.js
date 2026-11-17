@@ -26,6 +26,11 @@
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.DiscoveryStore.createDiscoveryStore(global.localStorage);
         const toast = global.UiToast.createToast({ document: doc, container: doc.body });
+        const celebrate = global.UiCelebration.createCelebration({
+            h,
+            container: doc.body,
+            reducedMotion: () => global.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        });
         const data = global.DiscoveryData.createDiscoveryData({
             fetchWithRetry: global.DevotionalFetch.fetchWithRetry,
             cache: global.DiscoveryCache.createCacheStore(global.caches, CACHE_NAME),
@@ -70,6 +75,7 @@
             nav: global.DiscoveryNav,
             copyright: global.DiscoveryCopyright.createCopyright({ versionInfo: global.DevotionalVersion.versionInfo }),
             toast,
+            celebrate,
             onExit: () => router.close(),
             scrollToTop: () => global.scrollTo(0, 0),
         });
@@ -121,13 +127,20 @@
             const modified = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
             if (router.current() && !modified && !e.defaultPrevented && !global.DiscoveryNav.isTypingTarget(e.target)) detailPage.onKey(e.key);
         });
-        let touchStart = null;
-        detailView.addEventListener('touchstart', (e) => { touchStart = { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY }; }, { passive: true });
-        detailView.addEventListener('touchcancel', () => { touchStart = null; }, { passive: true });
+        const swipe = global.UiSwipeDrag.createSwipeDrag({
+            classify: (delta) => global.DiscoveryNav.classifySwipe(delta, { rtl: rtl() }),
+            getTarget: () => detailView.querySelector('.study-page'),
+            rtl,
+            canGo: detailPage.canGo,
+            onCommit: (dir) => (dir === 'next' ? detailPage.next() : detailPage.prev()),
+        });
+        const point = (e) => e.changedTouches[0];
+        detailView.addEventListener('touchstart', (e) => { if (e.changedTouches.length === 1) swipe.start(point(e).clientX, point(e).clientY); else swipe.cancel(); }, { passive: true });
+        detailView.addEventListener('touchmove', (e) => { if (e.changedTouches.length === 1) swipe.move(point(e).clientX, point(e).clientY); else swipe.cancel(); }, { passive: true });
+        detailView.addEventListener('touchcancel', () => swipe.cancel(), { passive: true });
         detailView.addEventListener('touchend', (e) => {
-            if (!touchStart || e.changedTouches.length !== 1) { touchStart = null; return; } // a second finger (pinch) is never a swipe
-            detailPage.onSwipe({ dx: e.changedTouches[0].clientX - touchStart.x, dy: e.changedTouches[0].clientY - touchStart.y });
-            touchStart = null;
+            if (e.changedTouches.length !== 1) { swipe.cancel(); return; } // a second finger (pinch) is never a swipe
+            swipe.end(point(e).clientX, point(e).clientY);
         }, { passive: true });
 
         router.start();

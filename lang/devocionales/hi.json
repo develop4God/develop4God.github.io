@@ -296,6 +296,8 @@
     "strongNumber": "स्ट्रॉन्ग नंबर",
     "reference": "संदर्भ",
     "application": "अनुप्रयोग",
-    "activationPrayer": "समापन प्रार्थना"
+    "activationPrayer": "समापन प्रार्थना",
+    "pageOf": "पृष्ठ {current} / {total}",
+    "swipeHint": "आगे बढ़ने के लिए स्वाइप करें"
   }
 }
