@@ -172,6 +172,38 @@ test('buildSw lists the extra pages for the worker, and none when there are none
     assert.deepEqual(buildSw(root).config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms.html']);
 });
 
+test('collectPrecache covers a page in a subfolder (<folder>/index.html) and everything it loads', () => {
+    const { root, write } = makeSite();
+    write('devocionales/estudios/index.html', '<html><head><script src="/js/studies-only.js"></script><link rel="stylesheet" href="/devocionales/css/studies.css"></head></html>');
+    write('js/studies-only.js', 'studies();');
+    write('devocionales/css/studies.css', 'body{color:red}');
+    const urls = collectPrecache(root);
+    assert.ok(urls.includes('/devocionales/estudios/index.html'));
+    assert.ok(urls.includes('/js/studies-only.js'));
+    assert.ok(urls.includes('/devocionales/css/studies.css'));
+});
+
+test('collectPrecache fails, naming the page, when a subfolder page references a missing file', () => {
+    const { root, write } = makeSite();
+    write('devocionales/estudios/index.html', '<html><head><script src="/js/studies-missing.js"></script></head></html>');
+    assert.throws(() => collectPrecache(root), /studies-missing\.js/);
+});
+
+test('subfolders without an index.html (vendor, icons, js...) are not pages', () => {
+    const { root, write } = makeSite();
+    write('devocionales/notes/readme.txt', 'not a page');
+    write('devocionales/estudios/other.html', '<html></html>'); // only index.html is the page of a folder
+    assert.deepEqual(buildSw(root).config.pages, []);
+    assert.equal(collectPrecache(root).some((url) => url.includes('notes') || url.includes('other.html')), false);
+});
+
+test('buildSw lists a subfolder page for the worker after the top-level pages', () => {
+    const { root, write } = makeSite();
+    write('devocionales/privacy-policy.html', '<html></html>');
+    write('devocionales/estudios/index.html', '<html></html>');
+    assert.deepEqual(buildSw(root).config.pages, ['/devocionales/privacy-policy.html', '/devocionales/estudios/index.html']);
+});
+
 test('buildSw rejects a fresh-first path that is not precached', () => {
     const { root } = makeSite();
     assert.throws(() => buildSw(root, { freshFirst: ['/devocionales/js/not-precached.js'] }), /not-precached\.js/);
@@ -242,7 +274,11 @@ test('the real site builds, and the worker never lists itself', () => {
     assert.ok(config.precache.includes('/devocionales/vendor/tailwind.css'));
     assert.ok(config.precache.includes('/devocionales/vendor/fonts/inter-latin.woff2'));
     assert.equal(config.precache.filter((url) => url.endsWith('/sw.js')).length, 0);
-    assert.deepEqual(config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html']);
+    assert.deepEqual(config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html', '/devocionales/estudios/index.html']);
+    // the studies page, and the scripts and styles only it loads, are available offline
+    assert.ok(config.precache.includes('/devocionales/estudios/index.html'));
+    assert.ok(config.precache.includes('/devocionales/js/discovery-boot.js'));
+    assert.ok(config.precache.includes('/devocionales/css/discovery.css'));
     assert.ok(config.freshFirst.length > 0);
     for (const path of config.freshFirst) assert.ok(config.precache.includes(path), `${path} must be precached`);
     for (const path of config.sameOriginData) assert.equal(config.precache.includes(path), false, `${path} is fetched live`);

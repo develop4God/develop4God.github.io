@@ -43,6 +43,7 @@ const RUNTIME = {
     timeoutMs: 4000,
     freshTimeoutMs: 1000, // the page blocks on the config script, so it waits less than the data does
     maxDataEntries: 24, // year files kept: a few languages and versions, current and previous year
+    maxStudyEntries: 100, // Bible-study files kept (42 studies: two languages' worth); the studies index is never evicted
     // Hero images: saved on first view. Their list (index.json, above) is data; the images are not.
     imagePathPrefix: '/develop4God/Devocionales-assets/main/images/devotionals/',
     maxImageEntries: 30,
@@ -91,13 +92,20 @@ function cssReferences(css, cssUrl) {
         .map((ref) => new URL(ref, `http://x${cssUrl}`).pathname);
 }
 
-// devocionales/index.html first, then the other .html pages in that folder, sorted.
+// devocionales/index.html first, then the other .html pages in that folder, sorted, then the page of
+// each immediate subfolder (<folder>/index.html, e.g. estudios/). Only index.html is a folder's page:
+// vendor/, icons/ and js/ hold assets, and other files in a page folder are not pages.
 function pageFiles(root) {
-    const others = fs.readdirSync(path.join(root, PAGES_DIR))
-        .filter((name) => name.endsWith('.html') && `${PAGES_DIR}/${name}` !== SHELL_FILE)
-        .sort()
-        .map((name) => `${PAGES_DIR}/${name}`);
-    return [SHELL_FILE, ...others];
+    const entries = fs.readdirSync(path.join(root, PAGES_DIR), { withFileTypes: true });
+    const others = entries
+        .filter((e) => e.isFile() && e.name.endsWith('.html') && `${PAGES_DIR}/${e.name}` !== SHELL_FILE)
+        .map((e) => `${PAGES_DIR}/${e.name}`)
+        .sort();
+    const folderPages = entries
+        .filter((e) => e.isDirectory() && fs.existsSync(path.join(root, PAGES_DIR, e.name, 'index.html')))
+        .map((e) => `${PAGES_DIR}/${e.name}/index.html`)
+        .sort();
+    return [SHELL_FILE, ...others, ...folderPages];
 }
 
 function collectPrecache(root) {

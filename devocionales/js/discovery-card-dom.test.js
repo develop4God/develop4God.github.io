@@ -150,3 +150,9 @@ test('hero: the button opens that study', () => {
     el.querySelector('.study-hero-button').click();
     assert.equal(opened, 'love');
 });
+
+test('hero: the visible label is the only name (no duplicate aria-label that screen readers would read twice)', () => {
+    const el = dom.buildHero({ kind: 'start', card: card() }, { onOpen: noop });
+    assert.equal(el.hasAttribute('aria-label'), false);
+    assert.ok(el.querySelector('.study-hero-label').textContent.length > 0);
+});

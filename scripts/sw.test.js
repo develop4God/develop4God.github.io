@@ -26,6 +26,7 @@ const CONFIG = {
     timeoutMs: 40,
     freshTimeoutMs: 20, // the page blocks on the config script, so its wait is shorter than the data wait
     maxDataEntries: 3,
+    maxStudyEntries: 2,
     dataHost: DATA_HOST,
     dataPathPrefixes: [
         '/develop4God/Devocionales-json/',
@@ -37,10 +38,11 @@ const CONFIG = {
     sameOriginData: ['/data/app-stats.json'],
     installAttempts: 3,
     installRetryDelayMs: 1,
-    pages: ['/devocionales/privacy-policy.html'],
+    pages: ['/devocionales/privacy-policy.html', '/devocionales/estudios/index.html'],
     precache: [
         '/devocionales/',
         '/devocionales/privacy-policy.html',
+        '/devocionales/estudios/index.html',
         '/devocionales/vendor/tailwind.css',
         '/devocionales/js/devotional-pwa-config.js',
         '/js/shared.js',
@@ -56,6 +58,7 @@ async function killSwitch(worker) {
 }
 const JS = { type: 'basic', contentType: 'text/javascript' }; // how the site serves its own scripts
 const PRIVACY_URL = `${ORIGIN}/devocionales/privacy-policy.html`;
+const STUDIES_URL = `${ORIGIN}/devocionales/estudios/index.html`;
 const CONFIG_URL = `${ORIGIN}/devocionales/js/devotional-pwa-config.js`;
 const STATS_URL = `${ORIGIN}/data/app-stats.json`;
 const imageUrl = (n) => `https://${DATA_HOST}/develop4God/Devocionales-assets/main/images/devotionals/hero_0${n}.jpg`;
@@ -202,6 +205,7 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
 
 const ALL_ROUTES = () => ({
     [PRIVACY_URL]: response('<html>privacy v1</html>', { type: 'basic' }),
+    [STUDIES_URL]: response('<html>studies v1</html>', { type: 'basic' }),
     [CONFIG_URL]: response('config v1', JS),
     [`${ORIGIN}/devocionales/`]: response('<html>shell v1</html>', { type: 'basic' }),
     [`${ORIGIN}/devocionales/vendor/tailwind.css`]: response('css', { type: 'basic' }),
@@ -481,6 +485,33 @@ test('the data cache keeps the newest year files, and never evicts the index or 
     assert.deepEqual([...data.entries.keys()], [INDEX_URL, STATS_URL, ...urls.slice(-3)]);
 });
 
+const STUDY_INDEX_URL = 'https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/main/discovery/index.json';
+const studyUrl = (n) => `https://raw.githubusercontent.com/develop4God/Devocionales-json/refs/heads/main/discovery/en/study_${n}_en_001.json`;
+
+test('Bible-study files in the data cache are capped (newest kept); the studies index and year files are never evicted by them', async () => {
+    const studies = [1, 2, 3, 4].map(studyUrl);
+    const years = [1, 2].map(yearUrl);
+    const worker = await installed({
+        [STUDY_INDEX_URL]: response('{"studies":[]}'),
+        ...Object.fromEntries(years.map((u) => [u, response(u)])),
+        ...Object.fromEntries(studies.map((u) => [u, response(u)])),
+    });
+    await ask(worker, STUDY_INDEX_URL);
+    for (const u of years) await ask(worker, u);
+    for (const u of studies) await ask(worker, u);
+    const keys = [...(await worker.caches.open('devocionales-data')).entries.keys()];
+    assert.deepEqual(keys.filter((k) => k.includes('/discovery/en/')), studies.slice(-2));
+    assert.ok(keys.includes(STUDY_INDEX_URL), 'the studies index is small and every visit needs it');
+    for (const u of years) assert.ok(keys.includes(u), 'year files are not counted against the studies');
+});
+
+test('a saved study opens offline through the worker', async () => {
+    const worker = await installed({ [studyUrl(1)]: response('{"cards":[]}') });
+    await ask(worker, studyUrl(1));
+    worker.net.offline = true;
+    assert.equal(await ask(worker, studyUrl(1)), '{"cards":[]}');
+});
+
 // ------------------------------------------------------------------------ other pages offline
 
 test('the legal pages open offline, from the build cache', async () => {
@@ -493,6 +524,35 @@ test('the legal pages open offline, from the build cache', async () => {
 test('a page that is not listed is left to the browser', async () => {
     const worker = await installed();
     assert.equal(worker.fetchEvent(`${ORIGIN}/devocionales/terms-and-conditions.html`, { mode: 'navigate' }).answer, undefined);
+});
+
+// ----------------------------------------------- the Bible-studies page (a folder page) offline
+
+for (const [label, path] of [
+    ['its directory URL', '/devocionales/estudios/'],
+    ['index.html', '/devocionales/estudios/index.html'],
+    ['the slashless URL the host may redirect from', '/devocionales/estudios'],
+    ['a deep link with a study id and language in the query', '/devocionales/estudios/?lang=en&id=love'],
+]) {
+    test(`the studies page opens offline from the build cache through ${label}`, async () => {
+        const worker = await installed();
+        worker.net.offline = true;
+        const event = worker.fetchEvent(`${ORIGIN}${path}`, { mode: 'navigate' });
+        assert.equal(await (await event.answer).text(), '<html>studies v1</html>');
+    });
+}
+
+test('the studies page does not hijack the reader or a folder that is not listed', async () => {
+    const worker = await installed();
+    worker.net.offline = true;
+    assert.equal(await (await worker.fetchEvent(`${ORIGIN}/devocionales/`, { mode: 'navigate' }).answer).text(), '<html>shell v1</html>');
+    assert.equal(worker.fetchEvent(`${ORIGIN}/devocionales/other/`, { mode: 'navigate' }).answer, undefined);
+    assert.equal(worker.fetchEvent(`${ORIGIN}/devocionales/other`, { mode: 'navigate' }).answer, undefined);
+});
+
+test('the studies page is only answered for navigations (the study data and other requests stay with the browser)', async () => {
+    const worker = await installed();
+    assert.equal(worker.fetchEvent(`${ORIGIN}/devocionales/estudios/missing.json`).answer, undefined);
 });
 
 // ------------------------------------------------------------- config: fresh first, then saved

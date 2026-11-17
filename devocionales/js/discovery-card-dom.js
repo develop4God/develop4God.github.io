@@ -70,7 +70,7 @@
         function buildHero({ kind, card }, { onOpen }) {
             const isContinue = kind === 'continue';
             const percent = isContinue ? percentOf(card) : null;
-            return h('section', { class: 'study-hero', attrs: { 'aria-label': t(isContinue ? 'continueWhereLeft' : 'startHere') } }, [
+            return h('section', { class: 'study-hero' }, [
                 h('p', { class: 'study-hero-label', text: t(isContinue ? 'continueWhereLeft' : 'startHere') }),
                 h('div', { class: 'study-hero-main' }, [
                     h('span', { class: 'study-card-emoji', text: card.emoji, attrs: { 'aria-hidden': 'true' } }),
