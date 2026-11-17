@@ -5,12 +5,18 @@ on:
     branches: [main]
   pull_request:
 
+# Read-only token: the repo default is write, and no job here needs it.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Unit + e2e tests (blocking)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -54,6 +60,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -82,6 +90,15 @@ jobs:
       - name: Validate JavaScript
         run: eslint "**/*.js" --ignore-pattern "node_modules/"
 
+      - name: innerHTML guard still rejects unsafe code in the reader
+        # Self-test of the no-restricted-syntax override in .eslintrc.json: an edit that
+        # silently drops the guard would otherwise leave lint green.
+        run: |
+          if printf 'const el = document.body;\nel.innerHTML = "x";\n' | eslint --stdin --stdin-filename devocionales/js/guard-check.js; then
+            echo "The innerHTML guard did not fire"
+            exit 1
+          fi
+
       - name: Generated files are up to date
         # Same script as the local validator (phase 9); see its header for what it rebuilds and why.
         run: bash scripts/check-generated.sh
@@ -92,6 +109,8 @@ jobs:
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Check for broken links
         # --exclude mailto: : not a fetchable HTTP(S) resource, so lychee

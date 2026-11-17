@@ -7,6 +7,17 @@
         return Boolean(standalone && typeof standalone.isAndroid === 'function' && standalone.isAndroid(global.navigator));
     }
 
+    // Builds one element with text set via textContent, never parsed as HTML. Not DomBuilder
+    // (dom-builder.js) on purpose: the previous deploy's HTML does not load that script, and this
+    // file must keep working against it (see the replay test in e2e/devocionales-shell.spec.js).
+    function createEl(tag, className, attrs, text) {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        Object.entries(attrs || {}).forEach(([name, value]) => el.setAttribute(name, value));
+        if (text !== undefined) el.textContent = text;
+        return el;
+    }
+
     function showError(onRetry) {
         document.getElementById('loading-state').classList.add('hidden');
         document.getElementById('error-state').classList.remove('hidden');
@@ -28,26 +39,20 @@
 
     function renderAccordion(paraMeditar) {
         const container = document.getElementById('meditar-accordion');
-        container.innerHTML = '';
-        (paraMeditar || []).forEach((item) => {
-            const wrap = document.createElement('div');
-            wrap.className = 'accordion-item open';
-            wrap.innerHTML = `
-                <button class="accordion-title" type="button" aria-expanded="true">
-                    <span>${item.cita}</span>
-                    <i data-lucide="chevron-down" class="chev w-4 h-4"></i>
-                </button>
-                <div class="accordion-content">
-                    <div class="accordion-content-inner">${item.texto}</div>
-                </div>
-            `;
-            const title = wrap.querySelector('.accordion-title');
+        container.replaceChildren(...(paraMeditar || []).map((item) => {
+            // cita/texto come from remote content: text nodes only, never parsed as HTML.
+            const title = createEl('button', 'accordion-title', { type: 'button', 'aria-expanded': 'true' });
+            title.append(createEl('span', '', {}, item.cita || ''), createEl('i', 'chev w-4 h-4', { 'data-lucide': 'chevron-down' }));
+            const content = createEl('div', 'accordion-content');
+            content.append(createEl('div', 'accordion-content-inner', {}, item.texto || ''));
+            const wrap = createEl('div', 'accordion-item open');
+            wrap.append(title, content);
             title.addEventListener('click', () => {
                 const isOpen = wrap.classList.toggle('open');
                 title.setAttribute('aria-expanded', String(isOpen));
             });
-            container.appendChild(wrap);
-        });
+            return wrap;
+        }));
     }
 
     function renderTags(tags) {
@@ -57,7 +62,7 @@
             wrap.classList.add('hidden');
             return;
         }
-        list.innerHTML = tags.map(t => `<span class="tag-pill">${t}</span>`).join('');
+        list.replaceChildren(...tags.map((t) => createEl('span', 'tag-pill', {}, t)));
     }
 
     // Same stacked-listener pitfall as devotional-tts.js's setupTts:
