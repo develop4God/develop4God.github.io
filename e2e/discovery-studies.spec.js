@@ -175,11 +175,12 @@ test.describe('card actions', () => {
     await expect(page.locator('.toast')).toHaveClass(/toast-error/);
   });
 
-  test('opening a study marks it seen and navigates to its deep link', async ({ page }) => {
+  test('opening a study marks it seen and shows the reader at its deep link', async ({ page }) => {
     await mockData(page);
     await open(page);
     await card(page, 's3').locator('.study-card-open').click();
-    await page.waitForURL(/estudios\/\?id=s3/);
+    await expect(page.locator('.study-detail-title')).toBeVisible();
+    await expect(page).toHaveURL(/id=s3/);
     expect(await page.evaluate(() => localStorage.getItem('discovery_seen_studies'))).toContain('s3');
   });
 });

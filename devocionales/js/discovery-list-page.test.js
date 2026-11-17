@@ -13,7 +13,7 @@ function load(name) {
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
 ['dom-builder.js', 'discovery-data.js', 'discovery-store.js', 'discovery-sort-filter.js', 'discovery-card-dom.js',
-    'discovery-list-dom.js', 'discovery-share-text.js', 'discovery-list-page.js'].forEach(load);
+    'discovery-list-dom.js', 'discovery-cards.js', 'discovery-share-text.js', 'discovery-list-page.js'].forEach(load);
 const W = global.window;
 const { createListPage } = W.DiscoveryListPage;
 

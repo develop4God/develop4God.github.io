@@ -241,6 +241,7 @@
   "shell": {
     "nav_label": "Nabigasyon ng app",
     "home": "Home",
+    "studies": "Mga Pag-aaral sa Biblia",
     "settings": "Mga Setting",
     "language": "Wika",
     "theme": "Tema",
@@ -282,6 +283,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "Ituloy kung saan ka huminto",
     "startHere": "Magsimula rito",
-    "studiesCount": "{count} pag-aaral"
+    "studiesCount": "{count} pag-aaral",
+    "previous": "Nakaraan",
+    "next": "Susunod",
+    "exit": "Lumabas",
+    "markCompleted": "Kumpletuhin ang pag-aaral",
+    "completedStudy": "Nakumpletong pag-aaral",
+    "studyCompleted": "Matagumpay na nakumpleto ang pag-aaral",
+    "studyNotFound": "Hindi nahanap ang pag-aaral.",
+    "keyVerse": "PANGUNAHING TALATA",
+    "meaning": "Kahulugan",
+    "strongNumber": "Numerong Strong",
+    "reference": "Sanggunian",
+    "application": "Aplikasyon",
+    "activationPrayer": "Panalangin ng Pagsasabuhay"
   }
 }

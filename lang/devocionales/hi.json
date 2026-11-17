@@ -241,6 +241,7 @@
   "shell": {
     "nav_label": "ऐप नेविगेशन",
     "home": "होम",
+    "studies": "बाइबिल अध्ययन",
     "settings": "सेटिंग्स",
     "language": "भाषा",
     "theme": "थीम",
@@ -282,6 +283,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "जहाँ छोड़ा था वहीं से जारी रखें",
     "startHere": "यहाँ से शुरू करें",
-    "studiesCount": "{count} अध्ययन"
+    "studiesCount": "{count} अध्ययन",
+    "previous": "पिछला",
+    "next": "अगला",
+    "exit": "बाहर निकलें",
+    "markCompleted": "अध्ययन पूर्ण करें",
+    "completedStudy": "अध्ययन पूर्ण हुआ",
+    "studyCompleted": "अध्ययन सफलतापूर्वक पूर्ण हुआ",
+    "studyNotFound": "अध्ययन नहीं मिला।",
+    "keyVerse": "मुख्य पद",
+    "meaning": "अर्थ",
+    "strongNumber": "स्ट्रॉन्ग नंबर",
+    "reference": "संदर्भ",
+    "application": "अनुप्रयोग",
+    "activationPrayer": "समापन प्रार्थना"
   }
 }

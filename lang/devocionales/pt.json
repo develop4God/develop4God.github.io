@@ -241,6 +241,7 @@
   "shell": {
     "nav_label": "Navegação do app",
     "home": "Início",
+    "studies": "Estudos Bíblicos",
     "settings": "Configurações",
     "language": "Idioma",
     "theme": "Tema",
@@ -282,6 +283,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "Continue de onde parou",
     "startHere": "Comece aqui",
-    "studiesCount": "{count} estudos"
+    "studiesCount": "{count} estudos",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "exit": "Sair",
+    "markCompleted": "Concluir estudo",
+    "completedStudy": "Estudo concluído",
+    "studyCompleted": "Estudo concluído com sucesso",
+    "studyNotFound": "Estudo não encontrado.",
+    "keyVerse": "VERSÍCULO CHAVE",
+    "meaning": "Significado",
+    "strongNumber": "Número Strong",
+    "reference": "Referência",
+    "application": "Aplicação",
+    "activationPrayer": "Oração de Encerramento"
   }
 }

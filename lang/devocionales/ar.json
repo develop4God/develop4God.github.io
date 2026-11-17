@@ -241,6 +241,7 @@
   "shell": {
     "nav_label": "التنقل في التطبيق",
     "home": "الرئيسية",
+    "studies": "دراسات كتابية",
     "settings": "الإعدادات",
     "language": "اللغة",
     "theme": "المظهر",
@@ -282,6 +283,19 @@
     "shareFooterDeveloper": "Develop4God",
     "continueWhereLeft": "تابع من حيث توقفت",
     "startHere": "ابدأ من هنا",
-    "studiesCount": "{count} دراسات"
+    "studiesCount": "{count} دراسات",
+    "previous": "السابق",
+    "next": "التالي",
+    "exit": "خروج",
+    "markCompleted": "إتمام الدراسة",
+    "completedStudy": "دراسة مُكتملة",
+    "studyCompleted": "تمت الدراسة بنجاح",
+    "studyNotFound": "الدراسة غير موجودة.",
+    "keyVerse": "الآية المفتاحية",
+    "meaning": "المعنى",
+    "strongNumber": "رقم سترونج",
+    "reference": "المرجع",
+    "application": "التطبيق",
+    "activationPrayer": "صلاة الختام"
   }
 }
