@@ -48,7 +48,7 @@
 // independent of the page build. Each keeps only the newest entries (the data cache never evicts
 // the small index and stats files).
 
-const CONFIG = JSON.parse("{\"version\":\"ed36212e2f68\",\"claimTimeoutMs\":1000,\"installAttempts\":3,\"installRetryDelayMs\":500,\"timeoutMs\":4000,\"freshTimeoutMs\":1000,\"maxDataEntries\":24,\"imagePathPrefix\":\"/develop4God/Devocionales-assets/main/images/devotionals/\",\"maxImageEntries\":30,\"freshFirst\":[\"/devocionales/js/devotional-pwa-config.js\"],\"sameOriginData\":[\"/data/app-stats.json\"],\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"pages\":[\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/chrome.css\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/css/theme.css\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-app-version.js\",\"/devocionales/js/devotional-build.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-ios-hint.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-manifest.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-push-firebase.js\",\"/devocionales/js/devotional-push-help.js\",\"/devocionales/js/devotional-push-offer.js\",\"/devocionales/js/devotional-push-store.js\",\"/devocionales/js/devotional-push.js\",\"/devocionales/js/devotional-pwa-config.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-standalone.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-theme.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/privacy-policy.html\",\"/devocionales/pwa/devotional-shell-core.js\",\"/devocionales/pwa/devotional-shell.js\",\"/devocionales/pwa/shell.css\",\"/devocionales/terms-and-conditions.html\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
+const CONFIG = JSON.parse("{\"version\":\"409eacfb14c7\",\"claimTimeoutMs\":1000,\"installAttempts\":3,\"installRetryDelayMs\":500,\"timeoutMs\":4000,\"freshTimeoutMs\":1000,\"maxDataEntries\":24,\"maxStudyEntries\":100,\"imagePathPrefix\":\"/develop4God/Devocionales-assets/main/images/devotionals/\",\"maxImageEntries\":30,\"freshFirst\":[\"/devocionales/js/devotional-pwa-config.js\"],\"sameOriginData\":[\"/data/app-stats.json\"],\"dataHost\":\"raw.githubusercontent.com\",\"dataPathPrefixes\":[\"/develop4God/Devocionales-json/\",\"/develop4God/Devocionales-assets/main/images/devotionals/index.json\"],\"pages\":[\"/devocionales/privacy-policy.html\",\"/devocionales/terms-and-conditions.html\",\"/devocionales/estudios/index.html\"],\"precache\":[\"/devocionales/\",\"/devocionales/css/chrome.css\",\"/devocionales/css/discovery.css\",\"/devocionales/css/language-selector.css\",\"/devocionales/css/modern.css\",\"/devocionales/css/theme.css\",\"/devocionales/estudios/index.html\",\"/devocionales/icons/apple-touch-icon.png\",\"/devocionales/icons/icon-192.png\",\"/devocionales/icons/icon-512.png\",\"/devocionales/icons/icon-maskable-512.png\",\"/devocionales/js/bible-text-formatter.js\",\"/devocionales/js/devotional-app-version.js\",\"/devocionales/js/devotional-build.js\",\"/devocionales/js/devotional-error-logger.js\",\"/devocionales/js/devotional-fetch.js\",\"/devocionales/js/devotional-i18n-adapter.js\",\"/devocionales/js/devotional-install.js\",\"/devocionales/js/devotional-ios-hint.js\",\"/devocionales/js/devotional-loader.js\",\"/devocionales/js/devotional-manifest.js\",\"/devocionales/js/devotional-nav.js\",\"/devocionales/js/devotional-progress.js\",\"/devocionales/js/devotional-push-firebase.js\",\"/devocionales/js/devotional-push-help.js\",\"/devocionales/js/devotional-push-offer.js\",\"/devocionales/js/devotional-push-store.js\",\"/devocionales/js/devotional-push.js\",\"/devocionales/js/devotional-pwa-config.js\",\"/devocionales/js/devotional-render-dom.js\",\"/devocionales/js/devotional-salvation-modal.js\",\"/devocionales/js/devotional-share.js\",\"/devocionales/js/devotional-standalone.js\",\"/devocionales/js/devotional-sw-register.js\",\"/devocionales/js/devotional-theme.js\",\"/devocionales/js/devotional-tts.js\",\"/devocionales/js/devotional-version.js\",\"/devocionales/js/discovery-boot.js\",\"/devocionales/js/discovery-cache.js\",\"/devocionales/js/discovery-card-dom.js\",\"/devocionales/js/discovery-cards.js\",\"/devocionales/js/discovery-copyright.js\",\"/devocionales/js/discovery-data.js\",\"/devocionales/js/discovery-detail-dom.js\",\"/devocionales/js/discovery-detail-page.js\",\"/devocionales/js/discovery-list-dom.js\",\"/devocionales/js/discovery-list-page.js\",\"/devocionales/js/discovery-nav.js\",\"/devocionales/js/discovery-router.js\",\"/devocionales/js/discovery-share-text.js\",\"/devocionales/js/discovery-sort-filter.js\",\"/devocionales/js/discovery-store.js\",\"/devocionales/js/dom-builder.js\",\"/devocionales/js/i18n.js\",\"/devocionales/js/modern.js\",\"/devocionales/js/share-or-copy.js\",\"/devocionales/js/ui-celebration.js\",\"/devocionales/js/ui-pager-dots.js\",\"/devocionales/js/ui-swipe-drag.js\",\"/devocionales/js/ui-toast.js\",\"/devocionales/manifest.webmanifest\",\"/devocionales/privacy-policy.html\",\"/devocionales/pwa/devotional-shell-core.js\",\"/devocionales/pwa/devotional-shell.js\",\"/devocionales/pwa/shell.css\",\"/devocionales/terms-and-conditions.html\",\"/devocionales/vendor/fonts/inter-latin-ext.woff2\",\"/devocionales/vendor/fonts/inter-latin.woff2\",\"/devocionales/vendor/lucide.min.js\",\"/devocionales/vendor/tailwind.css\",\"/js/app-stats.js\",\"/js/rtl-helper.js\",\"/js/site-footer.js\",\"/lang/devocionales/ar.json\",\"/lang/devocionales/de.json\",\"/lang/devocionales/en.json\",\"/lang/devocionales/es.json\",\"/lang/devocionales/fil.json\",\"/lang/devocionales/fr.json\",\"/lang/devocionales/hi.json\",\"/lang/devocionales/ja.json\",\"/lang/devocionales/pt.json\",\"/lang/devocionales/zh.json\"]}"); // replaced by scripts/build-sw.js
 
 const CACHE_PREFIX = 'devocionales-';
 const BUILD_CACHE = `${CACHE_PREFIX}${CONFIG.version}`;
@@ -63,9 +63,19 @@ const BUILD_QUERY_MESSAGE = 'devocionales-build?';
 const SHELL_PATH = '/devocionales/';
 const SHELL_PATHS = new Set([SHELL_PATH, `${SHELL_PATH}index.html`]);
 // The host redirects `page.html` to the extensionless `page`, so both forms must be served offline.
-const PAGE_PATHS = new Set([...SHELL_PATHS, ...CONFIG.pages, ...CONFIG.pages.map((page) => page.replace(/\.html$/, ''))]);
+// A folder page (`<folder>/index.html`) is also reached as `<folder>/` and `<folder>`.
+const FOLDER_PAGES = CONFIG.pages.filter((page) => page.endsWith('/index.html')).map((page) => page.slice(0, -'index.html'.length));
+const PAGE_PATHS = new Set([
+  ...SHELL_PATHS,
+  ...CONFIG.pages,
+  ...CONFIG.pages.map((page) => page.replace(/\.html$/, '')),
+  ...FOLDER_PAGES,
+  ...FOLDER_PAGES.map((folder) => folder.slice(0, -1)),
+]);
 const pageKey = (pathname) => {
   if (SHELL_PATHS.has(pathname)) return SHELL_PATH;
+  if (FOLDER_PAGES.includes(pathname)) return `${pathname}index.html`;
+  if (FOLDER_PAGES.includes(`${pathname}/`)) return `${pathname}/index.html`;
   return pathname.endsWith('.html') ? pathname : `${pathname}.html`;
 };
 const SLOW = Symbol('slow');
@@ -314,12 +324,16 @@ async function trim(cache, limit, counts = () => true) {
   for (const key of keys.slice(0, Math.max(0, keys.length - limit))) await cache.delete(key);
 }
 
-// Only year files are capped: the index and stats files are small and every load needs them.
+// Year files and Bible-study files are capped, each against its own kind: the index and stats files
+// are small and every load needs them, and reading many studies must not evict the devotional.
+const isStudyFile = (url) => url.includes('/discovery/') && !url.endsWith('/discovery/index.json');
+
 async function saveData(request, response) {
   const copy = await cleanCopy(response);
   await writeTo(DATA_CACHE, async (cache) => {
     await cache.put(request, copy);
     await trim(cache, CONFIG.maxDataEntries, (url) => url.includes('/Devocional_year_'));
+    await trim(cache, CONFIG.maxStudyEntries, isStudyFile);
   });
 }
 
