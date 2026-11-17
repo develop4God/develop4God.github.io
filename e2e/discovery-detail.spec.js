@@ -252,11 +252,27 @@ test.describe('completion celebration', () => {
     await expect(layer).toHaveCount(0, { timeout: 5000 });
   });
 
+  test('the button plays its done animation (wipe, check, pop, halo) and settles on a green check', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
+    const names = await page.evaluate(() => new Promise((resolve) => {
+      document.querySelector('.study-complete').click();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        resolve([...new Set(document.querySelector('.study-complete').getAnimations({ subtree: true }).map((a) => a.animationName))].sort());
+      }));
+    }));
+    expect(names).toEqual(['study-check', 'study-halo', 'study-pop', 'study-wipe']);
+    await expect(page.locator('.study-complete .study-complete-check')).toBeVisible();
+    await expect(page.locator('.study-complete')).toHaveText('Study completed');
+  });
+
   test('no confetti when the viewer prefers reduced motion; the study still completes', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await finish(page);
     await expect(page.locator('.study-complete')).toBeDisabled();
     await expect(page.locator('.celebration')).toHaveCount(0);
+    expect(await page.evaluate(() => document.querySelector('.study-complete').getAnimations({ subtree: true }).length)).toBe(0);
   });
 
   test('reopening a completed study does not celebrate again', async ({ page }) => {

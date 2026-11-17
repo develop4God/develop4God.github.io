@@ -125,7 +125,7 @@
                     text: t(isCompleted ? 'completedStudy' : 'markCompleted'),
                     attrs: { type: 'button', disabled: isCompleted ? '' : undefined },
                     on: { click: onComplete },
-                }),
+                }, isCompleted ? [h('span', { class: 'study-complete-check', attrs: { 'aria-hidden': 'true' } })] : []),
                 isText(copyright) ? h('p', { class: 'study-copyright', text: copyright }) : null,
             ]);
         }

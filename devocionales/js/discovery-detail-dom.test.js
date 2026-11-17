@@ -206,6 +206,15 @@ test('footer (last page): Mark as completed calls back; completed shows a disabl
     assert.equal(finished.querySelector('.study-complete').hasAttribute('disabled'), true);
 });
 
+test('footer: a completed button carries a decorative check, an open one does not', () => {
+    const finished = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: noop }).querySelector('.study-complete');
+    const check = finished.querySelector('.study-complete-check');
+    assert.ok(check);
+    assert.equal(check.getAttribute('aria-hidden'), 'true');
+    assert.equal(finished.textContent, 'Study completed', 'the check adds no text for screen readers');
+    assert.equal(dom.buildFooter({ isCompleted: false, copyright: '', onComplete: noop }).querySelector('.study-complete-check'), null);
+});
+
 test('footer: shows the copyright line (C5) and omits it when empty', () => {
     assert.equal(dom.buildFooter({ isCompleted: false, copyright: 'KJV text', onComplete: noop }).querySelector('.study-copyright').textContent, 'KJV text');
     assert.equal(dom.buildFooter({ isCompleted: false, copyright: '', onComplete: noop }).querySelector('.study-copyright'), null);

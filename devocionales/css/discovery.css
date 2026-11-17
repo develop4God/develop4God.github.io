@@ -483,6 +483,13 @@ body {
 }
 
 .study-complete {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     min-block-size: 2.75rem;
     border: 0;
     border-radius: 0.375rem;
@@ -490,11 +497,122 @@ body {
     color: var(--bg);
     font-weight: 700;
     cursor: pointer;
+    transition: transform 0.12s ease;
 }
 
+/* Done state: solid green with a check (dark enough for white text at 4.5:1) */
 .study-complete:disabled {
-    opacity: 0.6;
+    background: #1f7a50;
+    color: #fff;
     cursor: default;
+}
+
+.study-complete:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.study-complete-check {
+    position: relative;
+    order: -1;
+    inline-size: 1rem;
+    block-size: 1rem;
+}
+
+.study-complete-check::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0.33rem;
+    inset-block-start: 0.05rem;
+    inline-size: 0.3rem;
+    block-size: 0.62rem;
+    border: solid currentcolor;
+    border-width: 0 0.16rem 0.16rem 0;
+    transform: rotate(45deg);
+}
+
+/* Just completed: a green wipe fills the button, the check draws itself, one spring pop, one gold halo */
+.study-complete.is-just-done {
+    animation: study-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), study-halo 0.8s ease-out;
+}
+
+.study-complete.is-just-done:disabled {
+    background: var(--accent);
+}
+
+.study-complete.is-just-done::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #1f7a50;
+    animation: study-wipe 0.5s ease-out forwards;
+}
+
+.study-complete.is-just-done .study-complete-check::after {
+    animation: study-check 0.35s ease-out 0.3s backwards;
+}
+
+@keyframes study-wipe {
+    from {
+        clip-path: circle(0 at 50% 50%);
+    }
+
+    to {
+        clip-path: circle(80% at 50% 50%);
+    }
+}
+
+@keyframes study-check {
+    from {
+        clip-path: inset(0 0 100% 0);
+    }
+
+    to {
+        clip-path: inset(0);
+    }
+}
+
+@keyframes study-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.06);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes study-halo {
+    from {
+        box-shadow: 0 0 0 0 rgba(245, 179, 1, 0.6);
+    }
+
+    to {
+        box-shadow: 0 0 0 0.9rem rgba(245, 179, 1, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .study-complete {
+        transition: none;
+    }
+
+    .study-complete.is-just-done,
+    .study-complete.is-just-done .study-complete-check::after {
+        animation: none;
+    }
+
+    .study-complete.is-just-done::before {
+        display: none;
+    }
+
+    .study-complete.is-just-done:disabled {
+        background: #1f7a50;
+    }
 }
 
 .study-copyright {

@@ -72,6 +72,8 @@
             toast.show(t('studyCompleted'));
             if (celebrate) celebrate.burst();
             render({ focusPage: true }); // the button that had focus was replaced; keep the reader's place
+            const done = view.root.querySelector('.study-complete');
+            if (done) done.classList.add('is-just-done'); // only this button plays the done animation
         }
 
         async function open(target) {

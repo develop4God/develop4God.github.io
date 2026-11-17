@@ -164,6 +164,20 @@ test('an already completed study opens without a celebration', async () => {
     assert.equal(bursts.length, 0);
 });
 
+test('only the button just completed plays the done animation; an opened completed study does not', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    page.goTo(3);
+    root.querySelector('.study-complete').click();
+    assert.ok(root.querySelector('.study-complete').classList.contains('is-just-done'));
+    const storage = memoryStorage();
+    W.DiscoveryStore.createDiscoveryStore(storage).completeStudy('love', 'en');
+    const again = setup({ storage });
+    await again.page.open(summary);
+    again.page.goTo(3);
+    assert.equal(again.root.querySelector('.study-complete').classList.contains('is-just-done'), false);
+});
+
 test('completing still works when no celebration is wired', async () => {
     const { page, root, store, toasts } = setup({ celebrate: null });
     await page.open(summary);
