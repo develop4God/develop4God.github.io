@@ -599,3 +599,49 @@ test('devocionales reader still renders when the browser serves the previous cac
   await expect(page.locator('#devotional-verse-ref')).not.toHaveText('');
   await expect(page.locator('#error-state')).toBeHidden();
 });
+
+test.describe('devocionales reader renders remote content as text, never as HTML', () => {
+  // Para Meditar, the tags and the Bible-version codes come from the Devocionales-json repo. A
+  // markup payload in any of them must show up literally and run nothing.
+  const PAYLOAD = '<img src=x onerror="window.__xss=1">';
+
+  async function mockPayloadArchive(page) {
+    await page.route('**/Devocionales-json/**/index.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        files: { en: { NIV: { files: { 2019: 'Devocional_year_2019_en_NIV.json' } }, [PAYLOAD]: { files: {} } } },
+      }),
+    }));
+    await page.route('**/Devocionales-json/**/Devocional_year_2019_en_NIV.json', (route) => route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: {
+          en: {
+            '2020-01-01': [{
+              id: 'mock-xss', date: '2020-01-01', language: 'en', version: 'NIV',
+              versiculo: 'Mock 1:1 NIV: "text"', reflexion: 'r', oracion: 'o',
+              para_meditar: [{ cita: PAYLOAD, texto: PAYLOAD }], tags: [PAYLOAD],
+            }],
+          },
+        },
+      }),
+    }));
+  }
+
+  test('a markup payload in para_meditar, tags and version codes is shown literally and executes nothing', async ({ page }) => {
+    const appErrors = [];
+    page.on('pageerror', (e) => appErrors.push(e.message));
+
+    await mockPayloadArchive(page);
+    await page.goto('/devocionales/?lang=en&date=2020-01-01', { waitUntil: 'networkidle' });
+
+    await expect(page.locator('#meditar-accordion .accordion-title')).toHaveText(PAYLOAD);
+    await expect(page.locator('#meditar-accordion .accordion-content-inner')).toHaveText(PAYLOAD);
+    await expect(page.locator('#tags-list .tag-pill')).toHaveText(PAYLOAD);
+    await expect(page.locator('#version-select option').filter({ hasText: PAYLOAD })).toHaveCount(1);
+
+    expect(await page.locator('#meditar-accordion img, #tags-list img, #version-select img').count()).toBe(0);
+    expect(await page.evaluate(() => window.__xss)).toBeUndefined();
+    expect(appErrors).toEqual([]);
+  });
+});
