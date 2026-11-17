@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'discovery-cards.js', 'discovery-store.js', 'discovery-nav.js', 'discovery-card-dom.js',
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'discovery-store.js', 'discovery-nav.js', 'discovery-card-dom.js',
     'discovery-list-dom.js', 'discovery-detail-dom.js', 'discovery-copyright.js', 'discovery-detail-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
@@ -16,7 +16,7 @@ for (const name of ['dom-builder.js', 'discovery-cards.js', 'discovery-store.js'
 const W = global.window;
 
 const LABELS = {
-    previous: 'Previous', next: 'Next', exit: 'Exit', markCompleted: 'Complete study', completedStudy: 'Study completed',
+    pageOf: 'Page {current} of {total}', swipeHint: 'Swipe to continue', previous: 'Previous', next: 'Next', exit: 'Exit', markCompleted: 'Complete study', completedStudy: 'Study completed',
     studyCompleted: 'Study completed successfully', studyNotFound: 'Study not found.', title: 'Bible Studies',
     loading: 'Loading', loadError: 'Load error', retry: 'Retry', keyVerse: 'KEY VERSE',
 };
@@ -72,7 +72,7 @@ test('open: shows loading, then the study header, the key verse page first, and 
     await p;
     assert.equal(root.querySelector('.study-detail-title').textContent, 'Love');
     assert.ok(root.querySelector('.study-page-keyverse'));
-    assert.equal(root.querySelectorAll('.study-seg').length, 4);
+    assert.equal(root.querySelectorAll('.pager-dot').length, 4);
     assert.ok(JSON.parse(storage.data.discovery_seen_studies).includes('love'));
 });
 
@@ -105,25 +105,18 @@ test('paging past the ends is a no-op', async () => {
     assert.equal(root.querySelector('.study-next'), null);
 });
 
-test('C2 keyboard arrows and swipes page; RTL mirrors them', async () => {
+test('C2 keyboard arrows page; RTL mirrors them (swipes: see ui-swipe-drag.test.js)', async () => {
     const ltr = setup();
     await ltr.page.open(summary);
     ltr.page.onKey('ArrowRight');
     assert.equal(title(ltr.root), 'Card 1');
-    ltr.page.onSwipe({ dx: 90, dy: 0 });
-    assert.ok(ltr.root.querySelector('.study-page-keyverse'));
-    ltr.page.onSwipe({ dx: -90, dy: 3 });
-    assert.equal(title(ltr.root), 'Card 1');
     ltr.page.onKey('Enter');
-    ltr.page.onSwipe({ dx: -10, dy: 0 });
     assert.equal(title(ltr.root), 'Card 1');
 
     const rtl = setup({ rtl: true });
     await rtl.page.open(summary);
     rtl.page.onKey('ArrowLeft');
     assert.equal(title(rtl.root), 'Card 1');
-    rtl.page.onSwipe({ dx: 90, dy: 0 });
-    assert.equal(title(rtl.root), 'Card 2');
 });
 
 test('last page: shows the footer with the completion button and the study version copyright (C4, C5)', async () => {
@@ -265,7 +258,7 @@ test('close: a later open supersedes an earlier slow load', async () => {
     assert.equal(root.querySelector('.study-detail-title').textContent, 'New');
 });
 
-test('review: keys and swipes are ignored while loading, after an error, and after not-found (no stale pages)', async () => {
+test('review: keys and swipe targets are ignored while loading, after an error, and after not-found (no stale pages)', async () => {
     let fail = false;
     const { page, root } = setup({ loadStudy: async () => { if (fail) throw new Error('offline'); return study(); } });
     await page.open(summary);
@@ -273,7 +266,7 @@ test('review: keys and swipes are ignored while loading, after an error, and aft
     await page.open({ ...summary, id: 'other' });
     assert.ok(root.textContent.includes('Load error'));
     page.onKey('ArrowRight');
-    page.onSwipe({ dx: -90, dy: 0 });
+    assert.equal(page.canGo('next'), false, 'no page to drag to while the error shows');
     assert.ok(root.textContent.includes('Load error'), 'the error message is not replaced by the previous study');
     page.showNotFound();
     page.onKey('ArrowRight');
@@ -291,5 +284,56 @@ test('review: completing keeps keyboard focus inside the reader (on the page) in
 test('review: the segmented progress bar has an accessible name (the study title)', async () => {
     const { page, root } = setup();
     await page.open(summary);
-    assert.equal(root.querySelector('.study-segments').getAttribute('aria-label'), 'Love');
+    assert.equal(root.querySelector('.pager-dots').getAttribute('aria-label'), 'Love');
+});
+
+test('tapping a progress segment jumps to that page, forward or back', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    root.querySelectorAll('.pager-dot')[3].click();
+    assert.ok(root.querySelector('.study-complete'), 'the last page is open');
+    root.querySelectorAll('.pager-dot')[0].click();
+    assert.ok(root.querySelector('.study-page-keyverse'));
+});
+
+test('the new page slides in from the direction of travel; the first open and a no-op do not slide', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    assert.equal(root.querySelector('.study-page').classList.contains('slide-in-next'), false);
+    page.next();
+    assert.ok(root.querySelector('.study-page').classList.contains('slide-in-next'));
+    page.prev();
+    assert.ok(root.querySelector('.study-page').classList.contains('slide-in-prev'));
+    root.querySelectorAll('.pager-dot')[3].click();
+    assert.ok(root.querySelector('.study-page').classList.contains('slide-in-next'), 'a jump forward slides forward');
+});
+
+test('canGo reports whether there is a page in that direction (drag resistance)', async () => {
+    const { page } = setup();
+    await page.open(summary);
+    assert.equal(page.canGo('prev'), false);
+    assert.equal(page.canGo('next'), true);
+    page.goTo(3);
+    assert.equal(page.canGo('next'), false);
+    assert.equal(page.canGo('prev'), true);
+});
+
+test('the swipe hint shows once on the first page, and is gone for good after the reader pages', async () => {
+    const { page, root, storage } = setup();
+    await page.open(summary);
+    assert.ok(root.querySelector('.study-swipe-hint'));
+    page.next();
+    assert.equal(root.querySelector('.study-swipe-hint'), null);
+    page.prev();
+    assert.equal(root.querySelector('.study-swipe-hint'), null, 'seen: never again');
+    const again = setup({ storage });
+    await again.page.open(summary);
+    assert.equal(again.root.querySelector('.study-swipe-hint'), null);
+});
+
+test('the hint is not shown on later pages', async () => {
+    const { page, root } = setup();
+    await page.open(summary);
+    page.goTo(2);
+    assert.equal(root.querySelector('.study-swipe-hint'), null);
 });

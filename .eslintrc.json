@@ -40,6 +40,8 @@
     "DiscoveryShareText": "readonly",
     "UiToast": "readonly",
     "UiCelebration": "readonly",
+    "UiSwipeDrag": "readonly",
+    "UiPagerDots": "readonly",
     "ShareOrCopy": "readonly",
     "DomBuilder": "readonly",
     "DevotionalTheme": "readonly",

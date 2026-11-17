@@ -296,6 +296,8 @@
     "strongNumber": "Strong's Number",
     "reference": "Reference",
     "application": "Application",
-    "activationPrayer": "Closing prayer"
+    "activationPrayer": "Closing prayer",
+    "pageOf": "Page {current} of {total}",
+    "swipeHint": "Swipe to continue"
   }
 }

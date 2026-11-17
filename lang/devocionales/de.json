@@ -296,6 +296,8 @@
     "strongNumber": "Strong-Nummer",
     "reference": "Referenz",
     "application": "Anwendung",
-    "activationPrayer": "Abschlussgebet"
+    "activationPrayer": "Abschlussgebet",
+    "pageOf": "Seite {current} von {total}",
+    "swipeHint": "Zum Fortfahren wischen"
   }
 }

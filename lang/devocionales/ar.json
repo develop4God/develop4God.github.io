@@ -296,6 +296,8 @@
     "strongNumber": "رقم سترونج",
     "reference": "المرجع",
     "application": "التطبيق",
-    "activationPrayer": "صلاة الختام"
+    "activationPrayer": "صلاة الختام",
+    "pageOf": "الصفحة {current} من {total}",
+    "swipeHint": "اسحب للمتابعة"
   }
 }

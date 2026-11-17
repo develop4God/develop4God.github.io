@@ -296,6 +296,8 @@
     "strongNumber": "Numéro de Strong",
     "reference": "Référence",
     "application": "Application",
-    "activationPrayer": "Prière de clôture"
+    "activationPrayer": "Prière de clôture",
+    "pageOf": "Page {current} sur {total}",
+    "swipeHint": "Faites glisser pour continuer"
   }
 }

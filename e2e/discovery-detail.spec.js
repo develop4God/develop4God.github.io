@@ -46,7 +46,7 @@ test.describe('sanity', () => {
     await openStudy(page);
     await expect(page.locator('.study-detail-title')).toHaveText(ASCENSION.title);
     await expect(page.locator('.study-keyverse-text')).toHaveText(ASCENSION.key_verse.text);
-    await expect(page.locator('.study-seg')).toHaveCount(PAGES);
+    await expect(page.locator('.pager-dot')).toHaveCount(PAGES);
     await expect(page.locator('#studies-list-view')).toBeHidden();
     expect(errors).toEqual([]);
   });
@@ -96,6 +96,79 @@ test.describe('paging', () => {
       touch('touchend', 120);
     });
     await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
+  });
+});
+
+test.describe('carousel', () => {
+  // Plain events carrying changedTouches: the Touch/TouchEvent constructors are missing in some engines.
+  async function touch(page, type, x, y = 300) {
+    await page.evaluate(([t, cx, cy]) => {
+      const event = new Event(t, { bubbles: true });
+      Object.defineProperty(event, 'changedTouches', { value: [{ clientX: cx, clientY: cy }] });
+      document.getElementById('studies-detail-view').dispatchEvent(event);
+    }, [type, x, y]);
+  }
+  const transformOf = (page) => page.locator('.study-page').evaluate((el) => el.style.transform);
+
+  test('tapping a dot jumps to that page and marks it current', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await page.locator('.pager-dot').nth(3).click();
+    await expect(page.locator('.pager-dot').nth(3)).toHaveAttribute('aria-current', 'step');
+    await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[2].title);
+    await expect(page.locator('.pager-dot').nth(3)).toHaveClass(/is-current/);
+  });
+
+  test('the page follows the finger while dragging, and a long drag turns the page with a slide', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 300);
+    await touch(page, 'touchmove', 220);
+    expect(await transformOf(page)).toMatch(/translateX\(-\d+px\)/);
+    await touch(page, 'touchend', 120);
+    await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
+    await expect(page.locator('.study-page')).toHaveClass(/slide-in-next/);
+    expect(await transformOf(page)).toBe('');
+  });
+
+  test('a short drag springs back and keeps the page', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 300);
+    await touch(page, 'touchmove', 270);
+    await touch(page, 'touchend', 270);
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+    expect(await transformOf(page)).toBe('');
+  });
+
+  test('a vertical drag never moves the page', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await touch(page, 'touchstart', 200, 100);
+    await touch(page, 'touchmove', 195, 300);
+    expect(await transformOf(page)).toBe('');
+    await touch(page, 'touchend', 195, 300);
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+  });
+
+  test('the swipe hint shows on the first page until the reader pages, then never again', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(1);
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(0);
+    await page.locator('.pager-dot').first().click();
+    await expect(page.locator('.study-page-keyverse')).toBeVisible();
+    await expect(page.locator('.study-swipe-hint')).toHaveCount(0);
+  });
+
+  test('Previous and Next stay available as quiet fallbacks, still 44px tall', async ({ page }) => {
+    await mockData(page);
+    await openStudy(page);
+    const next = page.locator('.study-next');
+    await expect(next).toBeVisible();
+    expect((await next.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    expect(await next.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
   });
 });
 

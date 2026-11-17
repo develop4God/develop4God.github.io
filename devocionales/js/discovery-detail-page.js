@@ -36,14 +36,17 @@
             return next === -1 ? 0 : next;
         }
 
-        function render({ focusPage = false } = {}) {
+        // slide: 'next' | 'prev' when the page changed, so the new page enters from that side.
+        function render({ focusPage = false, slide = null } = {}) {
             const page = pages[index];
             const pageEl = detailDom.buildPage(page);
             pageEl.setAttribute('tabindex', '-1');
+            if (slide) pageEl.classList.add(`slide-in-${slide}`);
             const isCompleted = store.getProgress(summary.id, lang()).isCompleted;
             view.root.replaceChildren(
                 detailDom.buildHeader({ emoji: summary.emoji, title: summary.title, subtitle: summary.subtitle }),
-                detailDom.buildProgress(pages.length, index, summary.title),
+                detailDom.buildProgress(pages.length, index, summary.title, { onSelect: goTo }),
+                ...(index === 0 && !store.hasSeenSwipeHint() ? [detailDom.buildSwipeHint()] : []),
                 pageEl,
                 ...(page.isLast ? [detailDom.buildFooter({
                     isCompleted,
@@ -57,11 +60,15 @@
 
         function goTo(target) {
             if (!study || !pages.length || target < 0 || target >= pages.length || target === index) return;
+            const slide = target > index ? 'next' : 'prev';
             index = target;
+            store.markSwipeHintSeen(); // the reader has paged: the hint has done its job
             recordView();
-            render({ focusPage: true });
+            render({ focusPage: true, slide });
             scrollToTop();
         }
+
+        const canGo = (dir) => pages.length > 0 && (dir === 'next' ? index < pages.length - 1 : index > 0);
 
         const next = () => goTo(index + 1);
         const prev = () => goTo(index - 1);
@@ -111,12 +118,7 @@
             if (action === 'next') next(); else if (action === 'prev') prev();
         };
 
-        const onSwipe = (delta) => {
-            const action = nav.classifySwipe(delta, { rtl: rtl() });
-            if (action === 'next') next(); else if (action === 'prev') prev();
-        };
-
-        return { open, goTo, next, prev, onKey, onSwipe, showNotFound };
+        return { open, goTo, next, prev, canGo, onKey, showNotFound };
     }
 
     global.DiscoveryDetailPage = { createDetailPage };
