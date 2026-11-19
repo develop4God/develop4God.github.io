@@ -7,13 +7,6 @@
     // i18n are injected, so every rule here is unit-tested without a browser.
     const RETURN_DELAY_MS = 5000;
 
-    // Logical direction from a key: in RTL the arrows mirror (ArrowRight goes back).
-    function directionFor(key, rtl) {
-        if (key === 'ArrowRight') return rtl ? 'prev' : 'next';
-        if (key === 'ArrowLeft') return rtl ? 'next' : 'prev';
-        return null;
-    }
-
     function createReaderPage(deps) {
         const { view, lang, data, store, timers, celebrate, onExit, copyright } = deps;
 
@@ -21,6 +14,8 @@
         let study = null;
         let pages = [];
         let index = 0;
+        let phase = 'intro'; // 'intro' (C0, shown on every open) -> 'reader'
+        let intro = null;
         let loadSeq = 0;
         let completing = false; // press-once: set on the first completion, never cleared for this encounter
 
@@ -29,6 +24,8 @@
             const isCompleted = !!summary && store.isCompleted(summary.id);
             view.render({
                 summary,
+                phase,
+                intro,
                 index,
                 pages,
                 footer: {
@@ -41,12 +38,36 @@
             });
         }
 
+        // Header fields for the intro screen, taken from the list entry (already localized by the loader).
+        function introOf(entry) {
+            return {
+                title: entry.title,
+                subtitle: entry.subtitle || '',
+                scripture: entry.scripture || '',
+                minutes: entry.minutes,
+                testament: entry.testament || '',
+                emoji: entry.emoji,
+                introImage: entry.introImage || '',
+                accent: entry.accent || null,
+                mood: entry.mood || '',
+            };
+        }
+
+        function enter() {
+            if (phase === 'reader' || !pages.length) return;
+            phase = 'reader';
+            index = 0;
+            render();
+        }
+
         async function open(target) {
             const seq = ++loadSeq;
             summary = target;
             study = null;
             pages = [];
             index = 0;
+            phase = 'intro';
+            intro = target ? introOf(target) : null;
             completing = false;
             try {
                 const loaded = await data.loadEncounter(target, lang());
@@ -71,6 +92,9 @@
             render();
         }
 
+        // Swipe support: whether a page exists in that direction (paging only happens in the reader).
+        const canGo = (dir) => phase === 'reader' && pages.length > 0 && (dir === 'next' ? index < pages.length - 1 : index > 0);
+
         const next = () => goTo(index + 1);
         const prev = () => goTo(index - 1);
 
@@ -89,13 +113,15 @@
             onExit();
         }
 
+        // Paging keys belong to the reader; during the intro they do nothing.
         function onKey(key, { rtl = false } = {}) {
-            const direction = directionFor(key, rtl);
-            if (direction === 'next') next();
-            else if (direction === 'prev') prev();
+            if (phase !== 'reader') return;
+            const action = global.DiscoveryNav.keyAction(key, { rtl });
+            if (action === 'next') next();
+            else if (action === 'prev') prev();
         }
 
-        return { open, goTo, next, prev, complete, exit, onKey };
+        return { open, enter, goTo, next, prev, canGo, complete, exit, onKey };
     }
 
     global.EncounterReaderPage = { createReaderPage, RETURN_DELAY_MS };

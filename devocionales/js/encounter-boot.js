@@ -45,6 +45,62 @@
             focusFallback: () => { const title = byId('encounters-title'); title.setAttribute('tabindex', '-1'); title.focus(); },
         });
 
+        const listView = byId('encounters-list-view');
+        const detailView = byId('encounters-detail-view');
+        const celebration = global.UiCelebration.createCelebration({
+            h,
+            container: doc.body,
+            reducedMotion: () => global.matchMedia('(prefers-reduced-motion: reduce)').matches,
+        });
+        const rtl = () => doc.documentElement.dir === 'rtl';
+
+        // Route state lives in the URL (?id=), owned by the Bible-studies router with the Encounters
+        // nav helpers (same URL grammar). Declared first: the list's open handler calls it.
+        let router = null;
+        let readerView = null;
+        const reader = global.EncounterReaderPage.createReaderPage({
+            view: { render: (state) => readerView.render(state) },
+            lang,
+            data: { loadEncounter: (entry, language) => data.loadStudy(entry, language) },
+            store,
+            timers: { setTimeout: (fn, ms) => global.setTimeout(fn, ms) },
+            celebrate: () => celebration.burst(),
+            onExit: () => router.close(),
+            copyright: (language, bibleVersion) => global.DiscoveryCopyright.createCopyright({
+                versionInfo: global.DevotionalVersion.versionInfo,
+            }).resolve(language, bibleVersion),
+        });
+        readerView = global.EncounterReaderView.createReaderView({
+            dom: global.EncounterReaderDom.createReaderDom({ h, t, imageUrlFor: images.imageUrl }),
+            root: detailView,
+            listView,
+            detailView,
+            actions: reader,
+        });
+
+        // The deep link decides what shows: the lock rule is applied on the card list, not here.
+        async function showDeepLink(id) {
+            let entries;
+            try {
+                entries = await data.loadIndex(lang());
+            } catch (_) {
+                readerView.showList(); // the list shows its own error with Retry
+                return;
+            }
+            const cards = global.EncounterCards.buildCards(entries, { completed: store.loadCompleted(), allUnlocked: false });
+            const route = global.EncounterRoute.routeFor(cards, id);
+            if (route.kind === 'open') {
+                readerView.showReader();
+                reader.open(route.entry);
+            } else if (route.kind === 'locked') {
+                readerView.showList();
+                unlockSheet.open();
+            } else {
+                readerView.showReader();
+                readerView.render({ notFound: true, summary: { id }, phase: 'intro', intro: null, pages: [], index: 0, footer: {} });
+            }
+        }
+
         const listPage = global.EncounterListPage.createListPage({
             view: { count: byId('encounters-count'), body: byId('encounters-body') },
             lang,
@@ -55,7 +111,14 @@
             unlockSheet,
             allUnlocked: () => false,
             afterRender: renderIcons,
-            onOpen: () => {},
+            onOpen: (id) => router.open(id),
+        });
+
+        router = global.DiscoveryRouter.createRouter({
+            win: global,
+            nav: global.DiscoveryNav,
+            onList: () => { readerView.showList(); },
+            onDetail: (id) => { showDeepLink(id); },
         });
 
         function applyStaticText() {
@@ -92,7 +155,29 @@
         // Coming back through the back/forward cache must show the latest progress.
         global.addEventListener('pageshow', (e) => { if (e.persisted) listPage.refresh(); });
 
+        // Paging by keyboard and swipe, only while the reader shows a page.
+        doc.addEventListener('keydown', (e) => {
+            const modified = e.altKey || e.ctrlKey || e.metaKey || e.shiftKey;
+            if (!detailView.hidden && !modified && !e.defaultPrevented && !global.DiscoveryNav.isTypingTarget(e.target)) reader.onKey(e.key, { rtl: rtl() });
+        });
+        const swipe = global.UiSwipeDrag.createSwipeDrag({
+            classify: (delta) => global.DiscoveryNav.classifySwipe(delta, { rtl: rtl() }),
+            getTarget: () => detailView.querySelector('.encounter-page'),
+            rtl,
+            canGo: reader.canGo,
+            onCommit: (dir) => (dir === 'next' ? reader.next() : reader.prev()),
+        });
+        const point = (e) => e.changedTouches[0];
+        detailView.addEventListener('touchstart', (e) => { if (e.changedTouches.length === 1) swipe.start(point(e).clientX, point(e).clientY); else swipe.cancel(); }, { passive: true });
+        detailView.addEventListener('touchmove', (e) => { if (e.changedTouches.length === 1) swipe.move(point(e).clientX, point(e).clientY); else swipe.cancel(); }, { passive: true });
+        detailView.addEventListener('touchcancel', () => swipe.cancel(), { passive: true });
+        detailView.addEventListener('touchend', (e) => {
+            if (e.changedTouches.length !== 1) { swipe.cancel(); return; } // a second finger (pinch) is never a swipe
+            swipe.end(point(e).clientX, point(e).clientY);
+        }, { passive: true });
+
         listPage.init();
+        router.start();
         showWelcomeOnce();
         renderIcons();
     }

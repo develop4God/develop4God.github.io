@@ -328,3 +328,255 @@
         animation: none;
     }
 }
+
+/* Reader: intro (C0), pages, progress, paging and the completion footer. Text colours come from the
+   theme tokens so light and dark both work. */
+
+.encounter-intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-block: 1rem 2rem;
+    animation: encounter-rise 0.4s ease-out both;
+}
+
+.encounter-intro-back {
+    align-self: flex-start;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.5rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+}
+
+.encounter-intro-media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: var(--accent-soft);
+    display: grid;
+    place-items: center;
+}
+
+.encounter-intro-media .encounter-card-image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.encounter-card-image[hidden] {
+    display: none;
+}
+
+.encounter-intro-emoji {
+    font-size: 3rem;
+}
+
+.encounter-intro-title {
+    margin: 0;
+    font-size: 1.75rem;
+    color: var(--text);
+}
+
+.encounter-intro-subtitle,
+.encounter-intro-scripture {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.encounter-intro-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.encounter-chip {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    background-color: var(--accent-soft);
+}
+
+.encounter-intro-enter,
+.encounter-complete,
+.encounter-exit {
+    min-block-size: 3.25rem;
+    padding-inline: 1.5rem;
+    border: 0;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0a0e1a;
+    background: var(--accent);
+}
+
+.encounter-pages {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-block: 1rem 2rem;
+}
+
+.encounter-page {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    color: var(--text);
+}
+
+.encounter-page-title {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.encounter-page-subtitle,
+.encounter-verse-ref,
+.encounter-question-category,
+.encounter-prayer-title,
+.encounter-keyverse-label {
+    margin: 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+}
+
+.encounter-page .encounter-card-image {
+    inline-size: 100%;
+    border-radius: 1rem;
+    object-fit: cover;
+}
+
+.encounter-narrative,
+.encounter-content,
+.encounter-reflection,
+.encounter-prayer-text,
+.encounter-verse-text,
+.encounter-question-text {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.encounter-verse,
+.encounter-completion-verse,
+.encounter-prayer,
+.encounter-question {
+    padding: 0.75rem 1rem;
+    border-inline-start: 3px solid var(--accent);
+    border-radius: 0.5rem;
+    background-color: var(--accent-soft);
+}
+
+.encounter-revelation {
+    margin: 0;
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+.encounter-page--keyverse {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.encounter-keyverse-text {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+.encounter-keyverse-ref {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.encounter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.encounter-prev,
+.encounter-next {
+    min-inline-size: 3rem;
+    min-block-size: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.encounter-prev[disabled] {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.encounter-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding-block: 1rem;
+}
+
+.encounter-complete[disabled] {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.encounter-copyright {
+    margin: 0;
+    font-size: 0.75rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.encounter-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 3rem;
+    color: var(--text);
+    text-align: center;
+}
+
+.encounter-back,
+.encounter-retry {
+    min-block-size: 2.75rem;
+    padding-inline: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.encounter-page--completion .encounter-completion-verse {
+    font-size: 1.1rem;
+}
+
+/* Keyboard focus for every reader control (kept last so it wins over the base rules). */
+.encounter-intro-enter:focus-visible,
+.encounter-complete:focus-visible,
+.encounter-exit:focus-visible,
+.encounter-prev:focus-visible,
+.encounter-next:focus-visible,
+.encounter-intro-back:focus-visible,
+.encounter-back:focus-visible,
+.encounter-retry:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}

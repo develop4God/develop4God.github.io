@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-for (const name of ['discovery-cards.js', 'encounter-reader-page.js']) {
+for (const name of ['discovery-cards.js', 'discovery-nav.js', 'encounter-reader-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -209,8 +209,56 @@ test('a late load for a previous encounter cannot replace the current one', asyn
 test('keyboard next/prev follows RTL: arrow keys mirror in Arabic', async () => {
     const { page, calls } = setup();
     await page.open(SUMMARY);
+    page.enter();
     page.onKey('ArrowRight', { rtl: true });
     assert.equal(last(calls).index, 0); // in RTL ArrowRight means previous: already first
     page.onKey('ArrowLeft', { rtl: true });
     assert.equal(last(calls).index, 1);
+});
+
+test('C0: opening shows the intro first; enter() starts the reader at the key verse', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    assert.equal(last(calls).phase, 'intro');
+    page.enter();
+    assert.equal(last(calls).phase, 'reader');
+    assert.equal(last(calls).index, 0);
+});
+
+test('C0: the intro is shown on every open, not only the first', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    page.enter();
+    page.goTo(2);
+    await page.open(SUMMARY);
+    assert.equal(last(calls).phase, 'intro');
+    assert.equal(last(calls).index, 0);
+});
+
+test('paging keys are ignored while the intro is showing', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    page.onKey('ArrowLeft');
+    assert.equal(last(calls).index, 0);
+    assert.equal(last(calls).phase, 'intro');
+});
+
+test('the intro carries the encounter header fields from the summary', async () => {
+    const { page, calls } = setup();
+    await page.open({ ...SUMMARY, title: 'Bartimaeus', scripture: 'Mark 10:46-52', minutes: 7, testament: 'new' });
+    assert.equal(last(calls).intro.title, 'Bartimaeus');
+    assert.equal(last(calls).intro.minutes, 7);
+    assert.equal(last(calls).intro.testament, 'new');
+});
+
+test('canGo: only in the reader phase, and only within the page bounds', async () => {
+    const { page } = setup();
+    await page.open(SUMMARY);
+    assert.equal(page.canGo('next'), false, 'intro: no paging yet');
+    page.enter();
+    assert.equal(page.canGo('prev'), false, 'first page');
+    assert.equal(page.canGo('next'), true);
+    page.goTo(3);
+    assert.equal(page.canGo('next'), false, 'last page');
+    assert.equal(page.canGo('prev'), true);
 });
