@@ -119,7 +119,8 @@ function fakeAdapter(overrides = {}) {
     return adapter;
 }
 
-const t = (key) => `T:${key}`;
+// time_set_at carries the {time} placeholder, as the language files do.
+const t = (key) => (key === 'push.time_set_at' ? 'T:push.time_set_at {time}' : `T:${key}`);
 const CONFIG = { enabled: true, pushEnabled: true };
 const OPTED = { 'devotionalPush.optedIn': '1', 'devotionalPush.token': 'tok1' };
 // The app's order on every entry: lastLogin, token, settings.
@@ -395,8 +396,70 @@ test('A5: a failed settings write keeps the flags and the UI on with an error, s
     assert.equal(ctx.storage.data['devotionalPush.optedIn'], '1');
     assert.equal(ctx.storage.data['devotionalPush.token'], 'tok1');
     assertOn(ctx);
-    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_error_off');
     assert.equal(ctx.el('switch').disabled, false);
+});
+
+test('OFF-ERR: a failing turn-on still says it could not be turned on', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ getToken: () => Promise.reject(new Error('x')) }) });
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.equal(ctx.el('status').textContent, 'T:push.status_error');
+});
+
+test('TIME: the confirmation fills the {time} placeholder wherever the language puts it', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    ctx.deps.t = (key) => (key === 'push.time_set_at' ? '{time} \u2190 set' : key);
+    await ctx.run();
+    ctx.el('hour').value = '4';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.equal(ctx.el('status').textContent, '04:00 \u2190 set');
+});
+
+test('TIME: a translation without the {time} placeholder gets the hour appended, and $ in a value is literal', async () => {
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    ctx.deps.t = (key) => (key === 'push.time_set_at' ? 'Notification time set to' : key);
+    await ctx.run();
+    ctx.el('hour').value = '4';
+    ctx.el('hour').listeners.change();
+    await tick();
+    assert.equal(ctx.el('status').textContent, 'Notification time set to 04:00');
+});
+
+test('LANG-BUSY: a failed hour save made while busy does not drop the language change made meanwhile', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    const realSet = ctx.adapter.db.set;
+    ctx.adapter.db.set = (...args) => { ctx.adapter.db.set = realSet; return gate.then(() => realSet(...args)); };
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    // While that save is in flight: a second pick and a language change. The next save (the second hour) fails once.
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.i18nState.lang = 'en';
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    let failed = false;
+    ctx.adapter.db.set = (...args) => {
+        if (!failed) { failed = true; return Promise.reject(new Error('network')); }
+        return realSet(...args);
+    };
+    release();
+    await tick();
+    assert.equal(ctx.el('hour').value, '12', 'the row shows the last hour the server has');
+    const last = ctx.adapter.writes[ctx.adapter.writes.length - 1];
+    assert.equal(last.data.preferredLanguage, 'en', 'the language change is still written');
+    assert.equal(last.data.notificationTime, '12:00');
+});
+
+test('FORMAT: the store exposes the one hour formatter and the facade does not carry a copy', () => {
+    assert.equal(typeof globals.DevotionalPushStore.formatHour, 'function');
+    assert.equal(globals.DevotionalPushStore.formatHour(4), '04:00');
+    assert.doesNotMatch(fs.readFileSync(path.join(__dirname, 'devotional-push.js'), 'utf8'), /padStart/);
 });
 
 test('A5: disable with no signed-in user skips Firestore but still deletes the token and clears the flags', async () => {
@@ -561,7 +624,7 @@ test('FIX2: a successful hour change clears the error left by an earlier failed 
     ctx.el('hour').value = '4';
     ctx.el('hour').listeners.change();
     await tick();
-    assert.equal(ctx.el('status').textContent, 'T:push.time_set 04:00');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set_at 04:00');
 });
 
 test('kill switch or revoked permission with a failed settings write keeps the flag for the next visit', async () => {
@@ -624,6 +687,103 @@ test('LANG: a language change before opting in writes nothing', async () => {
     ctx.i18nState.langHandlers.forEach((h) => h());
     await tick();
     assert.deepEqual(ctx.adapter.log, []);
+});
+
+test('RACE: a second hour pick while a save runs is shown, then saved after it; the stored, shown and written hours agree', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.deepEqual(ctx.adapter.writes.map((w) => w.data.notificationTime), ['12:00', '15:00']);
+    assert.equal(ctx.storage.data['devotionalPush.hour'], '15');
+    assert.equal(ctx.el('hour').value, '15');
+    assert.equal(ctx.el('time-value').textContent, '15:00');
+});
+
+test('RACE: the running save writes the hour that was chosen, not what the picker shows at that moment', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    ctx.adapter.db.set = (p, data) => { ctx.adapter.writes.push({ path: p, data }); return Promise.resolve(); };
+    release();
+    await tick();
+    assert.equal(ctx.adapter.writes[0].data.notificationTime, '12:00');
+});
+
+test('RACE: a pick made while the switch is being turned off is dropped and the row returns to the saved hour', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('switch').listeners.click();
+    await tick();
+    ctx.el('hour').value = '15';
+    ctx.el('hour').listeners.change();
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.equal(ctx.el('hour').value, '9');
+    assert.ok(!ctx.adapter.writes.some((w) => w.data && w.data.notificationTime));
+});
+
+test('LANG-BUSY: a language change while a save is in flight is written once the flow ends', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage({ ...OPTED, 'devotionalPush.hour': '9' }) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    const realSet = ctx.adapter.db.set;
+    ctx.adapter.db.set = (...args) => { ctx.adapter.db.set = realSet; return gate.then(() => realSet(...args)); };
+    ctx.el('hour').value = '12';
+    ctx.el('hour').listeners.change();
+    await tick();
+    ctx.i18nState.lang = 'en';
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    release();
+    await tick();
+    const last = ctx.adapter.writes[ctx.adapter.writes.length - 1];
+    assert.equal(last.data.preferredLanguage, 'en');
+    assert.equal(last.data.notificationTime, '12:00');
+});
+
+test('LANG-BUSY: several language changes while busy cause one rewrite; none when notifications ended up off', async () => {
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const ctx = setup({ adapter: fakeAdapter({ permission: () => 'granted' }), storage: fakeStorage(OPTED) });
+    await ctx.run();
+    ctx.adapter.writes.length = 0;
+    ctx.adapter.load = () => gate;
+    ctx.el('switch').listeners.click();
+    await tick();
+    ctx.i18nState.lang = 'en';
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    ctx.i18nState.langHandlers.forEach((h) => h());
+    ctx.adapter.load = () => Promise.resolve();
+    release();
+    await tick();
+    assert.equal(ctx.adapter.writes.filter((w) => w.data && w.data.preferredLanguage).length, 0);
+    assertOff(ctx);
 });
 
 // Surface gate: pushEnabled && isStandalone && !isAndroid. Browser tabs and Android never write.
@@ -811,7 +971,7 @@ test('S7: picking a new hour while on writes once, shows the new hour and the co
     assert.equal(ctx.adapter.writes.length, 1);
     assert.equal(ctx.adapter.writes[0].data.notificationTime, '18:00');
     assert.equal(ctx.el('time-value').textContent, '18:00');
-    assert.equal(ctx.el('status').textContent, 'T:push.time_set 18:00');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set_at 18:00');
     assert.equal(ctx.storage.data['devotionalPush.hour'], '18');
 });
 
@@ -842,7 +1002,7 @@ test('S9: a failed save followed by the same pick retries the save (the failed h
     ctx.el('hour').listeners.change();
     await tick();
     assert.equal(ctx.adapter.writes[0].data.notificationTime, '12:00');
-    assert.equal(ctx.el('status').textContent, 'T:push.time_set 12:00');
+    assert.equal(ctx.el('status').textContent, 'T:push.time_set_at 12:00');
 });
 
 test('S10: the time row shows the stored hour on entry, and the status line carries only a message after a change', async () => {

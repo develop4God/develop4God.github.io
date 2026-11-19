@@ -329,7 +329,8 @@
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
                 <!-- [html-validate-disable-next no-redundant-for] -->
-                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                <label class="theme-switch" for="theme-toggle" aria-labelledby="theme-switch-label">
+                    <span id="theme-switch-label" class="sr-only" data-i18n="shell.theme">Theme</span>
                     <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
                     <input type="checkbox" id="theme-toggle">
                     <span class="theme-switch-track">
@@ -554,10 +555,10 @@
                 </div>
                 <label class="settings-row settings-time is-off" data-push-time-row>
                     <svg class="settings-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    <span class="settings-label" data-i18n="push.time_label">Daily notification time</span>
+                    <span class="settings-label" id="push-time-label" data-i18n="push.time_label">Daily notification time</span>
                     <span class="settings-value" data-push-time-value>09:00</span>
                     <svg class="settings-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
-                    <select id="push-hour" data-push-hour disabled>
+                    <select id="push-hour" data-push-hour aria-labelledby="push-time-label" disabled>
                     <option value="0">00:00</option>
                     <option value="1">01:00</option>
                     <option value="2">02:00</option>
@@ -584,13 +585,14 @@
                     <option value="23">23:00</option>
                     </select>
                 </label>
+                <p class="text-xs mb-2" data-i18n="push.consent">When you turn this on, this browser will receive one notification a day. We store an anonymous identifier, your time zone, your language and the chosen hour. You can turn it off at any time.</p>
                 <p id="push-status" data-push-status role="status" aria-live="polite" class="settings-status"></p>
             </section>
             <!-- Moved here from the header and the reading page by devotional-shell.js (installed app only); the
                  elements keep their ids, so every script that reads them is unaffected. Hidden elsewhere. -->
-            <div class="settings-row" data-shell-slot="language"><span class="settings-label" data-i18n="shell.language">Language</span></div>
-            <div class="settings-row" data-shell-slot="theme"><span class="settings-label" data-i18n="shell.theme">Theme</span></div>
-            <div class="settings-row" data-shell-slot="font"><span class="settings-label" data-i18n="shell.font_size">Font size</span></div>
+            <div class="settings-row" data-shell-slot="language"><span class="settings-label" id="shell-language-label" data-i18n="shell.language">Language</span></div>
+            <div class="settings-row" data-shell-slot="theme"><span class="settings-label" id="shell-theme-label" data-i18n="shell.theme">Theme</span></div>
+            <div class="settings-row" data-shell-slot="font"><span class="settings-label" id="shell-font-label" data-i18n="shell.font_size">Font size</span></div>
             <div class="settings-row" data-app-version-row><span class="settings-label" data-i18n="shell.app_version">App version</span><span class="settings-value"><span data-app-version></span> <small class="settings-build" data-app-build></small></span></div>
         </div>
     </div>

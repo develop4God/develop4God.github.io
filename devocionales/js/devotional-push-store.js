@@ -56,5 +56,5 @@
         return { touchUser, saveToken, saveSettings, removeToken };
     }
 
-    global.DevotionalPushStore = { create };
+    global.DevotionalPushStore = { create, formatHour };
 })(window);

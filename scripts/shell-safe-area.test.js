@@ -36,3 +36,13 @@ test('with the full screen in use, content stays out of the landscape notch on e
   assert.match(body, /padding-left:\s*env\(safe-area-inset-left\)/);
   assert.match(body, /padding-right:\s*env\(safe-area-inset-right\)/);
 });
+
+test('the landscape rail keeps its labels and the reading column out of the notch and the status bar', () => {
+  const rail = ruleBody(css, '.shell-active[data-shell-layout="rail"] [data-shell-nav]');
+  assert.match(rail, /env\(safe-area-inset-top\)/);
+  assert.match(rail, /var\(--shell-rail-inset\)/);
+  assert.match(ruleBody(css, '.shell-active[data-shell-layout="rail"] body'), /calc\(12rem \+ var\(--shell-rail-inset\)\)/);
+  // The rail sits on the start edge: the left cutout in LTR, the right one in RTL.
+  assert.match(ruleBody(css, '.shell-active[data-shell-layout="rail"]'), /--shell-rail-inset:\s*env\(safe-area-inset-left\)/);
+  assert.match(ruleBody(css, '.shell-active[dir="rtl"][data-shell-layout="rail"]'), /--shell-rail-inset:\s*env\(safe-area-inset-right\)/);
+});
