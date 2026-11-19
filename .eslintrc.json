@@ -48,6 +48,8 @@
     "DevotionalTheme": "readonly",
     "DiscoverySortFilter": "readonly",
     "EncounterLock": "readonly",
+    "EncounterStore": "readonly",
+    "EncounterCards": "readonly",
     "EncounterData": "readonly",
     "ContentIndex": "readonly",
     "StorageJson": "readonly",
