@@ -14,34 +14,9 @@
 
     const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-    // Every storage access is guarded: blocked or full storage must never break rendering.
+    // Storage access goes through StorageJson (guarded: blocked or full storage never breaks rendering).
     function createDiscoveryStore(storage, now = () => new Date()) {
-        function read(key) {
-            try {
-                const raw = storage.getItem(key);
-                return raw ? JSON.parse(raw) : null;
-            } catch (_) {
-                return null;
-            }
-        }
-
-        function write(key, value) {
-            try {
-                storage.setItem(key, JSON.stringify(value));
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        function remove(key) {
-            try { storage.removeItem(key); } catch (_) { /* blocked storage: nothing to remove */ }
-        }
-
-        function readSet(key) {
-            const v = read(key);
-            return new Set(Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []);
-        }
+        const { read, write, remove, readSet } = global.StorageJson.createJsonStorage(storage);
 
         // Returns the stored record (so unknown fields such as answeredQuestions survive writes).
         function readProgressRecord(studyId, lang) {

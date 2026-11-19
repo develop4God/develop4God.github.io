@@ -7,9 +7,11 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-const filename = path.join(__dirname, 'discovery-store.js');
-const source = fs.readFileSync(filename, 'utf8');
-vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+for (const name of ['storage-json.js', 'discovery-store.js']) {
+    const filename = path.join(__dirname, name);
+    const source = fs.readFileSync(filename, 'utf8');
+    vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+}
 const { createDiscoveryStore, KEYS } = global.window.DiscoveryStore;
 
 function memoryStorage(initial = {}) {

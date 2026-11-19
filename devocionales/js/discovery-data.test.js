@@ -7,10 +7,12 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-const filename = path.join(__dirname, 'discovery-data.js');
-const source = fs.readFileSync(filename, 'utf8');
-// vm.runInThisContext (not new Function) so c8 attributes coverage to the real file.
-vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+for (const name of ['content-index.js', 'discovery-data.js']) {
+    const filename = path.join(__dirname, name);
+    const source = fs.readFileSync(filename, 'utf8');
+    // vm.runInThisContext (not new Function) so c8 attributes coverage to the real file.
+    vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+}
 const { parseIndex, createDiscoveryData, DEFAULT_MINUTES } = global.window.DiscoveryData;
 
 const entry = (over = {}) => ({
