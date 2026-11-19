@@ -10,7 +10,20 @@
 
     function createCardDom({ h, t, imageUrlFor }) {
         const meta = (card) => [card.scripture, `${card.minutes} ${t('min_immersive_journey')}`].filter(Boolean).join(' · ');
-        const hintOf = (card) => (card.prerequisiteTitle ? t('complete_to_unlock').replace('{title}', card.prerequisiteTitle) : '');
+        const hintOf = (card) => (card.prerequisiteTitle ? t('complete_to_unlock').replace('{title}', () => card.prerequisiteTitle) : '');
+
+        // A failed avif <source> is never retried by the browser, so drop it to let the png src load; only
+        // when that fails too is the image hidden.
+        function onImageError(e) {
+            const img = e.target;
+            const source = img.parentElement && img.parentElement.querySelector('source');
+            if (source) {
+                source.remove();
+                img.setAttribute('src', img.getAttribute('src')); // re-run the load without the avif candidate
+            } else {
+                img.hidden = true;
+            }
+        }
 
         function media(card) {
             const accentStyle = typeof card.accent === 'string' && HEX_COLOR.test(card.accent) ? `background-color:${card.accent}` : undefined;
@@ -18,7 +31,7 @@
                 h('source', { attrs: { type: 'image/avif', srcset: imageUrlFor(card, 'avif') } }),
                 h('img', {
                     attrs: { src: imageUrlFor(card, 'png'), alt: '', loading: 'lazy', decoding: 'async' },
-                    on: { error: (e) => { e.target.hidden = true; } }, // a missing image never blocks reading (C4)
+                    on: { error: onImageError }, // a missing image never blocks reading (C4)
                 }),
             ]) : null;
             return h('span', { class: 'encounter-card-media', attrs: { style: accentStyle } }, [

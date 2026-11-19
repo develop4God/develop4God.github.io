@@ -584,13 +584,13 @@ async function openStudies(page, viewport, query = STUDIES) {
 }
 
 test.describe('Studies tab in the installed app', () => {
-    test('the reader bar is Home, Studies, Settings; Studies has the graduation-cap icon and links to the studies page', async ({ page }) => {
+    test('the reader bar is Home, Studies, Encounters, Settings; Studies has the graduation-cap icon and links to the studies page', async ({ page }) => {
         const errors = trackErrors(page);
         await installedIos(page);
         await open(page, PHONE);
         const tabs = page.locator('[data-shell-nav] [data-shell-tab]');
-        await expect(tabs).toHaveCount(3);
-        expect(await tabs.evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'settings']);
+        await expect(tabs).toHaveCount(4);
+        expect(await tabs.evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'encounters', 'settings']);
         const studies = page.locator('[data-shell-tab="studies"]');
         await expect(studies).toContainText('Bible Studies');
         await expect(studies).toHaveAttribute('href', '/devocionales/estudios/');
@@ -708,7 +708,7 @@ test.describe('Studies tab: surfaces where it must not appear, and the kill swit
         await mockStudies(page);
         await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
             const response = await route.fetch();
-            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'settings']", "tabs: ['home', 'settings']") });
+            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'encounters', 'settings']", "tabs: ['home', 'settings']") });
         });
         await open(page, PHONE);
         await expect(page.locator('[data-shell-tab="studies"]')).toHaveCount(0);
@@ -722,10 +722,24 @@ test.describe('Studies tab: surfaces where it must not appear, and the kill swit
         await installedIos(page);
         await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
             const response = await route.fetch();
-            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'settings']", "tabs: ['home', 'settings']") });
+            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'encounters', 'settings']", "tabs: ['home', 'settings']") });
         });
         await open(page, PHONE);
         await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
+        await expect(page.locator('[data-shell-tab="studies"]')).toHaveCount(0);
+        expect(errors).toEqual([]);
+    });
+
+    test('the config from before Encounters (home, studies, settings) with the new HTML shows no Encounters tab and no errors', async ({ page }) => {
+        const errors = trackErrors(page);
+        await installedIos(page);
+        await mockStudies(page);
+        await page.route('**/devocionales/js/devotional-pwa-config.js', async (route) => {
+            const response = await route.fetch();
+            await route.fulfill({ response, body: (await response.text()).replace("tabs: ['home', 'studies', 'encounters', 'settings']", "tabs: ['home', 'studies', 'settings']") });
+        });
+        await open(page, PHONE);
+        expect(await page.locator('[data-shell-nav] [data-shell-tab]').evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'settings']);
         expect(errors).toEqual([]);
     });
 });

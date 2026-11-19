@@ -113,7 +113,7 @@ a.shell-tab { text-decoration: none; }
 .shell-active[data-shell-view="settings"] main { display: none; }
 
 /* The browser-tab header links to Studies; the installed app has the Studies tab in its bar instead. */
-.shell-active #nav-studies-item { display: none; }
+.shell-active #nav-studies-item, .shell-active #nav-encounters-item { display: none; }
 
 /* The font toggle moved to Settings, which leaves only the Bible version under this heading. */
 .shell-active #reading-options-label { display: none; }

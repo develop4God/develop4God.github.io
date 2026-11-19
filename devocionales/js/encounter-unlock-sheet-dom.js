@@ -5,10 +5,10 @@
     // in the app). Modal dialog: focus starts on the safe choice (Keep reading), Escape / backdrop /
     // Keep reading close it and focus returns to what opened it. `mountActions` lets the payment
     // module add its button without this file knowing about payments. `showPlayLink` is false where
-    // there is no app to open (iOS).
+    // there is no app to open (iOS); `focusFallback` is used when the opener no longer exists.
     const TITLE_ID = 'encounter-sheet-title';
 
-    function createUnlockSheet({ h, t, container, playStoreUrl, showPlayLink = true, setBackgroundInert = () => {} }) {
+    function createUnlockSheet({ h, t, container, playStoreUrl, showPlayLink = true, setBackgroundInert = () => {}, focusFallback = () => {} }) {
         let backdrop = null;
         let trigger = null;
 
@@ -17,7 +17,8 @@
             backdrop.remove();
             backdrop = null;
             setBackgroundInert(false);
-            if (trigger && trigger.focus) trigger.focus();
+            // The list may have been re-rendered while the sheet was open, detaching the card that opened it.
+            if (trigger && trigger.focus && trigger.isConnected !== false) trigger.focus(); else focusFallback();
             trigger = null;
         }
 

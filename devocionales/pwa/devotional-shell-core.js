@@ -85,18 +85,19 @@
         return hash === '#settings' && Array.isArray(tabs) && tabs.includes('settings') ? 'settings' : 'home';
     }
 
-    // THE tab table: one definition of the bar for every page of the app (the reader and the
-    // Bible-studies page). A page only says which page it is (`data-shell-page` on the nav);
+    // THE tab table: one definition of the bar for every page of the app (the reader, the
+    // Bible-studies page and the Encounters page). A page only says which page it is (`data-shell-page` on the nav);
     // the markup is generated from here, so the bar can never differ between pages.
     // `panel` tabs are panels of the reader page (switched in place); `link` tabs navigate.
     const TAB_TABLE = {
         home: { icon: 'house', labelKey: 'shell.home', fallback: 'Home', controls: 'shell-home-panel', href: `${SCOPE_PATH}/` },
         studies: { icon: 'graduation-cap', labelKey: 'shell.studies', fallback: 'Bible Studies', href: `${SCOPE_PATH}/estudios/` },
+        encounters: { icon: 'sparkles', labelKey: 'shell.encounters', fallback: 'Encounters', href: `${SCOPE_PATH}/encounters/` },
         settings: { icon: 'settings', labelKey: 'shell.settings', fallback: 'Settings', controls: 'shell-settings', href: `${SCOPE_PATH}/#settings` },
     };
     // On the reader, Home and Settings are panels; every other page reaches every tab by link.
     const PANELS_ON_READER = ['home', 'settings'];
-    const PAGE_TAB = { studies: 'studies' }; // which tab is current on a page that is not the reader
+    const PAGE_TAB = { studies: 'studies', encounters: 'encounters' }; // which tab is current on a page that is not the reader
 
     // `allowed` is the PWA config's `tabs`: it decides which tabs exist and in which order.
     function tabsForPage(page, allowed) {

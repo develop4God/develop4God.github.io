@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'storage-json.js', 'discovery-store.js', 'discovery-nav.js', 'discovery-card-dom.js',
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'discovery-store.js', 'discovery-nav.js', 'discovery-card-dom.js',
     'discovery-list-dom.js', 'discovery-detail-dom.js', 'discovery-copyright.js', 'discovery-detail-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);

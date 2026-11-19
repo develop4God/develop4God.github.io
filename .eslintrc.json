@@ -50,6 +50,7 @@
     "EncounterLock": "readonly",
     "EncounterStore": "readonly",
     "EncounterCards": "readonly",
+    "EncounterListPage": "readonly",
     "EncounterWelcomeDom": "readonly",
     "EncounterCardDom": "readonly",
     "EncounterUnlockSheetDom": "readonly",

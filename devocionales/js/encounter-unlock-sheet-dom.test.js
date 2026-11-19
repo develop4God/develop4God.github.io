@@ -104,3 +104,21 @@ test('the page behind is made inert while the sheet is open and restored on clos
     dialog(doc).querySelector('.encounter-sheet-keep').click();
     assert.deepEqual(calls, [true, false]);
 });
+
+test('review: if the card that opened the sheet was re-rendered away, focus goes to the fallback target', () => {
+    let fell = 0;
+    const { doc, sheet, trigger } = make({ focusFallback: () => { fell += 1; } });
+    sheet.open();
+    trigger.isConnected = false; // the list was re-rendered while the sheet was open
+    dialog(doc).dispatch('keydown', { key: 'Escape' });
+    assert.equal(fell, 1);
+});
+
+test('review: a connected trigger gets focus back and the fallback is not used', () => {
+    let fell = 0;
+    const { doc, sheet, trigger } = make({ focusFallback: () => { fell += 1; } });
+    sheet.open();
+    dialog(doc).dispatch('keydown', { key: 'Escape' });
+    assert.equal(fell, 0);
+    assert.equal(doc.activeElement, trigger);
+});

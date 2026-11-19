@@ -3,11 +3,26 @@
 
     // Bible-study ("Discovery") index parsing and cached loading. Mirrors the
     // Flutter app's discovery_bloc / discovery_repository behaviour; kept apart
-    // from devotional-loader.js on purpose (SOLID-lite, one concern per file). Needs content-index.js loaded first.
-    const { isObject, isNonEmptyString, readMinutes, pickLocalized, DEFAULT_MINUTES } = global.ContentIndex;
+    // from devotional-loader.js on purpose (SOLID-lite, one concern per file).
+    const DEFAULT_MINUTES = 5;
     const DEFAULT_EMOJI = '📖';
     const FALLBACK_TITLE_LANG = 'es';
     const INDEX_KEY = 'index';
+
+    const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+    const isNonEmptyString = (v) => typeof v === 'string' && v.length > 0;
+
+    function readMinutes(map, lang) {
+        if (!isObject(map)) return DEFAULT_MINUTES;
+        const n = Number(map[lang]);
+        return Number.isFinite(n) && n > 0 ? n : DEFAULT_MINUTES;
+    }
+
+    function pick(map, lang) {
+        if (!isObject(map)) return '';
+        if (isNonEmptyString(map[lang])) return map[lang];
+        return isNonEmptyString(map[FALLBACK_TITLE_LANG]) ? map[FALLBACK_TITLE_LANG] : '';
+    }
 
     function parseEntry(raw, lang) {
         if (!isObject(raw) || !isNonEmptyString(raw.id)) return null;
@@ -17,7 +32,7 @@
             id: raw.id,
             version: raw.version === undefined || raw.version === null ? '0' : String(raw.version),
             emoji: isNonEmptyString(raw.emoji) ? raw.emoji : DEFAULT_EMOJI,
-            title: pickLocalized(raw.titles, lang, FALLBACK_TITLE_LANG) || raw.id,
+            title: pick(raw.titles, lang) || raw.id,
             subtitle: isObject(raw.subtitles) && isNonEmptyString(raw.subtitles[lang]) ? raw.subtitles[lang] : '',
             minutes: readMinutes(raw.estimated_reading_minutes, lang),
             file,
