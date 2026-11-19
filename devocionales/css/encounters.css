@@ -29,15 +29,11 @@
     overflow: hidden;
 }
 
-.encounter-card-media picture,
 .encounter-card-media img {
     position: absolute;
     inset: 0;
     inline-size: 100%;
     block-size: 100%;
-}
-
-.encounter-card-media img {
     object-fit: cover;
 }
 

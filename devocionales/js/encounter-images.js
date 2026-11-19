@@ -2,7 +2,7 @@
     'use strict';
 
     // Encounter image URLs, mirroring Constants.getEncounterImageUrl in devocional_nuevo:
-    // {base}/{encounterId}/{name}.{format}, avif first with png as the fallback. Names come from the
+    // {base}/{encounterId}/{name}.{format}; the web uses webp (the CDN has avif, png and webp for each). Names come from the
     // remote index, so anything that could leave the encounter's folder yields '' (no image).
     const FORMATS = ['avif', 'png', 'webp'];
     const SAFE_PART = /^[A-Za-z0-9._-]+$/;

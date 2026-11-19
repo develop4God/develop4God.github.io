@@ -1,1 +1,1 @@
-window.DevotionalBuild = Object.freeze({ id: '3a993f736bb9' });
+window.DevotionalBuild = Object.freeze({ id: 'b3695347411a' });

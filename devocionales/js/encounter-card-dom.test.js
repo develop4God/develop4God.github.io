@@ -88,13 +88,13 @@ test('coming soon without a release date shows no date line', () => {
     assert.equal(el.querySelectorAll('.encounter-card-release').length, 0);
 });
 
-test('image: avif source + png fallback from the injected url builder; accent colour placeholder', () => {
+test('image: one webp <img> from the injected url builder; accent colour placeholder', () => {
     const el = dom.buildCard(card(), { handlers: handlers() });
     const media = el.querySelector('.encounter-card-media');
     assert.equal(media.getAttribute('style'), 'background-color:#1e3a5f');
-    assert.equal(el.querySelector('source').getAttribute('srcset'), 'https://cdn.test/peter/peter_intro.avif');
+    assert.equal(el.querySelectorAll('source').length, 0);
     const img = el.querySelector('img');
-    assert.equal(img.getAttribute('src'), 'https://cdn.test/peter/peter_intro.png');
+    assert.equal(img.getAttribute('src'), 'https://cdn.test/peter/peter_intro.webp');
     assert.equal(img.getAttribute('loading'), 'lazy');
     assert.equal(img.getAttribute('alt'), '');
 });
@@ -108,8 +108,7 @@ test('no intro image or no accent: no <img>, no inline style, still a valid card
 test('a failing image is hidden so it never blocks reading (C4)', () => {
     const el = dom.buildCard(card(), { handlers: handlers() });
     const img = el.querySelector('img');
-    img.dispatch('error'); // avif dropped, png tried
-    img.dispatch('error'); // png failed too
+    img.dispatch('error');
     assert.equal(img.hidden, true);
 });
 
@@ -122,14 +121,4 @@ test('remote strings are text, never markup', () => {
 test('review: replacement patterns in a remote title ($&, $$, $1) never mangle the locked hint', () => {
     const el = dom.buildCard(card({ state: 'locked', prerequisiteTitle: 'Cost $$ of $& Grace $1' }), { handlers: handlers() });
     assert.equal(el.querySelector('.encounter-card-hint').textContent, 'Complete to access: Cost $$ of $& Grace $1');
-});
-
-test('review: when the avif fails the png is tried before the image is hidden', () => {
-    const el = dom.buildCard(card(), { handlers: handlers() });
-    const img = el.querySelector('img');
-    img.dispatch('error'); // avif source failed: drop it so the png src loads
-    assert.equal(el.querySelectorAll('source').length, 0);
-    assert.equal(img.hidden, false);
-    img.dispatch('error'); // the png failed too
-    assert.equal(img.hidden, true);
 });
