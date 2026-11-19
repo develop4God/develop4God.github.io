@@ -84,3 +84,36 @@ test('another tab completing an encounter is picked up on the next load', () => 
     createEncounterStore(raw).markCompleted('z');
     assert.equal(store.isCompleted('z'), true);
 });
+
+// ---- welcome (B8): shown once per browser, set on Begin ----
+
+test('B8 the welcome has not been seen on a fresh browser, and is remembered after markWelcomeSeen', () => {
+    const raw = memory();
+    const store = createEncounterStore(raw);
+    assert.equal(store.hasSeenWelcome(), false);
+    store.markWelcomeSeen();
+    assert.equal(store.hasSeenWelcome(), true);
+    assert.equal(createEncounterStore(raw).hasSeenWelcome(), true);
+    assert.equal(KEYS.welcomeSeen, 'develop4God_encounters_welcome_seen');
+});
+
+test('B8 a corrupt welcome flag counts as not seen; only true counts as seen', () => {
+    for (const bad of ['{x', '"yes"', '1', '0', 'null', '[]']) {
+        assert.equal(createEncounterStore(memory({ [KEYS.welcomeSeen]: bad })).hasSeenWelcome(), false, bad);
+    }
+    assert.equal(createEncounterStore(memory({ [KEYS.welcomeSeen]: 'true' })).hasSeenWelcome(), true);
+});
+
+test('B8 blocked storage: the welcome is remembered for the session so it never loops', () => {
+    const store = createEncounterStore(blocked());
+    assert.equal(store.hasSeenWelcome(), false);
+    store.markWelcomeSeen();
+    assert.equal(store.hasSeenWelcome(), true);
+});
+
+test('B8 the welcome flag does not touch the completed list', () => {
+    const raw = memory();
+    const store = createEncounterStore(raw);
+    store.markWelcomeSeen();
+    assert.equal(store.loadCompleted().size, 0);
+});
