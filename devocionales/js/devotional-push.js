@@ -48,6 +48,25 @@
         };
     }
 
+    // Optional (an old cached page lacks the module): without it, or when the caller gave none, logging is a no-op.
+    // Never throws, so it can be built before anything else that might fail.
+    function makeLog(win, given) {
+        let log = () => {};
+        let created = null;
+        try {
+            if (!(given && given.log) && global.DevotionalPushLog) created = global.DevotionalPushLog.create(win);
+            log = (given && given.log) || (created ? created.log : log);
+        } catch (err) { /* no logging */ }
+        const safe = (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } };
+        // Callers skip building expensive details when logging is off. An injected logger counts as on unless it sets
+        // its own `on` to false (the contract: a logger function may carry a boolean `on` property).
+        safe.on = given && given.log ? given.log.on !== false : Boolean(created && created.on);
+        return safe;
+    }
+
+    // Reading the permission must not be able to break init when it is only being logged.
+    const permissionOf = (adapter) => { try { return adapter.permission(); } catch (err) { return 'unreadable'; } };
+
     function resolveDeps(win, deps) {
         const given = deps || {};
         const adapter = given.adapter;
@@ -196,6 +215,8 @@
     }
 
     async function init(doc, win, config, deps) {
+        // Built outside the try so the final catch can report a crash, including one while wiring the dependencies.
+        let log = makeLog(win, deps);
         try {
             const resolved = resolveDeps(win, deps);
             const { adapter, store, storage, t, i18n, i18nWaitMs } = resolved;
@@ -210,20 +231,27 @@
             // Surface gate first: a browser tab or Android never writes, unsubscribes or asks for
             // permission, even with a stale opted-in flag (a desktop tab shares storage with the app).
             if (!isAppSurface(win)) {
+                log('init.hidden', { reason: 'not-installed-app', pushEnabled: config.pushEnabled });
                 if (config.pushEnabled === true && needsInstallFirst(win)) view.showInstallHint();
                 else view.hide();
                 return;
             }
             if (config.pushEnabled !== true || config.enabled === false) {
+                log('init.hidden', { reason: 'switched-off', pushEnabled: config.pushEnabled, enabled: config.enabled });
                 view.hide();
                 if (isOptedIn()) await disableFlow(resolved);
                 return;
             }
             if (needsInstallFirst(win)) {
+                log('init.install-hint', { reason: 'ios-needs-home-screen-install' });
                 view.showInstallHint();
                 return;
             }
-            if (!adapter.supported()) return;
+            if (!adapter.supported()) {
+                log('init.hidden', { reason: 'unsupported-browser' });
+                return;
+            }
+            if (log.on) log('init.ready', { permission: permissionOf(adapter), optedIn: isOptedIn() });
 
             // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
             let savedHour = parseHour(storage.get(KEY_HOUR));
@@ -260,7 +288,9 @@
             // Platform steps for a browser-level block; the generic line where no steps exist.
             const showBlocked = () => {
                 const help = global.DevotionalPushHelp;
-                view.message((help && help.helpKey(win.navigator)) || 'push.status_denied');
+                const key = (help && help.helpKey(win.navigator)) || 'push.status_denied';
+                log('enable.blocked', { key });
+                view.message(key);
             };
 
             // Runs after a flow: the hour picked meanwhile (when notifications are still on), then the
@@ -293,21 +323,30 @@
                 try {
                     permission = await adapter.requestPermission();
                 } catch (err) {
+                    log('enable.permission_error', { error: err });
                     view.message('push.status_error');
                     return;
                 }
+                log('enable.permission', { result: permission });
                 if (permission !== 'granted') {
                     if (permission === 'denied') showBlocked();
                     else view.message('push.status_denied');
                     return;
                 }
+                // The step being attempted, so a failure names the step that failed.
+                let failedAt = 'load';
                 try {
                     await adapter.load();
+                    failedAt = 'signInAnonymously';
                     const uid = await adapter.signInAnonymously();
+                    failedAt = 'registration';
                     const registration = await adapter.registration();
                     if (!registration) throw new Error('push: no service worker registration');
+                    failedAt = 'getToken';
                     const token = await adapter.getToken(registration);
+                    failedAt = 'writeAll';
                     await writeAll(uid, token, chosenHour);
+                    log('enable.done', { hour: chosenHour });
                     storage.set(KEY_OPTED_IN, '1');
                     storage.set(KEY_TOKEN, token);
                     savedHour = chosenHour;
@@ -320,6 +359,7 @@
                     }
                     view.showState(true);
                 } catch (err) {
+                    log('enable.failed', { failedAt, error: err });
                     view.message('push.status_error');
                 }
             };
@@ -341,6 +381,7 @@
                     await saveSettingsNow(savedHour);
                     view.message('push.status_enabled');
                 } catch (err) {
+                    log('settings.failed', { error: err });
                     view.message('push.status_error');
                 }
             };
@@ -362,6 +403,7 @@
                     storage.set(KEY_HOUR, next);
                     view.message('push.time_set_at', formatHour(next));
                 } catch (err) {
+                    log('hour.failed', { hour: next, error: err });
                     view.selectHour(savedHour);
                     view.message('push.time_error');
                 }
@@ -381,6 +423,7 @@
                     storage.set(KEY_TOKEN, token);
                 } catch (err) {
                     // Retried on the next visit.
+                    log('resume.failed', { error: err });
                 }
             };
 
@@ -453,6 +496,7 @@
             await exclusive(enterWhileOptedIn);
         } catch (err) {
             // init never throws: the page works the same without push.
+            log('init.crashed', { error: err });
         }
     }
 
