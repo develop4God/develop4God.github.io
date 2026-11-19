@@ -13,6 +13,8 @@ const PAGES = [
   ['/work-with-me/', '/work-with-me/'],
   ['/devocionales/privacy-policy.html', '/devocionales/privacy-policy'],
   ['/devocionales/terms-and-conditions.html', '/devocionales/terms-and-conditions'],
+  ['/habitus/politica-de-privacidad.html', '/habitus/politica-de-privacidad'],
+  ['/habitus/terminos-y-condiciones.html', '/habitus/terminos-y-condiciones'],
 ];
 
 for (const [served, canonical] of PAGES) {

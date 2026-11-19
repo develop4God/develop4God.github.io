@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones de Uso - Habitus+Faith</title>
+    <meta name="title-key" content="legal.terms.title">
+    <meta name="description" content="Términos y Condiciones de Uso de la aplicación Habitus+Faith. Normativas y condiciones de uso de la aplicación móvil.">
+    <link rel="canonical" href="https://develop4god.com/habitus/terminos-y-condiciones">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/modern.css">
+    <link rel="stylesheet" href="/devocionales/css/language-selector.css">
+    <script>
+        (function () {
+            const saved = localStorage.getItem('theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+    <link rel="stylesheet" href="/habitus/css/habitus-base.css">
+    <link rel="stylesheet" href="/habitus/css/habitus-legal.css">
+</head>
+<body>
+
+    <header class="site-nav">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <div class="flex items-center gap-3">
+                <a href="/habitus/" class="btn-secondary px-3 py-1.5 text-sm flex items-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span data-i18n="legal.terms.backToHome">Volver a la página principal</span>
+                </a>
+                <div id="language-selector"></div>
+                <!-- label wraps its own input; for attribute kept for clarity -->
+                <!-- [html-validate-disable-next no-redundant-for] -->
+                <label class="theme-switch" for="theme-toggle" aria-label="Cambiar tema">
+                    <i data-lucide="sun" class="theme-switch-icon theme-icon-light"></i>
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="theme-switch-track">
+                        <span class="theme-switch-dot"></span>
+                    </span>
+                    <i data-lucide="moon" class="theme-switch-icon theme-icon-dark"></i>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10">
+        <div class="legal-card">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-center mb-4" data-i18n="legal.terms.title">Términos y Condiciones de Uso de la Aplicación "Habitus+Faith"</h1>
+
+            <div class="text-center text-sm mb-8" style="color: var(--text-muted);">
+                <strong data-i18n="legal.terms.lastUpdated">Fecha de Última Actualización:</strong>
+                <span data-i18n="legal.terms.date">3 de septiembre de 2026</span>
+            </div>
+
+            <div class="prose prose-lg max-w-none">
+                <!-- Legal body rendered by habitus-legal.js from the translations -->
+                <div id="legal-content" data-legal-kind="terms"></div>
+
+                <div class="text-center mt-12 pt-6" style="border-top: 1px solid var(--border);">
+                    <a href="/habitus/" class="btn-primary inline-flex items-center gap-2 px-6 py-3">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        <span data-i18n="legal.terms.backToHome">Volver a la página principal</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer id="page-footer" class="mt-12 py-8 text-center text-sm" style="border-top: 1px solid var(--border); color: var(--text-muted);">
+        <p><a href="mailto:develop4God@gmail.com" style="color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="mail" class="w-4 h-4"></i><span data-i18n="footer.contact">Contacto</span></a></p>
+        <p style="margin-top: 8px;">
+            <a href="/habitus/politica-de-privacidad" style="color: var(--text-muted);" data-i18n="footer.privacy">Política de Privacidad</a>
+            &nbsp;&middot;&nbsp;
+            <a href="/habitus/terminos-y-condiciones" style="color: var(--text-muted);" data-i18n="footer.terms">Términos y Condiciones</a>
+        </p>
+    </footer>
+
+    <script src="/js/site-footer.js"></script>
+    <script src="/js/rtl-helper.js"></script>
+    <script src="/devocionales/js/dom-builder.js"></script>
+    <script src="/habitus/js/habitus-i18n.js"></script>
+    <script src="/habitus/js/habitus-legal.js"></script>
+    <script src="/habitus/js/habitus-theme.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

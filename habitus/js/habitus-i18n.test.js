@@ -111,3 +111,36 @@ test('applyTranslationsForTest: does not call SiteFooter when translations has n
 
     delete global.window.SiteFooter;
 });
+
+test('onTranslationsApplied: listener runs on every apply and immediately when translations are already applied', () => {
+    const seen = [];
+    global.window.HabitusI18n.onTranslationsApplied((t) => seen.push(t));
+    assert.equal(seen.length, 0);
+    applyTranslationsForTest({ a: 1 });
+    applyTranslationsForTest({ b: 2 });
+    assert.deepEqual(seen, [{ a: 1 }, { b: 2 }]);
+});
+
+test('applyTranslations: <meta name="title-key"> sets the document title from that key, over meta.title', () => {
+    global.document = {
+        readyState: 'complete',
+        title: '',
+        querySelectorAll: () => [],
+        querySelector: (sel) => (sel === 'meta[name="title-key"]' ? { getAttribute: () => 'legal.terms.title' } : null),
+        getElementById: () => null,
+    };
+    applyTranslationsForTest({ meta: { title: 'Site' }, legal: { terms: { title: 'Terms' } } });
+    assert.equal(global.document.title, 'Terms');
+});
+
+test('applyTranslations: a missing title-key value keeps meta.title', () => {
+    global.document = {
+        readyState: 'complete',
+        title: '',
+        querySelectorAll: () => [],
+        querySelector: (sel) => (sel === 'meta[name="title-key"]' ? { getAttribute: () => 'legal.nope.title' } : null),
+        getElementById: () => null,
+    };
+    applyTranslationsForTest({ meta: { title: 'Site' } });
+    assert.equal(global.document.title, 'Site');
+});
