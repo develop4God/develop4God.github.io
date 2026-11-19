@@ -79,29 +79,22 @@
         });
 
         // The deep link decides what shows: the lock rule is applied on the card list, not here.
-        async function showDeepLink(id) {
-            let entries;
-            try {
-                entries = await data.loadIndex(lang());
-            } catch (_) {
-                readerView.showList(); // the list shows its own error with Retry
-                return;
-            }
-            const cards = global.EncounterCards.buildCards(entries, { completed: store.loadCompleted(), allUnlocked: false });
-            const route = global.EncounterRoute.routeFor(cards, id);
-            if (route.kind === 'open') {
-                readerView.showReader();
-                reader.open(route.entry);
-            } else if (route.kind === 'locked') {
-                reader.reset();
-                readerView.showList();
-                unlockSheet.open();
-            } else {
-                reader.reset();
-                readerView.showReader();
-                readerView.render({ notFound: true, summary: { id }, phase: 'intro', intro: null, pages: [], index: 0, footer: {} });
-            }
-        }
+        const deepLink = global.EncounterRoute.createDeepLink({
+            loadCards: async () => global.EncounterCards.buildCards(await data.loadIndex(lang()), {
+                completed: store.loadCompleted(),
+                allUnlocked: false,
+            }),
+            actions: {
+                showList: () => { reader.reset(); readerView.showList(); },
+                openReader: (entry) => { readerView.showReader(); reader.open(entry); },
+                showLocked: () => { reader.reset(); readerView.showList(); unlockSheet.open(); },
+                showNotFound: (id) => {
+                    reader.reset();
+                    readerView.showReader();
+                    readerView.render({ notFound: true, summary: { id }, phase: 'intro', intro: null, pages: [], index: 0, footer: {} });
+                },
+            },
+        });
 
         const listPage = global.EncounterListPage.createListPage({
             view: { count: byId('encounters-count'), body: byId('encounters-body') },
@@ -120,8 +113,8 @@
             win: global,
             nav: global.DiscoveryNav,
             // Back to the list: redraw from storage so a just-completed encounter shows as done and the next one opens (B6).
-            onList: () => { reader.reset(); readerView.showList(); listPage.refresh(); },
-            onDetail: (id) => { showDeepLink(id); },
+            onList: () => { deepLink.cancel(); reader.reset(); readerView.showList(); listPage.refresh(); },
+            onDetail: (id) => { deepLink.open(id); },
         });
 
         function applyStaticText() {
