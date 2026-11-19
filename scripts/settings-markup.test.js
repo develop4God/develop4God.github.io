@@ -13,7 +13,7 @@ const css = fs.readFileSync(path.join(ROOT, 'devocionales', 'pwa', 'shell.css'),
 const en = JSON.parse(fs.readFileSync(path.join(ROOT, 'lang', 'devocionales', 'en.json'), 'utf8'));
 
 const pushSection = () => {
-  const start = html.indexOf('<section data-push');
+  const start = html.indexOf('<section data-push '); // not data-push-offer, the first-launch card above it
   assert.notEqual(start, -1);
   return html.slice(start, html.indexOf('</section>', start));
 };

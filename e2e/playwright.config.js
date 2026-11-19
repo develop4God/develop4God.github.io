@@ -12,7 +12,6 @@ const { resolvePort } = require('../scripts/e2e-port');
 // Set E2E_PORT to run on a private port (e.g. E2E_PORT=8899) when another run holds the default.
 const PORT = resolvePort(process.env);
 
-
 module.exports = defineConfig({
   testDir: '.',
   timeout: 15_000,
