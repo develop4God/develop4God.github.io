@@ -15,6 +15,7 @@
     "DevotionalFetch": "readonly",
     "DevotionalNav": "readonly",
     "DevotionalErrorLogger": "readonly",
+    "DevotionalPushLog": "readonly",
     "DevotionalProgress": "readonly",
     "DevotionalVersion": "readonly",
     "DevotionalTts": "readonly",

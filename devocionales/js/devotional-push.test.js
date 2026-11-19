@@ -15,6 +15,7 @@ const globals = {};
 loadInto(globals, 'devotional-standalone.js');
 loadInto(globals, 'devotional-ios-hint.js');
 loadInto(globals, 'devotional-push-store.js');
+loadInto(globals, 'devotional-push-log.js');
 loadInto(globals, 'devotional-push-help.js');
 loadInto(globals, 'devotional-push-offer.js');
 loadInto(globals, 'devotional-push.js');
@@ -1266,4 +1267,69 @@ test('H6: the generic denied text (prompt dismissed) is not treated as the block
     assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
     await ctx.becomeVisible();
     assert.equal(ctx.el('status').textContent, 'T:push.status_denied');
+});
+
+// The debug log: every step that used to fail silently now says why (shown only with ?pushdebug=1).
+function withLog(overrides) {
+    const entries = [];
+    const ctx = setup({ adapter: fakeAdapter(overrides) });
+    ctx.deps.log = (step, detail) => entries.push({ step, detail });
+    ctx.entries = entries;
+    ctx.steps = () => entries.map((e) => e.step);
+    return ctx;
+}
+
+test('log: a denied permission is recorded with the result and the help key shown', async () => {
+    const ctx = withLog({ requestPermission: () => Promise.resolve('denied') });
+    await ctx.run();
+    await ctx.tap('switch');
+    const entry = ctx.entries.find((e) => e.step === 'enable.permission');
+    assert.deepEqual(entry.detail, { result: 'denied' });
+    assert.ok(ctx.steps().includes('enable.blocked'));
+});
+
+test('log: a failing enable step records the step name and the error message', async () => {
+    const ctx = withLog({ getToken: () => Promise.reject(new Error('no token')) });
+    await ctx.run();
+    await ctx.tap('switch');
+    const entry = ctx.entries.find((e) => e.step === 'enable.failed');
+    assert.equal(entry.detail.error.message, 'no token');
+    assert.equal(entry.detail.after, 'registration');
+});
+
+test('log: a null registration and a rejecting requestPermission are recorded too', async () => {
+    const nullReg = withLog({ registration: () => Promise.resolve(null) });
+    await nullReg.run();
+    await nullReg.tap('switch');
+    assert.match(nullReg.entries.find((e) => e.step === 'enable.failed').detail.error.message, /no service worker registration/);
+    const rejecting = withLog({ requestPermission: () => Promise.reject(new Error('boom')) });
+    await rejecting.run();
+    await rejecting.tap('switch');
+    assert.equal(rejecting.entries.find((e) => e.step === 'enable.permission_error').detail.error.message, 'boom');
+});
+
+test('log: the surface gate says why push is hidden in a browser tab', async () => {
+    const ctx = withLog();
+    ctx.win = fakeWin({ standalone: false });
+    ctx.win.document = ctx.doc;
+    await init(ctx.doc, ctx.win, CONFIG, ctx.deps);
+    const entry = ctx.entries.find((e) => e.step === 'init.hidden');
+    assert.equal(entry.detail.reason, 'not-installed-app');
+});
+
+test('log: a visit while opted in records the silent re-registration failing', async () => {
+    const ctx = withLog({ getToken: () => Promise.reject(new Error('fcm down')) });
+    ctx.storage.data['devotionalPush.optedIn'] = '1';
+    ctx.adapter.permission = () => 'granted';
+    await ctx.run();
+    await tick();
+    assert.equal(ctx.entries.find((e) => e.step === 'resume.failed').detail.error.message, 'fcm down');
+});
+
+test('log: a throwing logger never breaks the flow', async () => {
+    const ctx = setup();
+    ctx.deps.log = () => { throw new Error('logger bug'); };
+    await ctx.run();
+    await ctx.tap('switch');
+    assertOn(ctx);
 });

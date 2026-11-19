@@ -52,8 +52,11 @@
         const given = deps || {};
         const adapter = given.adapter;
         const i18n = given.i18n || global.DevotionalI18n || null;
+        // Optional (an old cached page lacks the module): without it, or when the caller gave none, logging is a no-op.
+        const log = given.log || (global.DevotionalPushLog ? global.DevotionalPushLog.create(win).log : () => {});
         return {
             adapter,
+            log: (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } },
             store: given.store || (adapter && global.DevotionalPushStore ? global.DevotionalPushStore.create({ db: adapter.db }) : null),
             storage: guardStorage(given.storage || defaultStorage(win)),
             i18n,
@@ -196,9 +199,12 @@
     }
 
     async function init(doc, win, config, deps) {
+        // Declared outside the try so the final catch can report a crash too.
+        let log = () => {};
         try {
             const resolved = resolveDeps(win, deps);
             const { adapter, store, storage, t, i18n, i18nWaitMs } = resolved;
+            log = resolved.log;
             if (!adapter) return;
             const view = createView(doc, t);
             const isOptedIn = () => storage.get(KEY_OPTED_IN) === '1';
@@ -210,11 +216,13 @@
             // Surface gate first: a browser tab or Android never writes, unsubscribes or asks for
             // permission, even with a stale opted-in flag (a desktop tab shares storage with the app).
             if (!isAppSurface(win)) {
+                log('init.hidden', { reason: 'not-installed-app', pushEnabled: config.pushEnabled });
                 if (config.pushEnabled === true && needsInstallFirst(win)) view.showInstallHint();
                 else view.hide();
                 return;
             }
             if (config.pushEnabled !== true || config.enabled === false) {
+                log('init.hidden', { reason: 'switched-off', pushEnabled: config.pushEnabled, enabled: config.enabled });
                 view.hide();
                 if (isOptedIn()) await disableFlow(resolved);
                 return;
@@ -223,7 +231,11 @@
                 view.showInstallHint();
                 return;
             }
-            if (!adapter.supported()) return;
+            if (!adapter.supported()) {
+                log('init.hidden', { reason: 'unsupported-browser' });
+                return;
+            }
+            log('init.ready', { permission: adapter.permission(), optedIn: isOptedIn() });
 
             // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
             let savedHour = parseHour(storage.get(KEY_HOUR));
@@ -260,7 +272,9 @@
             // Platform steps for a browser-level block; the generic line where no steps exist.
             const showBlocked = () => {
                 const help = global.DevotionalPushHelp;
-                view.message((help && help.helpKey(win.navigator)) || 'push.status_denied');
+                const key = (help && help.helpKey(win.navigator)) || 'push.status_denied';
+                log('enable.blocked', { key });
+                view.message(key);
             };
 
             // Runs after a flow: the hour picked meanwhile (when notifications are still on), then the
@@ -293,21 +307,30 @@
                 try {
                     permission = await adapter.requestPermission();
                 } catch (err) {
+                    log('enable.permission_error', { error: err });
                     view.message('push.status_error');
                     return;
                 }
+                log('enable.permission', { result: permission });
                 if (permission !== 'granted') {
                     if (permission === 'denied') showBlocked();
                     else view.message('push.status_denied');
                     return;
                 }
+                // The last step that finished, so a failure says where the flow stopped.
+                let after = 'permission';
                 try {
                     await adapter.load();
+                    after = 'load';
                     const uid = await adapter.signInAnonymously();
+                    after = 'signInAnonymously';
                     const registration = await adapter.registration();
                     if (!registration) throw new Error('push: no service worker registration');
+                    after = 'registration';
                     const token = await adapter.getToken(registration);
+                    after = 'getToken';
                     await writeAll(uid, token, chosenHour);
+                    log('enable.done', { hour: chosenHour });
                     storage.set(KEY_OPTED_IN, '1');
                     storage.set(KEY_TOKEN, token);
                     savedHour = chosenHour;
@@ -320,6 +343,7 @@
                     }
                     view.showState(true);
                 } catch (err) {
+                    log('enable.failed', { after, error: err });
                     view.message('push.status_error');
                 }
             };
@@ -341,6 +365,7 @@
                     await saveSettingsNow(savedHour);
                     view.message('push.status_enabled');
                 } catch (err) {
+                    log('settings.failed', { error: err });
                     view.message('push.status_error');
                 }
             };
@@ -362,6 +387,7 @@
                     storage.set(KEY_HOUR, next);
                     view.message('push.time_set_at', formatHour(next));
                 } catch (err) {
+                    log('hour.failed', { hour: next, error: err });
                     view.selectHour(savedHour);
                     view.message('push.time_error');
                 }
@@ -381,6 +407,7 @@
                     storage.set(KEY_TOKEN, token);
                 } catch (err) {
                     // Retried on the next visit.
+                    log('resume.failed', { error: err });
                 }
             };
 
@@ -453,6 +480,7 @@
             await exclusive(enterWhileOptedIn);
         } catch (err) {
             // init never throws: the page works the same without push.
+            log('init.crashed', { error: err });
         }
     }
 
