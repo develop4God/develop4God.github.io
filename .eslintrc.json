@@ -58,6 +58,7 @@
     "SiteFooter": "readonly",
     "WorkWithMeI18n": "readonly",
     "HabitusI18n": "readonly",
+    "HabitusLegal": "readonly",
     "lucide": "readonly",
     "TerminalMath": "readonly",
     "TerminalScenes": "readonly",

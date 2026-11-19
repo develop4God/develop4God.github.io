@@ -12,6 +12,7 @@
 
   let currentLanguage = DEFAULT_LANGUAGE;
   let translations = {};
+  const appliedListeners = [];
 
   function getBrowserLanguage() {
     const lang = navigator.language || navigator.userLanguage;
@@ -70,6 +71,14 @@
       }
     }
 
+    // A page whose title is its own translation (e.g. a legal page) names that key in
+    // <meta name="title-key">, which wins over meta.title.
+    const titleKeyMeta = document.querySelector('meta[name="title-key"]');
+    const pageTitle = titleKeyMeta && getNestedTranslation(translations, titleKeyMeta.getAttribute('content'));
+    if (pageTitle) {
+      document.title = pageTitle;
+    }
+
     document.querySelectorAll('[data-i18n]').forEach((element) => {
       const key = element.getAttribute('data-i18n');
       const value = getNestedTranslation(translations, key);
@@ -86,6 +95,17 @@
         copyright: translations.footer.copyright,
         madeWith: translations.footer.madeWith
       });
+    }
+
+    appliedListeners.forEach((listener) => listener(translations));
+  }
+
+  // Lets page-specific renderers (e.g. habitus-legal.js) react to every applied translation set.
+  // Called straight away when translations were already applied, so load order does not matter.
+  function onTranslationsApplied(listener) {
+    appliedListeners.push(listener);
+    if (Object.keys(translations).length) {
+      listener(translations);
     }
   }
 
@@ -268,6 +288,7 @@
 
   window.HabitusI18n = {
     getNestedTranslation,
+    onTranslationsApplied,
     // Test seam: applies a given translations object to the DOM the same
     // way the live fetch-driven flow does, without touching module state.
     applyTranslationsForTest: (t) => {
