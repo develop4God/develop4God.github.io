@@ -14,7 +14,7 @@ const ROOT = path.join(__dirname, '..');
 // tells crawlers two URLs exist. Every internal link must use the canonical (extensionless) form.
 function trackedHtml() {
     const listed = execFileSync('git', ['ls-files', '-z', '*.html'], { cwd: ROOT, encoding: 'utf8' });
-    return listed.split('\0').filter((file) => file && !file.startsWith('legacy/'));
+    return listed.split('\0').filter((file) => file);
 }
 
 // An internal link is relative, root-relative, or absolute on the apex or www host.
