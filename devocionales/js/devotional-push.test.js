@@ -1333,3 +1333,22 @@ test('log: a throwing logger never breaks the flow', async () => {
     await ctx.tap('switch');
     assertOn(ctx);
 });
+
+test('log: a throwing permission() while logging does not abort init', async () => {
+    const ctx = withLog({ permission: () => { throw new Error('webview'); } });
+    await ctx.run();
+    assert.equal(ctx.el('switch-row').shown, true);
+});
+
+test('log: a failure while wiring the dependencies is still recorded as init.crashed', async () => {
+    const ctx = withLog();
+    const realCreate = globals.DevotionalPushStore.create;
+    globals.DevotionalPushStore.create = () => { throw new Error('wiring'); };
+    try {
+        // No injected store: init builds one from the adapter, which now throws.
+        await init(ctx.doc, ctx.win, CONFIG, { adapter: ctx.adapter, storage: ctx.storage, t, log: ctx.deps.log });
+    } finally {
+        globals.DevotionalPushStore.create = realCreate;
+    }
+    assert.equal(ctx.entries.find((e) => e.step === 'init.crashed').detail.error.message, 'wiring');
+});

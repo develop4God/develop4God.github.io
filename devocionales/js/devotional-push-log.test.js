@@ -76,3 +76,12 @@ test('the kept log is capped so a long session cannot grow it without bound', ()
     assert.equal(win.__pushLog.length, 100);
     assert.equal(win.__pushLog[99].step, 's249');
 });
+
+test('?pushdebug=0 clears a stored flag, so a tester in an installed app can turn logging off', () => {
+    const removed = [];
+    const win = fakeWin({ search: '?pushdebug=0', stored: '1' });
+    win.localStorage.removeItem = (key) => removed.push(key);
+    load(win).create(win).log('x');
+    assert.deepEqual(removed, ['devotionalPush.debug']);
+    assert.equal(win.lines.length, 0);
+});

@@ -5,13 +5,18 @@
     // must work the same without push). Off unless the page is opened with ?pushdebug=1 or
     // localStorage "devotionalPush.debug" is "1". When on, each step is printed as "[push] step" and kept
     // in window.__pushLog (last 100) so a test or a remote-debugging session can read it. It never
-    // throws and never records tokens or ids: callers pass only step names, results and error messages.
+    // throws. It does not filter: callers pass only step names, results and error messages, never
+    // tokens or ids. ?pushdebug=0 removes the stored flag (an installed app has no way to edit it).
 
     const FLAG_KEY = 'devotionalPush.debug';
     const MAX_ENTRIES = 100;
 
     function isOn(win) {
         try {
+            if (/(^|[?&])pushdebug=0(&|$)/.test((win.location && win.location.search) || '')) {
+                win.localStorage.removeItem(FLAG_KEY);
+                return false;
+            }
             if (/(^|[?&])pushdebug=1(&|$)/.test((win.location && win.location.search) || '')) return true;
             return win.localStorage.getItem(FLAG_KEY) === '1';
         } catch (err) {

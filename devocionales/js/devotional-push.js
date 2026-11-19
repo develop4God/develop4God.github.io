@@ -48,15 +48,26 @@
         };
     }
 
+    // Optional (an old cached page lacks the module): without it, or when the caller gave none, logging is a no-op.
+    // Never throws, so it can be built before anything else that might fail.
+    function makeLog(win, given) {
+        let log = () => {};
+        try {
+            log = (given && given.log) || (global.DevotionalPushLog ? global.DevotionalPushLog.create(win).log : log);
+        } catch (err) { /* no logging */ }
+        return (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } };
+    }
+
+    // Reading the permission must not be able to break init when it is only being logged.
+    const permissionOf = (adapter) => { try { return adapter.permission(); } catch (err) { return 'unreadable'; } };
+
     function resolveDeps(win, deps) {
         const given = deps || {};
         const adapter = given.adapter;
         const i18n = given.i18n || global.DevotionalI18n || null;
-        // Optional (an old cached page lacks the module): without it, or when the caller gave none, logging is a no-op.
-        const log = given.log || (global.DevotionalPushLog ? global.DevotionalPushLog.create(win).log : () => {});
         return {
             adapter,
-            log: (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } },
+            log: makeLog(win, given),
             store: given.store || (adapter && global.DevotionalPushStore ? global.DevotionalPushStore.create({ db: adapter.db }) : null),
             storage: guardStorage(given.storage || defaultStorage(win)),
             i18n,
@@ -199,12 +210,11 @@
     }
 
     async function init(doc, win, config, deps) {
-        // Declared outside the try so the final catch can report a crash too.
-        let log = () => {};
+        // Built outside the try so the final catch can report a crash, including one while wiring the dependencies.
+        let log = makeLog(win, deps);
         try {
             const resolved = resolveDeps(win, deps);
             const { adapter, store, storage, t, i18n, i18nWaitMs } = resolved;
-            log = resolved.log;
             if (!adapter) return;
             const view = createView(doc, t);
             const isOptedIn = () => storage.get(KEY_OPTED_IN) === '1';
@@ -235,7 +245,7 @@
                 log('init.hidden', { reason: 'unsupported-browser' });
                 return;
             }
-            log('init.ready', { permission: adapter.permission(), optedIn: isOptedIn() });
+            log('init.ready', { permission: permissionOf(adapter), optedIn: isOptedIn() });
 
             // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
             let savedHour = parseHour(storage.get(KEY_HOUR));
