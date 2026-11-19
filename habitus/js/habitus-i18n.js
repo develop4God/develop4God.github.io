@@ -1,8 +1,7 @@
-// Habitus+Faith page i18n. Fetch-based, modeled on work-with-me/js/work-with-me-i18n.js: fetches
-// /lang/habitus/{locale}.json, applies
+// Habitus+Faith page i18n. Fetch-based: fetches /lang/habitus/{locale}.json, applies
 // data-i18n text, handles meta.title/meta.description, builds a language-switcher
-// dropdown reusing the same 10-language metadata as the work-with-me dropdown, and persists the
-// chosen language to the shared cross-section localStorage key.
+// dropdown, and persists the chosen language to the shared cross-section
+// localStorage key.
 (function () {
   'use strict';
 
@@ -109,8 +108,8 @@
     }
   }
 
-  // Language metadata — same set as the work-with-me page, reused here
-  // so the dropdown shows identical names/flags across sections.
+  // Language metadata (names and flags) for the dropdown; work-with-me-i18n.js
+  // keeps an identical copy so the dropdown matches across sections.
   const LANGUAGE_INFO = {
     es: { name: 'Español', flag: '🇪🇸' },
     en: { name: 'English', flag: '🇺🇸' },
