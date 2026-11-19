@@ -47,6 +47,7 @@
     "DomBuilder": "readonly",
     "DevotionalTheme": "readonly",
     "DiscoverySortFilter": "readonly",
+    "EncounterLock": "readonly",
     "DevotionalPush": "readonly",
     "DevotionalShell": "readonly",
     "DevotionalShellCore": "readonly",
