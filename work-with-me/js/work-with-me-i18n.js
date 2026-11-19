@@ -1,7 +1,7 @@
-// Work-With-Me page i18n. Fetch-based, modeled on js/home.js: fetches
+// Work-With-Me page i18n. Fetch-based: fetches
 // /work-with-me/lang/{locale}.json, applies data-i18n text, handles
 // meta.title/meta.description, builds a language-switcher dropdown reusing
-// the same 10-language metadata as home.js, and persists the chosen
+// the same 10-language metadata as the habitus dropdown, and persists the chosen
 // language to the shared cross-section localStorage key.
 (function () {
   'use strict';
@@ -89,7 +89,7 @@
     }
   }
 
-  // Language metadata — same set as js/home.js's LANGUAGE_INFO, reused here
+  // Language metadata — same set as the habitus page, reused here
   // so the dropdown shows identical names/flags across sections.
   const LANGUAGE_INFO = {
     es: { name: 'Español', flag: '🇪🇸' },
