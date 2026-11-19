@@ -73,7 +73,7 @@ test('isAllowedLink: navigation stays inside /devocionales/', () => {
 
 test('isAllowedLink: the rest of the site and look-alike paths are refused', () => {
     const { isAllowedLink } = loadCore();
-    for (const href of ['/', '/habitus/', '/work-with-me/', '/devocionales-evil/', '/legacy/', `${ORIGIN}/`, '/devocionales/../habitus/']) {
+    for (const href of ['/', '/habitus/', '/work-with-me/', '/devocionales-evil/', `${ORIGIN}/`, '/devocionales/../habitus/']) {
         assert.equal(isAllowedLink(link(href), ORIGIN, CONTACT), false, href);
     }
 });

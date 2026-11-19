@@ -14,7 +14,7 @@ const HOST = 'https://develop4god.com';
 // Tracked pages only, so generated or vendored folders never count as site pages.
 function htmlFiles() {
     const listed = execFileSync('git', ['ls-files', '-z', '*.html'], { cwd: ROOT, encoding: 'utf8' });
-    return listed.split('\0').filter((file) => file && !file.startsWith('legacy/')).map((file) => path.join(ROOT, file));
+    return listed.split('\0').filter((file) => file).map((file) => path.join(ROOT, file));
 }
 
 // The canonical URL each indexable page declares for itself.

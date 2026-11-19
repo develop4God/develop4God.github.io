@@ -10,7 +10,7 @@ versions, same file globs) so a local pass means CI will pass too.
   PHASE 1: node --check      — syntax, every tracked .js file
   PHASE 2: eslint             — devocionales/js, js, habitus/js
   PHASE 3: stylelint          — every .css file
-  PHASE 4: html-validate      — root/legacy/devocionales/habitus .html
+  PHASE 4: html-validate      — root/devocionales/habitus .html
   PHASE 5: node --test        — unit tests (bible-text-formatter, devotional-progress, devotional-tts)
   PHASE 6: c8 coverage        — report-only, no enforced threshold (npx, scratch-installed)
   PHASE 7: Playwright e2e     — full browser runtime verification (e2e/)
@@ -181,7 +181,7 @@ def phase_stylelint():
 def phase_html_validate():
     if _tool_missing('html-validate'):
         return False, 'html-validate not found on PATH — npm install -g html-validate@8'
-    rc, out, err = run_cmd(['html-validate', '*.html', 'legacy/*.html', 'devocionales/*.html', 'habitus/*.html'])
+    rc, out, err = run_cmd(['html-validate', '*.html', 'devocionales/*.html', 'habitus/*.html'])
     print(out)
     if err.strip():
         print(err)
