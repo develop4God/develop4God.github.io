@@ -58,7 +58,8 @@
             log = (given && given.log) || (created ? created.log : log);
         } catch (err) { /* no logging */ }
         const safe = (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } };
-        // Callers skip building expensive details when logging is off; an injected logger counts as on.
+        // Callers skip building expensive details when logging is off. An injected logger counts as on unless it sets
+        // its own `on` to false (the contract: a logger function may carry a boolean `on` property).
         safe.on = given && given.log ? given.log.on !== false : Boolean(created && created.on);
         return safe;
     }
@@ -242,6 +243,7 @@
                 return;
             }
             if (needsInstallFirst(win)) {
+                log('init.install-hint', { reason: 'ios-needs-home-screen-install' });
                 view.showInstallHint();
                 return;
             }

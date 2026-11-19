@@ -45,7 +45,7 @@ test('?pushdebug=1 turns it on: prints "[push] step" and keeps the entry in wind
 test('the localStorage flag turns it on; any other value or ?pushdebug=0 does not', () => {
     const on = fakeWin({ stored: '1' });
     load(on).create(on).log('x');
-    assert.equal(on.lines.length, 1);
+    assert.equal(on.lines.filter((line) => line[0] === '[push] x').length, 1);
     for (const win of [fakeWin({ stored: '0' }), fakeWin({ search: '?pushdebug=0' }), fakeWin({ search: '?pushdebug=10' })]) {
         load(win).create(win).log('x');
         assert.equal(win.lines.length, 0);
@@ -132,4 +132,31 @@ test('the logger exposes whether it is on, so callers can skip building details'
     const on = fakeWin({ search: '?pushdebug=1' });
     assert.equal(load(off).create(off).on, false);
     assert.equal(load(on).create(on).on, true);
+});
+
+test('a 39-character Google API key in a URL, and a key used as an object key, are redacted; hosts are not', () => {
+    const win = fakeWin({ search: '?pushdebug=1' });
+    const key = 'AIzaSyA1234567890abcdefghijklmnopqrstuv';
+    assert.equal(key.length, 39);
+    load(win).create(win).log('failed', {
+        error: new Error(`Request failed: https://firebaseinstallations.googleapis.com/v1/projects/p/installations?key=${key}`),
+        [key]: 1,
+    });
+    const text = JSON.stringify(win.__pushLog);
+    assert.ok(!text.includes('AIzaSyA'));
+    assert.ok(text.includes('firebaseinstallations.googleapis.com'));
+});
+
+test('an Error keeps its code (FirebaseError messaging/...), redacted like the rest', () => {
+    const win = fakeWin({ search: '?pushdebug=1' });
+    const err = Object.assign(new Error('x'), { code: 'messaging/token-subscribe-failed' });
+    load(win).create(win).log('failed', { error: err });
+    assert.equal(win.__pushLog[0].detail.error.code, 'messaging/token-subscribe-failed');
+});
+
+test('a stored flag announces itself once, so nobody leaves logging on unknowingly', () => {
+    const win = fakeWin({ stored: '1' });
+    load(win).create(win);
+    assert.equal(win.lines.length, 1);
+    assert.match(win.lines[0][0], /pushdebug=0/);
 });

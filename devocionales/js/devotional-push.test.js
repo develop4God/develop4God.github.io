@@ -1378,3 +1378,24 @@ test('log: with logging off, init does not read the permission just to log it', 
     const on = await countReads(true);
     assert.equal(on - off, 1);
 });
+
+test('log: the install hint (iOS Safari tab) is recorded as init.hidden-style entry too', async () => {
+    const ctx = withLog();
+    ctx.win = fakeWin({ ua: UA.iphone, standalone: true });
+    ctx.win.document = ctx.doc;
+    const hint = globals.DevotionalIosHint;
+    const realCanAdd = hint.canAddToHomeScreen;
+    hint.canAddToHomeScreen = () => true;
+    const standalone = globals.DevotionalStandalone;
+    const realIsStandalone = standalone.isStandalone;
+    let calls = 0;
+    // isAppSurface sees standalone, the later install check sees a browser tab.
+    standalone.isStandalone = () => { calls += 1; return calls === 1; };
+    try {
+        await init(ctx.doc, ctx.win, CONFIG, ctx.deps);
+    } finally {
+        hint.canAddToHomeScreen = realCanAdd;
+        standalone.isStandalone = realIsStandalone;
+    }
+    assert.ok(ctx.steps().includes('init.install-hint'));
+});
