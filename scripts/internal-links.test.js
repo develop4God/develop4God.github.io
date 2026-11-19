@@ -17,14 +17,16 @@ function trackedHtml() {
     return listed.split('\0').filter((file) => file && !file.startsWith('legacy/'));
 }
 
+// An internal link is relative, root-relative, or absolute on the apex or www host.
+const isInternal = (href) => !/^[a-z][a-z0-9+.-]*:/i.test(href) || /^https?:\/\/(www\.)?develop4god\.com(\/|$)/i.test(href);
+
 test('no page links to a .html page or to the www host', () => {
     const offenders = [];
     for (const file of trackedHtml()) {
         for (const tag of parseTags(fs.readFileSync(path.join(ROOT, file), 'utf8'))) {
-            const href = tag.name === 'a' ? tag.attrs.href || '' : '';
-            if (/^\/[^?#]*(?<!\/index)\.html([?#]|$)/.test(href) || /^https?:\/\/www\.develop4god\.com/.test(href)) {
-                offenders.push(`${file}: ${href}`);
-            }
+            const href = tag.name === 'a' ? (tag.attrs.href || '').trim() : '';
+            if (!href || !isInternal(href)) continue;
+            if (/\.html?([?#]|$)/i.test(href) || /^https?:\/\/www\./i.test(href)) offenders.push(`${file}: ${href}`);
         }
     }
     assert.deepEqual(offenders, []);
