@@ -1294,7 +1294,7 @@ test('log: a failing enable step records the step name and the error message', a
     await ctx.tap('switch');
     const entry = ctx.entries.find((e) => e.step === 'enable.failed');
     assert.equal(entry.detail.error.message, 'no token');
-    assert.equal(entry.detail.after, 'registration');
+    assert.equal(entry.detail.failedAt, 'getToken');
 });
 
 test('log: a null registration and a rejecting requestPermission are recorded too', async () => {
@@ -1351,4 +1351,30 @@ test('log: a failure while wiring the dependencies is still recorded as init.cra
         globals.DevotionalPushStore.create = realCreate;
     }
     assert.equal(ctx.entries.find((e) => e.step === 'init.crashed').detail.error.message, 'wiring');
+});
+
+test('log: a failing Firestore write is reported as failedAt writeAll, not as the step before it', async () => {
+    const ctx = withLog();
+    ctx.adapter.db.set = () => Promise.reject(new Error('rules'));
+    await ctx.run();
+    await ctx.tap('switch');
+    assert.equal(ctx.entries.find((e) => e.step === 'enable.failed').detail.failedAt, 'writeAll');
+});
+
+test('log: with logging off, init does not read the permission just to log it', async () => {
+    const countReads = async (logging) => {
+        let reads = 0;
+        const adapter = fakeAdapter({ permission: () => { reads += 1; return 'default'; } });
+        const ctx = setup({ adapter });
+        if (logging) {
+            const fn = () => {};
+            fn.on = true;
+            ctx.deps.log = fn;
+        }
+        await ctx.run();
+        return reads;
+    };
+    const off = await countReads(false);
+    const on = await countReads(true);
+    assert.equal(on - off, 1);
 });

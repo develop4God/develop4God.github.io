@@ -96,3 +96,40 @@ test('token-like strings (40+ id characters) inside an error message or a string
     assert.equal(short, 'permission-denied');
     assert.ok(!JSON.stringify(win.lines).includes('APA91b'));
 });
+
+test('redaction also covers plain error-like objects, nested objects and arrays', () => {
+    const win = fakeWin({ search: '?pushdebug=1' });
+    const token = 'fX3k9Qp2LmZ7vB1nC8dE4gH6jK0sT5uW:APA91bHxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    load(win).create(win).log('failed', {
+        error: { code: 'messaging/x', message: `bad ${token}` },
+        nested: { deeper: { value: token } },
+        list: [token, 'ok'],
+    });
+    const text = JSON.stringify(win.__pushLog);
+    assert.ok(!text.includes('APA91b'));
+    assert.equal(win.__pushLog[0].detail.error.message, 'bad [redacted]');
+    assert.equal(win.__pushLog[0].detail.error.code, 'messaging/x');
+    assert.equal(win.__pushLog[0].detail.list[1], 'ok');
+});
+
+test('a circular detail never throws', () => {
+    const win = fakeWin({ search: '?pushdebug=1' });
+    const loop = { name: 'x' };
+    loop.self = loop;
+    assert.doesNotThrow(() => load(win).create(win).log('loop', { loop }));
+});
+
+test('?pushdebug=1 persists the flag, so the installed app (no URL bar) keeps logging', () => {
+    const stored = {};
+    const win = fakeWin({ search: '?pushdebug=1' });
+    win.localStorage.setItem = (key, value) => { stored[key] = value; };
+    load(win).create(win);
+    assert.deepEqual(stored, { 'devotionalPush.debug': '1' });
+});
+
+test('the logger exposes whether it is on, so callers can skip building details', () => {
+    const off = fakeWin();
+    const on = fakeWin({ search: '?pushdebug=1' });
+    assert.equal(load(off).create(off).on, false);
+    assert.equal(load(on).create(on).on, true);
+});

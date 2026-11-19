@@ -17,7 +17,11 @@
                 win.localStorage.removeItem(FLAG_KEY);
                 return false;
             }
-            if (/(^|[?&])pushdebug=1(&|$)/.test((win.location && win.location.search) || '')) return true;
+            if (/(^|[?&])pushdebug=1(&|$)/.test((win.location && win.location.search) || '')) {
+                // Kept, so the installed app (no URL bar; a desktop tab shares its storage) logs on later visits too.
+                try { win.localStorage.setItem(FLAG_KEY, '1'); } catch (err) { /* blocked storage: on for this visit only */ }
+                return true;
+            }
             return win.localStorage.getItem(FLAG_KEY) === '1';
         } catch (err) {
             return false;
@@ -26,15 +30,18 @@
 
     // A run of 40+ id characters (FCM tokens, installation ids, API keys) is never worth keeping.
     const redact = (text) => text.replace(/[A-Za-z0-9_:.-]{40,}/g, '[redacted]');
+    const MAX_DEPTH = 4;
 
-    // An Error would print as {} in JSON; keep what helps.
-    function plain(detail) {
-        if (!detail || typeof detail !== 'object') return detail;
+    // A copy that is safe to print and to JSON.stringify: Errors reduced to name and message (they print as
+    // {} otherwise), every string redacted, depth capped (also ends cycles).
+    function plain(value, depth = 0) {
+        if (typeof value === 'string') return redact(value);
+        if (!value || typeof value !== 'object') return value;
+        if (value instanceof Error) return { name: redact(String(value.name)), message: redact(String(value.message)) };
+        if (depth >= MAX_DEPTH) return '[truncated]';
+        if (Array.isArray(value)) return value.map((item) => plain(item, depth + 1));
         const out = {};
-        for (const [key, value] of Object.entries(detail)) {
-            if (value instanceof Error) out[key] = { name: value.name, message: redact(String(value.message)) };
-            else out[key] = typeof value === 'string' ? redact(value) : value;
-        }
+        for (const [key, item] of Object.entries(value)) out[key] = plain(item, depth + 1);
         return out;
     }
 

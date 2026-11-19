@@ -52,10 +52,15 @@
     // Never throws, so it can be built before anything else that might fail.
     function makeLog(win, given) {
         let log = () => {};
+        let created = null;
         try {
-            log = (given && given.log) || (global.DevotionalPushLog ? global.DevotionalPushLog.create(win).log : log);
+            if (!(given && given.log) && global.DevotionalPushLog) created = global.DevotionalPushLog.create(win);
+            log = (given && given.log) || (created ? created.log : log);
         } catch (err) { /* no logging */ }
-        return (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } };
+        const safe = (step, detail) => { try { log(step, detail); } catch (err) { /* never break the flow */ } };
+        // Callers skip building expensive details when logging is off; an injected logger counts as on.
+        safe.on = given && given.log ? given.log.on !== false : Boolean(created && created.on);
+        return safe;
     }
 
     // Reading the permission must not be able to break init when it is only being logged.
@@ -67,7 +72,6 @@
         const i18n = given.i18n || global.DevotionalI18n || null;
         return {
             adapter,
-            log: makeLog(win, given),
             store: given.store || (adapter && global.DevotionalPushStore ? global.DevotionalPushStore.create({ db: adapter.db }) : null),
             storage: guardStorage(given.storage || defaultStorage(win)),
             i18n,
@@ -245,7 +249,7 @@
                 log('init.hidden', { reason: 'unsupported-browser' });
                 return;
             }
-            log('init.ready', { permission: permissionOf(adapter), optedIn: isOptedIn() });
+            if (log.on) log('init.ready', { permission: permissionOf(adapter), optedIn: isOptedIn() });
 
             // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
             let savedHour = parseHour(storage.get(KEY_HOUR));
@@ -327,18 +331,18 @@
                     else view.message('push.status_denied');
                     return;
                 }
-                // The last step that finished, so a failure says where the flow stopped.
-                let after = 'permission';
+                // The step being attempted, so a failure names the step that failed.
+                let failedAt = 'load';
                 try {
                     await adapter.load();
-                    after = 'load';
+                    failedAt = 'signInAnonymously';
                     const uid = await adapter.signInAnonymously();
-                    after = 'signInAnonymously';
+                    failedAt = 'registration';
                     const registration = await adapter.registration();
                     if (!registration) throw new Error('push: no service worker registration');
-                    after = 'registration';
+                    failedAt = 'getToken';
                     const token = await adapter.getToken(registration);
-                    after = 'getToken';
+                    failedAt = 'writeAll';
                     await writeAll(uid, token, chosenHour);
                     log('enable.done', { hour: chosenHour });
                     storage.set(KEY_OPTED_IN, '1');
@@ -353,7 +357,7 @@
                     }
                     view.showState(true);
                 } catch (err) {
-                    log('enable.failed', { after, error: err });
+                    log('enable.failed', { failedAt, error: err });
                     view.message('push.status_error');
                 }
             };
