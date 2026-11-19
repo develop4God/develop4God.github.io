@@ -451,8 +451,41 @@ test.describe('Settings screen: a plain list in the installed app', () => {
         await expect(page.locator('[data-push-time-row]')).toBeVisible();
         for (const slot of ['language', 'theme', 'font']) await expect(page.locator(`[data-shell-slot="${slot}"]`)).toBeVisible();
         const text = await page.locator('[data-shell-settings]').innerText();
-        for (const gone of ['anonymous identifier', 'Get a notification with your daily devotional', 'Reminders and preferences', 'Daily reminder']) expect(text).not.toContain(gone);
+        for (const gone of ['Get a notification with your daily devotional', 'Reminders and preferences', 'Daily reminder']) expect(text).not.toContain(gone);
         await shot(page, 'settings-list');
+    });
+
+    test('the consent line stays next to the switch (what is stored, and that it can be turned off)', async ({ page }) => {
+        await installedIos(page);
+        await pushOnWithStubAdapter(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="settings"]').click();
+        const consent = page.locator('[data-push] [data-i18n="push.consent"]');
+        await expect(consent).toBeVisible();
+        await expect(consent).toContainText('anonymous identifier');
+        await expect(consent).toContainText('turn it off at any time');
+    });
+
+    test('every control is named by its row: hour, language, theme and font size, and the theme name is translated', async ({ page }) => {
+        await installedIos(page);
+        await pushOnWithStubAdapter(page);
+        await open(page, PHONE);
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('#push-hour')).toHaveAccessibleName('Daily notification time');
+        await expect(page.locator('#language-selector')).toHaveAccessibleName('Language');
+        await expect(page.locator('.theme-switch')).toHaveAccessibleName('Theme');
+        await expect(page.locator('.text-size-toggle')).toHaveAccessibleName('Font size');
+        await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
+        await page.locator('[data-shell-tab="settings"]').click();
+        await expect(page.locator('.theme-switch')).toHaveAccessibleName('Tema');
+        await expect(page.locator('#language-selector')).toHaveAccessibleName('Idioma');
+    });
+
+    test('the Reading options heading is gone once the font toggle has moved, and the Bible version stays', async ({ page }) => {
+        await installedIos(page);
+        await open(page, PHONE);
+        await expect(page.locator('#reading-options-label')).toBeHidden();
+        await expect(page.locator('#version-select')).toBeVisible();
     });
 
     test('the footer is hidden on Settings only, and is back on Home', async ({ page }) => {
@@ -506,6 +539,8 @@ test.describe('Settings screen: a plain list in the installed app', () => {
 
     test('a browser tab is unchanged: the controls stay where they were and the Settings rows stay hidden', async ({ page }) => {
         await open(page, PHONE);
+        await expect(page.locator('#reading-options-label')).toBeVisible();
+        await expect(page.locator('.theme-switch')).toHaveAccessibleName('Theme');
         await expect(page.locator('header #language-selector')).toHaveCount(1);
         await expect(page.locator('header .theme-switch')).toHaveCount(1);
         await expect(page.locator('main .text-size-toggle')).toHaveCount(1);
