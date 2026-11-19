@@ -136,8 +136,11 @@
                 statusDetail = detail || '';
                 if (!status) return;
                 const text = statusKey ? t(statusKey) : '';
-                // The language file decides where the hour goes: "{time}" in the text.
-                status.textContent = text.replace('{time}', statusDetail);
+                // The language file decides where the hour goes: "{time}" in the text. Without the placeholder
+                // the hour is appended. A replacer function keeps "$" in the value literal.
+                status.textContent = text.includes('{time}')
+                    ? text.replace('{time}', () => statusDetail)
+                    : [text, statusDetail].filter(Boolean).join(' ');
             },
             messageKey: () => statusKey,
             rerender() { this.message(statusKey, statusDetail); },
@@ -267,11 +270,14 @@
                 pendingHour = null;
                 if (picked !== null) {
                     if (isOptedIn() && picked !== savedHour) {
-                        languageChanged = false;
+                        const languagePending = languageChanged;
+                        languageChanged = false; // a successful hour save carries the current language
                         await exclusive(() => changeHour(picked));
-                        return;
+                        if (savedHour === picked) return;
+                        languageChanged = languagePending; // the save failed: the language still has to be written
+                    } else {
+                        view.selectHour(savedHour);
                     }
-                    view.selectHour(savedHour);
                 }
                 if (languageChanged) {
                     languageChanged = false;
@@ -354,7 +360,7 @@
                     await saveSettingsNow(next);
                     savedHour = next;
                     storage.set(KEY_HOUR, next);
-                    view.message('push.time_set', formatHour(next));
+                    view.message('push.time_set_at', formatHour(next));
                 } catch (err) {
                     view.selectHour(savedHour);
                     view.message('push.time_error');
