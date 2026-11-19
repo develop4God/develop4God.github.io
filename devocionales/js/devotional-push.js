@@ -262,7 +262,7 @@
 
             // Runs after a flow: the hour picked meanwhile (when notifications are still on), then the
             // language changed meanwhile (the hour save already carries the current language).
-            async function applyDeferred() {
+            const applyDeferred = async () => {
                 const picked = pendingHour;
                 pendingHour = null;
                 if (picked !== null) {
@@ -277,7 +277,7 @@
                     languageChanged = false;
                     if (isOptedIn()) await exclusive(rewriteSettings);
                 }
-            }
+            };
 
             const enable = async () => {
                 // Read before any await: what the row shows when the reader taps is what gets saved.
