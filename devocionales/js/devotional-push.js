@@ -15,8 +15,8 @@
     // push.status_denied means "prompt dismissed" and is not one of them.
     const BLOCKED_KEYS = ['push.blocked_ios', 'push.blocked_desktop'];
 
-    // The scheduler ignores minutes, so a reminder time is always a whole hour, shown as "HH:00".
-    const formatHour = (hour) => `${String(hour).padStart(2, '0')}:00`;
+    // The one hour formatter lives in the store (it writes "HH:00" to Firestore); the screen shows the same text.
+    const formatHour = (hour) => global.DevotionalPushStore.formatHour(hour);
 
     function parseHour(value) {
         const hour = Number.parseInt(value, 10);
@@ -136,7 +136,11 @@
                 statusDetail = detail || '';
                 if (!status) return;
                 const text = statusKey ? t(statusKey) : '';
-                status.textContent = text && statusDetail ? `${text} ${statusDetail}` : text;
+                // The language file decides where the hour goes: "{time}" in the text. Without the placeholder
+                // the hour is appended. A replacer function keeps "$" in the value literal.
+                status.textContent = text.includes('{time}')
+                    ? text.replace('{time}', () => statusDetail)
+                    : [text, statusDetail].filter(Boolean).join(' ');
             },
             messageKey: () => statusKey,
             rerender() { this.message(statusKey, statusDetail); },
@@ -224,19 +228,21 @@
             // The hour last saved: where a failed save puts the row back, and what a repeated pick is compared with.
             let savedHour = parseHour(storage.get(KEY_HOUR));
             view.selectHour(savedHour);
-            // The select is the source of truth; storage only remembers it for the next visit.
-            const hour = () => (view.selectedHour() === null ? parseHour(storage.get(KEY_HOUR)) : view.selectedHour());
-            const settings = () => ({ notificationsEnabled: true, hour: hour(), timezone: browserTimezone(), language: siteLanguage(i18n) });
+            // Every write is told which hour to carry: the picker can already show a later pick, so it is never read.
+            const settings = (hour) => ({ notificationsEnabled: true, hour, timezone: browserTimezone(), language: siteLanguage(i18n) });
 
             // The three writes of the app's FirestoreUserProfileStore, in its order, on every entry.
-            const writeAll = async (uid, token) => {
+            const writeAll = async (uid, token, hour) => {
                 await store.touchUser(uid);
                 await store.saveToken(uid, token);
-                await store.saveSettings(uid, settings());
+                await store.saveSettings(uid, settings(hour));
             };
 
-            // The single busy flag: taps are ignored while any flow runs.
+            // The single busy flag: switch taps are ignored while any flow runs. A new hour or language
+            // chosen meanwhile is remembered and applied once the flow ends, so nothing chosen is lost.
             let busy = false;
+            let pendingHour = null;
+            let languageChanged = false;
             const exclusive = async (flow) => {
                 if (busy) return false;
                 busy = true;
@@ -247,6 +253,7 @@
                     busy = false;
                     view.busy(false);
                 }
+                await applyDeferred();
                 return true;
             };
 
@@ -256,7 +263,31 @@
                 view.message((help && help.helpKey(win.navigator)) || 'push.status_denied');
             };
 
+            // Runs after a flow: the hour picked meanwhile (when notifications are still on), then the
+            // language changed meanwhile (the hour save already carries the current language).
+            const applyDeferred = async () => {
+                const picked = pendingHour;
+                pendingHour = null;
+                if (picked !== null) {
+                    if (isOptedIn() && picked !== savedHour) {
+                        const languagePending = languageChanged;
+                        languageChanged = false; // a successful hour save carries the current language
+                        await exclusive(() => changeHour(picked));
+                        if (savedHour === picked) return;
+                        languageChanged = languagePending; // the save failed: the language still has to be written
+                    } else {
+                        view.selectHour(savedHour);
+                    }
+                }
+                if (languageChanged) {
+                    languageChanged = false;
+                    if (isOptedIn()) await exclusive(rewriteSettings);
+                }
+            };
+
             const enable = async () => {
+                // Read before any await: what the row shows when the reader taps is what gets saved.
+                const chosenHour = view.selectedHour() === null ? savedHour : view.selectedHour();
                 // The permission request runs before any other await, so the browser still sees the tap.
                 let permission;
                 try {
@@ -276,10 +307,10 @@
                     const registration = await adapter.registration();
                     if (!registration) throw new Error('push: no service worker registration');
                     const token = await adapter.getToken(registration);
-                    await writeAll(uid, token);
+                    await writeAll(uid, token, chosenHour);
                     storage.set(KEY_OPTED_IN, '1');
                     storage.set(KEY_TOKEN, token);
-                    savedHour = hour();
+                    savedHour = chosenHour;
                     storage.set(KEY_HOUR, savedHour);
                     // Without a persisted flag there would be no way to turn it off again: undo.
                     if (!isOptedIn()) {
@@ -295,7 +326,7 @@
 
             const disable = async () => {
                 if (await disableFlow(resolved)) view.showState(false);
-                else view.message('push.status_error');
+                else view.message('push.status_error_off');
             };
 
             // Revoked permission: the browser already dropped the subscription, so the UI is "off"
@@ -307,7 +338,7 @@
 
             const rewriteSettings = async () => {
                 try {
-                    await saveSettingsNow();
+                    await saveSettingsNow(savedHour);
                     view.message('push.status_enabled');
                 } catch (err) {
                     view.message('push.status_error');
@@ -315,21 +346,21 @@
             };
 
             // Writes the settings document for the signed-in reader; throws when it cannot.
-            const saveSettingsNow = async () => {
+            const saveSettingsNow = async (hour) => {
                 await adapter.load();
                 const uid = await adapter.currentUid();
                 if (!uid) throw new Error('push: no signed-in user');
-                await store.saveSettings(uid, settings());
+                await store.saveSettings(uid, settings(hour));
             };
 
             // Saves the picked hour. A failure puts the row back on the last saved hour, so the screen
             // never shows a time the server does not have.
             const changeHour = async (next) => {
                 try {
-                    await saveSettingsNow();
+                    await saveSettingsNow(next);
                     savedHour = next;
                     storage.set(KEY_HOUR, next);
-                    view.message('push.time_set', formatHour(next));
+                    view.message('push.time_set_at', formatHour(next));
                 } catch (err) {
                     view.selectHour(savedHour);
                     view.message('push.time_error');
@@ -346,7 +377,7 @@
                     const registration = await adapter.registration();
                     if (!registration) return;
                     const token = await adapter.getToken(registration);
-                    await writeAll(uid, token);
+                    await writeAll(uid, token, savedHour);
                     storage.set(KEY_TOKEN, token);
                 } catch (err) {
                     // Retried on the next visit.
@@ -381,12 +412,18 @@
             if (view.switchButton) view.switchButton.addEventListener('click', () => { run(isOptedIn() ? disable : enable); });
             if (view.hourSelect) {
                 view.hourSelect.addEventListener('change', () => {
-                    // Busy, or notifications are off (the row is disabled then, so this is only a guard).
-                    if (busy || !isOptedIn()) {
+                    // Notifications are off (the row is disabled then, so this is only a guard).
+                    if (!isOptedIn()) {
                         view.selectHour(savedHour);
                         return;
                     }
                     const next = parseHour(view.hourSelect.value);
+                    if (busy) {
+                        // Shown now, saved when the running flow ends.
+                        pendingHour = next;
+                        view.selectHour(next);
+                        return;
+                    }
                     if (next === savedHour) return;
                     view.selectHour(next);
                     exclusive(() => changeHour(next));
@@ -394,7 +431,10 @@
             }
 
             if (i18n && typeof i18n.onLanguageChanged === 'function') {
-                i18n.onLanguageChanged(() => { if (!busy && isOptedIn()) exclusive(rewriteSettings); });
+                i18n.onLanguageChanged(() => {
+                    if (busy) languageChanged = true;
+                    else if (isOptedIn()) exclusive(rewriteSettings);
+                });
             }
 
             if (!isOptedIn()) {

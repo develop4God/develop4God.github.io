@@ -66,15 +66,21 @@ a.shell-tab { text-decoration: none; }
 
 .shell-active[data-shell-layout="bar"] body { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
 
-/* Tablet and desktop: labelled rail. */
+/* Tablet and desktop: labelled rail. In landscape the iPhone cutout and status bar sit under it, so it
+   grows by the inset on its own (start) edge and drops below the top inset. */
+.shell-active[data-shell-layout="rail"] { --shell-rail-inset: env(safe-area-inset-left); }
+
+.shell-active[dir="rtl"][data-shell-layout="rail"] { --shell-rail-inset: env(safe-area-inset-right); }
+
 .shell-active[data-shell-layout="rail"] [data-shell-nav] {
     inset-block: 0;
     inset-inline: 0 auto;
-    width: 12rem;
+    width: calc(12rem + var(--shell-rail-inset));
     flex-direction: column;
     justify-content: flex-start;
     gap: 0.25rem;
-    padding: 1rem 0.5rem;
+    padding: calc(1rem + env(safe-area-inset-top)) 0.5rem 1rem;
+    padding-inline-start: calc(0.5rem + var(--shell-rail-inset));
     border-inline-end-width: 1px;
 }
 
@@ -88,7 +94,7 @@ a.shell-tab { text-decoration: none; }
 
 .shell-active[data-shell-layout="rail"] .shell-tab[aria-current="page"] { background: var(--accent-soft); }
 
-.shell-active[data-shell-layout="rail"] body { padding-inline-start: 12rem; }
+.shell-active[data-shell-layout="rail"] body { padding-inline-start: calc(12rem + var(--shell-rail-inset)); }
 
 /* The reading column: capped and a single column. The page's own two-column grid (md:grid) is keyed
    to the viewport width, which the rail has already narrowed, so beside the rail it would squeeze the
@@ -108,6 +114,9 @@ a.shell-tab { text-decoration: none; }
 
 /* The browser-tab header links to Studies; the installed app has the Studies tab in its bar instead. */
 .shell-active #nav-studies-item { display: none; }
+
+/* The font toggle moved to Settings, which leaves only the Bible version under this heading. */
+.shell-active #reading-options-label { display: none; }
 
 /* Google Play is for Android, which has no installed web app. */
 .shell-active #app-banner,

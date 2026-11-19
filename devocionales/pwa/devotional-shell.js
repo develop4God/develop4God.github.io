@@ -12,17 +12,24 @@
     // Controls that live in the header and on the reading page in a browser tab and in Settings in the
     // installed app. The existing elements are moved, never copied or recreated: the scripts that read
     // them by id (language selector, theme toggle, font size radios) keep working untouched.
+    // The row label names the control: a group for the language list and the font radios (they hold
+    // several buttons), the label itself for the theme switch (its checkbox is display:none).
     const SETTINGS_CONTROLS = [
         { slot: 'language', selector: '#language-selector' },
-        { slot: 'theme', selector: '.theme-switch' },
+        { slot: 'theme', selector: '.theme-switch', group: false },
         { slot: 'font', selector: '.text-size-toggle' },
     ];
 
     function moveControlsToSettings(doc) {
-        SETTINGS_CONTROLS.forEach(({ slot, selector }) => {
+        SETTINGS_CONTROLS.forEach(({ slot, selector, group = true }) => {
             const target = doc.querySelector(`[data-shell-slot="${slot}"]`);
             const control = doc.querySelector(selector);
-            if (target && control && !target.contains(control)) target.appendChild(control);
+            if (!target || !control) return;
+            if (!target.contains(control)) target.appendChild(control);
+            const label = target.querySelector('.settings-label');
+            if (!label || !label.id) return;
+            control.setAttribute('aria-labelledby', label.id);
+            if (group) control.setAttribute('role', 'group');
         });
     }
 
