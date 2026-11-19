@@ -66,3 +66,21 @@ test('landing page footer links open both legal pages', async ({ page }) => {
   await expect(page.locator('footer a[href="/habitus/politica-de-privacidad"]')).toHaveText('Privacy Policy');
   await expect(page.locator('footer a[href="/habitus/terminos-y-condiciones"]')).toHaveText('Terms and Conditions');
 });
+
+test('legal page: the theme switch highlights the icon of the active theme', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('theme', 'dark'));
+  await page.goto('/habitus/politica-de-privacidad.html', { waitUntil: 'networkidle' });
+  await expect(page.locator('.theme-switch .theme-icon-dark')).toHaveClass(/is-active/);
+  await page.locator('label.theme-switch').click();
+  await expect(page.locator('.theme-switch .theme-icon-light')).toHaveClass(/is-active/);
+});
+
+test('legal page: the header back link keeps its secondary-button padding and border', async ({ page }) => {
+  await page.goto('/habitus/terminos-y-condiciones.html', { waitUntil: 'networkidle' });
+  const style = await page.locator('header a[href="/habitus/"]').evaluate((el) => {
+    const s = getComputedStyle(el);
+    return { paddingLeft: parseFloat(s.paddingLeft), borderTopWidth: parseFloat(s.borderTopWidth) };
+  });
+  expect(style.paddingLeft).toBeGreaterThan(8);
+  expect(style.borderTopWidth).toBeGreaterThan(0);
+});

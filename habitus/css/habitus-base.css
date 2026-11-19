@@ -46,13 +46,13 @@ body {
     background: var(--bg);
 }
 
-.site-nav a:not(.btn-primary) {
+.site-nav a:not(.btn-primary, .btn-secondary) {
     color: var(--text-muted);
     font-weight: 500;
     padding: 0.5rem 0;
     border-bottom: 2px solid transparent;
 }
-.site-nav a:not(.btn-primary):hover { color: var(--text); }
+.site-nav a:not(.btn-primary, .btn-secondary):hover { color: var(--text); }
 
 .site-nav a.active {
     color: var(--text);
