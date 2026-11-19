@@ -22,7 +22,6 @@ async function switchLanguageViaDropdown(page, lang) {
 }
 
 const DROPDOWN_PAGES = [
-  { name: 'legacy-root', path: '/legacy/' },
   { name: 'habitus', path: '/habitus/' },
   { name: 'work-with-me', path: '/work-with-me/' },
 ];
