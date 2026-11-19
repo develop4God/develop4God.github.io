@@ -53,6 +53,8 @@
             ]));
         }
 
+        const connections = (card) => list(card.scripture_connections).map((v) => verse(v));
+
         function prayer(p) {
             if (!isObject(p) || !(isText(p.title) || isText(p.content))) return null;
             // Title is uppercased and falls back to the prayer label, as in the app's prayer block.
@@ -66,15 +68,15 @@
         const RENDERERS = {
             cinematic_scene: (card, id) => [
                 image(id, card.image_url), titleOf(card), ...paragraphs(card.narrative, 'encounter-narrative'),
-                verse(card.verse_overlay), revelation(card),
+                verse(card.verse_overlay), ...connections(card), revelation(card),
             ],
             scripture_moment: (card, id) => [
                 image(id, card.image_url), titleOf(card), subtitleOf(card), verse({ reference: card.verse_reference, text: card.verse_text }),
-                ...paragraphs(card.reflection, 'encounter-reflection'), revelation(card),
+                ...paragraphs(card.reflection, 'encounter-reflection'), ...connections(card), revelation(card),
             ],
             character_moment: (card, id) => [
                 image(id, card.image_url), iconOf(card), titleOf(card), subtitleOf(card), ...paragraphs(card.content, 'encounter-content'),
-                verse(card.verse_overlay), ...list(card.scripture_connections).map((v) => verse(v)), revelation(card),
+                verse(card.verse_overlay), ...connections(card), revelation(card),
             ],
             theological_depth: (card, id) => RENDERERS.character_moment(card, id),
             discovery_activation: (card, id) => [

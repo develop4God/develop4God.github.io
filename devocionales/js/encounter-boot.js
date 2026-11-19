@@ -93,9 +93,11 @@
                 readerView.showReader();
                 reader.open(route.entry);
             } else if (route.kind === 'locked') {
+                reader.reset();
                 readerView.showList();
                 unlockSheet.open();
             } else {
+                reader.reset();
                 readerView.showReader();
                 readerView.render({ notFound: true, summary: { id }, phase: 'intro', intro: null, pages: [], index: 0, footer: {} });
             }
@@ -117,7 +119,8 @@
         router = global.DiscoveryRouter.createRouter({
             win: global,
             nav: global.DiscoveryNav,
-            onList: () => { readerView.showList(); },
+            // Back to the list: redraw from storage so a just-completed encounter shows as done and the next one opens (B6).
+            onList: () => { reader.reset(); readerView.showList(); listPage.refresh(); },
             onDetail: (id) => { showDeepLink(id); },
         });
 

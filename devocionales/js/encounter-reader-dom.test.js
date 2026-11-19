@@ -208,3 +208,13 @@ test('not-found and error states are alerts with a way back', () => {
     err.querySelector('.encounter-retry').dispatch('click');
     assert.equal(retry, 1);
 });
+
+test('cinematic_scene and scripture_moment render scripture_connections, as the app does', () => {
+    const { dom } = setup();
+    const connections = [{ reference: 'John 1:42', text: 'You shall be called Cephas' }];
+    const cine = dom.buildPage(pageFor({ type: 'cinematic_scene', title: 'x', scripture_connections: connections }), 'b1');
+    assert.match(text(cine), /John 1:42/);
+    assert.match(text(cine), /You shall be called Cephas/);
+    const scrip = dom.buildPage(pageFor({ type: 'scripture_moment', verse_reference: 'Mark 10:51', scripture_connections: connections }), 'b1');
+    assert.match(text(scrip), /John 1:42/);
+});

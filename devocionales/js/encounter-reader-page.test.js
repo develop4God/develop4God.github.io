@@ -262,3 +262,37 @@ test('canGo: only in the reader phase, and only within the page bounds', async (
     assert.equal(page.canGo('next'), false, 'last page');
     assert.equal(page.canGo('prev'), true);
 });
+
+test('leaving before the 5 s return cancels it: the reader exits once, not again later', async () => {
+    const { page, calls, timers } = setup();
+    await page.open(SUMMARY);
+    page.goTo(3);
+    page.complete();
+    page.exit();
+    timers.fire();
+    assert.equal(calls.exits, 1);
+});
+
+test('opening another encounter cancels a pending return from the previous one', async () => {
+    const { page, calls, timers } = setup();
+    await page.open(SUMMARY);
+    page.goTo(3);
+    page.complete();
+    await page.open({ ...SUMMARY, id: 'other_001' });
+    timers.fire();
+    assert.equal(calls.exits, 0, 'a stale timer must not navigate away from the new encounter');
+});
+
+test('reset() drops the current encounter: keys no longer page it and a pending return is cancelled', async () => {
+    const { page, calls, timers } = setup();
+    await page.open(SUMMARY);
+    page.enter();
+    page.goTo(3);
+    page.complete();
+    page.reset();
+    const before = calls.rendered.length;
+    page.onKey('ArrowLeft');
+    timers.fire();
+    assert.equal(calls.rendered.length, before, 'no render after reset');
+    assert.equal(calls.exits, 0);
+});
