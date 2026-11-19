@@ -47,6 +47,7 @@
         // Header fields for the intro screen, taken from the list entry (already localized by the loader).
         function introOf(entry) {
             return {
+                id: entry.id,
                 title: entry.title,
                 subtitle: entry.subtitle || '',
                 scripture: entry.scripture || '',

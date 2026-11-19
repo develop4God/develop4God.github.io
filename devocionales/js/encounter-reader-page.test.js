@@ -247,6 +247,7 @@ test('the intro carries the encounter header fields from the summary', async () 
     const { page, calls } = setup();
     await page.open({ ...SUMMARY, title: 'Bartimaeus', scripture: 'Mark 10:46-52', minutes: 7, testament: 'new' });
     assert.equal(last(calls).intro.title, 'Bartimaeus');
+    assert.equal(last(calls).intro.id, 'bartimaeus_001', 'the intro needs the id to build its image URL');
     assert.equal(last(calls).intro.minutes, 7);
     assert.equal(last(calls).intro.testament, 'new');
 });
