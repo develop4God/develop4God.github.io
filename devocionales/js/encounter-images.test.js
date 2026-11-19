@@ -25,8 +25,8 @@ test('a filename that already has an extension is stripped and replaced by the f
     assert.equal(urls.imageUrl('a', 'x.y.png', 'png'), 'https://cdn.test/images/encounters/a/x.y.png');
 });
 
-test('defaults to avif', () => {
-    assert.ok(urls.imageUrl('a', 'b').endsWith('/a/b.avif'));
+test('defaults to webp', () => {
+    assert.ok(urls.imageUrl('a', 'b').endsWith('/a/b.webp'));
 });
 
 test('a trailing slash on the base is tolerated', () => {
