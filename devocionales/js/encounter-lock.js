@@ -9,12 +9,18 @@
         ? index.filter((x) => x && x.id && x.status === 'published')
         : []);
 
+    // Callers may hold completed ids as a Set, an array (parsed storage) or garbage.
+    const toSet = (completed) => {
+        if (completed instanceof Set) return completed;
+        return new Set(Array.isArray(completed) ? completed : []);
+    };
+
     function isUnlocked(index, id, completed, allUnlocked = false) {
         if (allUnlocked) return true;
         const list = published(index);
         const position = list.findIndex((x) => x.id === id);
         if (position <= 0) return true; // first, coming_soon or unknown: own overlay decides
-        return !!(completed && completed.has(list[position - 1].id));
+        return toSet(completed).has(list[position - 1].id);
     }
 
     function firstLocked(index, completed, allUnlocked = false) {

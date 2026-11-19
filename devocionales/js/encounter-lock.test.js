@@ -71,3 +71,11 @@ test('prerequisiteOf: the previous published entry, null for the first or unknow
     assert.equal(prerequisiteOf(index, 'nope'), null);
     assert.equal(prerequisiteOf(null, 'b'), null);
 });
+
+test('isUnlocked/firstLocked: completed given as an array works, any other shape is treated as empty and never throws', () => {
+    assert.equal(isUnlocked(index, 'b', ['a']), true);
+    assert.equal(firstLocked(index, ['a']).id, 'c');
+    assert.equal(isUnlocked(index, 'b', { a: true }), false);
+    assert.equal(isUnlocked(index, 'b', 'a'), false);
+    assert.equal(firstLocked(index, { a: true }).id, 'b');
+});
