@@ -85,3 +85,14 @@ test('?pushdebug=0 clears a stored flag, so a tester in an installed app can tur
     assert.deepEqual(removed, ['devotionalPush.debug']);
     assert.equal(win.lines.length, 0);
 });
+
+test('token-like strings (40+ id characters) inside an error message or a string detail are redacted', () => {
+    const win = fakeWin({ search: '?pushdebug=1' });
+    const token = 'fX3k9Qp2LmZ7vB1nC8dE4gH6jK0sT5uW:APA91bHxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    load(win).create(win).log('failed', { error: new Error(`FCM rejected ${token} for installation`), note: token, short: 'permission-denied' });
+    const { error, note, short } = win.__pushLog[0].detail;
+    assert.equal(error.message, 'FCM rejected [redacted] for installation');
+    assert.equal(note, '[redacted]');
+    assert.equal(short, 'permission-denied');
+    assert.ok(!JSON.stringify(win.lines).includes('APA91b'));
+});

@@ -5,8 +5,8 @@
     // must work the same without push). Off unless the page is opened with ?pushdebug=1 or
     // localStorage "devotionalPush.debug" is "1". When on, each step is printed as "[push] step" and kept
     // in window.__pushLog (last 100) so a test or a remote-debugging session can read it. It never
-    // throws. It does not filter: callers pass only step names, results and error messages, never
-    // tokens or ids. ?pushdebug=0 removes the stored flag (an installed app has no way to edit it).
+    // throws. Callers pass only step names, results and error messages; long id-like strings are
+    // redacted as a backstop. ?pushdebug=0 removes the stored flag (an installed app has no way to edit it).
 
     const FLAG_KEY = 'devotionalPush.debug';
     const MAX_ENTRIES = 100;
@@ -24,12 +24,16 @@
         }
     }
 
+    // A run of 40+ id characters (FCM tokens, installation ids, API keys) is never worth keeping.
+    const redact = (text) => text.replace(/[A-Za-z0-9_:.-]{40,}/g, '[redacted]');
+
     // An Error would print as {} in JSON; keep what helps.
     function plain(detail) {
         if (!detail || typeof detail !== 'object') return detail;
         const out = {};
         for (const [key, value] of Object.entries(detail)) {
-            out[key] = value instanceof Error ? { name: value.name, message: value.message } : value;
+            if (value instanceof Error) out[key] = { name: value.name, message: redact(String(value.message)) };
+            else out[key] = typeof value === 'string' ? redact(value) : value;
         }
         return out;
     }
