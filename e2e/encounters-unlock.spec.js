@@ -46,6 +46,14 @@ async function setUnlockEnabled(page, enabled) {
   await page.route(CONFIG_URL, (route) => route.fulfill({ contentType: 'application/javascript', body }));
 }
 
+// The client id in the shipped config, so the test follows the config and never hardcodes an id.
+function shippedClientId() {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'devocionales', 'js', 'devotional-pwa-config.js'), 'utf8');
+  const match = /encountersUnlock[\s\S]*?clientId: '([^']+)'/.exec(source);
+  if (!match) throw new Error('encountersUnlock clientId not found in config');
+  return match[1];
+}
+
 function stubSdk(page) {
   const requests = [];
   page.route(SDK_URL, (route) => {
@@ -116,7 +124,7 @@ test.describe('Encounters unlock by PayPal', () => {
     await page.locator('.encounter-sheet-support').click();
     await expect(page.locator('.encounter-paypal[data-rendered="yes"]')).toHaveCount(1);
     expect(requests.length).toBe(1);
-    expect(requests[0]).toContain('client-id=AQ71LLZhIEEHJcztnFQ');
+    expect(requests[0]).toContain(`client-id=${shippedClientId()}`);
     expect(requests[0]).toContain('currency=USD');
   });
 
