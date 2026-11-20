@@ -342,6 +342,9 @@
     "count": "{count} encounters",
     "loading": "Loading encounters…",
     "locked": "Locked",
-    "unlock_offer_play": "Get the app"
+    "unlock_offer_play": "Get the app",
+    "unlock_offer_this_browser": "Unlocks this browser only. Your app purchase is separate.",
+    "unlock_offer_failed": "The payment did not complete. Your encounters are still locked. Please try again.",
+    "read_now_hint": "Want to read it now? Tap here."
   }
 }

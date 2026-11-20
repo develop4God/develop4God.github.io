@@ -342,6 +342,9 @@
     "count": "{count}件の出会い",
     "loading": "出会いを読み込み中…",
     "locked": "ロック中",
-    "unlock_offer_play": "アプリを入手"
+    "unlock_offer_play": "アプリを入手",
+    "unlock_offer_this_browser": "このブラウザのみ開放されます。アプリでの購入とは別です。",
+    "unlock_offer_failed": "支払いが完了しませんでした。出会いはまだロックされています。もう一度お試しください。",
+    "read_now_hint": "今すぐ読みたいですか？ここをタップ。"
   }
 }
