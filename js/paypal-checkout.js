@@ -11,19 +11,28 @@
     const CURRENCY = /^[A-Z]{3}$/;
     const MAX_DESCRIPTION = 127;
 
-    function buildSdkUrl({ clientId, currency } = {}) {
+    // One SDK load per page and one intent: 'capture' for one-time orders, 'subscription' for plans.
+    const INTENTS = ['capture', 'subscription'];
+
+    function buildSdkUrl({ clientId, currency, intent = 'capture' } = {}) {
         if (typeof clientId !== 'string' || clientId.trim() === '') {
             throw new Error('PayPalCheckout: clientId is required');
         }
         if (typeof currency !== 'string' || !CURRENCY.test(currency)) {
             throw new Error('PayPalCheckout: currency must be a three-letter uppercase code');
         }
+        if (!INTENTS.includes(intent)) {
+            throw new Error('PayPalCheckout: intent must be capture or subscription');
+        }
         const params = new URLSearchParams({
             'client-id': clientId,
             currency,
-            intent: 'capture',
+            intent,
             components: 'buttons',
         });
+        if (intent === 'subscription') {
+            params.set('vault', 'true');
+        }
         return `${SDK_URL}?${params.toString()}`;
     }
 
@@ -77,5 +86,21 @@
         }).render(container);
     }
 
-    global.PayPalCheckout = { buildSdkUrl, buildOrder, renderButtons };
+    // Subscribe button for a plan created in the PayPal dashboard. The amount comes from the plan.
+    function renderSubscriptionButton(paypal, container, { planId, onApproved, onError } = {}) {
+        if (typeof planId !== 'string' || planId.trim() === '') {
+            throw new Error('PayPalCheckout: planId is required');
+        }
+        return paypal.Buttons({
+            createSubscription: (data, actions) => actions.subscription.create({ plan_id: planId }),
+            onApprove: (data) => {
+                if (typeof onApproved === 'function') onApproved(data.subscriptionID);
+            },
+            onError: (error) => {
+                if (typeof onError === 'function') onError(error);
+            },
+        }).render(container);
+    }
+
+    global.PayPalCheckout = { buildSdkUrl, buildOrder, renderButtons, renderSubscriptionButton };
 })(window);
