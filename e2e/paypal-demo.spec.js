@@ -84,7 +84,7 @@ test.describe('PayPal demo page, subscription mode', () => {
     });
     await page.goto('/paypal-demo/?mode=subscription', { waitUntil: 'domcontentloaded' });
 
-    await expect.poll(() => page.evaluate(() => window.__renderedInto !== undefined || window.__paypalOptions !== undefined)).toBe(true);
+    await expect.poll(() => requests.length).toBe(1);
     const url = new URL(requests[0]);
     expect(url.searchParams.get('intent')).toBe('subscription');
     expect(url.searchParams.get('vault')).toBe('true');

@@ -47,15 +47,6 @@
                 return;
             }
 
-            // Subscription plans created in the sandbox dashboard (fixed amounts, no server needed).
-            var PLANS = [
-                { label: 'Monthly 5 USD', planId: 'P-8PA466822A405015PNMALDPA' },
-                { label: 'Monthly 10 USD', planId: 'P-1X969655D5226362GNMALSLQ' },
-                { label: 'Monthly 25 USD', planId: 'P-35R67290FY745831SNMALS2Q' },
-                { label: 'Yearly 5 USD', planId: 'P-0LF0259858521293SNMALTTQ' },
-                { label: 'Yearly 10 USD', planId: 'P-3JT2138474919812VNMALUCA' },
-                { label: 'Yearly 25 USD', planId: 'P-4S8263013S486825RNMALUPY' }
-            ];
             var mode = new URLSearchParams(window.location.search).get('mode');
             var isSubscriptionMode = mode === 'subscription';
 
@@ -67,7 +58,7 @@
             });
             sdkScript.onload = function () {
                 if (isSubscriptionMode) {
-                    PLANS.forEach(function (plan) {
+                    PayPalCheckout.SUBSCRIPTION_PLANS.forEach(function (plan) {
                         var slot = document.createElement('div');
                         slot.className = 'plan-slot';
                         slot.textContent = plan.label;

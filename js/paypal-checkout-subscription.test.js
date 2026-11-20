@@ -11,7 +11,17 @@ const filename = path.join(__dirname, 'paypal-checkout.js');
 const source = fs.readFileSync(filename, 'utf8');
 global.window = {};
 vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
-const { buildSdkUrl, renderSubscriptionButton } = global.window.PayPalCheckout;
+const { buildSdkUrl, renderSubscriptionButton, SUBSCRIPTION_PLANS } = global.window.PayPalCheckout;
+
+test('SUBSCRIPTION_PLANS lists monthly and yearly plans at 5, 10 and 25 USD with unique ids', () => {
+  assert.equal(SUBSCRIPTION_PLANS.length, 6);
+  assert.deepEqual(
+    SUBSCRIPTION_PLANS.map((p) => `${p.frequency}-${p.amount}`).sort(),
+    ['monthly-10', 'monthly-25', 'monthly-5', 'yearly-10', 'yearly-25', 'yearly-5'],
+  );
+  assert.equal(new Set(SUBSCRIPTION_PLANS.map((p) => p.planId)).size, 6);
+  assert.ok(Object.isFrozen(SUBSCRIPTION_PLANS));
+});
 
 test('buildSdkUrl keeps the one-time capture intent by default', () => {
   const url = new URL(buildSdkUrl({ clientId: 'abc', currency: 'USD' }));
@@ -41,6 +51,13 @@ test('renderSubscriptionButton renders a subscribe button for the plan id', () =
   renderSubscriptionButton(fakePaypal, 'container-el', { planId: 'P-123' });
   assert.equal(rendered, 'container-el');
   assert.deepEqual(options.createSubscription(null, { subscription: { create: (body) => body } }), { plan_id: 'P-123' });
+});
+
+test('renderSubscriptionButton uses the round blue PayPal button style', () => {
+  let options = null;
+  const fakePaypal = { Buttons(opts) { options = opts; return { render() { return Promise.resolve(); } }; } };
+  renderSubscriptionButton(fakePaypal, 'c', { planId: 'P-123' });
+  assert.deepEqual(options.style, { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' });
 });
 
 test('renderSubscriptionButton reports an approved subscription id to onApproved', () => {

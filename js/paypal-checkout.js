@@ -14,6 +14,16 @@
     // One SDK load per page and one intent: 'capture' for one-time orders, 'subscription' for plans.
     const INTENTS = ['capture', 'subscription'];
 
+    // Subscription plans created in the sandbox dashboard (fixed amounts). Single source for every page.
+    const SUBSCRIPTION_PLANS = Object.freeze([
+        Object.freeze({ frequency: 'monthly', amount: 5, label: 'Monthly 5 USD', planId: 'P-8PA466822A405015PNMALDPA' }),
+        Object.freeze({ frequency: 'monthly', amount: 10, label: 'Monthly 10 USD', planId: 'P-1X969655D5226362GNMALSLQ' }),
+        Object.freeze({ frequency: 'monthly', amount: 25, label: 'Monthly 25 USD', planId: 'P-35R67290FY745831SNMALS2Q' }),
+        Object.freeze({ frequency: 'yearly', amount: 5, label: 'Yearly 5 USD', planId: 'P-0LF0259858521293SNMALTTQ' }),
+        Object.freeze({ frequency: 'yearly', amount: 10, label: 'Yearly 10 USD', planId: 'P-3JT2138474919812VNMALUCA' }),
+        Object.freeze({ frequency: 'yearly', amount: 25, label: 'Yearly 25 USD', planId: 'P-4S8263013S486825RNMALUPY' }),
+    ]);
+
     function buildSdkUrl({ clientId, currency, intent = 'capture' } = {}) {
         if (typeof clientId !== 'string' || clientId.trim() === '') {
             throw new Error('PayPalCheckout: clientId is required');
@@ -92,6 +102,7 @@
             throw new Error('PayPalCheckout: planId is required');
         }
         return paypal.Buttons({
+            style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
             createSubscription: (data, actions) => actions.subscription.create({ plan_id: planId }),
             onApprove: (data) => {
                 if (typeof onApproved === 'function') onApproved(data.subscriptionID);
@@ -102,5 +113,5 @@
         }).render(container);
     }
 
-    global.PayPalCheckout = { buildSdkUrl, buildOrder, renderButtons, renderSubscriptionButton };
+    global.PayPalCheckout = { buildSdkUrl, buildOrder, renderButtons, renderSubscriptionButton, SUBSCRIPTION_PLANS };
 })(window);

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apóyanos | Devocionales Cristianos</title>
+    <meta name="description" content="Apoya Devocionales Cristianos con un aporte único o mensual.">
+    <style>
+        :root { --blue: #0070ba; --ink: #1d1d1f; --muted: #5b5b5f; --chip: #eef0f3; }
+        body { margin: 0; font-family: system-ui, sans-serif; color: var(--ink); padding: 16px; }
+        main { max-width: 760px; margin: 0 auto; display: grid; gap: 32px; grid-template-columns: 1fr; }
+        @media (min-width: 720px) { main { grid-template-columns: 1fr 1fr; align-items: start; } }
+        h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 12px; }
+        .card { border: 1px solid #dcdfe4; border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
+        .group-title { font-weight: 700; margin: 0 0 10px; }
+        .segmented, .chips { display: grid; gap: 8px; margin-bottom: 20px; }
+        .segmented { grid-template-columns: repeat(3, 1fr); }
+        .chips { grid-template-columns: repeat(4, 1fr); }
+        button.opt, .opt { border: 0; border-radius: 10px; padding: 12px 6px; background: var(--chip); color: var(--ink); font-size: 1rem; cursor: pointer; }
+        .opt[aria-pressed="true"] { background: var(--blue); color: #fff; }
+        .other { display: none; margin: -8px 0 20px; }
+        .other.visible { display: block; }
+        .other input { width: 100%; box-sizing: border-box; padding: 10px; font-size: 1rem; border: 1px solid #c4c8cf; border-radius: 10px; }
+        .pay-link { display: block; text-align: center; background: var(--blue); color: #fff; text-decoration: none; padding: 14px; border-radius: 999px; font-weight: 700; }
+        .plan-slot { display: none; }
+        .plan-slot.visible { display: block; }
+        .free { margin-top: 16px; font-size: .95rem; color: var(--muted); }
+        #sdk-status { color: #9a3412; min-height: 1.2em; }
+    </style>
+</head>
+<body>
+<main>
+    <section>
+        <h1>Apóyanos</h1>
+        <p>Devocionales Cristianos es gratis para todos. Si te bendice, puedes apoyarnos con un aporte único o mensual. Cada aporte ayuda a seguir creando contenido.</p>
+        <p class="free">¿Prefieres no aportar? Sigue usando la app y el sitio gratis.</p>
+    </section>
+
+    <section class="card" aria-labelledby="give-title">
+        <h2 id="give-title" class="group-title">¿Con qué frecuencia?</h2>
+        <div class="segmented" role="group" aria-label="Frecuencia">
+            <button type="button" class="opt" data-frequency="once" aria-pressed="true">Única vez</button>
+            <button type="button" class="opt" data-frequency="monthly" aria-pressed="false">Mensual</button>
+            <button type="button" class="opt" data-frequency="yearly" aria-pressed="false">Anual</button>
+        </div>
+
+        <h2 class="group-title">¿Cuánto?</h2>
+        <div class="chips" role="group" aria-label="Monto">
+            <button type="button" class="opt" data-amount="5" aria-pressed="false">$5</button>
+            <button type="button" class="opt" data-amount="10" aria-pressed="true">$10</button>
+            <button type="button" class="opt" data-amount="25" aria-pressed="false">$25</button>
+            <button type="button" class="opt" data-amount="other" aria-pressed="false">Otro</button>
+        </div>
+
+        <div class="other" id="other-box">
+            <label for="other-amount">Otro monto (USD)</label>
+            <input id="other-amount" type="number" min="1" step="0.01" value="15">
+        </div>
+
+        <div id="once-pay">
+            <a id="once-link" class="pay-link" href="https://www.paypal.com/paypalme/develop4godOfficial/10USD" target="_blank" rel="noopener">Dar con PayPal</a>
+        </div>
+
+        <div id="plans" aria-live="polite"></div>
+        <p id="sdk-status" role="status"></p>
+    </section>
+
+    <section class="card" aria-labelledby="unlock-title">
+        <h2 id="unlock-title" class="group-title">Desbloquea los Encuentros</h2>
+        <p>Un aporte único desbloquea todos los Encuentros en este navegador.</p>
+        <a class="pay-link" href="/devocionales/encounters/">Desbloquear Encuentros</a>
+    </section>
+</main>
+
+<script src="/js/paypal-checkout.js"></script>
+<script>
+    (function () {
+        'use strict';
+        // Sandbox client id until the live plans exist; see the PR notes.
+        var CLIENT_ID = 'AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-';
+        var PAYPAL_ME = 'https://www.paypal.com/paypalme/develop4godOfficial/';
+        var frequency = 'once';
+        var amount = 10;
+
+        var frequencyButtons = document.querySelectorAll('[data-frequency]:not(.plan-slot)');
+        var amountButtons = document.querySelectorAll('[data-amount]:not(.plan-slot)');
+        var otherBox = document.getElementById('other-box');
+        var otherInput = document.getElementById('other-amount');
+        var onceLink = document.getElementById('once-link');
+        var oncePay = document.getElementById('once-pay');
+        var plansBox = document.getElementById('plans');
+        var sdkStatus = document.getElementById('sdk-status');
+
+        // One slot per shared plan; the frequency and amount drive which slot is visible.
+        PayPalCheckout.SUBSCRIPTION_PLANS.forEach(function (plan) {
+            var slot = document.createElement('div');
+            slot.className = 'plan-slot';
+            slot.setAttribute('data-frequency', plan.frequency);
+            slot.setAttribute('data-amount', String(plan.amount));
+            slot.setAttribute('data-plan', plan.planId);
+            plansBox.appendChild(slot);
+        });
+        var planSlots = document.querySelectorAll('.plan-slot');
+
+        function pressed(buttons, value, key) {
+            buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute(key) === value)); });
+        }
+
+        function otherValue() {
+            var v = parseFloat(otherInput.value);
+            return isNaN(v) ? 0 : v;
+        }
+
+        function refresh() {
+            var isOther = amount === 'other';
+            otherBox.classList.toggle('visible', isOther && frequency === 'once');
+            if (frequency === 'once') {
+                oncePay.style.display = '';
+                var value = isOther ? otherValue() : amount;
+                onceLink.href = PAYPAL_ME + (value > 0 ? value : 1) + 'USD';
+                planSlots.forEach(function (s) { s.classList.remove('visible'); });
+                return;
+            }
+            oncePay.style.display = 'none';
+            planSlots.forEach(function (s) {
+                var show = s.getAttribute('data-frequency') === frequency && s.getAttribute('data-amount') === String(amount);
+                s.classList.toggle('visible', show);
+            });
+            if (isOther) {
+                sdkStatus.textContent = 'Los aportes mensuales y anuales están en montos fijos ($5, $10 o $25).';
+            } else {
+                sdkStatus.textContent = '';
+            }
+        }
+
+        frequencyButtons.forEach(function (b) {
+            b.addEventListener('click', function () {
+                frequency = b.getAttribute('data-frequency');
+                pressed(frequencyButtons, frequency, 'data-frequency');
+                refresh();
+            });
+        });
+        amountButtons.forEach(function (b) {
+            b.addEventListener('click', function () {
+                var raw = b.getAttribute('data-amount');
+                amount = raw === 'other' ? 'other' : Number(raw);
+                pressed(amountButtons, raw, 'data-amount');
+                refresh();
+            });
+        });
+        otherInput.addEventListener('input', refresh);
+
+        // Recurring buttons: the SDK loads once with the subscription intent (one-time uses PayPal.me).
+        var sdk = document.createElement('script');
+        sdk.src = PayPalCheckout.buildSdkUrl({ clientId: CLIENT_ID, currency: 'USD', intent: 'subscription' });
+        sdk.onload = function () {
+            planSlots.forEach(function (slot) {
+                PayPalCheckout.renderSubscriptionButton(window.paypal, slot, {
+                    planId: slot.getAttribute('data-plan'),
+                    onApproved: function () { sdkStatus.textContent = '¡Gracias! Tu aporte mensual o anual quedó registrado.'; },
+                    onError: function () { sdkStatus.textContent = 'El aporte no se completó. Intenta de nuevo.'; }
+                });
+            });
+        };
+        sdk.onerror = function () { sdkStatus.textContent = 'No se pudo cargar PayPal. Revisa tu conexión.'; };
+        document.head.appendChild(sdk);
+
+        refresh();
+    })();
+</script>
+</body>
+</html>
