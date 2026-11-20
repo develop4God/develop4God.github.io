@@ -39,9 +39,9 @@
         },
         // Encounters unlock by PayPal (web only, this browser only). enabled:false = no PayPal button and
         // no PayPal script ever loads. clientId is the PayPal app's PUBLIC client id (sandbox while testing;
-        // the live id goes here, and enabled flips to true in the same commit, before production). Never put a client secret in this file.
+        // the live id goes here before enabling in production). Never put a client secret in this file.
         encountersUnlock: Object.freeze({
-            enabled: false,
+            enabled: true,
             clientId: 'AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-',
             amount: 4.99,
             currency: 'USD',

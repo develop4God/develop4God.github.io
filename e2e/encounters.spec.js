@@ -180,9 +180,9 @@ test.describe('the unlock sheet', () => {
     await expect(sheet).toBeVisible();
     await expect(sheet).toContainText('Everything is free.');
     await expect(sheet.locator('.encounter-sheet-keep')).toBeFocused();
-    // PayPal is off in the shipped config (encounters-unlock.spec.js covers it on): the Play link shows.
-    await expect(sheet.locator('.encounter-sheet-play')).toHaveAttribute('href', /play\.google\.com/);
-    await expect(sheet.locator('.encounter-sheet-support')).toHaveCount(0);
+    // PayPal is on in the shipped config: the support button replaces the Play link (the link returns only if the SDK fails).
+    await expect(sheet.locator('.encounter-sheet-support')).toBeVisible();
+    await expect(sheet.locator('.encounter-sheet-play')).toHaveCount(0);
     await sheet.locator('.encounter-sheet-keep').click();
     await expect(sheet).toHaveCount(0);
     await expect(card(page, 'b').locator('.study-card-open')).toBeFocused();
