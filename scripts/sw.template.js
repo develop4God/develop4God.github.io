@@ -189,13 +189,18 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// A page running the old build asks this waiting worker to take over. Only when every page is
-// hidden: a visible page must never get another build's files under it.
+// A page running the old build asks this waiting worker to take over. Normally only when every
+// page is hidden: a visible page must never get another build's files under it. An entry request
+// comes from a page that has only just loaded, so the reader has not started anything on it: it is
+// obeyed when every OTHER page is hidden (the sender is found by its client id; without one the
+// request is treated as a plain one).
 self.addEventListener('message', (event) => {
   if (!event.data || event.data.type !== SKIP_WAITING_MESSAGE) return;
+  const senderId = event.data.entry && event.source ? event.source.id : null;
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((pages) => {
-      if (pages.every((page) => page.visibilityState === 'hidden')) return self.skipWaiting();
+      const others = pages.filter((page) => senderId === null || page.id !== senderId);
+      if (others.every((page) => page.visibilityState === 'hidden')) return self.skipWaiting();
       return undefined;
     }),
   );
