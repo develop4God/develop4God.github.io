@@ -46,7 +46,12 @@ async function installWorker(page, base = '') {
     expect(await page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
 }
 
-const cacheNames = (page) => page.evaluate(() => caches.keys());
+// A page that reloads itself (the new worker took over) destroys the evaluation context mid-call:
+// report no caches for that instant so a poll retries, and let every other error fail the test.
+const cacheNames = (page) => page.evaluate(() => caches.keys()).catch((error) => {
+    if (/Execution context was destroyed/.test(error.message)) return [];
+    throw error;
+});
 
 test('the manifest is linked and describes an installable standalone app', async ({ page, request }) => {
     await page.goto(READER, { waitUntil: 'domcontentloaded' });
@@ -376,8 +381,8 @@ test.describe('master switch (DevotionalPwaConfig.enabled)', () => {
             state.overrides[CONFIG_PATH] = DISABLED;
             state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, 'bbbbbbbbbbbb');
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
-            await expect.poll(() => cacheNames(page)).toContain('devocionales-bbbbbbbbbbbb');
-
+            // No wait for the new worker's own cache: the page reloads and removes it as soon as the new config is read,
+            // so that state is gone before a poll can see it. The end state below proves the update was applied.
             // The old worker still answers the reload, but it fetches the config fresh.
             await page.reload({ waitUntil: 'domcontentloaded' }); // the next visit picks up the new config
             await expect.poll(() => page.evaluate(async () => (await navigator.serviceWorker.getRegistrations()).length)).toBe(0);

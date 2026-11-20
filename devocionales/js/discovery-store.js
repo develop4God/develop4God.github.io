@@ -14,8 +14,8 @@
 
     const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-    // Every storage access is guarded: blocked or full storage must never break rendering.
-    function createDiscoveryStore(storage, now = () => new Date()) {
+    // Guarded JSON access: every storage call may throw (blocked, full), and must never break rendering.
+    function createJsonAccess(storage) {
         function read(key) {
             try {
                 const raw = storage.getItem(key);
@@ -43,16 +43,25 @@
             return new Set(Array.isArray(v) ? v.filter((x) => typeof x === 'string') : []);
         }
 
+        return { read, write, remove, readSet };
+    }
+
+    // Section progress for one piece of content: which card sections were read and how many there are.
+    // Shared by Bible studies and Encounters. `keyOf(id, lang)` names the storage key, so each consumer
+    // keeps its own keys; `lang` is optional (Encounters progress is not per language).
+    function createProgressStore(storage, { keyOf, now = () => new Date() } = {}) {
+        const json = createJsonAccess(storage);
+
         // Returns the stored record (so unknown fields such as answeredQuestions survive writes).
-        function readProgressRecord(studyId, lang) {
-            const v = read(KEYS.progress(studyId, lang));
+        function readRecord(id, lang) {
+            const v = json.read(keyOf(id, lang));
             return isObject(v) ? v : {};
         }
 
-        function getProgress(studyId, lang) {
-            const r = readProgressRecord(studyId, lang);
+        function getProgress(id, lang) {
+            const r = readRecord(id, lang);
             return {
-                studyId,
+                studyId: id,
                 languageCode: lang,
                 completedSections: Array.isArray(r.completedSections)
                     ? r.completedSections.filter((n) => Number.isInteger(n) && n >= 0)
@@ -64,66 +73,74 @@
             };
         }
 
-        function saveProgress(studyId, lang, changes) {
-            const record = readProgressRecord(studyId, lang);
-            write(KEYS.progress(studyId, lang), { ...record, studyId, languageCode: lang, ...changes });
+        function saveProgress(id, lang, changes) {
+            const record = readRecord(id, lang);
+            json.write(keyOf(id, lang), { ...record, studyId: id, languageCode: lang, ...changes });
         }
 
-        function markSectionCompleted(studyId, index, lang) {
+        function markSectionCompleted(id, index, lang) {
             if (!Number.isInteger(index) || index < 0) return;
-            const { completedSections } = getProgress(studyId, lang);
+            const { completedSections } = getProgress(id, lang);
             if (completedSections.includes(index)) return;
-            saveProgress(studyId, lang, { completedSections: [...completedSections, index] });
+            saveProgress(id, lang, { completedSections: [...completedSections, index] });
         }
 
-        function setTotalSections(studyId, total, lang) {
+        function setTotalSections(id, total, lang) {
             if (!Number.isInteger(total) || total <= 0) return;
-            saveProgress(studyId, lang, { totalSections: total });
+            saveProgress(id, lang, { totalSections: total });
         }
 
-        function completeStudy(studyId, lang) {
-            if (getProgress(studyId, lang).isCompleted) return;
-            saveProgress(studyId, lang, { isCompleted: true, completedAt: now().toISOString() });
+        function completeStudy(id, lang) {
+            if (getProgress(id, lang).isCompleted) return;
+            saveProgress(id, lang, { isCompleted: true, completedAt: now().toISOString() });
         }
 
-        function resetProgress(studyId, lang) {
-            remove(KEYS.progress(studyId, lang));
+        function resetProgress(id, lang) {
+            json.remove(keyOf(id, lang));
         }
 
-        function completionPercentage(studyId, totalSections, lang) {
+        function completionPercentage(id, totalSections, lang) {
             if (!(totalSections > 0)) return 0;
-            return Math.min(1, getProgress(studyId, lang).completedSections.length / totalSections);
+            return Math.min(1, getProgress(id, lang).completedSections.length / totalSections);
         }
 
-        const loadFavorites = (lang) => readSet(KEYS.favorites(lang));
+        return { getProgress, markSectionCompleted, setTotalSections, completeStudy, resetProgress, completionPercentage };
+    }
+
+    // Studies: progress keyed per study and language; favourites and "seen" per language / globally.
+    function createDiscoveryStore(storage, now = () => new Date()) {
+        const json = createJsonAccess(storage);
+        const progress = createProgressStore(storage, { keyOf: KEYS.progress, now });
+
+        const loadFavorites = (lang) => json.readSet(KEYS.favorites(lang));
 
         // Returns true when the study was added, false when removed or the write failed.
         function toggleFavorite(studyId, lang) {
             const ids = loadFavorites(lang);
             const added = !ids.has(studyId);
             if (added) ids.add(studyId); else ids.delete(studyId);
-            return write(KEYS.favorites(lang), [...ids]) && added;
+            return json.write(KEYS.favorites(lang), [...ids]) && added;
         }
 
-        const loadSeen = () => readSet(KEYS.seen);
+        const loadSeen = () => json.readSet(KEYS.seen);
 
         function markSeen(studyId) {
             if (typeof studyId !== 'string' || !studyId) return;
             const seen = loadSeen();
             if (seen.has(studyId)) return;
             seen.add(studyId);
-            write(KEYS.seen, [...seen]);
+            json.write(KEYS.seen, [...seen]);
         }
 
-        const hasSeenSwipeHint = () => read(KEYS.swipeHint) === '1';
-        const markSwipeHintSeen = () => write(KEYS.swipeHint, '1');
+        const hasSeenSwipeHint = () => json.read(KEYS.swipeHint) === '1';
+        const markSwipeHintSeen = () => json.write(KEYS.swipeHint, '1');
 
         return {
             hasSeenSwipeHint, markSwipeHintSeen,
-            getProgress, markSectionCompleted, setTotalSections, completeStudy, resetProgress, completionPercentage,
+            ...progress,
             loadFavorites, toggleFavorite, loadSeen, markSeen,
         };
     }
 
-    global.DiscoveryStore = { createDiscoveryStore, KEYS };
+    global.DiscoveryStore = { createDiscoveryStore, createProgressStore, KEYS };
 })(window);

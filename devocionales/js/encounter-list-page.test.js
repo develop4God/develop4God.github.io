@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
+for (const name of ['dom-builder.js', 'discovery-cards.js', 'discovery-progress.js', 'discovery-hero-dom.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-filters.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -17,7 +17,7 @@ const { createBuilder } = global.window.DomBuilder;
 const TEXT = {
     studiesCount: '{count} encounters', loading: 'Loading…', loadError: 'Could not load', retry: 'Retry', empty: 'None yet',
     badge_completed: 'Completed', current: 'Current', coming_soon: 'COMING SOON', locked: 'Locked',
-    complete_to_unlock: 'Complete: {title}', min_immersive_journey: 'MIN',
+    complete_to_unlock: 'Complete: {title}', min_immersive_journey: 'MIN', noneFound: 'Nothing here',
 };
 const t = (k) => TEXT[k] || k;
 const e = (id, over = {}) => ({ id, version: '1', title: `T-${id}`, subtitle: '', scripture: '', minutes: 5, emoji: '📖', accent: null, introImage: '', status: 'published', isPublished: true, releaseDate: '', file: `${id}.json`, ...over });
@@ -156,4 +156,200 @@ test('several cards unlock at once (unlock all): each gets the bulk sweep and no
     assert.deepEqual(bulk.map((el) => el.getAttribute('data-encounter-id')), ['b', 'c']);
     assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
     assert.equal(view.body.querySelectorAll('[data-unlock-label]').length, 0);
+});
+
+// ---- shared header: hero + filter chips above the grid ----
+
+const HEADER_LABELS = { groupLabel: 'Encounters', startHere: 'Start here', read: 'Read', filterAll: 'All', filterPending: 'Pending', filterCompleted: 'Completed' };
+
+// The bar builder the composition root injects into the card DOM.
+const barOf = (h) => {
+    const heroDom = global.window.DiscoveryHeroDom.createHeroDom({ h });
+    return (fraction, className) => heroDom.progressBar(global.window.DiscoveryProgress.toPercent(fraction), className);
+};
+
+const headerOf = (h, labels) => ({
+    dom: global.window.DiscoveryHeroDom.createHeroDom({ h }),
+    filters: global.window.EncounterFilters,
+    heroProps: global.window.DiscoveryProgress.heroProps,
+    labels,
+});
+
+function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session = {}, withHeader = true, withModules = true } = {}) {
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), body: doc.createElement('div') };
+    if (withHeader) { view.hero = doc.createElement('div'); view.chips = doc.createElement('div'); }
+    const state = { completed: new Set(completed), opened: [] };
+    const store = { loadCompleted: () => new Set(state.completed) };
+    const storage = { data: { ...session }, getItem(k) { return k in this.data ? this.data[k] : null; }, setItem(k, v) { this.data[k] = v; } };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
+    const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store, listDom,
+        data: { loadIndex: async () => index },
+        cards: global.window.EncounterCards,
+        unlockSheet: { open() {} },
+        allUnlocked: () => false,
+        unlockLabel: 'New encounter unlocked',
+        onOpen: (id) => state.opened.push(id),
+        header: withModules ? headerOf(h, () => HEADER_LABELS) : null,
+        sessionStorage: storage,
+    });
+    return { page, view, state, storage };
+}
+const chip = (view, f) => view.chips.querySelector(`[data-filter="${f}"]`);
+
+test('header: shows the next encounter as the hero and one chip per filter with counts', async () => {
+    const { page, view } = setupHeader({ completed: ['a'] });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-title').textContent, 'T-b');
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    assert.deepEqual(view.chips.querySelectorAll('.study-chip').map((c) => c.querySelector('.study-chip-count').textContent), ['3', '2', '1']);
+});
+
+test('header: clicking a chip filters the grid and remembers the choice for the session', async () => {
+    const { page, view, storage } = setupHeader({ completed: ['a'] });
+    await page.init();
+    chip(view, 'completed').click();
+    assert.deepEqual(ids(view), ['a']);
+    assert.equal(chip(view, 'completed').getAttribute('aria-pressed'), 'true');
+    assert.equal(storage.data.encounterFilter, 'completed');
+});
+
+test('header: the saved filter is restored on a new page load; an unknown saved value falls back to all', async () => {
+    const restored = setupHeader({ completed: ['a'], session: { encounterFilter: 'pending' } });
+    await restored.page.init();
+    assert.deepEqual(ids(restored.view), ['b', 'c']);
+    const junk = setupHeader({ session: { encounterFilter: 'favorites' } });
+    await junk.page.init();
+    assert.equal(chip(junk.view, 'all').getAttribute('aria-pressed'), 'true');
+    assert.equal(ids(junk.view).length, 3);
+});
+
+test('header: a filter with nothing in it shows the "none found" message, not an empty grid', async () => {
+    const { page, view } = setupHeader({ completed: ['a', 'b', 'c'], session: { encounterFilter: 'pending' } });
+    await page.init();
+    assert.equal(view.body.querySelectorAll('.encounter-card').length, 0);
+    assert.equal(view.body.querySelector('.study-message').textContent, 'Nothing here');
+});
+
+test('header: no hero when every encounter is done; the hero is cleared when the index is empty', async () => {
+    const done = setupHeader({ completed: ['a', 'b', 'c'] });
+    await done.page.init();
+    assert.equal(done.view.hero.querySelectorAll('.study-hero').length, 0);
+    const empty = setupHeader({ index: [] });
+    await empty.page.init();
+    assert.equal(empty.view.hero.querySelectorAll('.study-hero').length, 0);
+    assert.equal(empty.view.chips.querySelectorAll('.study-chip').length, 0);
+});
+
+test('header: an older cached page without the hero/chips containers still renders the grid', async () => {
+    const { page, view } = setupHeader({ withHeader: false });
+    await page.init();
+    assert.deepEqual(ids(view), ['a', 'b', 'c']);
+});
+
+test('header: the unlock flash still plays when the newly opened card is visible under the filter', async () => {
+    const { page, view, state } = setupHeader({ completed: [], session: {} });
+    await page.init();
+    state.completed.add('a');
+    page.refresh();
+    assert.ok(card(view, 'b').classList.contains('is-just-unlocked'));
+});
+
+test('header: a card unlocked while a filter hides it does not flash or throw', async () => {
+    const { page, view, state } = setupHeader({ completed: [], session: { encounterFilter: 'completed' } });
+    await page.init();
+    state.completed.add('a');
+    page.refresh();
+    assert.deepEqual(ids(view), ['a']);
+    assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
+});
+
+// ---- section progress on the list: bar on the open card, "Continue" hero with its percent ----
+function setupProgressList(sectionsById) {
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), hero: doc.createElement('div'), chips: doc.createElement('div'), body: doc.createElement('div') };
+    const store = { loadCompleted: () => new Set() };
+    const progress = {
+        getProgress: (id) => (sectionsById[id] ? { completedSections: sectionsById[id].sections, totalSections: sectionsById[id].total } : { completedSections: [], totalSections: null }),
+    };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
+    const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store, listDom,
+        data: { loadIndex: async () => [e('a'), e('b')] },
+        cards: global.window.EncounterCards,
+        unlockSheet: { open() {} },
+        allUnlocked: () => false,
+        unlockLabel: 'x',
+        onOpen() {},
+        header: headerOf(h, () => ({ ...HEADER_LABELS, continueWhereLeft: 'Continue where you left off', continueBtn: 'Continue' })),
+        sessionStorage: { getItem: () => null, setItem() {} },
+        progress,
+    });
+    return { page, view };
+}
+
+test('progress: the open card shows its section bar; the card without reads shows none', async () => {
+    const { page, view } = setupProgressList({ a: { sections: [0], total: 4 } });
+    await page.init();
+    const bar = card(view, 'a').querySelector('[role="progressbar"]');
+    assert.equal(bar.getAttribute('aria-valuenow'), '25');
+    assert.equal(card(view, 'b').querySelector('[role="progressbar"]'), null);
+});
+
+test('progress: an open card in progress becomes the "Continue" hero with its percentage', async () => {
+    const { page, view } = setupProgressList({ a: { sections: [0], total: 4 } });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Continue where you left off');
+    assert.equal(view.hero.querySelector('.study-hero-button').textContent, 'Continue');
+    assert.equal(view.hero.querySelector('.study-hero-percent').textContent, '25%');
+});
+
+test('progress: with no progress the hero stays "Start here" and has no percentage', async () => {
+    const { page, view } = setupProgressList({});
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    assert.equal(view.hero.querySelector('.study-hero-percent'), null);
+});
+
+test('review: an older cached page with no header ignores a saved filter, so no hidden filter can stick', async () => {
+    const { page, view } = setupHeader({ withHeader: false, session: { encounterFilter: 'completed' }, completed: ['a'] });
+    await page.init();
+    assert.deepEqual(ids(view), ['a', 'b', 'c']);
+});
+
+test('header: hero and chip labels follow the language on the next render (labels are read at render time)', async () => {
+    let words = { ...HEADER_LABELS };
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), body: doc.createElement('div'), hero: doc.createElement('div'), chips: doc.createElement('div') };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store: { loadCompleted: () => new Set() }, listDom: global.window.DiscoveryListDom.createListDom({ h, t, cardDom }),
+        data: { loadIndex: async () => [e('a')] }, cards: global.window.EncounterCards, unlockSheet: { open() {} }, allUnlocked: () => false,
+        unlockLabel: 'x', onOpen() {}, header: headerOf(h, () => words),
+        sessionStorage: { getItem: () => null, setItem() {} },
+    });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    words = { ...HEADER_LABELS, startHere: 'Empieza aquí', filterAll: 'Todos' };
+    await page.reload();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Empieza aquí');
+    assert.equal(chip(view, 'all').querySelector('.study-chip-label').textContent, 'Todos');
+});
+
+test('header: the chips group is announced with the Encounters label, not the Bible-studies title', async () => {
+    const { page, view } = setupHeader();
+    await page.init();
+    assert.equal(view.chips.querySelector('.study-chips').getAttribute('aria-label'), 'Encounters');
+});
+
+test('header: a page without the shared header modules (older cached HTML) renders the plain grid and ignores a saved filter', async () => {
+    const { page, view } = setupHeader({ withModules: false, session: { encounterFilter: 'completed' }, completed: ['a'] });
+    await page.init();
+    assert.equal(view.body.querySelectorAll('.encounter-card').length, 3);
 });

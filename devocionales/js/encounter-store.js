@@ -7,6 +7,8 @@
     const KEYS = {
         completed: 'develop4God_encounters_completed',
         welcomeSeen: 'develop4God_encounters_welcome_seen',
+        // Section reads of one encounter (web-only: the app keeps completed ids only). Not per language.
+        progress: (id) => `develop4God_encounters_progress_${id}`,
     };
 
     function createEncounterStore(storage) {
