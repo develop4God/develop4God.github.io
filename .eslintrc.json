@@ -49,6 +49,8 @@
     "DevotionalTheme": "readonly",
     "DiscoverySortFilter": "readonly",
     "EncounterLock": "readonly",
+    "EncounterEntitlement": "readonly",
+    "EncounterPaypal": "readonly",
     "EncounterStore": "readonly",
     "EncounterCards": "readonly",
     "EncounterListPage": "readonly",
