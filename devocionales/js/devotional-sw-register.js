@@ -40,15 +40,23 @@
 
     // "Update on entry": for the first seconds of a page, the reader has not started anything on it,
     // so a new build may replace it right away (one quick reload) instead of waiting for the tab to
-    // be hidden. A takeover requested inside the window is latched, so the reload still happens when
-    // the worker answers after the window closed. Without performance.now the window never opens.
+    // be hidden. A takeover requested inside the window is latched for a grace period, so the reload
+    // still happens when the worker answers after the window closed; the latch expires, because a
+    // declined request (another tab was visible) must not keep this tab open to a takeover for good.
+    // Without performance.now the window never opens.
     const ENTRY_WINDOW_MS = 8000;
+    const ENTRY_LATCH_MS = 10000;
 
     function createEntryWindow(perf, windowMs) {
-        let latched = false;
+        let latchedAt = null;
+        const now = () => (perf && typeof perf.now === 'function' ? perf.now() : null);
         return {
-            isOpen: () => latched || Boolean(perf && typeof perf.now === 'function' && perf.now() < windowMs),
-            latch() { latched = true; },
+            isOpen() {
+                const t = now();
+                if (t === null) return false;
+                return t < windowMs || (latchedAt !== null && t < latchedAt + ENTRY_LATCH_MS);
+            },
+            latch() { latchedAt = now(); },
         };
     }
 

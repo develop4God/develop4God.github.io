@@ -419,8 +419,18 @@ test('createEntryWindow: open for the first seconds of the page, closed after, a
     assert.equal(entry.isOpen(), true);
     ms.value = 5000;
     assert.equal(entry.isOpen(), false);
+    ms.value = 4900;
     entry.latch();
+    ms.value = 9000;
     assert.equal(entry.isOpen(), true, 'a request made in time still reloads when the worker answers late');
+});
+
+test('createEntryWindow: a latch expires, so a later deploy never takes over a tab that has been reading for a while', () => {
+    const ms = { value: 4900 };
+    const entry = createEntryWindow(fakePerformance(ms), 5000);
+    entry.latch();
+    ms.value = 4900 + 14000;
+    assert.equal(entry.isOpen(), false);
 });
 
 test('createEntryWindow: a browser without performance.now never opens the window', () => {
@@ -481,7 +491,7 @@ test('reloadOnUpdate: a takeover requested in time still reloads a visible page 
     const ms = { value: 4900 };
     const entry = createEntryWindow(fakePerformance(ms), 5000);
     entry.latch();
-    ms.value = 12000;
+    ms.value = 9000;
     let reloads = 0;
     reloadOnUpdate(nav, fakeDocument('visible'), () => { reloads += 1; }, entry);
     nav.listeners.controllerchange();
