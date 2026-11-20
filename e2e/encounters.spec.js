@@ -340,4 +340,39 @@ test.describe('compatibility: previous studies HTML with the new scripts', () =>
     await expect(cards(page)).toHaveCount(1);
     expect(errors).toEqual([]);
   });
+
+  test('section progress: an encounter in progress shows its bar on the card and becomes the Continue hero', async ({ page }) => {
+    const errors = watchErrors(page);
+    await mockData(page);
+    await seed(page);
+    await page.addInitScript(() => {
+      try { localStorage.setItem('develop4God_encounters_progress_a', JSON.stringify({ completedSections: [0, 1], totalSections: 4 })); } catch (_) { /* storage blocked */ }
+    });
+    await page.goto(PAGE);
+    await expect(card(page, 'a').locator('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '50');
+    await expect(page.locator('#encounters-hero .study-hero-percent')).toHaveText('50%');
+    await expect(page.locator('#encounters-hero .study-hero-title')).toHaveText('Title a');
+    expect(errors).toEqual([]);
+  });
+
+  test('Continue resumes at the first unread card, not the key verse', async ({ page }) => {
+    const errors = watchErrors(page);
+    await mockData(page);
+    // Four cards so "two read" leaves a middle card to resume at (key verse, card 1-2 read, card 3 unread).
+    const four = { id: 'a', bible_version: 'KJ2000', key_verse: { reference: 'Mark 10:46', text: 'And they came to Jericho', bible_version: 'KJ2000' },
+      cards: [1, 2, 3].map((order) => ({ order, type: 'cinematic_scene', title: `Card ${order}`, narrative: 'x' })).concat([{ order: 4, type: 'completion', completion_verse: { reference: 'Mark 10:52', text: 'Go thy way' } }]) };
+    await page.route(/raw\.githubusercontent\.com\/develop4God\/Devocionales-json\/.*\/encounters\/en\/a_en\.json/, (route) => route.fulfill({ json: four }));
+    await seed(page);
+    await page.addInitScript(() => {
+      try { localStorage.setItem('develop4God_encounters_progress_a', JSON.stringify({ completedSections: [0, 1], totalSections: 4 })); } catch (_) { /* storage blocked */ }
+    });
+    await page.goto(PAGE);
+    await page.locator('#encounters-hero .study-hero-button').click();
+    // Progress bypasses the intro: Continue goes straight into the reader.
+    await expect(page.locator('.encounter-intro-enter')).toHaveCount(0);
+    // Pages: key verse (0), cards 1-4 (1-4). Cards 1 and 2 were read, so the reader opens on card 3 (page index 3).
+    const current = await page.locator('.pager-dot').evaluateAll((els) => els.findIndex((e) => e.classList.contains('is-current')));
+    expect(current).toBe(3);
+    expect(errors).toEqual([]);
+  });
 });

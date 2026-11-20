@@ -67,3 +67,36 @@ test('parseEmphasis: empty, non-string and markup-looking input are plain text',
     assert.deepEqual(parseEmphasis(null), []);
     assert.deepEqual(parseEmphasis('<b>x</b>'), [{ text: '<b>x</b>' }]);
 });
+
+// ---- shared section progress (studies and Encounters) ----
+const pagesOf = (n, withKeyVerse = true) => [
+    ...(withKeyVerse ? [{ kind: 'keyVerse', sectionIndex: null }] : []),
+    ...Array.from({ length: n }, (_, i) => ({ kind: 'card', sectionIndex: i, isLast: i === n - 1 })),
+];
+
+test('countSections: counts card pages only, never the key-verse page', () => {
+    assert.equal(global.window.DiscoveryCards.countSections(pagesOf(3)), 3);
+    assert.equal(global.window.DiscoveryCards.countSections(pagesOf(3, false)), 3);
+    assert.equal(global.window.DiscoveryCards.countSections([]), 0);
+});
+
+test('firstUnreadIndex: the first card page not yet read; page 0 when nothing is read or everything is read', () => {
+    const pages = pagesOf(3); // key verse, card 0, card 1, card 2 -> indexes 0..3
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex(pages, []), 0);
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex(pages, [0]), 2);
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex(pages, [0, 1]), 3);
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex(pages, [0, 1, 2]), 0);
+});
+
+test('firstUnreadIndex: ignores read sections that do not exist and an empty page list', () => {
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex(pagesOf(2), [9]), 1);
+    assert.equal(global.window.DiscoveryCards.firstUnreadIndex([], [0]), 0);
+});
+
+test('progressFraction: completed is 1; sections over total, capped at 1; no total means no bar', () => {
+    assert.equal(global.window.DiscoveryCards.progressFraction({ isCompleted: true, sections: 0, total: null }), 1);
+    assert.equal(global.window.DiscoveryCards.progressFraction({ isCompleted: false, sections: 1, total: 4 }), 0.25);
+    assert.equal(global.window.DiscoveryCards.progressFraction({ isCompleted: false, sections: 9, total: 4 }), 1);
+    assert.equal(global.window.DiscoveryCards.progressFraction({ isCompleted: false, sections: 1, total: null }), null);
+    assert.equal(global.window.DiscoveryCards.progressFraction({ isCompleted: false, sections: 1, total: 0 }), null);
+});

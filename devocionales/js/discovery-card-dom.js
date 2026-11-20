@@ -11,12 +11,8 @@
         const meta = (card) => `${t('eyebrow')} · ${card.minutes} ${t('minutes')}`;
         const percentOf = (card) => (card.percent === null || card.percent === undefined ? null : Math.round(card.percent * 100));
 
-        function progressBar(percent, className) {
-            return h('div', {
-                class: className,
-                attrs: { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(percent) },
-            }, [h('span', { class: 'study-progress-fill', attrs: { style: `width:${percent}%` } })]);
-        }
+        // The bar is shared with the hero and Encounters (discovery-list-dom.js).
+        const progressBar = global.DiscoveryListDom.createProgressBar(h);
 
         function openLabel(card) {
             const parts = [card.title, card.subtitle, meta(card)];
@@ -67,7 +63,7 @@
             ]);
         }
 
-        return { buildCard, progressBar };
+        return { buildCard };
     }
 
     global.DiscoveryCardDom = { createCardDom };

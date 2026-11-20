@@ -144,7 +144,19 @@ test('buildHero: the button calls onOpen with the card id', () => {
     assert.equal(opened, 'zz');
 });
 
+test('buildHero: the visible title is the only name (no aria-label that a screen reader would read twice)', () => {
+    const el = list.buildHero({ label: 'x', buttonLabel: 'Read', card: card('a') }, { onOpen: noop });
+    assert.equal(el.hasAttribute('aria-label'), false);
+    assert.equal(el.querySelector('.study-hero-button').hasAttribute('aria-label'), false);
+});
+
 test('buildHero: a missing subtitle renders no subtitle paragraph', () => {
     const el = list.buildHero({ label: 'x', buttonLabel: 'Read', card: card('a') }, { onOpen: noop });
     assert.equal(el.querySelector('.study-card-subtitle'), null);
+});
+
+test('buildHero: a percent draws its bar even when the injected card DOM has no progress bar (Encounters)', () => {
+    const encounterLike = createListDom({ h, t, cardDom: { buildCard: () => null } });
+    const el = encounterLike.buildHero({ label: 'Continue', buttonLabel: 'Go', card: card('a'), percent: 40 }, { onOpen: noop });
+    assert.equal(el.querySelector('[role="progressbar"]').getAttribute('aria-valuenow'), '40');
 });

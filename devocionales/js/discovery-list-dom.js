@@ -10,9 +10,20 @@
         { filter: 'favorites', labelKey: 'filterFavorites' },
     ];
 
+    // The progress bar shared by every study and encounter card and the hero (ARIA progressbar).
+    function createProgressBar(h) {
+        return function progressBar(percent, className) {
+            return h('div', {
+                class: className,
+                attrs: { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': String(percent) },
+            }, [h('span', { class: 'study-progress-fill', attrs: { style: `width:${percent}%` } })]);
+        };
+    }
+
     // Shared by Bible studies and Encounters. Labels and copy come in from the caller, so each page
     // supplies its own translation keys; this module owns only the markup.
     function createListDom({ h, t, cardDom }) {
+        const progressBar = createProgressBar(h);
         // items: [{ filter, label, count }]; the active one is pressed, a click reports its filter.
         function buildFilterChips(items, active, onSelect) {
             return h('div', { class: 'study-chips', attrs: { role: 'group', 'aria-label': t('title') } }, items.map(({ filter, label, count }) => h('button', {
@@ -42,7 +53,7 @@
                     ]),
                 ]),
                 percent === null ? null : h('div', { class: 'study-hero-progress' }, [
-                    cardDom.progressBar(percent, 'study-hero-bar'),
+                    progressBar(percent, 'study-hero-bar'),
                     h('span', { class: 'study-hero-percent', text: `${percent}%` }),
                 ]),
                 h('button', { class: 'study-hero-button', text: buttonLabel, attrs: { type: 'button' }, on: { click: () => onOpen(card.id) } }),
@@ -78,8 +89,8 @@
 
         const countLabel = (n) => t('studiesCount').replace('{count}', String(n));
 
-        return { buildChips, buildFilterChips, buildHero, buildGrid, buildMessage, countLabel };
+        return { buildChips, buildFilterChips, buildHero, buildGrid, buildMessage, countLabel, progressBar };
     }
 
-    global.DiscoveryListDom = { createListDom };
+    global.DiscoveryListDom = { createListDom, createProgressBar };
 })(window);

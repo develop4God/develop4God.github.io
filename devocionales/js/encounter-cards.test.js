@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-for (const name of ['encounter-lock.js', 'encounter-cards.js']) {
+for (const name of ['discovery-cards.js', 'encounter-lock.js', 'encounter-cards.js']) {
     const filename = path.join(__dirname, name);
     const source = fs.readFileSync(filename, 'utf8');
     vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
@@ -149,4 +149,38 @@ test('hero: null when every remaining encounter is locked or everything is done'
     const onlyLocked = [e('a', { isPublished: true }), e('b')];
     const cards = buildCards(onlyLocked, { completed: new Set(), allUnlocked: false }).map((c) => ({ ...c, state: c.id === 'a' ? 'completed' : 'locked', badge: null }));
     assert.equal(pickHero(cards), null);
+});
+
+// ---- section progress on open cards; "continue" hero (shared with Bible studies) ----
+const withProgress = (map) => (id) => map[id] || null;
+
+test('progress: only open cards get a percent; locked, completed and coming-soon cards get none', () => {
+    const cards = buildCards(entries, { completed: new Set(['a']), progressOf: withProgress({ b: { completedSections: [0, 1], totalSections: 4 }, a: { completedSections: [0], totalSections: 2 } }) });
+    assert.equal(cards.find((c) => c.id === 'b').percent, 0.5);
+    assert.equal(cards.find((c) => c.id === 'a').percent, null);
+    assert.equal(cards.find((c) => c.id === 'c').percent, null);
+    assert.equal(cards.find((c) => c.id === 's').percent, null);
+});
+
+test('progress: an open card with reads but no known total shows no bar; isInProgress only with a read section', () => {
+    const cards = buildCards(entries, { progressOf: withProgress({ a: { completedSections: [0], totalSections: null }, b: { completedSections: [], totalSections: 3 } }) });
+    assert.equal(cards.find((c) => c.id === 'a').percent, null);
+    assert.equal(cards.find((c) => c.id === 'a').isInProgress, true);
+    assert.equal(cards.find((c) => c.id === 'b').isInProgress, false);
+});
+
+test('progress: no progress lookup at all (old callers) leaves every card without a bar', () => {
+    assert.ok(build().every((c) => c.percent === null && c.isInProgress === false));
+});
+
+test('hero: an open card in progress is the "continue" hero with its percent', () => {
+    const cards = buildCards(entries, { completed: new Set(), progressOf: withProgress({ a: { completedSections: [0], totalSections: 4 } }) });
+    const hero = pickHero(cards);
+    assert.equal(hero.kind, 'continue');
+    assert.equal(hero.card.id, 'a');
+    assert.equal(hero.card.percent, 0.25);
+});
+
+test('hero: without progress the next open card is the "start" hero', () => {
+    assert.equal(pickHero(build()).kind, 'start');
 });

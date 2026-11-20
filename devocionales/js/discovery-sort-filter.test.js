@@ -7,9 +7,10 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-const filename = path.join(__dirname, 'discovery-sort-filter.js');
-const source = fs.readFileSync(filename, 'utf8');
-vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
+for (const name of ['discovery-cards.js', 'discovery-sort-filter.js']) {
+    const filename = path.join(__dirname, name);
+    vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
+}
 const { buildCards, filterCards, countFilters, pickHero, normalizeFilter, FILTERS } = global.window.DiscoverySortFilter;
 
 const study = (id) => ({ id, title: id, version: '1', emoji: '📖', subtitle: '', minutes: 5, file: `${id}.json` });

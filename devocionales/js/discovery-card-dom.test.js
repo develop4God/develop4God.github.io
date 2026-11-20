@@ -13,6 +13,7 @@ function load(name) {
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
 load('dom-builder.js');
+load('discovery-list-dom.js');
 load('discovery-card-dom.js');
 const { createBuilder } = global.window.DomBuilder;
 const { createCardDom } = global.window.DiscoveryCardDom;

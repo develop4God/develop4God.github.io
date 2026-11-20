@@ -239,3 +239,42 @@ test('swipe hint: unseen by default, remembered once marked, and storage failure
     assert.doesNotThrow(() => broken.markSwipeHintSeen());
     assert.equal(broken.hasSeenSwipeHint(), false);
 });
+
+// ---- shared section progress (studies and Encounters) ----
+const { createProgressStore } = global.window.DiscoveryStore;
+
+test('createProgressStore: writes to the key the caller chooses, not the studies key', () => {
+    const storage = memoryStorage();
+    const progress = createProgressStore(storage, { keyOf: (id) => `enc_progress_${id}` });
+    progress.markSectionCompleted('a', 2);
+    assert.deepEqual(progress.getProgress('a').completedSections, [2]);
+    assert.ok(storage.data.enc_progress_a);
+    assert.equal(Object.keys(storage.data).some((k) => k.startsWith('discovery_progress_')), false);
+});
+
+test('createProgressStore: a section is recorded once; a bad index is ignored; the total must be a positive integer', () => {
+    const progress = createProgressStore(memoryStorage(), { keyOf: (id) => `p_${id}` });
+    progress.markSectionCompleted('a', 1);
+    progress.markSectionCompleted('a', 1);
+    progress.markSectionCompleted('a', -1);
+    progress.markSectionCompleted('a', 1.5);
+    progress.setTotalSections('a', 0);
+    progress.setTotalSections('a', 4);
+    assert.deepEqual(progress.getProgress('a').completedSections, [1]);
+    assert.equal(progress.getProgress('a').totalSections, 4);
+    assert.equal(progress.completionPercentage('a', 4), 0.25);
+});
+
+test('createProgressStore: blocked or full storage never throws', () => {
+    const progress = createProgressStore(throwingStorage, { keyOf: (id) => `p_${id}` });
+    assert.doesNotThrow(() => progress.markSectionCompleted('a', 0));
+    assert.deepEqual(progress.getProgress('a').completedSections, []);
+});
+
+test('createProgressStore: never writes isCompleted when the caller does not ask for it', () => {
+    const storage = memoryStorage();
+    const progress = createProgressStore(storage, { keyOf: (id) => `p_${id}` });
+    progress.markSectionCompleted('a', 0);
+    progress.setTotalSections('a', 2);
+    assert.equal(JSON.parse(storage.data.p_a).isCompleted, undefined);
+});

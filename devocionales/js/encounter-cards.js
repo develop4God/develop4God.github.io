@@ -6,7 +6,9 @@
     // EncounterLock's. Order is never changed: completed cards stay where the index puts them.
     //   state: 'completed' | 'open' | 'locked' | 'comingSoon'
     //   badge: 'completed' | 'next' (first unfinished open card) | null
-    function buildCards(entries, { completed = new Set(), allUnlocked = false } = {}) {
+    // progressOf(id) -> { completedSections, totalSections } | null: section reads of an entry (Encounters progress store).
+    //   Only an open card gets a percent; isInProgress = open with at least one section read.
+    function buildCards(entries, { completed = new Set(), allUnlocked = false, progressOf = () => null } = {}) {
         if (!Array.isArray(entries)) return [];
         const list = entries.filter((x) => x && typeof x === 'object' && x.id);
         const lock = global.EncounterLock;
@@ -23,10 +25,15 @@
             if (state === 'completed') badge = 'completed';
             else if (state === 'open' && !nextAssigned) { badge = 'next'; nextAssigned = true; }
             const prerequisite = state === 'locked' ? lock.prerequisiteOf(list, entry.id) : null;
+            const progress = state === 'open' ? progressOf(entry.id) : null;
+            const sections = progress && Array.isArray(progress.completedSections) ? progress.completedSections.length : 0;
+            const total = progress ? progress.totalSections : null;
             return {
                 ...entry,
                 state,
                 badge,
+                isInProgress: state === 'open' && sections > 0,
+                percent: state === 'open' ? global.DiscoveryCards.progressFraction({ isCompleted: false, sections, total }) : null,
                 isNextLocked: state === 'locked' && entry.id === nextLockedId,
                 prerequisiteTitle: prerequisite ? prerequisite.title : null,
             };
@@ -56,8 +63,11 @@
         };
     }
 
-    // The hero is the first open, unfinished encounter (the one the reader should go to next). A locked card is never a hero.
+    // The hero: an open encounter already in progress ("continue"), else the first open unfinished one ("start").
+    // A locked card is never a hero.
     function pickHero(cards) {
+        const inProgress = cards.find((c) => c.isInProgress && c.state === 'open');
+        if (inProgress) return { card: inProgress, kind: 'continue' };
         const next = cards.find((c) => c.badge === 'next' && c.state === 'open');
         return next ? { card: next, kind: 'start' } : null;
     }

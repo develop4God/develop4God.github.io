@@ -5,7 +5,7 @@
     // loader, store, card view-model, DOM builders, unlock sheet and navigation are all injected, so
     // this file only wires state -> view and taps -> collaborators.
     function createListPage(deps) {
-        const { view, lang, data, store, cards, listDom, unlockSheet, onOpen, labels = {} } = deps;
+        const { view, lang, data, store, cards, listDom, unlockSheet, onOpen, labels = {}, progress = null } = deps;
         const FILTER_SESSION_KEY = 'encounterFilter';
         const CHIP_KEYS = [['all', 'filterAll'], ['pending', 'filterPending'], ['completed', 'filterCompleted']];
 
@@ -35,13 +35,22 @@
             afterRender();
         }
 
+        // The shared hero: "Continue" for an encounter in progress (with its percentage), else "Start here".
+        function heroProps({ kind, card }) {
+            const isContinue = kind === 'continue';
+            return {
+                label: isContinue ? labels.continueWhereLeft : labels.startHere,
+                buttonLabel: isContinue ? labels.continueBtn : labels.read,
+                card,
+                percent: isContinue && card.percent !== null && card.percent !== undefined ? Math.round(card.percent * 100) : null,
+            };
+        }
+
         // Hero (the next encounter to read) and filter chips, built from the full list so the counts are never filtered.
         function renderHeader(list) {
             if (!hasHeader()) return;
             const hero = cards.pickHero(list);
-            view.hero.replaceChildren(...(hero ? [listDom.buildHero({
-                label: labels.startHere, buttonLabel: labels.read, card: hero.card,
-            }, { onOpen: (id) => onOpen(id) })] : []));
+            view.hero.replaceChildren(...(hero ? [listDom.buildHero(heroProps(hero), { onOpen: (id) => onOpen(id) })] : []));
             const counts = cards.countFilters(list);
             const items = CHIP_KEYS.map(([key, labelKey]) => ({ filter: key, label: labels[labelKey], count: counts[key] }));
             view.chips.replaceChildren(listDom.buildFilterChips(items, filter, setFilter));
@@ -51,10 +60,15 @@
 
         function render() {
             if (!entries.length) { showMessage('empty'); return; }
-            const list = cards.buildCards(entries, { completed: store.loadCompleted(), allUnlocked: allUnlocked() });
+            const list = cards.buildCards(entries, {
+                completed: store.loadCompleted(),
+                allUnlocked: allUnlocked(),
+                progressOf: (id) => (progress ? progress.getProgress(id) : null),
+            });
             view.count.textContent = listDom.countLabel(cards.countPublished(entries));
             renderHeader(list);
-            const visible = cards.filterCards(list, filter);
+            // Without the chips a saved filter could not be cleared: an older cached page always shows everything.
+            const visible = cards.filterCards(list, hasHeader() ? filter : 'all');
             view.body.replaceChildren(visible.length ? listDom.buildGrid(visible, { handlers }) : listDom.buildMessage('filtered'));
             // A card that was locked and is open now plays the unlock once (the CSS respects reduced motion).
             // One card gets the flash and its pill; several (unlock all) get a staggered sweep and no pill.

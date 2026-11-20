@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
+for (const name of ['dom-builder.js', 'discovery-cards.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -252,4 +252,59 @@ test('header: a card unlocked while a filter hides it does not flash or throw', 
     page.refresh();
     assert.deepEqual(ids(view), ['a']);
     assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
+});
+
+// ---- section progress on the list: bar on the open card, "Continue" hero with its percent ----
+function setupProgressList(sectionsById) {
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), hero: doc.createElement('div'), chips: doc.createElement('div'), body: doc.createElement('div') };
+    const store = { loadCompleted: () => new Set() };
+    const progress = {
+        getProgress: (id) => (sectionsById[id] ? { completedSections: sectionsById[id].sections, totalSections: sectionsById[id].total } : { completedSections: [], totalSections: null }),
+    };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x' });
+    const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store, listDom,
+        data: { loadIndex: async () => [e('a'), e('b')] },
+        cards: global.window.EncounterCards,
+        unlockSheet: { open() {} },
+        allUnlocked: () => false,
+        unlockLabel: 'x',
+        onOpen() {},
+        labels: { ...HEADER_LABELS, continueWhereLeft: 'Continue where you left off', continueBtn: 'Continue' },
+        sessionStorage: { getItem: () => null, setItem() {} },
+        progress,
+    });
+    return { page, view };
+}
+
+test('progress: the open card shows its section bar; the card without reads shows none', async () => {
+    const { page, view } = setupProgressList({ a: { sections: [0], total: 4 } });
+    await page.init();
+    const bar = card(view, 'a').querySelector('[role="progressbar"]');
+    assert.equal(bar.getAttribute('aria-valuenow'), '25');
+    assert.equal(card(view, 'b').querySelector('[role="progressbar"]'), null);
+});
+
+test('progress: an open card in progress becomes the "Continue" hero with its percentage', async () => {
+    const { page, view } = setupProgressList({ a: { sections: [0], total: 4 } });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Continue where you left off');
+    assert.equal(view.hero.querySelector('.study-hero-button').textContent, 'Continue');
+    assert.equal(view.hero.querySelector('.study-hero-percent').textContent, '25%');
+});
+
+test('progress: with no progress the hero stays "Start here" and has no percentage', async () => {
+    const { page, view } = setupProgressList({});
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    assert.equal(view.hero.querySelector('.study-hero-percent'), null);
+});
+
+test('review: an older cached page with no header ignores a saved filter, so no hidden filter can stick', async () => {
+    const { page, view } = setupHeader({ withHeader: false, session: { encounterFilter: 'completed' }, completed: ['a'] });
+    await page.init();
+    assert.deepEqual(ids(view), ['a', 'b', 'c']);
 });

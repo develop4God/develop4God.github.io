@@ -9,6 +9,7 @@
     const BADGE_KEY = { completed: 'badge_completed', next: 'current' };
 
     function createCardDom({ h, t, imageUrlFor }) {
+        const progressBar = global.DiscoveryListDom.createProgressBar(h);
         const meta = (card) => [card.scripture, `${card.minutes} ${t('min_immersive_journey')}`].filter(Boolean).join(' · ');
         const hintOf = (card) => (card.prerequisiteTitle ? t('complete_to_unlock').replace('{title}', () => card.prerequisiteTitle) : '');
 
@@ -37,12 +38,15 @@
             ]);
         }
 
+        // Section progress (open cards only): the same bar as the Bible-studies cards, percent 0..1 from the view-model.
         function body(card) {
+            const percent = card.percent === null || card.percent === undefined ? null : Math.round(card.percent * 100);
             return h('span', { class: 'study-card-body' }, [
                 h('h3', { class: 'study-card-title', text: card.title }),
                 card.subtitle ? h('p', { class: 'study-card-subtitle', text: card.subtitle }) : null,
                 h('p', { class: 'study-card-meta', text: meta(card) }),
                 card.state === 'comingSoon' && card.releaseDate ? h('p', { class: 'encounter-card-release', text: card.releaseDate }) : null,
+                percent === null ? null : progressBar(percent, 'study-card-progress'),
             ]);
         }
 

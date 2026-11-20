@@ -9,6 +9,8 @@
 
     function createReaderPage(deps) {
         const { view, lang, data, store, timers, celebrate, toast, completedMessage, onExit, copyright } = deps;
+        // Section progress (shared DiscoveryStore.createProgressStore). Optional: a page cached before it existed has none.
+        const progress = deps.progress || null;
 
         let summary = null;
         let study = null;
@@ -60,10 +62,28 @@
             };
         }
 
+        // Only card pages are sections: the key-verse page is never recorded. Called whenever the reader shows a page.
+        function recordView() {
+            if (!progress || !summary) return;
+            const page = pages[index];
+            if (page && page.sectionIndex !== null) progress.markSectionCompleted(summary.id, page.sectionIndex);
+        }
+
+        // Where the reader opens: the first unread card. Every card read but not completed (completion is on the last
+        // card, so it was not reached) opens on the completion card, not back at the start.
+        function resumeIndex() {
+            const done = progress.getProgress(summary.id).completedSections;
+            const first = global.DiscoveryCards.firstUnreadIndex(pages, done);
+            const allRead = done.length >= global.DiscoveryCards.countSections(pages) && global.DiscoveryCards.countSections(pages) > 0;
+            return first === 0 && allRead && !store.isCompleted(summary.id) ? pages.length - 1 : first;
+        }
+
+        // Entering the reader resumes at the first card not yet read (page 0 when nothing is read or all are).
         function enter() {
             if (phase === 'reader' || !pages.length) return;
             phase = 'reader';
-            index = 0;
+            index = progress && summary ? resumeIndex() : 0;
+            recordView();
             render();
         }
 
@@ -87,7 +107,10 @@
                 }
                 study = loaded;
                 pages = built;
-                render();
+                if (progress) progress.setTotalSections(target.id, global.DiscoveryCards.countSections(built));
+                // An encounter already in progress resumes directly: the intro is for a first read only.
+                if (progress && progress.getProgress(target.id).completedSections.length > 0) enter();
+                else render();
             } catch (_) {
                 if (seq !== loadSeq) return;
                 render({ error: true });
@@ -97,6 +120,7 @@
         function goTo(target) {
             if (!pages.length || target < 0 || target >= pages.length || target === index) return;
             index = target;
+            recordView();
             render();
         }
 

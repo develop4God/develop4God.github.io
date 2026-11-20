@@ -26,6 +26,10 @@
         const byId = (id) => doc.getElementById(id);
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.EncounterStore.createEncounterStore(global.localStorage);
+        // Section progress: the same store Bible studies use. A page cached before discovery-store.js existed has none (no bars, no resume).
+        const progress = global.DiscoveryStore && global.DiscoveryStore.createProgressStore
+            ? global.DiscoveryStore.createProgressStore(global.localStorage, { keyOf: (id) => global.EncounterStore.KEYS.progress(id) })
+            : null;
         // A page cached before the entitlement script existed reads every encounter as locked.
         const entitlement = global.EncounterEntitlement ? global.EncounterEntitlement.createEncounterEntitlement(global.localStorage) : null;
         const isUnlockedAll = () => (entitlement ? entitlement.isUnlocked() : false);
@@ -163,6 +167,7 @@
             lang,
             data: { loadEncounter: (entry, language) => data.loadStudy(entry, language) },
             store,
+            progress,
             timers: { setTimeout: (fn, ms) => global.setTimeout(fn, ms) },
             celebrate: () => celebration.burst(),
             toast,
@@ -221,11 +226,14 @@
             labels: {
                 startHere: discoveryT('startHere'),
                 read: discoveryT('read'),
+                continueWhereLeft: discoveryT('continueWhereLeft'),
+                continueBtn: discoveryT('continueBtn'),
                 filterAll: discoveryT('filterAll'),
                 filterPending: discoveryT('filterPending'),
                 filterCompleted: discoveryT('filterCompleted'),
             },
             sessionStorage: global.sessionStorage,
+            progress,
         });
 
         router = global.DiscoveryRouter.createRouter({
