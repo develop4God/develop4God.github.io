@@ -525,6 +525,7 @@
 }
 
 .encounter-intro-enter,
+.encounter-complete,
 .encounter-exit {
     min-block-size: 3.25rem;
     padding-inline: 1.5rem;
@@ -561,7 +562,8 @@
 .encounter-page-subtitle,
 .encounter-verse-ref,
 .encounter-question-category,
-.encounter-prayer-title {
+.encounter-prayer-title,
+.encounter-keyverse-label {
     margin: 0;
     font-size: 0.8rem;
     letter-spacing: 0.1em;
@@ -605,12 +607,52 @@
     text-align: center;
 }
 
+.encounter-keyverse-text {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+.encounter-keyverse-ref {
+    margin: 0;
+    color: var(--text-muted);
+}
+
+.encounter-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.encounter-prev,
+.encounter-next {
+    min-inline-size: 3rem;
+    min-block-size: 3rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.encounter-prev[disabled] {
+    opacity: 0.4;
+    cursor: default;
+}
+
 .encounter-footer {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
     padding-block: 1rem;
+}
+
+.encounter-complete[disabled] {
+    opacity: 0.6;
+    cursor: default;
 }
 
 .encounter-copyright {
@@ -648,6 +690,10 @@
 
 /* Keyboard focus for every reader control (kept last so it wins over the base rules). */
 .encounter-intro-enter:focus-visible,
+.encounter-complete:focus-visible,
+.encounter-exit:focus-visible,
+.encounter-prev:focus-visible,
+.encounter-next:focus-visible,
 .encounter-intro-back:focus-visible,
 .encounter-back:focus-visible,
 .encounter-retry:focus-visible {
@@ -797,6 +843,23 @@ body:has(.encounter-pass) .encounter-card.is-bulk-unlocked .encounter-card-media
     }
 }
 
+/* Completed on the completion card: the gold badge pops in. */
+.encounter-complete--pop {
+    animation: encounter-complete-pop 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+@keyframes encounter-complete-pop {
+        from {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+        to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
 /* Thank-you pass after a PayPal unlock: a modal dialog over the page. */
 .encounter-pass {
     position: fixed;
@@ -900,7 +963,8 @@ body:has(.encounter-pass) .encounter-card.is-bulk-unlocked .encounter-card-media
         display: none;
     }
 
-        .encounter-pass,
+    .encounter-complete--pop,
+    .encounter-pass,
     .encounter-pass-card {
         animation: none;
     }
