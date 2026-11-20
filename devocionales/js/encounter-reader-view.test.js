@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'encounter-reader-dom.js', 'encounter-reader-view.js']) {
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'key-verse-card.js', 'encounter-reader-dom.js', 'encounter-reader-view.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }

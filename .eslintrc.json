@@ -45,6 +45,8 @@
     "UiSwipeDrag": "readonly",
     "UiPagerDots": "readonly",
     "ShareOrCopy": "readonly",
+    "VerseShare": "readonly",
+    "KeyVerseCard": "readonly",
     "DomBuilder": "readonly",
     "DevotionalTheme": "readonly",
     "DiscoverySortFilter": "readonly",

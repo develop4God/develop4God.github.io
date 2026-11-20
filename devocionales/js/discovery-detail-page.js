@@ -6,7 +6,7 @@
     // helpers, copyright, toast), so this file only wires state -> view and actions -> store.
     function createDetailPage(deps) {
         const { view, t, lang, rtl, data, store, nav, copyright, toast, celebrate, onExit } = deps;
-        const detailDom = deps.detailDomFactory({ h: deps.h, t });
+        const detailDom = deps.detailDomFactory({ h: deps.h, t, shareVerse: deps.shareVerse });
         const { listDom } = deps;
 
         let study = null;

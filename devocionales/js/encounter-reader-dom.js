@@ -11,7 +11,7 @@
     const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
     const list = (v) => (Array.isArray(v) ? v.filter(isObject) : []);
 
-    function createReaderDom({ h, t, imageUrlFor, pagerDots = global.UiPagerDots.createPagerDots({ h }) }) {
+    function createReaderDom({ h, t, imageUrlFor, pagerDots = global.UiPagerDots.createPagerDots({ h }), keyVerseCard = global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h }) : null }) {
         const emphasis = (value) => global.DiscoveryCards.parseEmphasis(value).map((seg) => {
             if (seg.bold) return h('strong', { text: seg.text });
             if (seg.italic) return h('em', { text: seg.text });
@@ -100,11 +100,16 @@
 
         function buildPage(page, encounterId) {
             if (page.kind === 'keyVerse') {
-                return h('section', { class: 'encounter-page encounter-page--keyverse' }, [
-                    h('p', { class: 'encounter-keyverse-label', text: t('key_verse') }),
-                    h('p', { class: 'encounter-keyverse-text', text: String(page.keyVerse.text || '') }),
-                    h('p', { class: 'encounter-keyverse-ref', text: String(page.keyVerse.reference || '') }),
-                ]);
+                // Without the card script (an older cached page) the verse still shows as plain text.
+                const keyVerse = page.keyVerse;
+                const body = keyVerseCard
+                    ? keyVerseCard.build({ label: t('key_verse'), reference: keyVerse.reference, text: keyVerse.text })
+                    : [
+                        h('p', { class: 'encounter-keyverse-label', text: t('key_verse') }),
+                        h('p', { class: 'encounter-keyverse-text', text: String(keyVerse.text || '') }),
+                        h('p', { class: 'encounter-keyverse-ref', text: String(keyVerse.reference || '') }),
+                    ];
+                return h('section', { class: 'encounter-page encounter-page--keyverse' }, Array.isArray(body) ? body : [body]);
             }
             const card = page.card;
             const render = RENDERERS[card.type] || fallback;

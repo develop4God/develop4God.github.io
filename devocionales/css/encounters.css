@@ -562,8 +562,7 @@
 .encounter-page-subtitle,
 .encounter-verse-ref,
 .encounter-question-category,
-.encounter-prayer-title,
-.encounter-keyverse-label {
+.encounter-prayer-title {
     margin: 0;
     font-size: 0.8rem;
     letter-spacing: 0.1em;
@@ -605,17 +604,6 @@
 .encounter-page--keyverse {
     padding: 2rem 1rem;
     text-align: center;
-}
-
-.encounter-keyverse-text {
-    margin: 0;
-    font-size: 1.25rem;
-    line-height: 1.6;
-}
-
-.encounter-keyverse-ref {
-    margin: 0;
-    color: var(--text-muted);
 }
 
 .encounter-nav {

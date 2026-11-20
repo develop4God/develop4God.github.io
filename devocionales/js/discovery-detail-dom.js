@@ -9,7 +9,7 @@
     const isText = (v) => typeof v === 'string' && v.length > 0;
     const list = (v) => (Array.isArray(v) ? v.filter(isObject) : []);
 
-    function createDetailDom({ h, t, pagerDots = global.UiPagerDots.createPagerDots({ h }) }) {
+    function createDetailDom({ h, t, shareVerse = null, pagerDots = global.UiPagerDots.createPagerDots({ h }), keyVerseCard = global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h, shareVerse, shareLabel: t('share') }) : null }) {
         function emphasis(text) {
             return global.DiscoveryCards.parseEmphasis(text).map((seg) => {
                 if (seg.bold) return h('strong', { text: seg.text });
@@ -91,11 +91,16 @@
 
         function buildPage(page) {
             if (page.kind === 'keyVerse') {
-                return h('section', { class: 'study-page study-page-keyverse' }, [
-                    h('p', { class: 'study-keyverse-label', text: t('keyVerse') }),
-                    h('p', { class: 'study-keyverse-text', text: String(page.keyVerse.text || '') }),
-                    h('p', { class: 'study-keyverse-ref', text: String(page.keyVerse.reference || '') }),
-                ]);
+                // Without the card script (an older cached page) the verse still shows as plain text.
+                const keyVerse = page.keyVerse;
+                const body = keyVerseCard
+                    ? keyVerseCard.build({ label: t('keyVerse'), reference: keyVerse.reference, text: keyVerse.text })
+                    : [
+                        h('p', { class: 'study-keyverse-label', text: t('keyVerse') }),
+                        h('p', { class: 'study-keyverse-text', text: String(keyVerse.text || '') }),
+                        h('p', { class: 'study-keyverse-ref', text: String(keyVerse.reference || '') }),
+                    ];
+                return h('section', { class: 'study-page study-page-keyverse' }, Array.isArray(body) ? body : [body]);
             }
             return h('section', { class: 'study-page' }, cardSections(page.card));
         }

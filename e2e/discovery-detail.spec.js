@@ -45,7 +45,7 @@ test.describe('sanity', () => {
     await mockData(page);
     await openStudy(page);
     await expect(page.locator('.study-detail-title')).toHaveText(ASCENSION.title);
-    await expect(page.locator('.study-keyverse-text')).toHaveText(ASCENSION.key_verse.text);
+    await expect(page.locator('.key-verse-card-text')).toHaveText(ASCENSION.key_verse.text);
     await expect(page.locator('.pager-dot')).toHaveCount(PAGES);
     await expect(page.locator('#studies-list-view')).toBeHidden();
     expect(errors).toEqual([]);
@@ -60,7 +60,7 @@ test.describe('paging', () => {
     await page.locator('.study-next').click();
     await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
     await page.locator('.study-prev').click();
-    await expect(page.locator('.study-keyverse-label')).toBeVisible();
+    await expect(page.locator('.key-verse-card-label')).toBeVisible();
   });
 
   test('arrow keys page, and the focus moves to the new page', async ({ page }) => {
@@ -70,7 +70,7 @@ test.describe('paging', () => {
     await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
     await expect(page.locator('.study-page')).toBeFocused();
     await page.keyboard.press('ArrowLeft');
-    await expect(page.locator('.study-keyverse-label')).toBeVisible();
+    await expect(page.locator('.key-verse-card-label')).toBeVisible();
   });
 
   test('RTL (Arabic) mirrors the arrow keys', async ({ page }) => {

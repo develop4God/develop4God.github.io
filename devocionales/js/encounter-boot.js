@@ -30,6 +30,19 @@
         const isUnlockedAll = () => (entitlement ? entitlement.isUnlocked() : false);
         // A page cached before ui-toast.js was added has no toast: messages are then skipped, not thrown.
         const toast = global.UiToast ? global.UiToast.createToast({ document: doc, container: doc.body }) : { show: () => {} };
+        // Share strings come from the Bible-studies namespace: the Encounters namespace has none, and the
+        // reader already reuses another namespace's string the same way (`devotionals.errorRetry`).
+        const shareT = (key) => i18n.t(`discovery.${key}`, '');
+        // A page cached before verse-share.js was added has no VerseShare: the share button then does nothing.
+        const verseShare = global.VerseShare ? global.VerseShare.createVerseShare({
+            shareOrCopy: global.ShareOrCopy.shareOrCopy,
+            navigator: global.navigator,
+            playStoreUrl: global.DevotionalShare.PLAY_STORE_URL,
+            onOutcome: (outcome) => {
+                if (outcome === 'copied') toast.show(shareT('copied'));
+                if (outcome === 'failed') toast.show(shareT('shareError'), { kind: 'error' });
+            },
+        }) : { share: () => {} };
         const renderIcons = () => global.lucide.createIcons();
         const setBackgroundInert = (on) => doc.querySelectorAll(INERT_SELECTOR).forEach((el) => el.toggleAttribute('inert', on));
 
@@ -159,7 +172,12 @@
             }).resolve(language, bibleVersion),
         });
         readerView = global.EncounterReaderView.createReaderView({
-            dom: global.EncounterReaderDom.createReaderDom({ h, t, imageUrlFor: images.imageUrl }),
+            dom: global.EncounterReaderDom.createReaderDom({
+                h,
+                t,
+                imageUrlFor: images.imageUrl,
+                keyVerseCard: global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h, shareVerse: verseShare.share, shareLabel: shareT('share') }) : null,
+            }),
             root: detailView,
             listView,
             detailView,

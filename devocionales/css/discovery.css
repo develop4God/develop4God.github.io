@@ -511,22 +511,51 @@ body {
     line-height: 1.6;
 }
 
-.study-keyverse-label {
+/* Key verse card, shared by the Bible-studies and Encounters readers (key-verse-card.js). */
+.key-verse-card {
+    margin: 0;
+    padding: 1.5rem 1.25rem;
+    border: 1px solid var(--accent-soft);
+    border-radius: 1rem;
+    background: linear-gradient(160deg, var(--accent-soft), transparent);
+    text-align: center;
+}
+
+.key-verse-card-label {
     color: var(--accent);
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.08em;
 }
 
-.study-keyverse-text {
+.key-verse-card-text {
+    margin: 0.75rem 0;
     font-size: 1.25rem;
     font-style: italic;
     line-height: 1.6;
 }
 
-.study-keyverse-ref {
+.key-verse-card-ref {
+    margin: 0;
     color: var(--text-muted);
     font-weight: 700;
+}
+
+.key-verse-card-share {
+    margin-block-start: 1rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--accent);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.key-verse-card-share:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
 }
 
 .study-revelation,

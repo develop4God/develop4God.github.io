@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'discovery-detail-dom.js']) {
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'key-verse-card.js', 'discovery-detail-dom.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -30,9 +30,9 @@ const pageOf = (study, i) => W.DiscoveryCards.buildPages(study)[i];
 test('key verse page: label, verse text and reference (C1)', () => {
     const study = fixture('ascension_victory_en_001.json');
     const el = dom.buildPage(pageOf(study, 0));
-    assert.equal(el.querySelector('.study-keyverse-label').textContent, 'KEY VERSE');
-    assert.equal(el.querySelector('.study-keyverse-text').textContent, study.key_verse.text);
-    assert.equal(el.querySelector('.study-keyverse-ref').textContent, study.key_verse.reference);
+    assert.equal(el.querySelector('.key-verse-card-label').textContent, 'KEY VERSE');
+    assert.equal(el.querySelector('.key-verse-card-text').textContent, study.key_verse.text);
+    assert.equal(el.querySelector('.key-verse-card-ref').textContent, study.key_verse.reference);
 });
 
 test('card page: icon, title, subtitle and content with line breaks kept (C3)', () => {
@@ -251,4 +251,12 @@ test('not found: message and a link back to the list (C6)', () => {
     assert.ok(el.textContent.includes('Study not found.'));
     el.querySelector('.study-back').click();
     assert.equal(back, 1);
+});
+
+test('without the key verse card script (an older cached page) the key verse still shows as plain text', () => {
+    const plainDom = W.DiscoveryDetailDom.createDetailDom({ h: W.DomBuilder.createBuilder(doc), t, keyVerseCard: null });
+    const study = fixture('ascension_victory_en_001.json');
+    const el = plainDom.buildPage(pageOf(study, 0));
+    assert.equal(el.querySelector('.key-verse-card'), null);
+    assert.equal(el.querySelector('.study-keyverse-text').textContent, study.key_verse.text);
 });

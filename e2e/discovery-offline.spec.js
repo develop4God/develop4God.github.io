@@ -49,7 +49,7 @@ test.describe('offline', () => {
     await context.setOffline(true);
     await page.goto(`${STUDIES}&id=${id}`, { waitUntil: 'domcontentloaded' });
     await expect(page.locator('.study-detail-title')).toBeVisible();
-    await expect(page.locator('.study-keyverse-text')).not.toHaveText('');
+    await expect(page.locator('.key-verse-card-text')).not.toHaveText('');
   });
 
   test('the slashless URL the host redirects from also opens offline', async ({ page, context }) => {
