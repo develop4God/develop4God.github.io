@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBGE96RQML"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-KBGE96RQML');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Encounters - Devocionales Cristianos</title>
+    <meta name="description" content="Bible encounters: real stories read scene by scene. Finish one to open the next.">
+    <link rel="canonical" href="https://develop4god.com/devocionales/encounters/">
+    <meta name="theme-color" content="#26414d">
+
+    <link rel="preload" href="/devocionales/vendor/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <script src="/devocionales/vendor/lucide.min.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/modern.css">
+    <script src="/js/rtl-helper.js"></script>
+    <script src="/devocionales/js/i18n.js"></script>
+    <script src="/devocionales/js/devotional-theme.js"></script>
+    <link rel="stylesheet" href="/devocionales/css/theme.css">
+    <link rel="stylesheet" href="/devocionales/css/chrome.css">
+    <link rel="stylesheet" href="/devocionales/pwa/shell.css">
+    <link rel="stylesheet" href="/devocionales/css/discovery.css">
+    <link rel="stylesheet" href="/devocionales/css/encounters.css">
+</head>
+<body>
+
+    <header class="studies-header">
+        <div class="studies-header-inner">
+            <!-- Browser tab only: the installed app has the bottom bar (hidden under .is-standalone). -->
+            <nav id="encounters-nav" class="studies-nav" aria-label="Main navigation">
+                <a href="/devocionales/" id="encounters-nav-devotional" data-i18n="devotionals.navDevotional">Today's Devotional</a>
+                <a href="/devocionales/estudios/" data-i18n="shell.studies">Bible Studies</a>
+                <a href="/devocionales/encounters/" class="active" aria-current="page" data-i18n="shell.encounters">Encounters</a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="encounters-main" class="studies-main">
+        <div id="encounters-list-view">
+            <div class="studies-title-row">
+                <h1 id="encounters-title" class="studies-title">Encounters</h1>
+                <p id="encounters-count" class="studies-count"></p>
+            </div>
+            <div id="encounters-body"></div>
+        </div>
+        <div id="encounters-detail-view" hidden></div>
+    </main>
+
+    <!-- Installed app only (iOS and desktop): revealed by devotional-shell.js, hidden by shell.css everywhere else. -->
+    <nav id="shell-nav" data-shell-nav data-shell-page="encounters" aria-label="App navigation"></nav>
+
+    <footer id="page-footer" class="studies-footer">
+        <p>
+            <a href="/devocionales/privacy-policy" data-i18n="footer.privacy">Privacy Policy</a>
+            &nbsp;&middot;&nbsp;
+            <a href="/devocionales/terms-and-conditions" data-i18n="footer.terms">Terms and Conditions</a>
+        </p>
+    </footer>
+
+    <script src="/devocionales/js/devotional-standalone.js"></script>
+    <script src="/devocionales/js/devotional-i18n-adapter.js"></script>
+    <script src="/devocionales/js/devotional-fetch.js"></script>
+    <script src="/devocionales/js/devotional-share.js"></script>
+    <script src="/devocionales/js/devotional-ios-hint.js"></script>
+    <script src="/devocionales/js/dom-builder.js"></script>
+    <script src="/devocionales/js/content-index.js"></script>
+    <script src="/devocionales/js/storage-json.js"></script>
+    <script src="/devocionales/js/discovery-data.js"></script>
+    <script src="/devocionales/js/discovery-cache.js"></script>
+    <script src="/devocionales/js/discovery-list-dom.js"></script>
+    <script src="/devocionales/js/encounter-lock.js"></script>
+    <script src="/devocionales/js/encounter-data.js"></script>
+    <script src="/devocionales/js/encounter-store.js"></script>
+    <script src="/devocionales/js/encounter-cards.js"></script>
+    <script src="/devocionales/js/encounter-images.js"></script>
+    <script src="/devocionales/js/encounter-card-dom.js"></script>
+    <script src="/devocionales/js/encounter-welcome-dom.js"></script>
+    <script src="/devocionales/js/encounter-unlock-sheet-dom.js"></script>
+    <script src="/devocionales/js/encounter-list-page.js"></script>
+    <script src="/devocionales/js/devotional-pwa-config.js"></script>
+    <script src="/devocionales/pwa/devotional-shell-core.js"></script>
+    <script src="/devocionales/pwa/devotional-shell.js"></script>
+    <script src="/devocionales/js/encounter-boot.js"></script>
+</body>
+</html>

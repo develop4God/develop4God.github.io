@@ -1,0 +1,330 @@
+/* Encounters list, welcome screen and unlock sheet. Cards reuse the Bible-studies card/grid
+   classes (discovery.css); only what is specific to Encounters lives here. Logical properties keep
+   the layout correct in right-to-left languages. */
+
+.encounter-card .study-card-open {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    padding-inline-end: 0;
+    overflow: hidden;
+}
+
+.encounter-card-inner {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.encounter-card-media {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 16 / 9;
+    background-color: var(--accent-soft);
+    overflow: hidden;
+}
+
+.encounter-card-media img {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+}
+
+.encounter-card-media img[hidden] {
+    display: none;
+}
+
+.encounter-card .study-card-emoji {
+    font-size: 2.5rem;
+}
+
+.encounter-card .study-card-body {
+    padding: 0.75rem 1rem 1rem;
+}
+
+.encounter-badge {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-end: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    background: var(--accent);
+    color: var(--bg);
+}
+
+.encounter-card--open .encounter-badge {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+.encounter-card--coming-soon .encounter-badge {
+    background: var(--surface);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+}
+
+.encounter-card-hint,
+.encounter-card-release {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    margin: 0.5rem 0 0;
+    overflow-wrap: anywhere;
+}
+
+.encounter-card--locked,
+.encounter-card--coming-soon {
+    opacity: 0.6;
+}
+
+.encounter-card--coming-soon {
+    cursor: default;
+}
+
+.encounter-card--locked [data-lucide="lock"],
+.encounter-card--locked svg.lucide-lock {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    padding: 0.25rem;
+    border-radius: 9999px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.encounter-card--next-locked {
+    opacity: 0.85;
+    outline: 2px dashed var(--accent);
+    outline-offset: 2px;
+}
+
+.encounter-card.is-just-unlocked {
+    animation: encounter-unlock 1.4s ease-out 1;
+}
+
+@keyframes encounter-unlock {
+    0% {
+        box-shadow: 0 0 0 0 var(--accent);
+        transform: scale(0.97);
+    }
+
+    60% {
+        box-shadow: 0 0 0 10px transparent;
+        transform: scale(1);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 transparent;
+    }
+}
+
+/* First-visit welcome: full screen, same look as the app's EncounterWelcomePage. */
+.encounter-welcome {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background: #0a0e1a;
+    color: #fff;
+    overflow: hidden;
+}
+
+.encounter-welcome-image {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+    object-position: top center;
+    animation: encounter-fade 0.9s ease-in both;
+}
+
+.encounter-welcome::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.15) 0%,
+        rgba(0, 0, 0, 0.05) 25%,
+        rgba(10, 14, 26, 0.92) 62%,
+        #0a0e1a 100%
+    );
+}
+
+.encounter-welcome-content {
+    position: relative;
+    max-inline-size: 40rem;
+    inline-size: 100%;
+    margin-inline: auto;
+    padding: 2rem 2rem calc(3rem + env(safe-area-inset-bottom));
+    animation: encounter-rise 1.2s ease-out 0.7s both;
+}
+
+.encounter-welcome-title {
+    margin: 0;
+    font-size: clamp(1.75rem, 8vw, 2.4rem);
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+}
+
+.encounter-welcome-line {
+    display: block;
+    margin-block-end: 0.5rem;
+}
+
+.encounter-welcome-line--gold {
+    color: #ffd700;
+}
+
+.encounter-welcome-subtitle {
+    margin: 1.25rem 0 3rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.encounter-welcome-begin {
+    inline-size: 100%;
+    min-block-size: 4.5rem;
+    border: 0;
+    border-radius: 1.5rem;
+    cursor: pointer;
+    color: #0a0e1a;
+    font: inherit;
+    font-weight: 900;
+    font-size: 1rem;
+    letter-spacing: 0.125em;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #b8860b, #ffd700 25%, #ffffe0 50%, #ffd700 75%, #b8860b);
+    box-shadow: 0 8px 24px rgba(255, 215, 0, 0.6), 0 0 12px 4px rgba(255, 215, 0, 0.3);
+}
+
+.encounter-welcome-begin:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+@keyframes encounter-fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes encounter-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8%);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Unlock sheet: bottom sheet on phones, centred dialog on wider screens. */
+.encounter-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.encounter-sheet {
+    inline-size: 100%;
+    max-inline-size: 32rem;
+    max-block-size: 90dvh;
+    overflow-y: auto;
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
+}
+
+.encounter-sheet-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.25rem;
+}
+
+.encounter-sheet-body {
+    margin: 0 0 0.75rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.encounter-sheet-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-block-start: 1rem;
+}
+
+.encounter-sheet-keep,
+.encounter-sheet-play {
+    flex: 1 1 10rem;
+    min-block-size: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.encounter-sheet-keep {
+    background: var(--accent);
+    color: var(--bg);
+    border: 0;
+}
+
+.encounter-sheet-play {
+    background: none;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+@media (width >= 560px) {
+    .encounter-sheet-backdrop {
+        align-items: center;
+    }
+
+    .encounter-sheet {
+        border-radius: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .encounter-card.is-just-unlocked,
+    .encounter-welcome-image,
+    .encounter-welcome-content {
+        animation: none;
+    }
+}

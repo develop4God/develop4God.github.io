@@ -44,9 +44,10 @@
         return rawIndex.studies.map((e) => parseEntry(e, lang)).filter(Boolean);
     }
 
+    // parseIndex (optional): lets another content type (Encounters) reuse this loader with its own index rules.
     // cache: { get(key), put(key, value), remove(key) } (async). Cache failures
     // (quota, blocked storage) are swallowed: caching is an optimisation only.
-    function createDiscoveryData({ fetchWithRetry, cache, baseUrl }) {
+    function createDiscoveryData({ fetchWithRetry, cache, baseUrl, parseIndex: parse = parseIndex }) {
         const safe = async (fn, fallback = null) => {
             try { return await fn(); } catch (_) { return fallback; }
         };
@@ -61,10 +62,10 @@
             try {
                 const raw = await fetchJson(`${baseUrl}/index.json`);
                 await safe(() => cache.put(INDEX_KEY, raw));
-                return parseIndex(raw, lang);
+                return parse(raw, lang);
             } catch (err) {
                 const cached = await safe(() => cache.get(INDEX_KEY));
-                if (cached) return parseIndex(cached, lang);
+                if (cached) return parse(cached, lang);
                 throw err;
             }
         }

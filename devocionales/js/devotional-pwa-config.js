@@ -26,7 +26,7 @@
                 enabled: true,
                 // Tab names; each needs a [data-shell-tab] element in index.html. 'studies' is a link to the
                 // Bible-studies page; leaving it out removes that tab from the bar.
-                tabs: ['home', 'studies', 'settings'],
+                tabs: ['home', 'studies', 'encounters', 'settings'],
                 layout: {
                     // At or above this viewport width the tabs are a labelled rail, below it a bottom bar.
                     railMinWidth: 768,

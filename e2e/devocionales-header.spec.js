@@ -42,11 +42,12 @@ const mockStudies = (page) => page.route(STUDY_DATA, (route) => route.fulfill({
 }));
 
 test.describe('web header: Studies tab next to Today\'s Devotional', () => {
-  test('the reader header shows both links; Today\'s Devotional is active and Studies opens the studies page', async ({ page }) => {
+  test('the reader header shows the links; Today\'s Devotional is active and Studies opens the studies page', async ({ page }) => {
     await mockStudies(page);
     await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
     const links = page.locator('header nav a');
-    await expect(links).toHaveCount(2);
+    await expect(links).toHaveCount(3); // devotional, studies, encounters
+    await expect(links.nth(2)).toHaveAttribute('href', '/devocionales/encounters/');
     await expect(links.nth(0)).toHaveClass(/active/);
     await expect(links.nth(1)).toHaveText('Bible Studies');
     await expect(links.nth(1)).toHaveAttribute('href', '/devocionales/estudios/');
@@ -55,11 +56,12 @@ test.describe('web header: Studies tab next to Today\'s Devotional', () => {
     await expect(page.locator('.study-card').first()).toBeVisible();
   });
 
-  test('the studies page header has the same two links with Studies active, and the first one leads back', async ({ page }) => {
+  test('the studies page header has the same links with Studies active, and the first one leads back', async ({ page }) => {
     await mockStudies(page);
     await page.goto('/devocionales/estudios/?lang=en', { waitUntil: 'networkidle' });
     const links = page.locator('#studies-nav a');
-    await expect(links).toHaveCount(2);
+    await expect(links).toHaveCount(3);
+    await expect(links.nth(2)).toHaveAttribute('href', '/devocionales/encounters/');
     await expect(links.nth(0)).toHaveText('Today\'s Devotional');
     await expect(links.nth(1)).toHaveAttribute('aria-current', 'page');
     await links.nth(0).click();

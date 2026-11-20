@@ -274,11 +274,15 @@ test('the real site builds, and the worker never lists itself', () => {
     assert.ok(config.precache.includes('/devocionales/vendor/tailwind.css'));
     assert.ok(config.precache.includes('/devocionales/vendor/fonts/inter-latin.woff2'));
     assert.equal(config.precache.filter((url) => url.endsWith('/sw.js')).length, 0);
-    assert.deepEqual(config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html', '/devocionales/estudios/index.html']);
+    assert.deepEqual(config.pages, ['/devocionales/privacy-policy.html', '/devocionales/terms-and-conditions.html', '/devocionales/encounters/index.html', '/devocionales/estudios/index.html']);
     // the studies page, and the scripts and styles only it loads, are available offline
     assert.ok(config.precache.includes('/devocionales/estudios/index.html'));
     assert.ok(config.precache.includes('/devocionales/js/discovery-boot.js'));
     assert.ok(config.precache.includes('/devocionales/css/discovery.css'));
+    // the Encounters page, and the scripts and styles only it loads, are available offline too
+    assert.ok(config.precache.includes('/devocionales/encounters/index.html'));
+    assert.ok(config.precache.includes('/devocionales/js/encounter-boot.js'));
+    assert.ok(config.precache.includes('/devocionales/css/encounters.css'));
     assert.ok(config.freshFirst.length > 0);
     for (const path of config.freshFirst) assert.ok(config.precache.includes(path), `${path} must be precached`);
     for (const path of config.sameOriginData) assert.equal(config.precache.includes(path), false, `${path} is fetched live`);
