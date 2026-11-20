@@ -9,7 +9,7 @@ const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
 for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'discovery-store.js', 'discovery-nav.js', 'discovery-card-dom.js',
-    'discovery-list-dom.js', 'discovery-detail-dom.js', 'discovery-copyright.js', 'discovery-detail-page.js']) {
+    'discovery-list-dom.js', 'key-verse-card.js', 'discovery-detail-dom.js', 'discovery-copyright.js', 'discovery-detail-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -85,11 +85,11 @@ test('open: stores the card count for the list percentage (7/14 = 50%)', async (
 test('next / prev page through the cards and mark each viewed card as a completed section', async () => {
     const { page, root, store, scrolls } = setup();
     await page.open(summary);
-    root.querySelector('.study-next').click();
+    root.querySelector('.reader-next').click();
     assert.equal(title(root), 'Card 1');
-    root.querySelector('.study-next').click();
+    root.querySelector('.reader-next').click();
     assert.equal(title(root), 'Card 2');
-    root.querySelector('.study-prev').click();
+    root.querySelector('.reader-prev').click();
     assert.equal(title(root), 'Card 1');
     assert.deepEqual(store.getProgress('love', 'en').completedSections, [0, 1]);
     assert.ok(scrolls.length >= 3, 'each page change scrolls to the top');
@@ -102,7 +102,7 @@ test('paging past the ends is a no-op', async () => {
     assert.ok(root.querySelector('.study-page-keyverse'));
     for (let i = 0; i < 10; i++) page.next();
     assert.equal(title(root), 'Card 3');
-    assert.equal(root.querySelector('.study-next'), null);
+    assert.equal(root.querySelector('.reader-next'), null);
 });
 
 test('C2 keyboard arrows page; RTL mirrors them (swipes: see ui-swipe-drag.test.js)', async () => {
@@ -123,28 +123,28 @@ test('last page: shows the footer with the completion button and the study versi
     const { page, root } = setup();
     await page.open(summary);
     page.goTo(3);
-    assert.ok(root.querySelector('.study-complete'));
+    assert.ok(root.querySelector('.reader-complete'));
     assert.equal(root.querySelector('.study-copyright').textContent, 'copyright:en:KJ2000');
     page.goTo(1);
-    assert.equal(root.querySelector('.study-complete'), null);
+    assert.equal(root.querySelector('.reader-complete'), null);
 });
 
 test('C4 completing marks the study done, toasts, and the button becomes a disabled "Study completed"', async () => {
     const { page, root, store, toasts } = setup();
     await page.open(summary);
     page.goTo(3);
-    root.querySelector('.study-complete').click();
+    root.querySelector('.reader-complete').click();
     assert.equal(store.getProgress('love', 'en').isCompleted, true);
     assert.deepEqual(toasts, ['Study completed successfully']);
-    assert.equal(root.querySelector('.study-complete').textContent, 'Study completed');
-    assert.equal(root.querySelector('.study-complete').hasAttribute('disabled'), true);
+    assert.equal(root.querySelector('.reader-complete').textContent, 'Study completed');
+    assert.equal(root.querySelector('.reader-complete').hasAttribute('disabled'), true);
 });
 
 test('completing a study celebrates exactly once', async () => {
     const { page, root, bursts } = setup();
     await page.open(summary);
     page.goTo(3);
-    root.querySelector('.study-complete').click();
+    root.querySelector('.reader-complete').click();
     assert.equal(bursts.length, 1);
 });
 
@@ -161,21 +161,21 @@ test('only the button just completed plays the done animation; an opened complet
     const { page, root } = setup();
     await page.open(summary);
     page.goTo(3);
-    root.querySelector('.study-complete').click();
-    assert.ok(root.querySelector('.study-complete').classList.contains('is-just-done'));
+    root.querySelector('.reader-complete').click();
+    assert.ok(root.querySelector('.reader-complete').classList.contains('is-just-done'));
     const storage = memoryStorage();
     W.DiscoveryStore.createDiscoveryStore(storage).completeStudy('love', 'en');
     const again = setup({ storage });
     await again.page.open(summary);
     again.page.goTo(3);
-    assert.equal(again.root.querySelector('.study-complete').classList.contains('is-just-done'), false);
+    assert.equal(again.root.querySelector('.reader-complete').classList.contains('is-just-done'), false);
 });
 
 test('completing still works when no celebration is wired', async () => {
     const { page, root, store, toasts } = setup({ celebrate: null });
     await page.open(summary);
     page.goTo(3);
-    root.querySelector('.study-complete').click();
+    root.querySelector('.reader-complete').click();
     assert.equal(store.getProgress('love', 'en').isCompleted, true);
     assert.deepEqual(toasts, ['Study completed successfully']);
 });
@@ -186,7 +186,7 @@ test('an already completed study opens with the disabled button and does not toa
     const { page, root, toasts } = setup({ storage });
     await page.open(summary);
     page.goTo(3);
-    assert.equal(root.querySelector('.study-complete').hasAttribute('disabled'), true);
+    assert.equal(root.querySelector('.reader-complete').hasAttribute('disabled'), true);
     assert.deepEqual(toasts, []);
 });
 
@@ -219,7 +219,7 @@ test('exit calls the host; a failing load shows the error with Retry that reload
     await new Promise((r) => setImmediate(r));
     assert.ok(root.querySelector('.study-detail-title'));
     page.goTo(3);
-    root.querySelector('.study-exit').click();
+    root.querySelector('.reader-exit').click();
     assert.equal(exits.length, 1);
 });
 
@@ -277,7 +277,7 @@ test('review: completing keeps keyboard focus inside the reader (on the page) in
     const { page, root } = setup();
     await page.open(summary);
     page.goTo(3);
-    root.querySelector('.study-complete').click();
+    root.querySelector('.reader-complete').click();
     assert.equal(root.ownerDocument.activeElement, root.querySelector('.study-page'));
 });
 
@@ -291,7 +291,7 @@ test('tapping a progress segment jumps to that page, forward or back', async () 
     const { page, root } = setup();
     await page.open(summary);
     root.querySelectorAll('.pager-dot')[3].click();
-    assert.ok(root.querySelector('.study-complete'), 'the last page is open');
+    assert.ok(root.querySelector('.reader-complete'), 'the last page is open');
     root.querySelectorAll('.pager-dot')[0].click();
     assert.ok(root.querySelector('.study-page-keyverse'));
 });

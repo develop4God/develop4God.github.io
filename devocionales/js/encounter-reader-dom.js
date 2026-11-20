@@ -11,7 +11,7 @@
     const isObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
     const list = (v) => (Array.isArray(v) ? v.filter(isObject) : []);
 
-    function createReaderDom({ h, t, imageUrlFor, pagerDots = global.UiPagerDots.createPagerDots({ h }) }) {
+    function createReaderDom({ h, t, imageUrlFor, pagerDots = global.UiPagerDots.createPagerDots({ h }), navLabels = { previous: '', next: '', exit: '' }, paging = global.ReaderPagingDom ? global.ReaderPagingDom.createPagingDom({ h, labels: navLabels, pagerDots }) : null, keyVerseCard = global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h }) : null }) {
         const emphasis = (value) => global.DiscoveryCards.parseEmphasis(value).map((seg) => {
             if (seg.bold) return h('strong', { text: seg.text });
             if (seg.italic) return h('em', { text: seg.text });
@@ -100,11 +100,16 @@
 
         function buildPage(page, encounterId) {
             if (page.kind === 'keyVerse') {
-                return h('section', { class: 'encounter-page encounter-page--keyverse' }, [
-                    h('p', { class: 'encounter-keyverse-label', text: t('key_verse') }),
-                    h('p', { class: 'encounter-keyverse-text', text: String(page.keyVerse.text || '') }),
-                    h('p', { class: 'encounter-keyverse-ref', text: String(page.keyVerse.reference || '') }),
-                ]);
+                // Without the card script (an older cached page) the verse still shows as plain text.
+                const keyVerse = page.keyVerse;
+                const body = keyVerseCard
+                    ? keyVerseCard.build({ label: t('key_verse'), reference: keyVerse.reference, text: keyVerse.text })
+                    : [
+                        h('p', { class: 'encounter-keyverse-label', text: t('key_verse') }),
+                        h('p', { class: 'encounter-keyverse-text', text: String(keyVerse.text || '') }),
+                        h('p', { class: 'encounter-keyverse-ref', text: String(keyVerse.reference || '') }),
+                    ];
+                return h('section', { class: 'encounter-page encounter-page--keyverse' }, Array.isArray(body) ? body : [body]);
             }
             const card = page.card;
             const render = RENDERERS[card.type] || fallback;
@@ -132,28 +137,21 @@
             ]);
         }
 
-        function buildProgress(total, index, label, { onSelect } = {}) {
-            return pagerDots.build({ total, index, label, pageLabel: (n, count) => `${n} / ${count}`, onSelect });
-        }
+        // A page with an older ui-pager-dots.js has no paging module: the card still shows, without the controls.
+        const buildProgress = paging ? paging.buildProgress : () => h('div', { class: 'pager-dots' });
+        const buildNav = paging ? paging.buildNav : () => h('div', { class: 'reader-nav' });
 
-        function buildNav({ index, total, onPrev, onNext, onExit }) {
-            const isLast = index >= total - 1;
-            return h('div', { class: 'encounter-nav' }, [
-                h('button', { class: 'encounter-prev', text: '‹', attrs: { type: 'button', disabled: index === 0 ? '' : undefined }, on: { click: onPrev } }),
-                isLast
-                    ? h('button', { class: 'encounter-exit', text: t('exit'), attrs: { type: 'button' }, on: { click: onExit } })
-                    : h('button', { class: 'encounter-next', text: '›', attrs: { type: 'button' }, on: { click: onNext } }),
-            ]);
-        }
-
-        function buildFooter({ isCompleted, copyright, onComplete }) {
+        // Same completion button as the Bible studies (reader-complete in discovery.css). Only the render
+        // right after completing passes justCompleted, so only this button plays the done animation.
+        function buildFooter({ isCompleted, justCompleted, copyright, onComplete }) {
+            const classes = justCompleted ? 'reader-complete is-just-done' : 'reader-complete';
             return h('div', { class: 'encounter-footer' }, [
                 h('button', {
-                    class: isCompleted ? 'encounter-complete encounter-complete--pop' : 'encounter-complete',
-                    text: t(isCompleted ? 'badge_completed' : 'encounter_complete'),
+                    class: classes,
+                    text: t(isCompleted ? 'encounter_completed' : 'encounter_complete'),
                     attrs: { type: 'button', disabled: isCompleted ? '' : undefined },
                     on: { click: onComplete },
-                }),
+                }, isCompleted ? [h('span', { class: 'reader-complete-check', attrs: { 'aria-hidden': 'true' } })] : []),
                 isText(copyright) ? h('p', { class: 'encounter-copyright', text: copyright }) : null,
             ]);
         }

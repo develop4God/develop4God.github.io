@@ -26,6 +26,14 @@
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.DiscoveryStore.createDiscoveryStore(global.localStorage);
         const toast = global.UiToast.createToast({ document: doc, container: doc.body });
+        // A page cached before verse-share.js was added has no VerseShare: the share button then does nothing.
+        const verseShare = global.VerseShare ? global.VerseShare.createVerseShare({
+            shareOrCopy: global.ShareOrCopy.shareOrCopy,
+            navigator: global.navigator,
+            playStoreUrl: global.DevotionalShare.PLAY_STORE_URL,
+            toast,
+            messages: { copied: t('copied'), shareError: t('shareError') },
+        }) : null;
         const celebrate = global.UiCelebration.createCelebration({
             h,
             container: doc.body,
@@ -71,6 +79,7 @@
             data,
             store,
             detailDomFactory: global.DiscoveryDetailDom.createDetailDom,
+            shareVerse: verseShare ? verseShare.share : null,
             listDom,
             nav: global.DiscoveryNav,
             copyright: global.DiscoveryCopyright.createCopyright({ versionInfo: global.DevotionalVersion.versionInfo }),

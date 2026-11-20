@@ -8,7 +8,7 @@
     const RETURN_DELAY_MS = 5000;
 
     function createReaderPage(deps) {
-        const { view, lang, data, store, timers, celebrate, onExit, copyright } = deps;
+        const { view, lang, data, store, timers, celebrate, toast, completedMessage, onExit, copyright } = deps;
 
         let summary = null;
         let study = null;
@@ -113,7 +113,8 @@
             completing = true;
             store.markCompleted(summary.id);
             celebrate();
-            render();
+            toast.show(completedMessage);
+            render({ justCompleted: true });
             returnTimer = timers.setTimeout(() => { returnTimer = null; onExit(); }, RETURN_DELAY_MS);
         }
 

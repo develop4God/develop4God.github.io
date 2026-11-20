@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'encounter-reader-dom.js', 'encounter-reader-view.js']) {
+for (const name of ['dom-builder.js', 'ui-pager-dots.js', 'discovery-cards.js', 'key-verse-card.js', 'encounter-reader-dom.js', 'encounter-reader-view.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -65,7 +65,7 @@ test('reader phase renders progress, the current page and the nav, and the foote
     view.render({ ...base, index: 0 });
     assert.ok(detailView.querySelector('.pager-dots'));
     assert.ok(detailView.querySelector('.encounter-page'));
-    assert.ok(detailView.querySelector('.encounter-nav'));
+    assert.ok(detailView.querySelector('.reader-nav'));
     assert.equal(detailView.querySelector('.encounter-footer'), null);
     view.render({ ...base, index: 2 });
     assert.ok(detailView.querySelector('.encounter-footer'));
@@ -75,7 +75,7 @@ test('re-rendering replaces the previous content instead of appending to it', ()
     const { view, detailView } = setup();
     view.render({ ...base, index: 0 });
     view.render({ ...base, index: 1 });
-    assert.equal(detailView.querySelectorAll('.encounter-nav').length, 1);
+    assert.equal(detailView.querySelectorAll('.reader-nav').length, 1);
     assert.equal(detailView.querySelectorAll('.pager-dots').length, 1);
 });
 

@@ -36,7 +36,7 @@ module.exports = defineConfig({
     ...(process.env.E2E_WEBKIT
       ? [{
         name: 'webkit',
-        testMatch: /devocionales-(pwa|shell|self-hosted-assets)\.spec\.js|discovery-(studies|detail|offline)\.spec.js/,
+        testMatch: /devocionales-(pwa|shell|self-hosted-assets)\.spec\.js|discovery-(studies|detail|offline)\.spec.js|encounters\.spec\.js/,
         use: { browserName: 'webkit' },
       }]
       : []),
