@@ -17,7 +17,9 @@
         const isNew = !isCompleted && !(seen && seen.has(study.id));
         const total = progress ? progress.totalSections : null;
 
-        const percent = global.DiscoveryCards.progressFraction({ isCompleted, sections, total });
+        let percent = null;
+        if (isCompleted) percent = 1;
+        else if (total > 0) percent = Math.min(1, sections / total);
 
         let badge = null;
         if (isCompleted) badge = 'completed';

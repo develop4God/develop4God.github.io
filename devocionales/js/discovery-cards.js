@@ -46,25 +46,5 @@
         return segments;
     }
 
-    // Section progress, shared by Bible studies and Encounters. Only card pages are sections; the key-verse
-    // page is not counted and never recorded.
-    const countSections = (pages) => (Array.isArray(pages) ? pages.filter((p) => p && p.sectionIndex !== null).length : 0);
-
-    // Index of the first card page not yet read. Falls back to page 0 when nothing is read yet or every section is read.
-    function firstUnreadIndex(pages, completedSections) {
-        if (!Array.isArray(pages) || !pages.length) return 0;
-        const done = new Set(completedSections || []);
-        if (!done.size) return 0;
-        const next = pages.findIndex((p) => p.sectionIndex !== null && !done.has(p.sectionIndex));
-        return next === -1 ? 0 : next;
-    }
-
-    // 0..1 for the progress bar, or null when there is no total to measure against. Completed is always full.
-    function progressFraction({ isCompleted, sections, total }) {
-        if (isCompleted) return 1;
-        if (!(total > 0)) return null;
-        return Math.min(1, sections / total);
-    }
-
-    global.DiscoveryCards = { sortCards, buildPages, parseEmphasis, countSections, firstUnreadIndex, progressFraction };
+    global.DiscoveryCards = { sortCards, buildPages, parseEmphasis };
 })(window);

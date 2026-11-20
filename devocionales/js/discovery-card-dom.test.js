@@ -13,7 +13,6 @@ function load(name) {
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
 load('dom-builder.js');
-load('discovery-list-dom.js');
 load('discovery-card-dom.js');
 const { createBuilder } = global.window.DomBuilder;
 const { createCardDom } = global.window.DiscoveryCardDom;
@@ -119,4 +118,41 @@ test('card: completed studies show a full progress bar; unknown progress shows n
     const done = dom.buildCard(card({ isCompleted: true, percent: 1, badge: 'completed' }), { handlers: handlers() });
     assert.equal(done.querySelector('[role="progressbar"]').getAttribute('aria-valuenow'), '100');
     assert.equal(dom.buildCard(card(), { handlers: handlers() }).querySelector('[role="progressbar"]'), null);
+});
+
+// ---- hero (B2, B3) ----
+
+test('hero: continue kind uses the "continue where you left off" label, Continue button and progress', () => {
+    const el = dom.buildHero({ kind: 'continue', card: card({ isInProgress: true, percent: 0.5 }) }, { onOpen: noop });
+    assert.equal(el.querySelector('.study-hero-label').textContent, 'Continue where you left off');
+    assert.equal(el.querySelector('.study-hero-button').textContent, 'Continue');
+    const bar = el.querySelector('[role="progressbar"]');
+    assert.equal(bar.getAttribute('aria-valuenow'), '50');
+    assert.equal(el.querySelector('.study-hero-percent').textContent, '50%');
+});
+
+test('hero: B3 start kind uses "Start here" / Read and shows no progress at all', () => {
+    const el = dom.buildHero({ kind: 'start', card: card() }, { onOpen: noop });
+    assert.equal(el.querySelector('.study-hero-label').textContent, 'Start here');
+    assert.equal(el.querySelector('.study-hero-button').textContent, 'Read');
+    assert.equal(el.querySelector('[role="progressbar"]'), null);
+    assert.equal(el.querySelector('.study-hero-percent'), null);
+});
+
+test('hero: continue without a known total also hides the bar', () => {
+    const el = dom.buildHero({ kind: 'continue', card: card({ isInProgress: true, percent: null }) }, { onOpen: noop });
+    assert.equal(el.querySelector('[role="progressbar"]'), null);
+});
+
+test('hero: the button opens that study', () => {
+    let opened;
+    const el = dom.buildHero({ kind: 'start', card: card() }, { onOpen: (id) => { opened = id; } });
+    el.querySelector('.study-hero-button').click();
+    assert.equal(opened, 'love');
+});
+
+test('hero: the visible label is the only name (no duplicate aria-label that screen readers would read twice)', () => {
+    const el = dom.buildHero({ kind: 'start', card: card() }, { onOpen: noop });
+    assert.equal(el.hasAttribute('aria-label'), false);
+    assert.ok(el.querySelector('.study-hero-label').textContent.length > 0);
 });

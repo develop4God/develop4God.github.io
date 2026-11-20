@@ -92,19 +92,12 @@
             const visible = sortFilter.filterCards(cards, filter);
 
             view.count.textContent = listDom.countLabel(studies.length);
-            view.hero.replaceChildren(...(hero ? [listDom.buildHero(heroProps(hero), { onOpen: openStudy })] : []));
+            view.hero.replaceChildren(...(hero ? [cardDom.buildHero(hero, { onOpen: openStudy })] : []));
             view.chips.replaceChildren(listDom.buildChips(sortFilter.countFilters(cards), filter, setFilter));
             view.body.replaceChildren(visible.length
                 ? listDom.buildGrid(visible, { confirmingId, handlers })
                 : listDom.buildMessage(filter === 'favorites' ? 'favorites' : 'filtered'));
             afterRender();
-        }
-
-        // Studies-specific copy and progress for the shared hero: "Continue" shows the percentage, "Start here" none.
-        function heroProps({ kind, card }) {
-            const isContinue = kind === 'continue';
-            const percent = isContinue && card.percent !== null && card.percent !== undefined ? Math.round(card.percent * 100) : null;
-            return { label: t(isContinue ? 'continueWhereLeft' : 'startHere'), buttonLabel: t(isContinue ? 'continueBtn' : 'read'), card, percent };
         }
 
         function setFilter(next) {

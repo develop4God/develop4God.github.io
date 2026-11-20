@@ -30,7 +30,10 @@
         }
 
         function firstUnreadPage() {
-            return global.DiscoveryCards.firstUnreadIndex(pages, store.getProgress(summary.id, lang()).completedSections);
+            const done = new Set(store.getProgress(summary.id, lang()).completedSections);
+            if (!done.size) return 0;
+            const next = pages.findIndex((p) => p.sectionIndex !== null && !done.has(p.sectionIndex));
+            return next === -1 ? 0 : next;
         }
 
         // slide: 'next' | 'prev' when the page changed, so the new page enters from that side.
@@ -94,7 +97,7 @@
                 study = loaded;
                 pages = built;
                 store.markSeen(target.id);
-                store.setTotalSections(target.id, global.DiscoveryCards.countSections(pages), lang());
+                store.setTotalSections(target.id, pages.filter((p) => p.sectionIndex !== null).length, lang());
                 index = firstUnreadPage();
                 recordView();
                 render();
