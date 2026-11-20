@@ -5,7 +5,7 @@
     // loader, store, card view-model, DOM builders, unlock sheet and navigation are all injected, so
     // this file only wires state -> view and taps -> collaborators.
     function createListPage(deps) {
-        const { view, lang, data, store, cards, listDom, unlockSheet, onOpen, labels = {}, progress = null } = deps;
+        const { view, lang, data, store, cards, listDom, unlockSheet, onOpen, header = null, progress = null } = deps;
         const FILTER_SESSION_KEY = 'encounterFilter';
         const CHIP_KEYS = [['all', 'filterAll'], ['pending', 'filterPending'], ['completed', 'filterCompleted']];
 
@@ -18,10 +18,11 @@
         const afterRender = () => { if (deps.afterRender) deps.afterRender(); };
         const allUnlocked = () => (deps.allUnlocked ? !!deps.allUnlocked() : false);
         // The hero and chips are optional: a page cached before they existed has no containers, and then only the grid renders.
-        const hasHeader = () => !!(view.hero && view.chips);
+        const hasHeader = () => !!(header && view.hero && view.chips);
 
         function readFilter() {
-            try { return cards.normalizeFilter(deps.sessionStorage.getItem(FILTER_SESSION_KEY)); } catch (_) { return 'all'; }
+            if (!header) return 'all';
+            try { return header.filters.normalizeFilter(deps.sessionStorage.getItem(FILTER_SESSION_KEY)); } catch (_) { return 'all'; }
         }
 
         function saveFilter() {
@@ -35,25 +36,15 @@
             afterRender();
         }
 
-        // The shared hero: "Continue" for an encounter in progress (with its percentage), else "Start here".
-        function heroProps({ kind, card }) {
-            const isContinue = kind === 'continue';
-            return {
-                label: isContinue ? labels.continueWhereLeft : labels.startHere,
-                buttonLabel: isContinue ? labels.continueBtn : labels.read,
-                card,
-                percent: isContinue && card.percent !== null && card.percent !== undefined ? Math.round(card.percent * 100) : null,
-            };
-        }
-
         // Hero (the next encounter to read) and filter chips, built from the full list so the counts are never filtered.
         function renderHeader(list) {
             if (!hasHeader()) return;
-            const hero = cards.pickHero(list);
-            view.hero.replaceChildren(...(hero ? [listDom.buildHero(heroProps(hero), { onOpen: (id) => onOpen(id) })] : []));
-            const counts = cards.countFilters(list);
-            const items = CHIP_KEYS.map(([key, labelKey]) => ({ filter: key, label: labels[labelKey], count: counts[key] }));
-            view.chips.replaceChildren(listDom.buildFilterChips(items, filter, setFilter));
+            const hero = header.filters.pickHero(list);
+            const copy = header.labels(); // read at render time so a language switch is reflected
+            view.hero.replaceChildren(...(hero ? [header.dom.buildHero(header.heroProps(hero, copy), { onOpen: (id) => onOpen(id) })] : []));
+            const counts = header.filters.countFilters(list);
+            const items = CHIP_KEYS.map(([key, labelKey]) => ({ filter: key, label: copy[labelKey], count: counts[key] }));
+            view.chips.replaceChildren(header.dom.buildFilterChips(items, filter, setFilter, copy.groupLabel));
         }
 
         const handlers = { onOpen: (id) => onOpen(id), onLocked: () => unlockSheet.open() };
@@ -68,7 +59,7 @@
             view.count.textContent = listDom.countLabel(cards.countPublished(entries));
             renderHeader(list);
             // Without the chips a saved filter could not be cleared: an older cached page always shows everything.
-            const visible = cards.filterCards(list, hasHeader() ? filter : 'all');
+            const visible = hasHeader() ? header.filters.filterCards(list, filter) : list;
             view.body.replaceChildren(visible.length ? listDom.buildGrid(visible, { handlers }) : listDom.buildMessage('filtered'));
             // A card that was locked and is open now plays the unlock once (the CSS respects reduced motion).
             // One card gets the flash and its pill; several (unlock all) get a staggered sweep and no pill.
@@ -94,7 +85,7 @@
         function setFilter(next) {
             const doc = view.chips.ownerDocument;
             const hadFocus = !!(doc && view.chips.contains(doc.activeElement));
-            filter = cards.normalizeFilter(next);
+            filter = header.filters.normalizeFilter(next);
             saveFilter();
             render();
             if (hadFocus) {

@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'discovery-cards.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
+for (const name of ['dom-builder.js', 'discovery-cards.js', 'discovery-progress.js', 'discovery-hero-dom.js', 'encounter-lock.js', 'encounter-cards.js', 'encounter-filters.js', 'encounter-card-dom.js', 'discovery-list-dom.js', 'encounter-list-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -160,9 +160,22 @@ test('several cards unlock at once (unlock all): each gets the bulk sweep and no
 
 // ---- shared header: hero + filter chips above the grid ----
 
-const HEADER_LABELS = { startHere: 'Start here', read: 'Read', filterAll: 'All', filterPending: 'Pending', filterCompleted: 'Completed' };
+const HEADER_LABELS = { groupLabel: 'Encounters', startHere: 'Start here', read: 'Read', filterAll: 'All', filterPending: 'Pending', filterCompleted: 'Completed' };
 
-function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session = {}, withHeader = true } = {}) {
+// The bar builder the composition root injects into the card DOM.
+const barOf = (h) => {
+    const heroDom = global.window.DiscoveryHeroDom.createHeroDom({ h });
+    return (fraction, className) => heroDom.progressBar(global.window.DiscoveryProgress.toPercent(fraction), className);
+};
+
+const headerOf = (h, labels) => ({
+    dom: global.window.DiscoveryHeroDom.createHeroDom({ h }),
+    filters: global.window.EncounterFilters,
+    heroProps: global.window.DiscoveryProgress.heroProps,
+    labels,
+});
+
+function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session = {}, withHeader = true, withModules = true } = {}) {
     const doc = new FakeDocument();
     const h = createBuilder(doc);
     const view = { count: doc.createElement('p'), body: doc.createElement('div') };
@@ -170,7 +183,7 @@ function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session
     const state = { completed: new Set(completed), opened: [] };
     const store = { loadCompleted: () => new Set(state.completed) };
     const storage = { data: { ...session }, getItem(k) { return k in this.data ? this.data[k] : null; }, setItem(k, v) { this.data[k] = v; } };
-    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x' });
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
     const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
     const page = global.window.EncounterListPage.createListPage({
         view, t, lang: () => 'en', store, listDom,
@@ -180,7 +193,7 @@ function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session
         allUnlocked: () => false,
         unlockLabel: 'New encounter unlocked',
         onOpen: (id) => state.opened.push(id),
-        labels: HEADER_LABELS,
+        header: withModules ? headerOf(h, () => HEADER_LABELS) : null,
         sessionStorage: storage,
     });
     return { page, view, state, storage };
@@ -263,7 +276,7 @@ function setupProgressList(sectionsById) {
     const progress = {
         getProgress: (id) => (sectionsById[id] ? { completedSections: sectionsById[id].sections, totalSections: sectionsById[id].total } : { completedSections: [], totalSections: null }),
     };
-    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x' });
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
     const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
     const page = global.window.EncounterListPage.createListPage({
         view, t, lang: () => 'en', store, listDom,
@@ -273,7 +286,7 @@ function setupProgressList(sectionsById) {
         allUnlocked: () => false,
         unlockLabel: 'x',
         onOpen() {},
-        labels: { ...HEADER_LABELS, continueWhereLeft: 'Continue where you left off', continueBtn: 'Continue' },
+        header: headerOf(h, () => ({ ...HEADER_LABELS, continueWhereLeft: 'Continue where you left off', continueBtn: 'Continue' })),
         sessionStorage: { getItem: () => null, setItem() {} },
         progress,
     });
@@ -307,4 +320,36 @@ test('review: an older cached page with no header ignores a saved filter, so no 
     const { page, view } = setupHeader({ withHeader: false, session: { encounterFilter: 'completed' }, completed: ['a'] });
     await page.init();
     assert.deepEqual(ids(view), ['a', 'b', 'c']);
+});
+
+test('header: hero and chip labels follow the language on the next render (labels are read at render time)', async () => {
+    let words = { ...HEADER_LABELS };
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), body: doc.createElement('div'), hero: doc.createElement('div'), chips: doc.createElement('div') };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x', progressBar: barOf(h) });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store: { loadCompleted: () => new Set() }, listDom: global.window.DiscoveryListDom.createListDom({ h, t, cardDom }),
+        data: { loadIndex: async () => [e('a')] }, cards: global.window.EncounterCards, unlockSheet: { open() {} }, allUnlocked: () => false,
+        unlockLabel: 'x', onOpen() {}, header: headerOf(h, () => words),
+        sessionStorage: { getItem: () => null, setItem() {} },
+    });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    words = { ...HEADER_LABELS, startHere: 'Empieza aquí', filterAll: 'Todos' };
+    await page.reload();
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Empieza aquí');
+    assert.equal(chip(view, 'all').querySelector('.study-chip-label').textContent, 'Todos');
+});
+
+test('header: the chips group is announced with the Encounters label, not the Bible-studies title', async () => {
+    const { page, view } = setupHeader();
+    await page.init();
+    assert.equal(view.chips.querySelector('.study-chips').getAttribute('aria-label'), 'Encounters');
+});
+
+test('header: a page without the shared header modules (older cached HTML) renders the plain grid and ignores a saved filter', async () => {
+    const { page, view } = setupHeader({ withModules: false, session: { encounterFilter: 'completed' }, completed: ['a'] });
+    await page.init();
+    assert.equal(view.body.querySelectorAll('.encounter-card').length, 3);
 });

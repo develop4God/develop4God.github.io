@@ -26,8 +26,11 @@
         const byId = (id) => doc.getElementById(id);
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.EncounterStore.createEncounterStore(global.localStorage);
-        // Section progress: the same store Bible studies use. A page cached before discovery-store.js existed has none (no bars, no resume).
-        const progress = global.DiscoveryStore && global.DiscoveryStore.createProgressStore
+        // The shared list-header modules (hero, chips, section progress). A page cached before they existed lacks them:
+        // then the list is the plain grid and nothing records progress.
+        const sharedHeader = !!(global.DiscoveryProgress && global.DiscoveryHeroDom && global.EncounterFilters);
+        // Section progress: the same store Bible studies use.
+        const progress = sharedHeader && global.DiscoveryStore && global.DiscoveryStore.createProgressStore
             ? global.DiscoveryStore.createProgressStore(global.localStorage, { keyOf: (id) => global.EncounterStore.KEYS.progress(id) })
             : null;
         // A page cached before the entitlement script existed reads every encounter as locked.
@@ -55,7 +58,13 @@
             baseUrl: DATA_BASE_URL,
         });
         const images = global.EncounterImages.createImageUrls(IMAGE_BASE_URL);
-        const cardDom = global.EncounterCardDom.createCardDom({ h, t, imageUrlFor: images.cardImageUrl });
+        const heroDom = sharedHeader ? global.DiscoveryHeroDom.createHeroDom({ h }) : null;
+        const cardDom = global.EncounterCardDom.createCardDom({
+            h,
+            t,
+            imageUrlFor: images.cardImageUrl,
+            progressBar: heroDom ? (fraction, className) => heroDom.progressBar(global.DiscoveryProgress.toPercent(fraction), className) : null,
+        });
         const listDom = global.DiscoveryListDom.createListDom({ h, t, cardDom });
         // The PayPal button lives in the unlock sheet. Its script loads only when the support button is tapped (F2).
         const paypal = global.EncounterPaypal ? global.EncounterPaypal.createEncounterPaypal({
@@ -222,16 +231,22 @@
             afterRender: renderIcons,
             unlockLabel: t('new_unlocked'),
             onOpen: (id) => router.open(id),
-            // Hero and filter copy is the Bible-studies copy, shared as-is (the Encounters namespace has none).
-            labels: {
-                startHere: discoveryT('startHere'),
-                read: discoveryT('read'),
-                continueWhereLeft: discoveryT('continueWhereLeft'),
-                continueBtn: discoveryT('continueBtn'),
-                filterAll: discoveryT('filterAll'),
-                filterPending: discoveryT('filterPending'),
-                filterCompleted: discoveryT('filterCompleted'),
-            },
+            header: sharedHeader ? {
+                dom: heroDom,
+                filters: global.EncounterFilters,
+                heroProps: global.DiscoveryProgress.heroProps,
+                // Hero and filter copy is the Bible-studies copy, shared as-is. A function, so a language switch is picked up.
+                labels: () => ({
+                    startHere: discoveryT('startHere'),
+                    read: discoveryT('read'),
+                    continueWhereLeft: discoveryT('continueWhereLeft'),
+                    continueBtn: discoveryT('continueBtn'),
+                    filterAll: discoveryT('filterAll'),
+                    filterPending: discoveryT('filterPending'),
+                    filterCompleted: discoveryT('filterCompleted'),
+                    groupLabel: t('section_title'),
+                }),
+            } : null,
             sessionStorage: global.sessionStorage,
             progress,
         });

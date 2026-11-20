@@ -26,14 +26,17 @@
             else if (state === 'open' && !nextAssigned) { badge = 'next'; nextAssigned = true; }
             const prerequisite = state === 'locked' ? lock.prerequisiteOf(list, entry.id) : null;
             const progress = state === 'open' ? progressOf(entry.id) : null;
-            const sections = progress && Array.isArray(progress.completedSections) ? progress.completedSections.length : 0;
             const total = progress ? progress.totalSections : null;
+            // Only indexes inside the current total count: a record from a longer earlier version must not inflate the bar.
+            const read = progress && Array.isArray(progress.completedSections) ? progress.completedSections : [];
+            const sections = total > 0 ? read.filter((i) => i < total).length : read.length;
             return {
                 ...entry,
                 state,
                 badge,
                 isInProgress: state === 'open' && sections > 0,
-                percent: state === 'open' ? global.DiscoveryCards.progressFraction({ isCompleted: false, sections, total }) : null,
+                // No bar until a section was read: opening an encounter (or the intro) is not progress.
+                percent: state === 'open' && sections > 0 ? global.DiscoveryProgress.progressFraction({ isCompleted: false, sections, total }) : null,
                 isNextLocked: state === 'locked' && entry.id === nextLockedId,
                 prerequisiteTitle: prerequisite ? prerequisite.title : null,
             };
@@ -42,35 +45,5 @@
 
     const countPublished = (entries) => (Array.isArray(entries) ? entries.filter((x) => x && x.isPublished).length : 0);
 
-    // Filter chips for the list. 'all' is every card in index order (coming-soon cards included, as before);
-    // 'pending' = published and not completed; 'completed' = completed. Coming-soon cards only show under 'all'.
-    const FILTERS = ['all', 'pending', 'completed'];
-    const normalizeFilter = (value) => (FILTERS.includes(value) ? value : 'all');
-
-    function filterCards(cards, filter) {
-        switch (normalizeFilter(filter)) {
-            case 'pending': return cards.filter((c) => c.state === 'open' || c.state === 'locked');
-            case 'completed': return cards.filter((c) => c.state === 'completed');
-            default: return cards.slice();
-        }
-    }
-
-    function countFilters(cards) {
-        return {
-            all: cards.length,
-            pending: filterCards(cards, 'pending').length,
-            completed: filterCards(cards, 'completed').length,
-        };
-    }
-
-    // The hero: an open encounter already in progress ("continue"), else the first open unfinished one ("start").
-    // A locked card is never a hero.
-    function pickHero(cards) {
-        const inProgress = cards.find((c) => c.isInProgress && c.state === 'open');
-        if (inProgress) return { card: inProgress, kind: 'continue' };
-        const next = cards.find((c) => c.badge === 'next' && c.state === 'open');
-        return next ? { card: next, kind: 'start' } : null;
-    }
-
-    global.EncounterCards = { buildCards, countPublished, normalizeFilter, filterCards, countFilters, pickHero };
+    global.EncounterCards = { buildCards, countPublished };
 })(window);

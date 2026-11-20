@@ -8,7 +8,7 @@ const vm = require('node:vm');
 const { FakeDocument } = require('./fake-dom.helper');
 
 global.window = global.window || {};
-for (const name of ['dom-builder.js', 'discovery-list-dom.js', 'encounter-card-dom.js']) {
+for (const name of ['dom-builder.js', 'encounter-card-dom.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -131,4 +131,16 @@ test('the next locked card shows the gold "read it now" pill; other locked cards
     assert.equal(next.querySelector('.encounter-unlock-pill').textContent, TEXT_NOW);
     const other = local.buildCard(card({ state: 'locked', isNextLocked: false, prerequisiteTitle: 'Bartimaeus' }), { handlers: handlers() });
     assert.equal(other.querySelectorAll('.encounter-unlock-pill').length, 0);
+});
+
+// ---- section progress bar (injected: a page without the shared modules draws none) ----
+test('progress bar: an open card with a fraction draws the injected bar; without a fraction or a builder none', () => {
+    const bars = [];
+    const withBar = createCardDom({ h: createBuilder(doc), t, imageUrlFor, progressBar: (fraction, cls) => { bars.push([fraction, cls]); return createBuilder(doc)('div', { class: cls }); } });
+    const drawn = withBar.buildCard(card({ percent: 0.5 }), { handlers: handlers() });
+    assert.deepEqual(bars, [[0.5, 'study-card-progress']]);
+    assert.ok(drawn.querySelector('.study-card-progress'));
+    assert.equal(withBar.buildCard(card({ percent: null }), { handlers: handlers() }).querySelector('.study-card-progress'), null);
+    assert.equal(withBar.buildCard(card(), { handlers: handlers() }).querySelector('.study-card-progress'), null, 'no percent field (an older view-model)');
+    assert.equal(dom.buildCard(card({ percent: 0.5 }), { handlers: handlers() }).querySelector('.study-card-progress'), null, 'no builder injected');
 });
