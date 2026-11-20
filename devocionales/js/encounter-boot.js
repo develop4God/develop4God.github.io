@@ -30,6 +30,17 @@
         const isUnlockedAll = () => (entitlement ? entitlement.isUnlocked() : false);
         // A page cached before ui-toast.js was added has no toast: messages are then skipped, not thrown.
         const toast = global.UiToast ? global.UiToast.createToast({ document: doc, container: doc.body }) : { show: () => {} };
+        // Share strings come from the Bible-studies namespace: the Encounters namespace has none, and the
+        // reader already reuses another namespace's string the same way (`devotionals.errorRetry`).
+        const discoveryT = (key) => i18n.t(`discovery.${key}`, '');
+        // A page cached before verse-share.js was added has no VerseShare: the share button then does nothing.
+        const verseShare = global.VerseShare ? global.VerseShare.createVerseShare({
+            shareOrCopy: global.ShareOrCopy.shareOrCopy,
+            navigator: global.navigator,
+            playStoreUrl: global.DevotionalShare.PLAY_STORE_URL,
+            toast,
+            messages: { copied: discoveryT('copied'), shareError: discoveryT('shareError') },
+        }) : null;
         const renderIcons = () => global.lucide.createIcons();
         const setBackgroundInert = (on) => doc.querySelectorAll(INERT_SELECTOR).forEach((el) => el.toggleAttribute('inert', on));
 
@@ -153,13 +164,21 @@
             store,
             timers: { setTimeout: (fn, ms) => global.setTimeout(fn, ms) },
             celebrate: () => celebration.burst(),
+            toast,
+            completedMessage: t('encounter_completed_success'),
             onExit: () => router.close(),
             copyright: (language, bibleVersion) => global.DiscoveryCopyright.createCopyright({
                 versionInfo: global.DevotionalVersion.versionInfo,
             }).resolve(language, bibleVersion),
         });
         readerView = global.EncounterReaderView.createReaderView({
-            dom: global.EncounterReaderDom.createReaderDom({ h, t, imageUrlFor: images.imageUrl }),
+            dom: global.EncounterReaderDom.createReaderDom({
+                h,
+                t,
+                imageUrlFor: images.imageUrl,
+                navLabels: { previous: discoveryT('previous'), next: discoveryT('next'), exit: discoveryT('exit') },
+                keyVerseCard: global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h, shareVerse: verseShare ? verseShare.share : null, shareLabel: discoveryT('share') }) : null,
+            }),
             root: detailView,
             listView,
             detailView,

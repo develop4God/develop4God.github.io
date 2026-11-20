@@ -314,6 +314,8 @@
     "retry": "Retry",
     "coming_soon": "COMING SOON",
     "badge_completed": "Completed",
+    "encounter_completed": "Encounter completed",
+    "encounter_completed_success": "Encounter completed successfully",
     "current": "Current",
     "min_immersive_journey": "MIN IMMERSIVE JOURNEY",
     "new_testament": "NEW TESTAMENT",

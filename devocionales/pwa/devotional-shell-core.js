@@ -92,7 +92,7 @@
     const TAB_TABLE = {
         home: { icon: 'house', labelKey: 'shell.home', fallback: 'Home', controls: 'shell-home-panel', href: `${SCOPE_PATH}/` },
         studies: { icon: 'graduation-cap', labelKey: 'shell.studies', fallback: 'Bible Studies', href: `${SCOPE_PATH}/estudios/` },
-        encounters: { icon: 'sparkles', labelKey: 'shell.encounters', fallback: 'Encounters', href: `${SCOPE_PATH}/encounters/` },
+        encounters: { icon: 'map-pin', labelKey: 'shell.encounters', fallback: 'Encounters', href: `${SCOPE_PATH}/encounters/` },
         settings: { icon: 'settings', labelKey: 'shell.settings', fallback: 'Settings', controls: 'shell-settings', href: `${SCOPE_PATH}/#settings` },
     };
     // On the reader, Home and Settings are panels; every other page reaches every tab by link.

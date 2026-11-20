@@ -314,6 +314,8 @@
     "retry": "पुनः प्रयास करें",
     "coming_soon": "जल्द आ रहा है",
     "badge_completed": "पूर्ण",
+    "encounter_completed": "मुलाकात पूर्ण",
+    "encounter_completed_success": "मुलाकात सफलतापूर्वक पूर्ण हुई",
     "current": "वर्तमान",
     "min_immersive_journey": "मिनट की इमर्सिव यात्रा",
     "new_testament": "नया नियम",

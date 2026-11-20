@@ -314,6 +314,8 @@
     "retry": "إعادة المحاولة",
     "coming_soon": "قريبًا",
     "badge_completed": "مُكتمل",
+    "encounter_completed": "اكتمل اللقاء",
+    "encounter_completed_success": "اكتمل اللقاء بنجاح",
     "current": "الحالية",
     "min_immersive_journey": "دقيقة رحلة غامرة",
     "new_testament": "العهد الجديد",
