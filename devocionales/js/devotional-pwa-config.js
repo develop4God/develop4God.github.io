@@ -38,11 +38,11 @@
             },
         },
         // Encounters unlock by PayPal (web only, this browser only). enabled:false = no PayPal button and
-        // no PayPal script ever loads. clientId is the PayPal app's PUBLIC client id (sandbox while testing;
-        // the live id goes here before enabling in production). Never put a client secret in this file.
+        // no PayPal script ever loads. clientId is the PayPal app's PUBLIC LIVE client id (app
+        // encounters_unlock). Never put a client secret in this file.
         encountersUnlock: Object.freeze({
             enabled: true,
-            clientId: 'AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-',
+            clientId: 'BAAzCtTUx9vcxROgeYlg1X3mkeTCAAWEyqv-_YAOoS8TROsuJTgJA40nvHpM_LP1q1vtHMMe3rDt53OPBY',
             amount: 4.99,
             currency: 'USD',
         }),
