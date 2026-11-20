@@ -9,6 +9,7 @@
   },
   "globals": {
     "DevotionalI18n": "readonly",
+    "PayPalCheckout": "readonly",
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",
     "DevotionalShare": "readonly",

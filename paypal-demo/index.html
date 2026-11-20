@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Developer demo, not a public page: kept out of the sitemap and search results. -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>PayPal checkout demo</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; max-width: 480px; margin-inline: auto; }
+        label { display: block; margin-top: 12px; font-weight: 600; }
+        input { width: 100%; box-sizing: border-box; padding: 8px; font-size: 16px; margin-top: 4px; }
+        #status { margin-top: 16px; min-height: 1.5em; }
+        .warning { color: #9a3412; }
+    </style>
+</head>
+<body data-client-id="REPLACE_WITH_SANDBOX_CLIENT_ID" data-currency="USD">
+    <h1>PayPal checkout demo</h1>
+    <p>Sandbox only. Replace the client id on the body tag with your PayPal sandbox client id.</p>
+
+    <label for="amount">Amount (USD)</label>
+    <input id="amount" type="number" min="0.01" step="0.01" value="1.00">
+
+    <label for="description">Description</label>
+    <input id="description" type="text" maxlength="127" value="Demo payment">
+
+    <div id="paypal-button-container"></div>
+    <p id="status" role="status"></p>
+
+    <script src="/js/paypal-checkout.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            var body = document.body;
+            var clientId = body.getAttribute('data-client-id');
+            var currency = body.getAttribute('data-currency');
+            var status = document.getElementById('status');
+            var container = document.getElementById('paypal-button-container');
+
+            function say(text, isWarning) {
+                status.textContent = text;
+                status.className = isWarning ? 'warning' : '';
+            }
+
+            if (!clientId || clientId.indexOf('REPLACE_') === 0) {
+                say('Set data-client-id on the body tag to your sandbox client id to load the buttons.', true);
+                return;
+            }
+
+            var sdkScript = document.createElement('script');
+            sdkScript.src = PayPalCheckout.buildSdkUrl({ clientId: clientId, currency: currency });
+            sdkScript.onload = function () {
+                PayPalCheckout.renderButtons(window.paypal, container, {
+                    amount: parseFloat(document.getElementById('amount').value),
+                    currency: currency,
+                    description: document.getElementById('description').value,
+                    onApproved: function (details) {
+                        say('Payment completed. Status: ' + details.status, false);
+                    },
+                    onError: function () {
+                        say('The payment did not complete. Check your PayPal account before trying again.', true);
+                    }
+                });
+            };
+            sdkScript.onerror = function () {
+                say('Could not load the PayPal SDK. Check the client id and your connection.', true);
+            };
+            document.head.appendChild(sdkScript);
+        })();
+    </script>
+</body>
+</html>
