@@ -38,16 +38,37 @@
         if (typeof container.startMessages === 'function') container.startMessages();
     }
 
+    // "Update on entry": for the first seconds of a page, the reader has not started anything on it,
+    // so a new build may replace it right away (one quick reload) instead of waiting for the tab to
+    // be hidden. A takeover requested inside the window is latched, so the reload still happens when
+    // the worker answers after the window closed. Without performance.now the window never opens.
+    const ENTRY_WINDOW_MS = 8000;
+
+    function createEntryWindow(perf, windowMs) {
+        let latched = false;
+        return {
+            isOpen: () => latched || Boolean(perf && typeof perf.now === 'function' && perf.now() < windowMs),
+            latch() { latched = true; },
+        };
+    }
+
+    const NO_ENTRY_WINDOW = { isOpen: () => false, latch() {} };
+
     // A worker for a new build installs and waits. This page runs the old build, so it asks the
     // waiting worker to take over, but only while its own tab is hidden (the worker also checks
     // every other tab); a declined request is repeated the next time the tab is hidden. The first
     // worker (the page has no controller yet) is not an update and is never asked.
-    function deliverUpdates(nav, doc, registration) {
+    function deliverUpdates(nav, doc, registration, entry = NO_ENTRY_WINDOW) {
         const container = nav && nav.serviceWorker;
         if (!container || !registration) return;
         const askIfHidden = () => {
-            if (doc.visibilityState !== 'hidden' || !container.controller || !registration.waiting) return;
-            registration.waiting.postMessage({ type: SKIP_WAITING_MESSAGE });
+            if (!container.controller || !registration.waiting) return;
+            if (doc.visibilityState === 'hidden') {
+                registration.waiting.postMessage({ type: SKIP_WAITING_MESSAGE });
+            } else if (entry.isOpen()) {
+                entry.latch();
+                registration.waiting.postMessage({ type: SKIP_WAITING_MESSAGE, entry: true });
+            }
         };
         doc.addEventListener('visibilitychange', askIfHidden);
         registration.addEventListener('updatefound', () => {
@@ -64,13 +85,13 @@
     // once, but never under the reader's eyes: a visible tab waits until it is hidden. Whether a
     // change is an update is decided when it fires: the first change of a page that started
     // without a worker is that worker claiming it (nothing is stale), every later one is a deploy.
-    function reloadOnUpdate(nav, doc, reload) {
+    function reloadOnUpdate(nav, doc, reload, entry = NO_ENTRY_WINDOW) {
         const container = nav && nav.serviceWorker;
         if (!container) return;
         let controlled = Boolean(container.controller);
         let waiting = false;
         const reloadWhenHidden = () => {
-            if (doc.visibilityState !== 'hidden') return;
+            if (doc.visibilityState !== 'hidden' && !entry.isOpen()) return;
             doc.removeEventListener('visibilitychange', reloadWhenHidden);
             reload();
         };
@@ -152,13 +173,14 @@
             return;
         }
         answerBuildQueries(win.navigator, win);
-        reloadOnUpdate(win.navigator, win.document, () => win.location.reload());
+        const entry = createEntryWindow(win.performance, ENTRY_WINDOW_MS);
+        reloadOnUpdate(win.navigator, win.document, () => win.location.reload(), entry);
         const registerWorker = () => clearStandDownMarker(win)
             .then(() => register(win.navigator, workerUrl, scope))
-            .then((registration) => deliverUpdates(win.navigator, win.document, registration));
+            .then((registration) => deliverUpdates(win.navigator, win.document, registration, entry));
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
     }
 
-    global.DevotionalSwRegister = { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, start, disable };
+    global.DevotionalSwRegister = { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, createEntryWindow, start, disable };
 })(window);

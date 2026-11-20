@@ -12,7 +12,7 @@ function loadModule() {
     return win.DevotionalSwRegister;
 }
 
-const { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, start, disable } = loadModule();
+const { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, start, disable, createEntryWindow } = loadModule();
 
 function fakeNavigator({ controller = null, registerImpl } = {}) {
     const listeners = {};
@@ -406,4 +406,110 @@ test('start: with the PWA disabled none of it is wired', async () => {
     start(win, '/devocionales/sw.js', '/devocionales/', { enabled: false });
     await settle();
     assert.deepEqual(Object.keys(nav.listeners), []);
+});
+
+// ------------------------------------------------------------ update on entry
+
+const ENTRY_REQUEST = { type: 'devocionales-skip-waiting', entry: true };
+const fakePerformance = (ms) => ({ now: () => ms.value });
+
+test('createEntryWindow: open for the first seconds of the page, closed after, and latched once used', () => {
+    const ms = { value: 100 };
+    const entry = createEntryWindow(fakePerformance(ms), 5000);
+    assert.equal(entry.isOpen(), true);
+    ms.value = 5000;
+    assert.equal(entry.isOpen(), false);
+    entry.latch();
+    assert.equal(entry.isOpen(), true, 'a request made in time still reloads when the worker answers late');
+});
+
+test('createEntryWindow: a browser without performance.now never opens the window', () => {
+    assert.equal(createEntryWindow(undefined, 5000).isOpen(), false);
+    assert.equal(createEntryWindow({}, 5000).isOpen(), false);
+});
+
+test('deliverUpdates: a visible page that has only just loaded asks for an entry takeover', () => {
+    const waiting = fakeWorker();
+    const ms = { value: 200 };
+    const entry = createEntryWindow(fakePerformance(ms), 5000);
+    deliverUpdates(fakeNavigator({ controller: {} }), fakeDocument('visible'), fakeRegistration({ waiting }), entry);
+    assert.deepEqual(waiting.posted, [ENTRY_REQUEST]);
+});
+
+test('deliverUpdates: after the entry window a visible page waits for the tab to be hidden', () => {
+    const waiting = fakeWorker();
+    const ms = { value: 9000 };
+    const doc = fakeDocument('visible');
+    deliverUpdates(fakeNavigator({ controller: {} }), doc, fakeRegistration({ waiting }), createEntryWindow(fakePerformance(ms), 5000));
+    assert.deepEqual(waiting.posted, []);
+    doc.hide();
+    assert.deepEqual(waiting.posted, [{ type: 'devocionales-skip-waiting' }]);
+});
+
+test('deliverUpdates: the first worker is still no update during the entry window', () => {
+    const waiting = fakeWorker();
+    const entry = createEntryWindow(fakePerformance({ value: 1 }), 5000);
+    deliverUpdates(fakeNavigator({ controller: null }), fakeDocument('visible'), fakeRegistration({ waiting }), entry);
+    assert.deepEqual(waiting.posted, []);
+});
+
+test('deliverUpdates: a worker that finishes installing during the entry window is asked at once', () => {
+    const installing = fakeWorker();
+    const registration = fakeRegistration({ installing: null });
+    const entry = createEntryWindow(fakePerformance({ value: 1000 }), 5000);
+    deliverUpdates(fakeNavigator({ controller: {} }), fakeDocument('visible'), registration, entry);
+    registration.installing = installing;
+    registration.listeners.updatefound();
+    installing.state = 'installed';
+    registration.waiting = installing;
+    installing.listeners.statechange();
+    assert.deepEqual(installing.posted, [ENTRY_REQUEST]);
+});
+
+test('reloadOnUpdate: inside the entry window a visible page reloads at once, once', () => {
+    const nav = fakeNavigator({ controller: {} });
+    let reloads = 0;
+    const entry = createEntryWindow(fakePerformance({ value: 300 }), 5000);
+    reloadOnUpdate(nav, fakeDocument('visible'), () => { reloads += 1; }, entry);
+    nav.listeners.controllerchange();
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 1);
+});
+
+test('reloadOnUpdate: a takeover requested in time still reloads a visible page that answers late', () => {
+    const nav = fakeNavigator({ controller: {} });
+    const ms = { value: 4900 };
+    const entry = createEntryWindow(fakePerformance(ms), 5000);
+    entry.latch();
+    ms.value = 12000;
+    let reloads = 0;
+    reloadOnUpdate(nav, fakeDocument('visible'), () => { reloads += 1; }, entry);
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 1);
+});
+
+test('reloadOnUpdate: after the entry window, with no request made, a visible page still waits', () => {
+    const nav = fakeNavigator({ controller: {} });
+    const doc = fakeDocument('visible');
+    let reloads = 0;
+    reloadOnUpdate(nav, doc, () => { reloads += 1; }, createEntryWindow(fakePerformance({ value: 20000 }), 5000));
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 0);
+    doc.hide();
+    assert.equal(reloads, 1);
+});
+
+test('start: wires the entry window so a freshly loaded visible page updates itself', async () => {
+    const waiting = fakeWorker();
+    const registration = fakeRegistration({ waiting });
+    const nav = fakeNavigator({ controller: {}, registerImpl: () => Promise.resolve(registration) });
+    const doc = fakeDocument('visible');
+    doc.readyState = 'complete';
+    let reloads = 0;
+    const win = { navigator: nav, document: doc, performance: fakePerformance({ value: 400 }), location: { reload() { reloads += 1; } }, addEventListener() {} };
+    start(win, '/devocionales/sw.js', '/devocionales/', {});
+    await settle();
+    assert.deepEqual(waiting.posted, [ENTRY_REQUEST]);
+    nav.listeners.controllerchange();
+    assert.equal(reloads, 1);
 });

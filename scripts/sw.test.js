@@ -195,9 +195,9 @@ function loadWorker({ routes = {}, config = CONFIG, preexisting = [] } = {}) {
         handlers.fetch(event);
         return event;
     };
-    const message = async (data) => {
+    const message = async (data, source) => {
         const waits = [];
-        handlers.message({ data, waitUntil: (promise) => waits.push(promise) });
+        handlers.message({ data, source, waitUntil: (promise) => waits.push(promise) });
         await Promise.all(waits);
     };
     return { handlers, shown, caches, calls, requests, net, spies, lifecycle, fetchEvent, message, hasCalls, windows };
@@ -912,6 +912,42 @@ test('a page asking the waiting worker to take over is obeyed only when every pa
     oneVisible.windows.push(pageOf('v0', 'hidden'), pageOf('v0', 'visible'));
     await oneVisible.message(SKIP_WAITING);
     assert.equal(oneVisible.spies.skipWaiting, 0, 'a visible page must never get a new build under it');
+});
+
+// An entry request comes from a page that has only just loaded and is still the one the reader is
+// looking at: it may take over while that page is visible, but never under another visible page.
+const ENTRY = { type: 'devocionales-skip-waiting', entry: true };
+const sender = { id: 'sender' };
+
+test('an entry request is obeyed when the sender is the only visible page', async () => {
+    const alone = await installed();
+    alone.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' });
+    await alone.message(ENTRY, sender);
+    assert.equal(alone.spies.skipWaiting, 1);
+
+    const withHiddenTab = await installed();
+    withHiddenTab.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' }, { ...pageOf('v0', 'hidden'), id: 'other' });
+    await withHiddenTab.message(ENTRY, sender);
+    assert.equal(withHiddenTab.spies.skipWaiting, 1);
+});
+
+test('an entry request is refused while another page is visible, and without a known sender', async () => {
+    const otherVisible = await installed();
+    otherVisible.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' }, { ...pageOf('v0', 'visible'), id: 'other' });
+    await otherVisible.message(ENTRY, sender);
+    assert.equal(otherVisible.spies.skipWaiting, 0, 'another visible tab must never get a new build under it');
+
+    const noSender = await installed();
+    noSender.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' });
+    await noSender.message(ENTRY, undefined);
+    assert.equal(noSender.spies.skipWaiting, 0, 'without a sender the visible page cannot be excluded');
+});
+
+test('a plain request still needs every page hidden, even from a page that sends entry-less messages', async () => {
+    const worker = await installed();
+    worker.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' });
+    await worker.message(SKIP_WAITING, sender);
+    assert.equal(worker.spies.skipWaiting, 0);
 });
 
 test('other messages do not make the worker take over', async () => {
