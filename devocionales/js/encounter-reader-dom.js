@@ -149,7 +149,7 @@
         function buildFooter({ isCompleted, copyright, onComplete }) {
             return h('div', { class: 'encounter-footer' }, [
                 h('button', {
-                    class: 'encounter-complete',
+                    class: isCompleted ? 'encounter-complete encounter-complete--pop' : 'encounter-complete',
                     text: t(isCompleted ? 'badge_completed' : 'encounter_complete'),
                     attrs: { type: 'button', disabled: isCompleted ? '' : undefined },
                     on: { click: onComplete },

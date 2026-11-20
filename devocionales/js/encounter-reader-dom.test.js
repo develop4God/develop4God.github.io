@@ -218,3 +218,11 @@ test('cinematic_scene and scripture_moment render scripture_connections, as the 
     const scrip = dom.buildPage(pageFor({ type: 'scripture_moment', verse_reference: 'Mark 10:51', scripture_connections: connections }), 'b1');
     assert.match(text(scrip), /John 1:42/);
 });
+
+test('footer: the completed button carries the pop class; the pending one does not', () => {
+    const { dom } = setup();
+    const done = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: () => {} });
+    assert.ok(done.querySelector('.encounter-complete').classList.contains('encounter-complete--pop'));
+    const open = dom.buildFooter({ isCompleted: false, copyright: '', onComplete: () => {} });
+    assert.equal(open.querySelector('.encounter-complete').classList.contains('encounter-complete--pop'), false);
+});

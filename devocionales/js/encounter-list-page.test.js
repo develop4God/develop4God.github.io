@@ -26,7 +26,7 @@ function setup({ index = [e('a'), e('b'), e('c')], completed = [], allUnlocked =
     const doc = new FakeDocument();
     const h = createBuilder(doc);
     const view = { count: doc.createElement('p'), body: doc.createElement('div') };
-    const state = { completed: new Set(completed), sheetOpened: 0, opened: [], loads: 0 };
+    const state = { completed: new Set(completed), allUnlocked, sheetOpened: 0, opened: [], loads: 0 };
     const store = { loadCompleted: () => new Set(state.completed) };
     const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x' });
     const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
@@ -35,7 +35,8 @@ function setup({ index = [e('a'), e('b'), e('c')], completed = [], allUnlocked =
         data: { loadIndex: loadIndex || (async () => { state.loads += 1; return index; }) },
         cards: global.window.EncounterCards,
         unlockSheet: { open: () => { state.sheetOpened += 1; } },
-        allUnlocked: () => allUnlocked,
+        allUnlocked: () => state.allUnlocked,
+        unlockLabel: 'New encounter unlocked',
         onOpen: (id) => state.opened.push(id),
     });
     return { page, view, state };
@@ -133,4 +134,26 @@ test('a newer reload supersedes a slower earlier one (rapid language switches)',
     resolvers[0]([e('old')]);
     await first;
     assert.deepEqual(ids(view), ['new']);
+});
+
+test('one card unlocked: it gets the single-unlock flash and the pill label, never the bulk sweep', async () => {
+    const { page, view, state } = setup();
+    await page.init();
+    state.completed.add('a');
+    page.refresh();
+    assert.ok(card(view, 'b').classList.contains('is-just-unlocked'));
+    assert.equal(card(view, 'b').getAttribute('data-unlock-label'), 'New encounter unlocked');
+    assert.equal(view.body.querySelectorAll('.is-bulk-unlocked').length, 0);
+});
+
+test('several cards unlock at once (unlock all): each gets the bulk sweep and no pill', async () => {
+    const { page, view, state } = setup({ allUnlocked: false });
+    await page.init();
+    state.completed.add('a');
+    state.allUnlocked = true;
+    page.refresh();
+    const bulk = view.body.querySelectorAll('.is-bulk-unlocked');
+    assert.deepEqual(bulk.map((el) => el.getAttribute('data-encounter-id')), ['b', 'c']);
+    assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
+    assert.equal(view.body.querySelectorAll('[data-unlock-label]').length, 0);
 });

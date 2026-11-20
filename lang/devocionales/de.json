@@ -342,6 +342,14 @@
     "count": "{count} Begegnungen",
     "loading": "Begegnungen werden geladen…",
     "locked": "Gesperrt",
-    "unlock_offer_play": "App herunterladen"
+    "unlock_offer_play": "App herunterladen",
+    "unlock_offer_this_browser": "Schaltet nur diesen Browser frei. Dein Kauf in der App ist separat.",
+    "unlock_offer_failed": "Die Zahlung wurde nicht abgeschlossen. Deine Begegnungen bleiben gesperrt. Bitte versuche es erneut.",
+    "read_now_hint": "Möchtest du es jetzt lesen? Tippe hier.",
+    "new_unlocked": "Neue Begegnung freigeschaltet",
+    "pass_kicker": "Begegnungs-Pass",
+    "pass_title": "Danke, dass Sie unseren Dienst unterstützen",
+    "pass_body": "Alle Begegnungen sind auf diesem Gerät geöffnet. Lesen Sie weiter, eine Geschichte nach der anderen.",
+    "pass_button": "Lesen beginnen"
   }
 }

@@ -11,6 +11,7 @@
     // The shared list DOM asks for studies-flavoured keys; they map onto the app's `encounters.*` strings.
     const KEY_ALIASES = { loadError: 'error_load', empty: 'empty_title', studiesCount: 'count' };
     const INERT_SELECTOR = 'header, main, footer, #shell-nav';
+    const PASS_AUTO_CLOSE_MS = 6500;
 
     function boot() {
         const doc = global.document;
@@ -24,6 +25,11 @@
         const byId = (id) => doc.getElementById(id);
         const h = global.DomBuilder.createBuilder(doc);
         const store = global.EncounterStore.createEncounterStore(global.localStorage);
+        // A page cached before the entitlement script existed reads every encounter as locked.
+        const entitlement = global.EncounterEntitlement ? global.EncounterEntitlement.createEncounterEntitlement(global.localStorage) : null;
+        const isUnlockedAll = () => (entitlement ? entitlement.isUnlocked() : false);
+        // A page cached before ui-toast.js was added has no toast: messages are then skipped, not thrown.
+        const toast = global.UiToast ? global.UiToast.createToast({ document: doc, container: doc.body }) : { show: () => {} };
         const renderIcons = () => global.lucide.createIcons();
         const setBackgroundInert = (on) => doc.querySelectorAll(INERT_SELECTOR).forEach((el) => el.toggleAttribute('inert', on));
 
@@ -35,12 +41,22 @@
         const images = global.EncounterImages.createImageUrls(IMAGE_BASE_URL);
         const cardDom = global.EncounterCardDom.createCardDom({ h, t, imageUrlFor: images.cardImageUrl });
         const listDom = global.DiscoveryListDom.createListDom({ h, t, cardDom });
+        // The PayPal button lives in the unlock sheet. Its script loads only when the support button is tapped (F2).
+        const paypal = global.EncounterPaypal ? global.EncounterPaypal.createEncounterPaypal({
+            h,
+            config: global.DevotionalPwaConfig && global.DevotionalPwaConfig.encountersUnlock,
+            checkout: global.PayPalCheckout,
+            loadScript: loadScript,
+            getSdk: () => global.paypal,
+            note: t('unlock_offer_this_browser'),
+        }) : { mount: () => false, isEnabled: () => false, supportLabel: () => '' };
         const unlockSheet = global.EncounterUnlockSheetDom.createUnlockSheet({
             h,
             t,
             container: doc.body,
             playStoreUrl: global.DevotionalShare.PLAY_STORE_URL,
-            showPlayLink: !global.DevotionalIosHint.isIos(global.navigator), // no Android app to open on iOS
+            // With PayPal on, the support button replaces the Play link. No Android app to open on iOS.
+            showPlayLink: !global.DevotionalIosHint.isIos(global.navigator) && !paypal.isEnabled(),
             setBackgroundInert,
             focusFallback: () => { const title = byId('encounters-title'); title.setAttribute('tabindex', '-1'); title.focus(); },
         });
@@ -53,6 +69,74 @@
             reducedMotion: () => global.matchMedia('(prefers-reduced-motion: reduce)').matches,
         });
         const rtl = () => doc.documentElement.dir === 'rtl';
+        // The thank-you pass after a payment. A page cached before pass-dom existed falls back to the toast.
+        const pass = global.EncounterPassDom ? global.EncounterPassDom.createPassDom({
+            h,
+            t,
+            container: doc.body,
+            setBackgroundInert,
+            focusFallback: () => { const title = byId('encounters-title'); title.setAttribute('tabindex', '-1'); title.focus(); },
+            setTimer: (fn, ms) => global.setTimeout(fn, ms),
+            clearTimer: (id) => global.clearTimeout(id),
+            autoCloseMs: PASS_AUTO_CLOSE_MS,
+        }) : null;
+
+        function loadScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = doc.createElement('script');
+                script.src = url;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('PayPal SDK failed to load'));
+                doc.head.append(script);
+            });
+        }
+
+        function onUnlockGranted() {
+            if (entitlement) entitlement.grant();
+            try {
+                // Refresh first: the card that opened the sheet is re-rendered, so close() must not refocus a detached card.
+                listPage.refresh();
+                unlockSheet.close();
+                if (pass) pass.open();
+                else toast.show(t('unlock_offer_thanks'));
+            } catch (error) {
+                // The payment is captured and stored already: the payer must still get the thank-you.
+                console.error('Encounters: the post-payment screen failed', error);
+                toast.show(t('unlock_offer_thanks'));
+            }
+        }
+
+        function openUnlockSheet() {
+            unlockSheet.open({
+                mountActions: (actions) => {
+                    if (!paypal.isEnabled()) return;
+                    // The checkout loads only when this button is tapped; then the PayPal buttons take its place.
+                    const support = h('button', {
+                        class: 'encounter-sheet-support',
+                        text: paypal.supportLabel(t('unlock_offer_button'), lang()),
+                        attrs: { type: 'button' },
+                        on: {
+                            click: () => {
+                                support.remove();
+                                paypal.mount(actions, {
+                                    onGranted: onUnlockGranted,
+                                    onFailed: () => toast.show(t('unlock_offer_failed'), { kind: 'error' }),
+                                    onUnavailable: () => {
+                                        if (global.DevotionalIosHint.isIos(global.navigator)) return;
+                                        actions.append(h('a', {
+                                            class: 'encounter-sheet-play',
+                                            text: t('unlock_offer_play'),
+                                            attrs: { href: global.DevotionalShare.PLAY_STORE_URL, rel: 'noopener', target: '_blank' },
+                                        }));
+                                    },
+                                });
+                            },
+                        },
+                    });
+                    actions.prepend(support); // left of "Keep reading in order"
+                },
+            });
+        }
 
         // Route state lives in the URL (?id=), owned by the Bible-studies router with the Encounters
         // nav helpers (same URL grammar). Declared first: the list's open handler calls it.
@@ -82,12 +166,12 @@
         const deepLink = global.EncounterRoute.createDeepLink({
             loadCards: async () => global.EncounterCards.buildCards(await data.loadIndex(lang()), {
                 completed: store.loadCompleted(),
-                allUnlocked: false,
+                allUnlocked: isUnlockedAll(),
             }),
             actions: {
                 showList: () => { reader.reset(); readerView.showList(); },
                 openReader: (entry) => { readerView.showReader(); reader.open(entry); },
-                showLocked: () => { reader.reset(); readerView.showList(); unlockSheet.open(); },
+                showLocked: () => { reader.reset(); readerView.showList(); openUnlockSheet(); },
                 showNotFound: (id) => {
                     reader.reset();
                     readerView.showReader();
@@ -103,9 +187,10 @@
             store,
             cards: global.EncounterCards,
             listDom,
-            unlockSheet,
-            allUnlocked: () => false,
+            unlockSheet: { open: openUnlockSheet },
+            allUnlocked: isUnlockedAll,
             afterRender: renderIcons,
+            unlockLabel: t('new_unlocked'),
             onOpen: (id) => router.open(id),
         });
 

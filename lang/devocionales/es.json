@@ -342,6 +342,14 @@
     "count": "{count} encuentros",
     "loading": "Cargando encuentros…",
     "locked": "Bloqueado",
-    "unlock_offer_play": "Obtener la app"
+    "unlock_offer_play": "Obtener la app",
+    "unlock_offer_this_browser": "Desbloquea solo este navegador. Tu compra en la app es aparte.",
+    "unlock_offer_failed": "El pago no se completó. Tus encuentros siguen bloqueados. Inténtalo de nuevo.",
+    "read_now_hint": "¿Quieres leerlo ahora? Toca aquí.",
+    "new_unlocked": "Nuevo encuentro desbloqueado",
+    "pass_kicker": "Pase de Encuentros",
+    "pass_title": "Gracias por apoyar nuestro ministerio",
+    "pass_body": "Todos los encuentros están abiertos en este dispositivo. Sigue leyendo, una historia a la vez.",
+    "pass_button": "Empezar a leer"
   }
 }
