@@ -37,6 +37,15 @@
                 contactAddress: 'develop4God@gmail.com',
             },
         },
+        // Encounters unlock by PayPal (web only, this browser only). enabled:false = no PayPal button and
+        // no PayPal script ever loads. clientId is the PayPal app's PUBLIC LIVE client id (app
+        // encounters_unlock). Never put a client secret in this file.
+        encountersUnlock: Object.freeze({
+            enabled: true,
+            clientId: 'BAAzCtTUx9vcxROgeYlg1X3mkeTCAAWEyqv-_YAOoS8TROsuJTgJA40nvHpM_LP1q1vtHMMe3rDt53OPBY',
+            amount: 4.99,
+            currency: 'USD',
+        }),
         // The Firebase WEB config. It is public by design (it ships to every browser); what protects
         // the backend is the API key's HTTP-referrer restriction and the Firestore security rules.
         firebase: {

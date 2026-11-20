@@ -44,7 +44,7 @@ test('parseIndex: maps a published entry for the language', () => {
         id: 'peter_water_001', version: '2.4', status: 'published', isPublished: true,
         emoji: '🌊', accent: '#1e3a5f', mood: 'storm', character: 'Peter',
         introImage: 'peter_intro.png', title: 'Walked on Water', subtitle: 'Faith',
-        scripture: 'Matthew 14:22-33', minutes: 5, releaseDate: '', file: 'peter_en.json',
+        scripture: 'Matthew 14:22-33', minutes: 5, testament: '', releaseDate: '', file: 'peter_en.json',
     });
 });
 
@@ -171,4 +171,14 @@ test('loadStudy: A4 caches by id+version, refetches on a new version, serves sta
 
 test('loadStudy: rejects for an entry without a file (coming_soon)', async () => {
     await assert.rejects(makeLoader({}).loader.loadStudy(list([soon()])[0], 'en'));
+});
+
+test('parseIndex: keeps a valid testament and drops anything else', () => {
+    const base = { id: 'b', status: 'published', files: { en: 'b_en.json' }, titles: { en: 'B' } };
+    const [oldOne] = parseIndex({ encounters: [{ ...base, testament: 'old' }] }, 'en');
+    const [newOne] = parseIndex({ encounters: [{ ...base, testament: 'new' }] }, 'en');
+    const [other] = parseIndex({ encounters: [{ ...base, testament: 'apocrypha' }] }, 'en');
+    assert.equal(oldOne.testament, 'old');
+    assert.equal(newOne.testament, 'new');
+    assert.equal(other.testament, '');
 });

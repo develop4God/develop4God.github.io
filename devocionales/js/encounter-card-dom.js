@@ -24,16 +24,24 @@
             return h('span', { class: 'encounter-card-media', attrs: { style: accentStyle } }, [
                 h('span', { class: 'study-card-emoji', text: card.emoji, attrs: { 'aria-hidden': 'true' } }),
                 image,
+                card.state === 'locked' ? lockOverlay(card) : null,
+            ]);
+        }
+
+        // The locked state lives on the artwork: a lock, "Complete X to unlock", and on the next one the read-now pill.
+        function lockOverlay(card) {
+            return h('span', { class: 'encounter-lock-overlay' }, [
+                h('i', { class: 'encounter-lock-icon', attrs: { 'aria-hidden': 'true' } }),
+                hintOf(card) ? h('span', { class: 'encounter-card-hint', text: hintOf(card) }) : null,
+                card.isNextLocked ? h('span', { class: 'encounter-unlock-pill', text: t('read_now_hint') }) : null,
             ]);
         }
 
         function body(card) {
-            const hint = card.state === 'locked' ? hintOf(card) : '';
             return h('span', { class: 'study-card-body' }, [
                 h('h3', { class: 'study-card-title', text: card.title }),
                 card.subtitle ? h('p', { class: 'study-card-subtitle', text: card.subtitle }) : null,
                 h('p', { class: 'study-card-meta', text: meta(card) }),
-                hint ? h('p', { class: 'encounter-card-hint', text: hint }) : null,
                 card.state === 'comingSoon' && card.releaseDate ? h('p', { class: 'encounter-card-release', text: card.releaseDate }) : null,
             ]);
         }
@@ -52,7 +60,7 @@
             const classes = ['study-card', 'encounter-card', `encounter-card--${card.state === 'comingSoon' ? 'coming-soon' : card.state}`];
             if (card.isNextLocked) classes.push('encounter-card--next-locked');
             const attrs = { 'data-encounter-id': card.id };
-            const inner = [media(card), body(card), card.state === 'locked' ? h('i', { attrs: { 'data-lucide': 'lock', 'aria-hidden': 'true' } }) : null, badge(card)];
+            const inner = [media(card), body(card), badge(card)];
 
             if (card.state === 'comingSoon') {
                 return h('article', { class: classes.join(' '), attrs: { ...attrs, 'aria-disabled': 'true' } }, [h('div', { class: 'encounter-card-inner' }, inner)]);

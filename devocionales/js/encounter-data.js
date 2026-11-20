@@ -9,6 +9,7 @@
     const FALLBACK_LANG = 'en';
     const STATUSES = ['published', 'coming_soon'];
     const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+    const TESTAMENTS = ['old', 'new'];
 
     const str = (v) => (isNonEmptyString(v) ? v : '');
     const pick = (map, lang) => pickLocalized(map, lang, FALLBACK_LANG);
@@ -38,6 +39,7 @@
             subtitle: isObject(raw.subtitles) ? str(raw.subtitles[lang]) : '',
             scripture: isObject(raw.scripture_reference) ? str(raw.scripture_reference[lang]) : '',
             minutes: readMinutes(raw.estimated_reading_minutes, lang),
+            testament: TESTAMENTS.includes(raw.testament) ? raw.testament : '',
             releaseDate: isPublished ? '' : pickReleaseDate(raw.release_date, lang),
             file,
         };

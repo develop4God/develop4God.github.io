@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "paypal-mcp-server": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.sandbox.paypal.com/mcp"
+      ]
+    }
+  }
+}

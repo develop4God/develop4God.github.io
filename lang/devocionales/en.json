@@ -342,6 +342,14 @@
     "count": "{count} encounters",
     "loading": "Loading encounters…",
     "locked": "Locked",
-    "unlock_offer_play": "Get the app"
+    "unlock_offer_play": "Get the app",
+    "unlock_offer_this_browser": "Unlocks this browser only. Your app purchase is separate.",
+    "unlock_offer_failed": "The payment did not complete. Your encounters are still locked. Please try again.",
+    "read_now_hint": "Want to read it now? Tap here.",
+    "new_unlocked": "New encounter unlocked",
+    "pass_kicker": "Encounters Pass",
+    "pass_title": "Thank you for supporting our ministry",
+    "pass_body": "Every encounter is open on this device. Keep reading, one story at a time.",
+    "pass_button": "Start reading"
   }
 }
