@@ -118,10 +118,14 @@
                         on: {
                             click: () => {
                                 support.remove();
+                                // The support button left the focus order: move focus to the safe choice, so Escape still works.
+                                actions.querySelector('.encounter-sheet-keep').focus();
                                 paypal.mount(actions, {
                                     onGranted: onUnlockGranted,
                                     onFailed: () => toast.show(t('unlock_offer_failed'), { kind: 'error' }),
                                     onUnavailable: () => {
+                                        // Bring the support button back so the payer can retry; then offer the Play link where it applies.
+                                        actions.prepend(support);
                                         if (global.DevotionalIosHint.isIos(global.navigator)) return;
                                         actions.append(h('a', {
                                             class: 'encounter-sheet-play',

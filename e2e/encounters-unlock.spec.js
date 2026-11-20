@@ -189,6 +189,21 @@ test.describe('Encounters unlock by PayPal', () => {
     await expect(page.locator('.encounter-sheet-play')).toBeVisible();
     await expect(page.locator('.encounter-paypal')).toHaveCount(0);
     await expect(page.locator('.encounter-sheet-keep')).toBeVisible();
+    // The support button comes back, so the reader can retry once the SDK is reachable again.
+    await expect(page.locator('.encounter-sheet-support')).toBeVisible();
     expect(await page.evaluate((k) => localStorage.getItem(k), KEY)).toBeNull();
+  });
+
+  test('tapping support keeps focus inside the sheet, so Escape still closes it', async ({ page }) => {
+    await seed(page);
+    await mockData(page);
+    await setUnlockEnabled(page, true);
+    await stubSdk(page);
+    await openLockedSheet(page);
+    await page.locator('.encounter-sheet-support').click();
+    await expect(page.locator('.encounter-paypal[data-rendered="yes"]')).toHaveCount(1);
+    await expect(page.locator('.encounter-sheet-keep')).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('.encounter-sheet')).toHaveCount(0);
   });
 });
