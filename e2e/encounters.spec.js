@@ -61,7 +61,13 @@ function watchErrors(page) {
 
 const cards = (page) => page.locator('.encounter-card');
 const card = (page, id) => page.locator(`.encounter-card[data-encounter-id="${id}"]`);
-const installedIos = (page) => page.addInitScript(() => Object.defineProperty(navigator, 'standalone', { get: () => true }));
+// An installed iOS app: standalone, and an iPhone user agent. The Android device profiles report Android,
+// which the shell treats as not iOS, so the iOS scenario has to present itself as iOS.
+const installedIos = (page) => page.addInitScript(() => {
+  Object.defineProperty(navigator, 'standalone', { get: () => true });
+  Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' });
+  Object.defineProperty(navigator, 'userAgentData', { get: () => undefined });
+});
 
 test.describe('first visit: the welcome screen (same as the app)', () => {
   test('shows once; Begin dismisses it, focus moves to the page, and it never returns', async ({ page }) => {
