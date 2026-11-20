@@ -371,6 +371,9 @@ test.describe('compatibility: previous studies HTML with the new scripts', () =>
     // Progress bypasses the intro: Continue goes straight into the reader.
     await expect(page.locator('.encounter-intro-enter')).toHaveCount(0);
     // Pages: key verse (0), cards 1-4 (1-4). Cards 1 and 2 were read, so the reader opens on card 3 (page index 3).
+    // Wait for the reader to render its pager before reading it: the render follows the async load, so a
+    // read right after the click races it on slower (mobile-emulated) runs.
+    await expect(page.locator('.pager-dot.is-current')).toHaveCount(1);
     const current = await page.locator('.pager-dot').evaluateAll((els) => els.findIndex((e) => e.classList.contains('is-current')));
     expect(current).toBe(3);
     expect(errors).toEqual([]);
