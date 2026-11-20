@@ -323,4 +323,21 @@ test.describe('compatibility: previous studies HTML with the new scripts', () =>
     await expect(page.locator('.study-card')).toHaveCount(1);
     expect(errors).toEqual([]);
   });
+
+  test('shared header: the next encounter is the hero; the chips filter the grid and the choice survives a reload', async ({ page }) => {
+    const errors = watchErrors(page);
+    await mockData(page);
+    await seed(page, { completed: ['a'] });
+    await page.goto(PAGE);
+    await expect(page.locator('#encounters-hero .study-hero-title')).toHaveText('Title b');
+    await expect(page.locator('#encounters-hero .study-hero-label')).toHaveText('Start here');
+    await expect(page.locator('#encounters-chips .study-chip')).toHaveCount(3);
+    await page.locator('#encounters-chips [data-filter="completed"]').click();
+    await expect(cards(page)).toHaveCount(1);
+    await expect(card(page, 'a')).toBeVisible();
+    await page.reload();
+    await expect(page.locator('#encounters-chips [aria-pressed="true"]')).toHaveAttribute('data-filter', 'completed');
+    await expect(cards(page)).toHaveCount(1);
+    expect(errors).toEqual([]);
+  });
 });

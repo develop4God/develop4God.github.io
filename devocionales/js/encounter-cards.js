@@ -35,5 +35,32 @@
 
     const countPublished = (entries) => (Array.isArray(entries) ? entries.filter((x) => x && x.isPublished).length : 0);
 
-    global.EncounterCards = { buildCards, countPublished };
+    // Filter chips for the list. 'all' is every card in index order (coming-soon cards included, as before);
+    // 'pending' = published and not completed; 'completed' = completed. Coming-soon cards only show under 'all'.
+    const FILTERS = ['all', 'pending', 'completed'];
+    const normalizeFilter = (value) => (FILTERS.includes(value) ? value : 'all');
+
+    function filterCards(cards, filter) {
+        switch (normalizeFilter(filter)) {
+            case 'pending': return cards.filter((c) => c.state === 'open' || c.state === 'locked');
+            case 'completed': return cards.filter((c) => c.state === 'completed');
+            default: return cards.slice();
+        }
+    }
+
+    function countFilters(cards) {
+        return {
+            all: cards.length,
+            pending: filterCards(cards, 'pending').length,
+            completed: filterCards(cards, 'completed').length,
+        };
+    }
+
+    // The hero is the first open, unfinished encounter (the one the reader should go to next). A locked card is never a hero.
+    function pickHero(cards) {
+        const next = cards.find((c) => c.badge === 'next' && c.state === 'open');
+        return next ? { card: next, kind: 'start' } : null;
+    }
+
+    global.EncounterCards = { buildCards, countPublished, normalizeFilter, filterCards, countFilters, pickHero };
 })(window);

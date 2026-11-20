@@ -10,16 +10,43 @@
         { filter: 'favorites', labelKey: 'filterFavorites' },
     ];
 
+    // Shared by Bible studies and Encounters. Labels and copy come in from the caller, so each page
+    // supplies its own translation keys; this module owns only the markup.
     function createListDom({ h, t, cardDom }) {
-        function buildChips(counts, active, onSelect) {
-            return h('div', { class: 'study-chips', attrs: { role: 'group', 'aria-label': t('title') } }, CHIPS.map(({ filter, labelKey }) => h('button', {
+        // items: [{ filter, label, count }]; the active one is pressed, a click reports its filter.
+        function buildFilterChips(items, active, onSelect) {
+            return h('div', { class: 'study-chips', attrs: { role: 'group', 'aria-label': t('title') } }, items.map(({ filter, label, count }) => h('button', {
                 class: 'study-chip',
                 attrs: { type: 'button', 'data-filter': filter, 'aria-pressed': String(filter === active) },
                 on: { click: () => onSelect(filter) },
             }, [
-                h('span', { class: 'study-chip-label', text: t(labelKey) }),
-                h('span', { class: 'study-chip-count', text: String(counts[filter]) }),
+                h('span', { class: 'study-chip-label', text: label }),
+                h('span', { class: 'study-chip-count', text: String(count) }),
             ])));
+        }
+
+        function buildChips(counts, active, onSelect) {
+            return buildFilterChips(CHIPS.map(({ filter, labelKey }) => ({ filter, label: t(labelKey), count: counts[filter] })), active, onSelect);
+        }
+
+        // The "Start here" / "Continue" hero. `label` and `buttonLabel` are already translated by the caller;
+        // a percent (0-100) adds the progress bar, drawn by the card DOM so both screens share one bar.
+        function buildHero({ label, buttonLabel, card, percent = null }, { onOpen }) {
+            return h('section', { class: 'study-hero' }, [
+                h('p', { class: 'study-hero-label', text: label }),
+                h('div', { class: 'study-hero-main' }, [
+                    h('span', { class: 'study-card-emoji', text: card.emoji, attrs: { 'aria-hidden': 'true' } }),
+                    h('div', { class: 'study-hero-text' }, [
+                        h('h2', { class: 'study-hero-title', text: card.title }),
+                        card.subtitle ? h('p', { class: 'study-card-subtitle', text: card.subtitle }) : null,
+                    ]),
+                ]),
+                percent === null ? null : h('div', { class: 'study-hero-progress' }, [
+                    cardDom.progressBar(percent, 'study-hero-bar'),
+                    h('span', { class: 'study-hero-percent', text: `${percent}%` }),
+                ]),
+                h('button', { class: 'study-hero-button', text: buttonLabel, attrs: { type: 'button' }, on: { click: () => onOpen(card.id) } }),
+            ]);
         }
 
         function buildGrid(cards, { confirmingId = null, handlers }) {
@@ -51,7 +78,7 @@
 
         const countLabel = (n) => t('studiesCount').replace('{count}', String(n));
 
-        return { buildChips, buildGrid, buildMessage, countLabel };
+        return { buildChips, buildFilterChips, buildHero, buildGrid, buildMessage, countLabel };
     }
 
     global.DiscoveryListDom = { createListDom };

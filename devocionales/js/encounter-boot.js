@@ -20,7 +20,8 @@
         const i18n = global.DevotionalI18n;
         const supported = Object.keys(global.i18n.supportedLanguages);
         const lang = () => i18n.getLanguage(supported, 'en');
-        const t = (key) => i18n.t(`encounters.${KEY_ALIASES[key] || key}`, '');
+        // Keys the Encounters namespace lacks (the shared list copy: "none found", "title") come from the Bible-studies namespace.
+        const t = (key) => i18n.t(`encounters.${KEY_ALIASES[key] || key}`, '') || i18n.t(`discovery.${key}`, '');
 
         const byId = (id) => doc.getElementById(id);
         const h = global.DomBuilder.createBuilder(doc);
@@ -204,7 +205,8 @@
         });
 
         const listPage = global.EncounterListPage.createListPage({
-            view: { count: byId('encounters-count'), body: byId('encounters-body') },
+            // The hero and chips containers are absent on a page cached before the shared header existed.
+            view: { count: byId('encounters-count'), body: byId('encounters-body'), hero: byId('encounters-hero'), chips: byId('encounters-chips') },
             lang,
             data,
             store,
@@ -215,6 +217,15 @@
             afterRender: renderIcons,
             unlockLabel: t('new_unlocked'),
             onOpen: (id) => router.open(id),
+            // Hero and filter copy is the Bible-studies copy, shared as-is (the Encounters namespace has none).
+            labels: {
+                startHere: discoveryT('startHere'),
+                read: discoveryT('read'),
+                filterAll: discoveryT('filterAll'),
+                filterPending: discoveryT('filterPending'),
+                filterCompleted: discoveryT('filterCompleted'),
+            },
+            sessionStorage: global.sessionStorage,
         });
 
         router = global.DiscoveryRouter.createRouter({

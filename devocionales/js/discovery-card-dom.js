@@ -67,27 +67,7 @@
             ]);
         }
 
-        function buildHero({ kind, card }, { onOpen }) {
-            const isContinue = kind === 'continue';
-            const percent = isContinue ? percentOf(card) : null;
-            return h('section', { class: 'study-hero' }, [
-                h('p', { class: 'study-hero-label', text: t(isContinue ? 'continueWhereLeft' : 'startHere') }),
-                h('div', { class: 'study-hero-main' }, [
-                    h('span', { class: 'study-card-emoji', text: card.emoji, attrs: { 'aria-hidden': 'true' } }),
-                    h('div', { class: 'study-hero-text' }, [
-                        h('h2', { class: 'study-hero-title', text: card.title }),
-                        card.subtitle ? h('p', { class: 'study-card-subtitle', text: card.subtitle }) : null,
-                    ]),
-                ]),
-                percent === null ? null : h('div', { class: 'study-hero-progress' }, [
-                    progressBar(percent, 'study-hero-bar'),
-                    h('span', { class: 'study-hero-percent', text: `${percent}%` }),
-                ]),
-                h('button', { class: 'study-hero-button', text: t(isContinue ? 'continueBtn' : 'read'), attrs: { type: 'button' }, on: { click: () => onOpen(card.id) } }),
-            ]);
-        }
-
-        return { buildCard, buildHero };
+        return { buildCard, progressBar };
     }
 
     global.DiscoveryCardDom = { createCardDom };

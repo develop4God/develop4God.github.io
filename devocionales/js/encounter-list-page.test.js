@@ -17,7 +17,7 @@ const { createBuilder } = global.window.DomBuilder;
 const TEXT = {
     studiesCount: '{count} encounters', loading: 'Loading…', loadError: 'Could not load', retry: 'Retry', empty: 'None yet',
     badge_completed: 'Completed', current: 'Current', coming_soon: 'COMING SOON', locked: 'Locked',
-    complete_to_unlock: 'Complete: {title}', min_immersive_journey: 'MIN',
+    complete_to_unlock: 'Complete: {title}', min_immersive_journey: 'MIN', noneFound: 'Nothing here',
 };
 const t = (k) => TEXT[k] || k;
 const e = (id, over = {}) => ({ id, version: '1', title: `T-${id}`, subtitle: '', scripture: '', minutes: 5, emoji: '📖', accent: null, introImage: '', status: 'published', isPublished: true, releaseDate: '', file: `${id}.json`, ...over });
@@ -156,4 +156,100 @@ test('several cards unlock at once (unlock all): each gets the bulk sweep and no
     assert.deepEqual(bulk.map((el) => el.getAttribute('data-encounter-id')), ['b', 'c']);
     assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
     assert.equal(view.body.querySelectorAll('[data-unlock-label]').length, 0);
+});
+
+// ---- shared header: hero + filter chips above the grid ----
+
+const HEADER_LABELS = { startHere: 'Start here', read: 'Read', filterAll: 'All', filterPending: 'Pending', filterCompleted: 'Completed' };
+
+function setupHeader({ index = [e('a'), e('b'), e('c')], completed = [], session = {}, withHeader = true } = {}) {
+    const doc = new FakeDocument();
+    const h = createBuilder(doc);
+    const view = { count: doc.createElement('p'), body: doc.createElement('div') };
+    if (withHeader) { view.hero = doc.createElement('div'); view.chips = doc.createElement('div'); }
+    const state = { completed: new Set(completed), opened: [] };
+    const store = { loadCompleted: () => new Set(state.completed) };
+    const storage = { data: { ...session }, getItem(k) { return k in this.data ? this.data[k] : null; }, setItem(k, v) { this.data[k] = v; } };
+    const cardDom = global.window.EncounterCardDom.createCardDom({ h, t, imageUrlFor: () => 'x' });
+    const listDom = global.window.DiscoveryListDom.createListDom({ h, t, cardDom });
+    const page = global.window.EncounterListPage.createListPage({
+        view, t, lang: () => 'en', store, listDom,
+        data: { loadIndex: async () => index },
+        cards: global.window.EncounterCards,
+        unlockSheet: { open() {} },
+        allUnlocked: () => false,
+        unlockLabel: 'New encounter unlocked',
+        onOpen: (id) => state.opened.push(id),
+        labels: HEADER_LABELS,
+        sessionStorage: storage,
+    });
+    return { page, view, state, storage };
+}
+const chip = (view, f) => view.chips.querySelector(`[data-filter="${f}"]`);
+
+test('header: shows the next encounter as the hero and one chip per filter with counts', async () => {
+    const { page, view } = setupHeader({ completed: ['a'] });
+    await page.init();
+    assert.equal(view.hero.querySelector('.study-hero-title').textContent, 'T-b');
+    assert.equal(view.hero.querySelector('.study-hero-label').textContent, 'Start here');
+    assert.deepEqual(view.chips.querySelectorAll('.study-chip').map((c) => c.querySelector('.study-chip-count').textContent), ['3', '2', '1']);
+});
+
+test('header: clicking a chip filters the grid and remembers the choice for the session', async () => {
+    const { page, view, storage } = setupHeader({ completed: ['a'] });
+    await page.init();
+    chip(view, 'completed').click();
+    assert.deepEqual(ids(view), ['a']);
+    assert.equal(chip(view, 'completed').getAttribute('aria-pressed'), 'true');
+    assert.equal(storage.data.encounterFilter, 'completed');
+});
+
+test('header: the saved filter is restored on a new page load; an unknown saved value falls back to all', async () => {
+    const restored = setupHeader({ completed: ['a'], session: { encounterFilter: 'pending' } });
+    await restored.page.init();
+    assert.deepEqual(ids(restored.view), ['b', 'c']);
+    const junk = setupHeader({ session: { encounterFilter: 'favorites' } });
+    await junk.page.init();
+    assert.equal(chip(junk.view, 'all').getAttribute('aria-pressed'), 'true');
+    assert.equal(ids(junk.view).length, 3);
+});
+
+test('header: a filter with nothing in it shows the "none found" message, not an empty grid', async () => {
+    const { page, view } = setupHeader({ completed: ['a', 'b', 'c'], session: { encounterFilter: 'pending' } });
+    await page.init();
+    assert.equal(view.body.querySelectorAll('.encounter-card').length, 0);
+    assert.equal(view.body.querySelector('.study-message').textContent, 'Nothing here');
+});
+
+test('header: no hero when every encounter is done; the hero is cleared when the index is empty', async () => {
+    const done = setupHeader({ completed: ['a', 'b', 'c'] });
+    await done.page.init();
+    assert.equal(done.view.hero.querySelectorAll('.study-hero').length, 0);
+    const empty = setupHeader({ index: [] });
+    await empty.page.init();
+    assert.equal(empty.view.hero.querySelectorAll('.study-hero').length, 0);
+    assert.equal(empty.view.chips.querySelectorAll('.study-chip').length, 0);
+});
+
+test('header: an older cached page without the hero/chips containers still renders the grid', async () => {
+    const { page, view } = setupHeader({ withHeader: false });
+    await page.init();
+    assert.deepEqual(ids(view), ['a', 'b', 'c']);
+});
+
+test('header: the unlock flash still plays when the newly opened card is visible under the filter', async () => {
+    const { page, view, state } = setupHeader({ completed: [], session: {} });
+    await page.init();
+    state.completed.add('a');
+    page.refresh();
+    assert.ok(card(view, 'b').classList.contains('is-just-unlocked'));
+});
+
+test('header: a card unlocked while a filter hides it does not flash or throw', async () => {
+    const { page, view, state } = setupHeader({ completed: [], session: { encounterFilter: 'completed' } });
+    await page.init();
+    state.completed.add('a');
+    page.refresh();
+    assert.deepEqual(ids(view), ['a']);
+    assert.equal(view.body.querySelectorAll('.is-just-unlocked').length, 0);
 });
