@@ -173,6 +173,9 @@ test.describe('updates', () => {
             const newVersion = 'aaaaaaaaaaaa';
             expect(await cacheNames(page)).toContain(`devocionales-${oldVersion}`);
             await page.evaluate(() => { window.readerSession = 'still-open'; });
+            // A reader who has been on the page for a while: past the first seconds in which a new
+            // build replaces the page at once (DevotionalSwRegister's entry window).
+            await page.waitForFunction(() => performance.now() > 9_000, undefined, { timeout: 20_000 });
 
             state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, newVersion); // the deploy
             await page.evaluate(async () => { await (await navigator.serviceWorker.getRegistration()).update(); });
@@ -230,6 +233,34 @@ test.describe('updates', () => {
             await page.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
             await expectReaderOnNewWorker(page);
         });
+    });
+
+    // "Update on entry": a deploy found within the first seconds of a visible page replaces it at
+    // once (one reload) instead of waiting until the tab is hidden. The deploy happens before the
+    // navigation, so the page is young when its update check finds the new worker.
+    test('a deploy found right after the reader opens replaces the page with the new build', async ({ page }) => {
+        const state = { overrides: {} };
+        const server = await startSiteServer(state);
+        const base = `http://127.0.0.1:${server.address().port}`;
+        try {
+            await installWorker(page, base);
+            const source = fs.readFileSync(path.join(SITE_ROOT, 'devocionales/sw.js'), 'utf8');
+            const oldVersion = source.match(/version\\":\\"([0-9a-f]{12})/)[1];
+            const newVersion = 'bbbbbbbbbbbb';
+            state.overrides['/devocionales/sw.js'] = source.replace(oldVersion, newVersion); // the deploy
+
+            await page.goto(`${base}${READER}`, { waitUntil: 'domcontentloaded' });
+            await page.evaluate(() => { window.beforeReload = 'old-page'; });
+            // The page reloads itself while these polls run, so a poll that lands mid-navigation reads as "not yet".
+            const whileReloading = (read) => () => read().catch(() => null);
+            await expect.poll(whileReloading(() => cacheNames(page)), { timeout: 20_000 }).toContain(`devocionales-${newVersion}`);
+            await expect.poll(whileReloading(() => cacheNames(page)), { timeout: 20_000 }).not.toContain(`devocionales-${oldVersion}`);
+            // The page reloaded itself: the marker set on the old page is gone, and the new worker controls it.
+            await expect.poll(whileReloading(() => page.evaluate(() => window.beforeReload === undefined)), { timeout: 20_000 }).toBe(true);
+            await expectReaderOnNewWorker(page);
+        } finally {
+            server.close();
+        }
     });
 
     // Closing the tab and opening another straight away is what a reader does. In Chromium under
