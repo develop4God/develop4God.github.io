@@ -28,11 +28,20 @@
             const list = cards.buildCards(entries, { completed: store.loadCompleted(), allUnlocked: allUnlocked() });
             view.count.textContent = listDom.countLabel(cards.countPublished(entries));
             view.body.replaceChildren(listDom.buildGrid(list, { handlers }));
-            // B6: a card that was locked and is open now gets the highlight once (the CSS respects reduced motion).
+            // A card that was locked and is open now plays the unlock once (the CSS respects reduced motion).
+            // One card gets the flash and its pill; several (unlock all) get a staggered sweep and no pill.
             if (previousStates) {
-                list.filter((c) => previousStates[c.id] === 'locked' && c.state === 'open').forEach((c) => {
+                const opened = list.filter((c) => previousStates[c.id] === 'locked' && c.state === 'open');
+                const single = opened.length === 1;
+                opened.forEach((c) => {
                     const el = view.body.querySelector(`[data-encounter-id="${c.id}"]`);
-                    if (el) el.classList.add('is-just-unlocked');
+                    if (!el) return;
+                    if (single) {
+                        el.classList.add('is-just-unlocked');
+                        el.setAttribute('data-unlock-label', deps.unlockLabel || '');
+                    } else {
+                        el.classList.add('is-bulk-unlocked');
+                    }
                 });
             }
             previousStates = Object.fromEntries(list.map((c) => [c.id, c.state]));

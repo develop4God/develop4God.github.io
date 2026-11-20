@@ -342,6 +342,14 @@
     "count": "{count} na engkwentro",
     "loading": "Naglo-load ng mga engkwentro…",
     "locked": "Naka-lock",
-    "unlock_offer_play": "Kunin ang app"
+    "unlock_offer_play": "Kunin ang app",
+    "unlock_offer_this_browser": "Ina-unlock lang nito ang browser na ito. Hiwalay ang iyong pagbili sa app.",
+    "unlock_offer_failed": "Hindi natapos ang bayad. Naka-lock pa rin ang mga encounter. Pakisubukang muli.",
+    "read_now_hint": "Gusto mo na bang basahin ito? I-tap dito.",
+    "new_unlocked": "Bagong pagtatagpo ang nabuksan",
+    "pass_kicker": "Pass ng Mga Pagtatagpo",
+    "pass_title": "Salamat sa pagsuporta sa aming ministeryo",
+    "pass_body": "Bukas na ang lahat ng pagtatagpo sa device na ito. Magpatuloy sa pagbabasa, isang kuwento sa bawat pagkakataon.",
+    "pass_button": "Simulan ang pagbasa"
   }
 }

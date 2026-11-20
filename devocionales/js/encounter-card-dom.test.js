@@ -122,3 +122,13 @@ test('review: replacement patterns in a remote title ($&, $$, $1) never mangle t
     const el = dom.buildCard(card({ state: 'locked', prerequisiteTitle: 'Cost $$ of $& Grace $1' }), { handlers: handlers() });
     assert.equal(el.querySelector('.encounter-card-hint').textContent, 'Complete to access: Cost $$ of $& Grace $1');
 });
+
+test('the next locked card shows the gold "read it now" pill; other locked cards do not (like the app)', () => {
+    const TEXT_NOW = 'Want to read it now? Tap here.';
+    const withT = (k) => (k === 'read_now_hint' ? TEXT_NOW : t(k));
+    const local = createCardDom({ h: createBuilder(doc), t: withT, imageUrlFor });
+    const next = local.buildCard(card({ state: 'locked', isNextLocked: true, prerequisiteTitle: 'Bartimaeus' }), { handlers: handlers() });
+    assert.equal(next.querySelector('.encounter-unlock-pill').textContent, TEXT_NOW);
+    const other = local.buildCard(card({ state: 'locked', isNextLocked: false, prerequisiteTitle: 'Bartimaeus' }), { handlers: handlers() });
+    assert.equal(other.querySelectorAll('.encounter-unlock-pill').length, 0);
+});
