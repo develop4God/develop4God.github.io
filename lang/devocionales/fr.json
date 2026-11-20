@@ -345,6 +345,11 @@
     "unlock_offer_play": "Obtenir l’application",
     "unlock_offer_this_browser": "Déverrouille uniquement ce navigateur. Votre achat dans l’application est séparé.",
     "unlock_offer_failed": "Le paiement n’a pas abouti. Vos rencontres restent verrouillées. Veuillez réessayer.",
-    "read_now_hint": "Envie de le lire maintenant ? Touchez ici."
+    "read_now_hint": "Envie de le lire maintenant ? Touchez ici.",
+    "new_unlocked": "Nouvelle rencontre débloquée",
+    "pass_kicker": "Pass Rencontres",
+    "pass_title": "Merci de soutenir notre ministère",
+    "pass_body": "Toutes les rencontres sont ouvertes sur cet appareil. Continuez à lire, une histoire à la fois.",
+    "pass_button": "Commencer à lire"
   }
 }

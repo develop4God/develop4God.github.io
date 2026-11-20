@@ -11,6 +11,7 @@
     // The shared list DOM asks for studies-flavoured keys; they map onto the app's `encounters.*` strings.
     const KEY_ALIASES = { loadError: 'error_load', empty: 'empty_title', studiesCount: 'count' };
     const INERT_SELECTOR = 'header, main, footer, #shell-nav';
+    const PASS_AUTO_CLOSE_MS = 6500;
 
     function boot() {
         const doc = global.document;
@@ -68,6 +69,17 @@
             reducedMotion: () => global.matchMedia('(prefers-reduced-motion: reduce)').matches,
         });
         const rtl = () => doc.documentElement.dir === 'rtl';
+        // The thank-you pass after a payment. A page cached before pass-dom existed falls back to the toast.
+        const pass = global.EncounterPassDom ? global.EncounterPassDom.createPassDom({
+            h,
+            t,
+            container: doc.body,
+            setBackgroundInert,
+            focusFallback: () => { const title = byId('encounters-title'); title.setAttribute('tabindex', '-1'); title.focus(); },
+            setTimer: (fn, ms) => global.setTimeout(fn, ms),
+            clearTimer: (id) => global.clearTimeout(id),
+            autoCloseMs: PASS_AUTO_CLOSE_MS,
+        }) : null;
 
         function loadScript(url) {
             return new Promise((resolve, reject) => {
@@ -81,10 +93,17 @@
 
         function onUnlockGranted() {
             if (entitlement) entitlement.grant();
-            // Refresh first: the card that opened the sheet is re-rendered, so close() must not refocus a detached card.
-            listPage.refresh();
-            unlockSheet.close();
-            toast.show(t('unlock_offer_thanks'));
+            try {
+                // Refresh first: the card that opened the sheet is re-rendered, so close() must not refocus a detached card.
+                listPage.refresh();
+                unlockSheet.close();
+                if (pass) pass.open();
+                else toast.show(t('unlock_offer_thanks'));
+            } catch (error) {
+                // The payment is captured and stored already: the payer must still get the thank-you.
+                console.error('Encounters: the post-payment screen failed', error);
+                toast.show(t('unlock_offer_thanks'));
+            }
         }
 
         function openUnlockSheet() {
@@ -171,6 +190,7 @@
             unlockSheet: { open: openUnlockSheet },
             allUnlocked: isUnlockedAll,
             afterRender: renderIcons,
+            unlockLabel: t('new_unlocked'),
             onOpen: (id) => router.open(id),
         });
 

@@ -345,6 +345,11 @@
     "unlock_offer_play": "アプリを入手",
     "unlock_offer_this_browser": "このブラウザのみ開放されます。アプリでの購入とは別です。",
     "unlock_offer_failed": "支払いが完了しませんでした。出会いはまだロックされています。もう一度お試しください。",
-    "read_now_hint": "今すぐ読みたいですか？ここをタップ。"
+    "read_now_hint": "今すぐ読みたいですか？ここをタップ。",
+    "new_unlocked": "新しい出会いが解放されました",
+    "pass_kicker": "出会いパス",
+    "pass_title": "ご支援ありがとうございます",
+    "pass_body": "この端末ですべての出会いが開かれました。一つずつ読み進めてください。",
+    "pass_button": "読み始める"
   }
 }

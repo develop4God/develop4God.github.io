@@ -12,7 +12,7 @@ const SDK_URL = /^https:\/\/www\.paypal\.com\/sdk\/js/;
 const CONFIG_URL = '**/devocionales/js/devotional-pwa-config.js';
 const PNG_1X1 = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
 const KEY = 'develop4God_encounters_unlock_all';
-const THANKS = 'Thank you! All encounters are open.';
+const THANKS = 'Thank you for supporting our ministry';
 const FAILED = 'The payment did not complete. Your encounters are still locked. Please try again.';
 
 const entry = (id) => ({
@@ -128,11 +128,12 @@ test.describe('Encounters unlock by PayPal', () => {
     await openCheckout(page);
 
     await page.evaluate(() => window.__paypalOptions.onApprove({}, {
-      order: { capture: () => Promise.resolve({ status: 'COMPLETED' }) },
+      order: { capture: () => Promise.resolve({ status: 'COMPLETED', purchase_units: [{ payments: { captures: [{ status: 'COMPLETED' }] } }] }) },
     }));
 
     await expect(page.locator('.encounter-sheet')).toHaveCount(0);
-    await expect(page.locator('.toast')).toContainText(THANKS);
+    await expect(page.locator('.encounter-pass')).toContainText(THANKS);
+    await expect(page.locator('.encounter-pass')).toHaveAttribute('role', 'dialog');
     await expect(page.locator('[data-encounter-id="b"]')).toHaveClass(/encounter-card--open/);
     await expect(page.locator('[data-encounter-id="c"]')).toHaveClass(/encounter-card--open/);
     await expect(page.locator('[data-encounter-id="c"]')).not.toHaveClass(/encounter-card--locked/);
@@ -146,12 +147,13 @@ test.describe('Encounters unlock by PayPal', () => {
     stubSdk(page);
     await openCheckout(page);
     await page.evaluate(async () => {
-      const actions = { order: { capture: () => Promise.resolve({ status: 'COMPLETED' }) } };
+      const actions = { order: { capture: () => Promise.resolve({ status: 'COMPLETED', purchase_units: [{ payments: { captures: [{ status: 'COMPLETED' }] } }] }) } };
       await window.__paypalOptions.onApprove({}, actions);
       await window.__paypalOptions.onApprove({}, actions);
     });
     // The once-only grant is asserted by the unit test; here the page must still show the thank-you and store it.
-    await expect(page.locator('.toast')).toContainText(THANKS);
+    await expect(page.locator('.encounter-pass')).toContainText(THANKS);
+    await expect(page.locator('.encounter-pass')).toHaveAttribute('role', 'dialog');
     expect(await page.evaluate((k) => localStorage.getItem(k), KEY)).toBe('true');
   });
 

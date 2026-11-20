@@ -6,6 +6,7 @@
 :root {
     --gold: #d9a62e;
     --gold-shine: #fff3c4;
+    --open-lock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill-rule='evenodd' d='M18 8H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z'/%3E%3Cpath d='M7 8V6c0-2.76 2.24-5 5-5 2.3 0 4.2 1.5 4.8 3.6l-1.9.6C14.5 3.8 13.4 2.9 12 2.9 10.3 2.9 8.9 4.3 8.9 6v2z'/%3E%3C/svg%3E");
     --gold-ink: #3e2a00;
 }
 
@@ -160,6 +161,7 @@
 
 .encounter-card.is-just-unlocked {
     animation: encounter-unlock 1.4s ease-out 1;
+    overflow: visible; /* the single-unlock pill sits outside the card; the bulk sweep stays inside */
 }
 
 @keyframes encounter-unlock {
@@ -412,8 +414,13 @@
 }
 
 @keyframes encounter-gold-shine {
-    from { background-position: 100% 0; }
-    to { background-position: -100% 0; }
+        from {
+        background-position: 100% 0;
+    }
+
+        to {
+        background-position: -100% 0;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -692,4 +699,273 @@
 .encounter-retry:focus-visible {
     outline: 3px solid var(--accent);
     outline-offset: 3px;
+}
+
+/* ---- Unlock feedback ------------------------------------------------------------------------------
+   Single unlock (is-just-unlocked): a gold open padlock over the artwork, then the padlock and the
+   "New encounter unlocked" pill (data-unlock-label) fade out, leaving the plain open card.
+   Unlock all (is-bulk-unlocked): every newly open card plays the same padlock with a staggered sweep,
+   with no pill. While the thank-you pass is open the sweep is paused behind it. Reduced motion hides
+   these transient layers entirely, so no static pill is left behind. */
+.encounter-card.is-just-unlocked,
+.encounter-card.is-bulk-unlocked {
+    position: relative;
+}
+
+.encounter-card.is-just-unlocked .encounter-card-media,
+.encounter-card.is-bulk-unlocked {
+    overflow: hidden; /* keeps the staggered sweep inside the card */
+}
+
+.encounter-card.is-bulk-unlocked .encounter-card-media {
+    position: relative;
+}
+
+.encounter-card.is-just-unlocked .encounter-card-media::after,
+.encounter-card.is-bulk-unlocked .encounter-card-media::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 50%;
+    inset-block-start: 50%;
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    translate: -50% -50%;
+    background: linear-gradient(180deg, var(--gold-shine) 0%, var(--gold) 100%);
+    filter: drop-shadow(0 0 10px rgba(217, 166, 46, 0.8));
+    mask: var(--open-lock) center / contain no-repeat;
+    opacity: 0;
+    animation: encounter-flash-lock 2.6s ease-out both;
+}
+
+.encounter-card.is-just-unlocked::after {
+    content: attr(data-unlock-label);
+    position: absolute;
+    inset-block-start: -0.6rem;
+    inset-inline-end: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #2a1d00;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: encounter-flash-pill 2.6s ease-out both;
+}
+
+.encounter-card.is-bulk-unlocked .encounter-card-media::after {
+    animation-delay: var(--sweep-delay, 0s);
+}
+
+.encounter-card.is-bulk-unlocked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 236, 170, 0.4) 50%, transparent 65%);
+    transform: translateX(-120%);
+    animation: encounter-card-sweep 1.1s ease-in-out var(--sweep-delay, 0s) both;
+}
+
+.encounter-card.is-bulk-unlocked:nth-child(2) {
+    --sweep-delay: 0.28s;
+}
+
+.encounter-card.is-bulk-unlocked:nth-child(3) {
+    --sweep-delay: 0.56s;
+}
+
+.encounter-card.is-bulk-unlocked:nth-child(4) {
+    --sweep-delay: 0.84s;
+}
+
+.encounter-card.is-bulk-unlocked:nth-child(5) {
+    --sweep-delay: 1.12s;
+}
+
+.encounter-card.is-bulk-unlocked:nth-child(n + 6) {
+    --sweep-delay: 1.4s;
+}
+
+body:has(.encounter-pass) .encounter-card.is-bulk-unlocked,
+body:has(.encounter-pass) .encounter-card.is-bulk-unlocked::after,
+body:has(.encounter-pass) .encounter-card.is-bulk-unlocked .encounter-card-media::after {
+    animation-play-state: paused;
+}
+
+@keyframes encounter-flash-lock {
+        0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+
+        20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+        45% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+        100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+}
+
+@keyframes encounter-flash-pill {
+        0%, 70% {
+        opacity: 1;
+    }
+
+        100% {
+        opacity: 0;
+    }
+}
+
+@keyframes encounter-bulk-sweep {
+    to {
+        transform: translateX(120%);
+    }
+}
+
+/* Card sweep: fades out as it leaves, so the resting card never shows a leftover streak. */
+@keyframes encounter-card-sweep {
+    0% {
+        transform: translateX(-120%);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+}
+
+/* Completed on the completion card: the gold badge pops in. */
+.encounter-complete--pop {
+    animation: encounter-complete-pop 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+@keyframes encounter-complete-pop {
+        from {
+        transform: scale(0.6);
+        opacity: 0;
+    }
+
+        to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Thank-you pass after a PayPal unlock: a modal dialog over the page. */
+.encounter-pass {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    padding-inline: max(1.25rem, env(safe-area-inset-left, 0px)) max(1.25rem, env(safe-area-inset-right, 0px));
+    background: radial-gradient(circle at 50% 45%, rgba(242, 193, 78, 0.28), rgba(11, 16, 32, 0.96) 62%);
+    animation: encounter-pass-fade 0.4s ease-out both;
+}
+
+.encounter-pass-card {
+    position: relative;
+    inline-size: min(100%, 22rem);
+    padding: 1.75rem 1.25rem;
+    border-radius: 20px;
+    border: 1px solid var(--gold);
+    background: linear-gradient(145deg, #2b2208, #14100a 55%, #2b2208);
+    text-align: center;
+    overflow: hidden;
+    animation: encounter-pass-in 0.8s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+.encounter-pass-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 236, 170, 0.35) 50%, transparent 65%);
+    transform: translateX(-120%);
+    animation: encounter-bulk-sweep 2.2s ease-in-out 0.6s 2 both;
+    pointer-events: none;
+}
+
+.encounter-pass-kicker {
+    margin: 0;
+    color: var(--gold);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+.encounter-pass-title {
+    margin: 0.5rem 0;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    text-wrap: balance;
+    color: #fff;
+}
+
+.encounter-pass-body {
+    margin: 0 0 1rem;
+    color: #d6cfb8;
+    font-size: 0.9375rem;
+}
+
+.encounter-pass-button {
+    padding: 0.625rem 1.25rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #2a1d00;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.encounter-pass-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+@keyframes encounter-pass-fade {
+        from {
+        opacity: 0;
+    }
+
+        to {
+        opacity: 1;
+    }
+}
+
+@keyframes encounter-pass-in {
+        from {
+        transform: scale(0.6) rotate(-4deg);
+        opacity: 0;
+    }
+
+        to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .encounter-card.is-just-unlocked::after,
+    .encounter-card.is-just-unlocked .encounter-card-media::after,
+    .encounter-card.is-bulk-unlocked::after,
+    .encounter-card.is-bulk-unlocked .encounter-card-media::after,
+    .encounter-pass-card::after {
+        display: none;
+    }
+
+    .encounter-complete--pop,
+    .encounter-pass,
+    .encounter-pass-card {
+        animation: none;
+    }
 }

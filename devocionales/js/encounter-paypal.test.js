@@ -34,6 +34,13 @@ function make(overrides = {}) {
     return { paypal: createEncounterPaypal(deps), calls, setSdk: (v) => { sdk = v; } };
 }
 
+// What PayPal's capture response looks like: the order status plus the captures under purchase_units.
+const paid = (id = 'CAP1', captureStatus = 'COMPLETED') => ({
+    status: 'COMPLETED',
+    id,
+    purchase_units: [{ payments: { captures: [{ id, status: captureStatus }] } }],
+});
+
 // Flush pending promise callbacks (the SDK load is a promise chain).
 const flush = () => new Promise((resolve) => setImmediate(resolve));
 
@@ -94,9 +101,9 @@ test('a COMPLETED capture grants exactly once, even if PayPal approves again (F3
     paypal.mount(container(), { onGranted: (d) => granted.push(d) });
     await flush();
     const { onApproved } = calls.render[0].options;
-    onApproved({ status: 'COMPLETED', id: 'CAP1' });
-    onApproved({ status: 'COMPLETED', id: 'CAP2' });
-    assert.deepEqual(granted, [{ status: 'COMPLETED', id: 'CAP1' }]);
+    onApproved(paid('CAP1'));
+    onApproved(paid('CAP2'));
+    assert.deepEqual(granted, [paid('CAP1')]);
 });
 
 test('a non-COMPLETED capture does not grant, reports failure, and a later completed one still can (F3)', async () => {
@@ -110,7 +117,7 @@ test('a non-COMPLETED capture does not grant, reports failure, and a later compl
     onApproved(undefined);
     assert.equal(failed, 2);
     assert.equal(granted.length, 0);
-    onApproved({ status: 'COMPLETED' });
+    onApproved(paid());
     assert.equal(granted.length, 1);
 });
 
@@ -131,7 +138,7 @@ test('an error after a granted capture is ignored, so the payer is not told it f
     paypal.mount(container(), { onGranted: () => {}, onFailed: () => { failed += 1; } });
     await flush();
     const { onApproved, onError } = calls.render[0].options;
-    onApproved({ status: 'COMPLETED' });
+    onApproved(paid());
     onError(new Error('late'));
     assert.equal(failed, 0);
 });
@@ -189,4 +196,47 @@ test('when the SDK cannot load, onUnavailable is called so the sheet can offer i
     paypal.mount(container(), { onUnavailable: () => { unavailable += 1; } });
     await flush();
     assert.equal(unavailable, 1);
+});
+
+test('a rejected render shows the Play fallback and removes the slot and note (no unhandled rejection)', async () => {
+    const calls = { onUnavailable: 0, onFailed: 0 };
+    const deps = {
+        h,
+        config: CONFIG,
+        note: 'Only this browser.',
+        checkout: {
+            buildSdkUrl: () => 'https://sdk.test/',
+            renderButtons: () => Promise.reject(new Error('container detached')),
+        },
+        loadScript: () => Promise.resolve(),
+        getSdk: () => ({}),
+    };
+    const paypal = createEncounterPaypal(deps);
+    const box = container();
+    paypal.mount(box, { onUnavailable: () => { calls.onUnavailable += 1; } });
+    await flush();
+    await flush();
+    assert.equal(calls.onUnavailable, 1);
+    assert.equal(box.children.length, 2, 'note and slot were appended');
+    assert.ok(box.children.every((el) => el.removed), 'both the note and the slot are removed');
+});
+
+test('an order COMPLETED whose capture is still PENDING does not grant and reports failure (review F-capture)', async () => {
+    const { paypal, calls } = make();
+    const granted = [];
+    let failed = 0;
+    paypal.mount(container(), { onGranted: (d) => granted.push(d), onFailed: () => { failed += 1; } });
+    await flush();
+    calls.render[0].options.onApproved(paid('CAP1', 'PENDING'));
+    assert.equal(granted.length, 0);
+    assert.equal(failed, 1);
+});
+
+test('an order COMPLETED with no capture record does not grant', async () => {
+    const { paypal, calls } = make();
+    const granted = [];
+    paypal.mount(container(), { onGranted: (d) => granted.push(d), onFailed: () => {} });
+    await flush();
+    calls.render[0].options.onApproved({ status: 'COMPLETED', purchase_units: [{}] });
+    assert.equal(granted.length, 0);
 });

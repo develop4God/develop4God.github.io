@@ -8,6 +8,15 @@
     // injected, which keeps this module free of globals and testable without PayPal.
     const DESCRIPTION = 'Encounters unlock for this browser';
 
+    // The order must be COMPLETED and have at least one capture, all of them COMPLETED. A PENDING
+    // capture (an eCheck or a review hold) has not moved the money yet, so it does not unlock anything.
+    function captureCompleted(details) {
+        if (!details || details.status !== 'COMPLETED') return false;
+        const unit = Array.isArray(details.purchase_units) ? details.purchase_units[0] : null;
+        const captures = unit && unit.payments && Array.isArray(unit.payments.captures) ? unit.payments.captures : [];
+        return captures.length > 0 && captures.every((capture) => capture && capture.status === 'COMPLETED');
+    }
+
     function createEncounterPaypal({ h, config, checkout, loadScript, getSdk, note = '' }) {
         let sdkLoad = null;
         let granted = false;
@@ -30,24 +39,25 @@
         function mount(container, { onGranted = () => {}, onFailed = () => {}, onUnavailable = () => {} } = {}) {
             if (!enabled() || granted) return false;
             const slot = h('div', { class: 'encounter-paypal' });
-            if (note) container.append(h('p', { class: 'encounter-sheet-note', text: note }));
+            const noteEl = note ? h('p', { class: 'encounter-sheet-note', text: note }) : null;
+            if (noteEl) container.append(noteEl);
             container.append(slot);
-            loadSdk().then(() => {
-                checkout.renderButtons(getSdk(), slot, {
+            loadSdk().then(() => checkout.renderButtons(getSdk(), slot, {
                     amount: config.amount,
                     currency: config.currency,
                     description: DESCRIPTION,
                     onApproved: (details) => {
                         if (granted) return;
-                        if (!details || details.status !== 'COMPLETED') { onFailed(); return; }
+                        if (!captureCompleted(details)) { onFailed(); return; }
                         granted = true;
                         onGranted(details);
                     },
                     onError: () => { if (!granted) onFailed(); },
-                });
-            }).catch(() => {
+            })).catch(() => {
+                // No SDK, or the buttons could not render: drop the note and slot, and offer the Play link instead.
+                if (noteEl) noteEl.remove();
                 slot.remove();
-                onUnavailable(); // no SDK: the sheet offers its Play link instead
+                onUnavailable();
             });
             return true;
         }
