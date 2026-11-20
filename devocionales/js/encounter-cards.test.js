@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-for (const name of ['encounter-lock.js', 'encounter-cards.js']) {
+for (const name of ['discovery-progress.js', 'encounter-lock.js', 'encounter-cards.js']) {
     const filename = path.join(__dirname, name);
     const source = fs.readFileSync(filename, 'utf8');
     vm.runInThisContext(`(function(window){${source}\n})`, { filename })(global.window);
@@ -87,4 +87,44 @@ test('does not mutate the entries it is given', () => {
     const before = JSON.stringify(entries);
     build(['a']);
     assert.equal(JSON.stringify(entries), before);
+});
+
+// ---- section progress on open cards; "continue" hero (shared with Bible studies) ----
+const withProgress = (map) => (id) => map[id] || null;
+
+test('progress: only open cards get a percent; locked, completed and coming-soon cards get none', () => {
+    const cards = buildCards(entries, { completed: new Set(['a']), progressOf: withProgress({ b: { completedSections: [0, 1], totalSections: 4 }, a: { completedSections: [0], totalSections: 2 } }) });
+    assert.equal(cards.find((c) => c.id === 'b').percent, 0.5);
+    assert.equal(cards.find((c) => c.id === 'a').percent, null);
+    assert.equal(cards.find((c) => c.id === 'c').percent, null);
+    assert.equal(cards.find((c) => c.id === 's').percent, null);
+});
+
+test('progress: an open card with reads but no known total shows no bar; isInProgress only with a read section', () => {
+    const cards = buildCards(entries, { progressOf: withProgress({ a: { completedSections: [0], totalSections: null }, b: { completedSections: [], totalSections: 3 } }) });
+    assert.equal(cards.find((c) => c.id === 'a').percent, null);
+    assert.equal(cards.find((c) => c.id === 'a').isInProgress, true);
+    assert.equal(cards.find((c) => c.id === 'b').isInProgress, false);
+});
+
+test('progress: no progress lookup at all (old callers) leaves every card without a bar', () => {
+    assert.ok(build().every((c) => c.percent === null && c.isInProgress === false));
+});
+
+
+test('buildCards: an open card whose total is stored but with no section read has no percent (no empty bar)', () => {
+    const [card] = global.window.EncounterCards.buildCards([{ id: 'a', isPublished: true }], { progressOf: () => ({ completedSections: [], totalSections: 8 }) });
+    assert.equal(card.percent, null);
+    assert.equal(card.isInProgress, false);
+});
+
+test('buildCards: indexes beyond the current total (from a longer earlier version) do not inflate the percent', () => {
+    const [card] = buildCards([e('a')], { progressOf: () => ({ completedSections: [0, 1, 2, 3, 4], totalSections: 4 }) });
+    assert.equal(card.percent, 1, 'indexes 0-3 are inside the total of 4; index 4 is not counted');
+    const [partial] = buildCards([e('a')], { progressOf: () => ({ completedSections: [0, 5, 6, 7], totalSections: 4 }) });
+    assert.equal(partial.percent, 0.25);
+    assert.equal(partial.isInProgress, true);
+    const [stale] = buildCards([e('a')], { progressOf: () => ({ completedSections: [5, 6], totalSections: 4 }) });
+    assert.equal(stale.isInProgress, false, 'only out-of-range indexes: nothing of this version was read');
+    assert.equal(stale.percent, null);
 });

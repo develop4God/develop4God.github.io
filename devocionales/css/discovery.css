@@ -155,6 +155,9 @@ body {
     margin-block-end: 0.5rem;
 }
 
+/* A page whose script has not filled the bar (an older cached one) shows no empty strip. */
+.studies-chips-bar:empty { display: none; }
+
 .study-chips {
     display: flex;
     gap: 0.5rem;

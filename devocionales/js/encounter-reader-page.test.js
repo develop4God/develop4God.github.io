@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 global.window = global.window || {};
-for (const name of ['discovery-cards.js', 'discovery-nav.js', 'encounter-reader-page.js']) {
+for (const name of ['discovery-cards.js', 'discovery-progress.js', 'discovery-hero-dom.js', 'discovery-nav.js', 'encounter-reader-page.js']) {
     const filename = path.join(__dirname, name);
     vm.runInThisContext(`(function(window){${fs.readFileSync(filename, 'utf8')}\n})`, { filename })(global.window);
 }
@@ -314,4 +314,140 @@ test('reset() drops the current encounter: keys no longer page it and a pending 
     timers.fire();
     assert.equal(calls.rendered.length, before, 'no render after reset');
     assert.equal(calls.exits, 0);
+});
+
+// ---- section progress (shared store): records card pages only, resumes at the first unread card ----
+function progressFake(initial = {}) {
+    const calls = { totals: [], marked: [] };
+    const data = { sections: [...(initial.sections || [])], total: initial.total || null };
+    return {
+        calls,
+        getProgress: () => ({ completedSections: [...data.sections], totalSections: data.total }),
+        setTotalSections: (id, total) => { calls.totals.push([id, total]); data.total = total; },
+        markSectionCompleted: (id, index) => { calls.marked.push([id, index]); if (!data.sections.includes(index)) data.sections.push(index); },
+    };
+}
+
+function setupProgress(progress, { loadGate = null, completed = false, study = SAMPLE } = {}) {
+    const { calls, timers, state } = setup({ completed });
+    // Rebuild with the progress dependency: the same page wiring, plus `progress`.
+    const rebuilt = createReaderPage({
+        view: { render: (p) => calls.rendered.push(p) },
+        lang: () => 'en',
+        data: { loadEncounter: async () => { if (loadGate) await loadGate; return study; } },
+        store: { isCompleted: () => state.isCompleted, markCompleted: () => {} },
+        dom: {},
+        timers,
+        celebrate: () => {},
+        toast: { show: () => {} },
+        completedMessage: 'done',
+        onExit: () => {},
+        copyright: () => '',
+        progress,
+    });
+    return { page: rebuilt, calls };
+}
+
+test('progress: merely opening an encounter writes nothing; the total is stored with the first recorded section', async () => {
+    const progress = progressFake();
+    const { page } = setupProgress(progress);
+    await page.open(SUMMARY);
+    assert.deepEqual(progress.calls.totals, []);
+    page.enter();
+    page.next(); // card 0: the first recorded section
+    assert.deepEqual(progress.calls.totals, [[SUMMARY.id, 3]], 'the key-verse page is not a section');
+    page.next(); // card 1: the total is already right, no second write
+    assert.equal(progress.calls.totals.length, 1);
+});
+
+test('progress: the intro and the key-verse page record nothing; enter() on a fresh encounter starts at page 0 without recording it', async () => {
+    const progress = progressFake();
+    const { page } = setupProgress(progress);
+    await page.open(SUMMARY);
+    assert.deepEqual(progress.calls.marked, []);
+    page.enter();
+    assert.deepEqual(progress.calls.marked, []);
+});
+
+test('progress: moving onto a card records that section; moving back to the key verse records nothing more', async () => {
+    const progress = progressFake();
+    const { page } = setupProgress(progress);
+    await page.open(SUMMARY);
+    page.enter();
+    page.next(); // card 0
+    assert.deepEqual(progress.calls.marked, [[SUMMARY.id, 0]]);
+    page.prev(); // key verse
+    assert.deepEqual(progress.calls.marked, [[SUMMARY.id, 0]]);
+});
+
+test('progress: enter() resumes at the first unread card, not at the start', async () => {
+    const progress = progressFake({ sections: [0], total: 3 });
+    const { page, calls } = setupProgress(progress);
+    await page.open(SUMMARY);
+    page.enter();
+    assert.equal(last(calls).index, 2); // key verse, card 0 (read), card 1 -> index 2
+    assert.deepEqual(progress.calls.marked, [[SUMMARY.id, 1]]);
+});
+
+test('progress: when every card is read but the encounter is not completed, enter() opens on the completion card', async () => {
+    const progress = progressFake({ sections: [0, 1, 2], total: 3 });
+    const { page, calls } = setupProgress(progress);
+    await page.open(SUMMARY);
+    page.enter();
+    assert.equal(last(calls).index, 3);
+});
+
+test('progress: a load superseded by reset() records nothing when it finally arrives', async () => {
+    const progress = progressFake();
+    let release;
+    const gate = new Promise((resolve) => { release = resolve; });
+    const { page } = setupProgress(progress, { loadGate: gate });
+    const opening = page.open(SUMMARY);
+    page.reset();
+    release();
+    await opening;
+    page.enter();
+    assert.deepEqual(progress.calls.totals, []);
+    assert.deepEqual(progress.calls.marked, []);
+});
+
+test('progress: without a progress store the reader behaves exactly as before (old cached pages)', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    page.enter();
+    page.next();
+    assert.equal(last(calls).index, 1);
+});
+
+test('intro bypass: an encounter with progress opens straight into the reader, no intro screen', async () => {
+    const progress = progressFake({ sections: [0], total: 3 });
+    const { page, calls } = setupProgress(progress);
+    await page.open(SUMMARY);
+    assert.equal(last(calls).phase, 'reader');
+});
+
+test('intro bypass: an encounter without progress still shows the intro first', async () => {
+    const progress = progressFake();
+    const { page, calls } = setupProgress(progress);
+    await page.open(SUMMARY);
+    assert.equal(last(calls).phase, 'intro');
+});
+
+test('intro bypass: a completed encounter reopens on the intro even though all its sections are recorded', async () => {
+    const progress = progressFake({ sections: [0, 1, 2], total: 3 });
+    const { page, calls } = setupProgress(progress, { completed: true });
+    await page.open(SUMMARY);
+    assert.equal(last(calls).phase, 'intro');
+    page.enter();
+    assert.equal(last(calls).index, 0, 'a completed encounter read again starts at the beginning');
+});
+
+test('resume: cards recorded from a longer version never send a shorter one straight to the completion card', async () => {
+    // Six sections read in the longer version (indexes 1-6); this version has cards 0-2 and no key verse.
+    const noKeyVerse = { ...SAMPLE, key_verse: undefined };
+    const progress = progressFake({ sections: [1, 2, 3, 4, 5, 6], total: 7 });
+    const { page, calls } = setupProgress(progress, { study: noKeyVerse });
+    await page.open(SUMMARY);
+    page.enter();
+    assert.equal(last(calls).index, 0, 'card 0 was never read, so the reader opens there, not on the last page');
 });

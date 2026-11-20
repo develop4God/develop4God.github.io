@@ -9,12 +9,14 @@
 
     function createReaderPage(deps) {
         const { view, lang, data, store, timers, celebrate, toast, completedMessage, onExit, copyright } = deps;
+        // Section progress (shared DiscoveryStore.createProgressStore). Optional: a page cached before it existed has none.
+        const progress = deps.progress || null;
 
         let summary = null;
         let study = null;
         let pages = [];
         let index = 0;
-        let phase = 'intro'; // 'intro' (C0, shown on every open) -> 'reader'
+        let phase = 'intro'; // 'intro' (C0, shown on every open except resuming an encounter in progress) -> 'reader'
         let intro = null;
         let loadSeq = 0;
         let completing = false; // press-once: set on the first completion, never cleared for this encounter
@@ -60,10 +62,32 @@
             };
         }
 
+        // Only card pages are sections: the key-verse page is never recorded. Viewing a card counts as reading it
+        // (as in Bible studies). Called whenever the reader shows a page. The section total is stored with the first
+        // recorded section, so merely opening an encounter writes nothing.
+        function recordView() {
+            if (!progress || !summary) return;
+            const page = pages[index];
+            if (!page || page.sectionIndex === null) return;
+            const total = global.DiscoveryProgress.countSections(pages);
+            if (progress.getProgress(summary.id).totalSections !== total) progress.setTotalSections(summary.id, total);
+            progress.markSectionCompleted(summary.id, page.sectionIndex);
+        }
+
+        // Where the reader opens: the first unread card. Every card read but not completed (completion is on the last
+        // card, so it was not reached) opens on the completion card, not back at the start.
+        function resumeIndex() {
+            const done = progress.getProgress(summary.id).completedSections;
+            const allRead = global.DiscoveryProgress.isFullyRead(pages, done);
+            return allRead && !store.isCompleted(summary.id) ? pages.length - 1 : global.DiscoveryProgress.firstUnreadIndex(pages, done);
+        }
+
+        // Entering the reader resumes at the first card not yet read (page 0 when nothing is read or all are).
         function enter() {
             if (phase === 'reader' || !pages.length) return;
             phase = 'reader';
-            index = 0;
+            index = progress && summary ? resumeIndex() : 0;
+            recordView();
             render();
         }
 
@@ -87,7 +111,10 @@
                 }
                 study = loaded;
                 pages = built;
-                render();
+                // An encounter in progress resumes directly. A completed one reopens on the intro like a fresh read.
+                const inProgress = progress && !store.isCompleted(target.id) && progress.getProgress(target.id).completedSections.length > 0;
+                if (inProgress) enter();
+                else render();
             } catch (_) {
                 if (seq !== loadSeq) return;
                 render({ error: true });
@@ -97,6 +124,7 @@
         function goTo(target) {
             if (!pages.length || target < 0 || target >= pages.length || target === index) return;
             index = target;
+            recordView();
             render();
         }
 
