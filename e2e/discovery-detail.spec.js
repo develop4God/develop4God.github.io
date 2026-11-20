@@ -56,10 +56,10 @@ test.describe('paging', () => {
   test('Next / Previous move through the cards; Previous is disabled on the first page', async ({ page }) => {
     await mockData(page);
     await openStudy(page);
-    await expect(page.locator('.study-prev')).toBeDisabled();
-    await page.locator('.study-next').click();
+    await expect(page.locator('.reader-prev')).toBeDisabled();
+    await page.locator('.reader-next').click();
     await expect(page.locator('.study-page-title')).toHaveText(ASCENSION.cards[0].title);
-    await page.locator('.study-prev').click();
+    await page.locator('.reader-prev').click();
     await expect(page.locator('.key-verse-card-label')).toBeVisible();
   });
 
@@ -165,7 +165,7 @@ test.describe('carousel', () => {
   test('Previous and Next stay available as quiet fallbacks, still 44px tall', async ({ page }) => {
     await mockData(page);
     await openStudy(page);
-    const next = page.locator('.study-next');
+    const next = page.locator('.reader-next');
     await expect(next).toBeVisible();
     expect((await next.boundingBox()).height).toBeGreaterThanOrEqual(44);
     expect(await next.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');
@@ -210,10 +210,10 @@ test.describe('completion, copyright and progress', () => {
     await openStudy(page);
     for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
     await expect(page.locator('.study-copyright')).toContainText('King James');
-    await page.locator('.study-complete').click();
+    await page.locator('.reader-complete').click();
     await expect(page.locator('.toast')).toHaveText('Study completed successfully');
-    await expect(page.locator('.study-complete')).toBeDisabled();
-    await expect(page.locator('.study-complete')).toHaveText('Study completed');
+    await expect(page.locator('.reader-complete')).toBeDisabled();
+    await expect(page.locator('.reader-complete')).toHaveText('Study completed');
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem('discovery_progress_ascension_en')).isCompleted)).toBe(true);
   });
 
@@ -271,7 +271,7 @@ test.describe('navigation and back (C6, C7)', () => {
     await page.locator('.study-card[data-study-id="ascension"] .study-card-open').click();
     await expect(page.locator('.study-page')).toBeVisible();
     for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
-    await page.locator('.study-exit').click();
+    await page.locator('.reader-exit').click();
     await expect(page.locator('#studies-list-view')).toBeVisible();
   });
 
@@ -279,7 +279,7 @@ test.describe('navigation and back (C6, C7)', () => {
     await mockData(page);
     await openStudy(page);
     for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
-    await page.locator('.study-exit').click();
+    await page.locator('.reader-exit').click();
     await expect(page.locator('#studies-list-view')).toBeVisible();
     await expect(page).toHaveURL(/estudios\/\?lang=en$/);
   });
@@ -312,7 +312,7 @@ test.describe('completion celebration', () => {
     await mockData(page);
     await openStudy(page);
     for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
-    await page.locator('.study-complete').click();
+    await page.locator('.reader-complete').click();
   }
 
   test('completing a study throws confetti that clears itself and never blocks taps', async ({ page }) => {
@@ -330,22 +330,22 @@ test.describe('completion celebration', () => {
     await openStudy(page);
     for (let i = 0; i < CARDS; i++) await page.keyboard.press('ArrowRight');
     const names = await page.evaluate(() => new Promise((resolve) => {
-      document.querySelector('.study-complete').click();
+      document.querySelector('.reader-complete').click();
       requestAnimationFrame(() => requestAnimationFrame(() => {
-        resolve([...new Set(document.querySelector('.study-complete').getAnimations({ subtree: true }).map((a) => a.animationName))].sort());
+        resolve([...new Set(document.querySelector('.reader-complete').getAnimations({ subtree: true }).map((a) => a.animationName))].sort());
       }));
     }));
     expect(names).toEqual(['study-check', 'study-halo', 'study-pop', 'study-wipe']);
-    await expect(page.locator('.study-complete .study-complete-check')).toBeVisible();
-    await expect(page.locator('.study-complete')).toHaveText('Study completed');
+    await expect(page.locator('.reader-complete .reader-complete-check')).toBeVisible();
+    await expect(page.locator('.reader-complete')).toHaveText('Study completed');
   });
 
   test('on a phone the completed button stays in view, so the animation is seen', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 600 });
     await finish(page);
-    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.reader-complete')).toBeDisabled();
     await page.waitForTimeout(400);
-    const box = await page.locator('.study-complete').boundingBox();
+    const box = await page.locator('.reader-complete').boundingBox();
     expect(box.y, 'top of the button inside the viewport').toBeGreaterThanOrEqual(0);
     expect(box.y + box.height, 'bottom of the button inside the viewport').toBeLessThanOrEqual(600);
   });
@@ -353,9 +353,9 @@ test.describe('completion celebration', () => {
   test('no confetti when the viewer prefers reduced motion; the study still completes', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await finish(page);
-    await expect(page.locator('.study-complete')).toBeDisabled();
+    await expect(page.locator('.reader-complete')).toBeDisabled();
     await expect(page.locator('.celebration')).toHaveCount(0);
-    expect(await page.evaluate(() => document.querySelector('.study-complete').getAnimations({ subtree: true }).length)).toBe(0);
+    expect(await page.evaluate(() => document.querySelector('.reader-complete').getAnimations({ subtree: true }).length)).toBe(0);
   });
 
   test('reopening a completed study does not celebrate again', async ({ page }) => {
@@ -363,8 +363,8 @@ test.describe('completion celebration', () => {
     await expect(page.locator('.celebration')).toHaveCount(0, { timeout: 5000 });
     await page.reload();
     await page.waitForSelector('.study-page');
-    for (let i = 0; i < PAGES && !(await page.locator('.study-complete').isVisible()); i++) await page.keyboard.press('ArrowRight');
-    await expect(page.locator('.study-complete')).toBeDisabled();
+    for (let i = 0; i < PAGES && !(await page.locator('.reader-complete').isVisible()); i++) await page.keyboard.press('ArrowRight');
+    await expect(page.locator('.reader-complete')).toBeDisabled();
     await expect(page.locator('.celebration')).toHaveCount(0);
   });
 });
@@ -378,7 +378,7 @@ test.describe('layout', () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), `page ${i}`).toBe(false);
       if (i < PAGES - 1) await page.keyboard.press('ArrowRight');
     }
-    for (const sel of ['.study-prev', '.study-exit', '.study-complete']) {
+    for (const sel of ['.reader-prev', '.reader-exit', '.reader-complete']) {
       const box = await page.locator(sel).first().boundingBox();
       expect(box.height, sel).toBeGreaterThanOrEqual(43.5);
     }

@@ -314,6 +314,8 @@
     "retry": "Reintentar",
     "coming_soon": "MUY PRONTO",
     "badge_completed": "Completado",
+    "encounter_completed": "Encuentro completado",
+    "encounter_completed_success": "Encuentro completado con éxito",
     "current": "Actual",
     "min_immersive_journey": "MIN DE EXPERIENCIA INMERSIVA",
     "new_testament": "NUEVO TESTAMENTO",

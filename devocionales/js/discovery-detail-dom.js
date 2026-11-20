@@ -9,7 +9,7 @@
     const isText = (v) => typeof v === 'string' && v.length > 0;
     const list = (v) => (Array.isArray(v) ? v.filter(isObject) : []);
 
-    function createDetailDom({ h, t, shareVerse = null, pagerDots = global.UiPagerDots.createPagerDots({ h }), keyVerseCard = global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h, shareVerse, shareLabel: t('share') }) : null }) {
+    function createDetailDom({ h, t, shareVerse = null, pagerDots = global.UiPagerDots.createPagerDots({ h }), paging = global.ReaderPagingDom ? global.ReaderPagingDom.createPagingDom({ h, labels: { previous: t('previous'), next: t('next'), exit: t('exit') }, pageLabel: (n, count) => t('pageOf').replace('{current}', String(n)).replace('{total}', String(count)), pagerDots }) : null, keyVerseCard = global.KeyVerseCard ? global.KeyVerseCard.createKeyVerseCard({ h, shareVerse, shareLabel: t('share') }) : null }) {
         function emphasis(text) {
             return global.DiscoveryCards.parseEmphasis(text).map((seg) => {
                 if (seg.bold) return h('strong', { text: seg.text });
@@ -106,33 +106,23 @@
         }
 
         // The progress segments are the carousel's dots (generic UiPagerDots): tap one to jump to that page.
-        function buildProgress(total, index, label, { onSelect } = {}) {
-            const pageLabel = (n, count) => t('pageOf').replace('{current}', String(n)).replace('{total}', String(count));
-            return pagerDots.build({ total, index, label, pageLabel, onSelect });
-        }
+        // A page with an older ui-pager-dots.js has no paging module: the card still shows, without the controls.
+        const buildProgress = paging ? paging.buildProgress : () => h('div', { class: 'pager-dots' });
 
         function buildSwipeHint() {
             return h('p', { class: 'study-swipe-hint', text: t('swipeHint') }, [h('span', { class: 'study-swipe-chevron', attrs: { 'aria-hidden': 'true' } })]);
         }
 
-        function buildNav({ index, total, onPrev, onNext, onExit }) {
-            const isLast = index >= total - 1;
-            return h('div', { class: 'study-nav' }, [
-                h('button', { class: 'study-prev', text: t('previous'), attrs: { type: 'button', disabled: index === 0 ? '' : undefined }, on: { click: onPrev } }),
-                isLast
-                    ? h('button', { class: 'study-exit', text: t('exit'), attrs: { type: 'button' }, on: { click: onExit } })
-                    : h('button', { class: 'study-next', text: t('next'), attrs: { type: 'button' }, on: { click: onNext } }),
-            ]);
-        }
+        const buildNav = paging ? paging.buildNav : () => h('div', { class: 'reader-nav' });
 
         function buildFooter({ isCompleted, copyright, onComplete }) {
             return h('div', { class: 'study-footer' }, [
                 h('button', {
-                    class: 'study-complete',
+                    class: 'reader-complete',
                     text: t(isCompleted ? 'completedStudy' : 'markCompleted'),
                     attrs: { type: 'button', disabled: isCompleted ? '' : undefined },
                     on: { click: onComplete },
-                }, isCompleted ? [h('span', { class: 'study-complete-check', attrs: { 'aria-hidden': 'true' } })] : []),
+                }, isCompleted ? [h('span', { class: 'reader-complete-check', attrs: { 'aria-hidden': 'true' } })] : []),
                 isText(copyright) ? h('p', { class: 'study-copyright', text: copyright }) : null,
             ]);
         }

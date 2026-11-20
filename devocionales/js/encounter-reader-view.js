@@ -22,7 +22,7 @@
             return [
                 dom.buildProgress(state.pages.length, state.index, state.summary.title, { onSelect: actions.goTo }),
                 pages,
-                page.isLast ? dom.buildFooter({ isCompleted: state.footer.isCompleted, copyright: state.footer.copyright, onComplete: actions.complete }) : null,
+                page.isLast ? dom.buildFooter({ isCompleted: state.footer.isCompleted, justCompleted: state.justCompleted, copyright: state.footer.copyright, onComplete: actions.complete }) : null,
                 dom.buildNav({ index: state.index, total: state.pages.length, onPrev: actions.prev, onNext: actions.next, onExit: actions.exit }),
             ];
         }

@@ -25,21 +25,54 @@ test('share text without a reference or text is empty, never "undefined"', () =>
     assert.equal(W.VerseShare.buildVerseShareText({ reference: undefined, text: null }, { playStoreUrl: 'x' }), '');
 });
 
-test('share hands the text to shareOrCopy and reports the outcome', async () => {
+const messages = { copied: 'Copied', shareError: 'Could not share' };
+
+function fakeToast() {
+    const shown = [];
+    return { shown, show: (text, options) => shown.push({ text, options }) };
+}
+
+test('share hands the text to shareOrCopy with the navigator and the verse reference as title', async () => {
     const calls = [];
-    const outcomes = [];
     const share = W.VerseShare.createVerseShare({
         shareOrCopy: async (nav, payload) => { calls.push({ nav, payload }); return 'shared'; },
         navigator: { id: 'nav' },
         playStoreUrl: 'https://store.example/app',
-        onOutcome: (o) => outcomes.push(o),
+        toast: fakeToast(),
+        messages,
     });
     await share(verse);
     assert.equal(calls.length, 1);
     assert.equal(calls[0].nav.id, 'nav');
     assert.equal(calls[0].payload.title, 'Mark 10:46');
     assert.match(calls[0].payload.text, /And they came to Jericho/);
-    assert.deepEqual(outcomes, ['shared']);
+});
+
+test('a copied verse shows the copied message; a shared or cancelled one shows nothing', async () => {
+    const toast = fakeToast();
+    const copied = W.VerseShare.createVerseShare({
+        shareOrCopy: async () => 'copied', navigator: {}, playStoreUrl: 'x', toast, messages,
+    });
+    await copied(verse);
+    assert.deepEqual(toast.shown, [{ text: 'Copied', options: undefined }]);
+
+    const quiet = fakeToast();
+    for (const outcome of ['shared', 'cancelled']) {
+        const share = W.VerseShare.createVerseShare({
+            shareOrCopy: async () => outcome, navigator: {}, playStoreUrl: 'x', toast: quiet, messages,
+        });
+        await share(verse);
+    }
+    assert.deepEqual(quiet.shown, []);
+});
+
+test('a failed share shows the error message as an error toast', async () => {
+    const toast = fakeToast();
+    const share = W.VerseShare.createVerseShare({
+        shareOrCopy: async () => 'failed', navigator: {}, playStoreUrl: 'x', toast, messages,
+    });
+    await share(verse);
+    assert.deepEqual(toast.shown, [{ text: 'Could not share', options: { kind: 'error' } }]);
 });
 
 test('an empty verse is not shared', async () => {
@@ -48,7 +81,8 @@ test('an empty verse is not shared', async () => {
         shareOrCopy: async () => { called = true; return 'shared'; },
         navigator: {},
         playStoreUrl: 'x',
-        onOutcome: () => {},
+        toast: fakeToast(),
+        messages,
     });
     await share({ reference: '', text: '' });
     assert.equal(called, false);

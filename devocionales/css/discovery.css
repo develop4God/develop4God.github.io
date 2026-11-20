@@ -621,7 +621,7 @@ body {
     margin-block-start: 1rem;
 }
 
-.study-complete {
+.reader-complete {
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -640,24 +640,24 @@ body {
 }
 
 /* Done state: solid green with a check (dark enough for white text at 4.5:1) */
-.study-complete:disabled {
+.reader-complete:disabled {
     background: #1f7a50;
     color: #fff;
     cursor: default;
 }
 
-.study-complete:active:not(:disabled) {
+.reader-complete:active:not(:disabled) {
     transform: scale(0.97);
 }
 
-.study-complete-check {
+.reader-complete-check {
     position: relative;
     order: -1;
     inline-size: 1rem;
     block-size: 1rem;
 }
 
-.study-complete-check::after {
+.reader-complete-check::after {
     content: "";
     position: absolute;
     inset-inline-start: 0.33rem;
@@ -670,15 +670,15 @@ body {
 }
 
 /* Just completed: a green wipe fills the button, the check draws itself, one spring pop, one gold halo */
-.study-complete.is-just-done {
+.reader-complete.is-just-done {
     animation: study-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), study-halo 0.8s ease-out;
 }
 
-.study-complete.is-just-done:disabled {
+.reader-complete.is-just-done:disabled {
     background: var(--accent);
 }
 
-.study-complete.is-just-done::before {
+.reader-complete.is-just-done::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -687,7 +687,7 @@ body {
     animation: study-wipe 0.5s ease-out forwards;
 }
 
-.study-complete.is-just-done .study-complete-check::after {
+.reader-complete.is-just-done .reader-complete-check::after {
     animation: study-check 0.35s ease-out 0.3s backwards;
 }
 
@@ -739,7 +739,7 @@ body {
     .study-page,
     .pager-dot,
     .pager-dot::before,
-    .study-complete {
+    .reader-complete {
         transition: none;
     }
 
@@ -749,16 +749,16 @@ body {
         animation: none;
     }
 
-    .study-complete.is-just-done,
-    .study-complete.is-just-done .study-complete-check::after {
+    .reader-complete.is-just-done,
+    .reader-complete.is-just-done .reader-complete-check::after {
         animation: none;
     }
 
-    .study-complete.is-just-done::before {
+    .reader-complete.is-just-done::before {
         display: none;
     }
 
-    .study-complete.is-just-done:disabled {
+    .reader-complete.is-just-done:disabled {
         background: #1f7a50;
     }
 }
@@ -770,7 +770,7 @@ body {
     margin: 0;
 }
 
-.study-nav {
+.reader-nav {
     display: flex;
     justify-content: space-between;
     gap: 0.75rem;
@@ -778,9 +778,9 @@ body {
     padding-block-end: env(safe-area-inset-bottom);
 }
 
-.study-prev,
-.study-next,
-.study-exit,
+.reader-prev,
+.reader-next,
+.reader-exit,
 .study-back {
     min-block-size: 2.75rem;
     min-inline-size: 6rem;
@@ -793,7 +793,7 @@ body {
     cursor: pointer;
 }
 
-.study-exit,
+.reader-exit,
 .study-back {
     background: var(--accent);
     border-color: var(--accent);
@@ -801,14 +801,14 @@ body {
 }
 
 /* Previous/Next are the fallback to swiping: quiet ghost buttons (still 44px tall) */
-.study-prev,
-.study-next {
+.reader-prev,
+.reader-next {
     border-color: transparent;
     background: transparent;
     color: var(--text-muted);
 }
 
-.study-prev:disabled {
+.reader-prev:disabled {
     opacity: 0.4;
     cursor: default;
 }

@@ -314,6 +314,8 @@
     "retry": "重试",
     "coming_soon": "即将推出",
     "badge_completed": "已完成",
+    "encounter_completed": "相遇完成",
+    "encounter_completed_success": "相遇已成功完成",
     "current": "当前",
     "min_immersive_journey": "分钟沉浸之旅",
     "new_testament": "新约",

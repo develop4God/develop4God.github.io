@@ -31,11 +31,9 @@
             shareOrCopy: global.ShareOrCopy.shareOrCopy,
             navigator: global.navigator,
             playStoreUrl: global.DevotionalShare.PLAY_STORE_URL,
-            onOutcome: (outcome) => {
-                if (outcome === 'copied') toast.show(t('copied'));
-                if (outcome === 'failed') toast.show(t('shareError'), { kind: 'error' });
-            },
-        }) : { share: () => {} };
+            toast,
+            messages: { copied: t('copied'), shareError: t('shareError') },
+        }) : null;
         const celebrate = global.UiCelebration.createCelebration({
             h,
             container: doc.body,
@@ -81,7 +79,7 @@
             data,
             store,
             detailDomFactory: global.DiscoveryDetailDom.createDetailDom,
-            shareVerse: verseShare.share,
+            shareVerse: verseShare ? verseShare.share : null,
             listDom,
             nav: global.DiscoveryNav,
             copyright: global.DiscoveryCopyright.createCopyright({ versionInfo: global.DevotionalVersion.versionInfo }),

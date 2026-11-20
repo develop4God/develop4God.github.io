@@ -1,8 +1,9 @@
 (function (global) {
     'use strict';
 
-    // Shares one key verse from any reader (Bible studies or Encounters). Pure formatting plus a
-    // thin call into ShareOrCopy, so the readers share one implementation and this file has no DOM.
+    // Shares one key verse from any reader (Bible studies or Encounters). Formatting is pure; the
+    // share itself goes through ShareOrCopy, and this module decides the feedback (toast) so the
+    // readers' boots only pass their own dependencies.
     function buildVerseShareText(verse, { playStoreUrl }) {
         const reference = verse && verse.reference ? String(verse.reference) : '';
         const text = verse && verse.text ? String(verse.text) : '';
@@ -10,12 +11,14 @@
         return [`📖 *${reference}*`, `"${text}"`, '', playStoreUrl].join('\n');
     }
 
-    function createVerseShare({ shareOrCopy, navigator, playStoreUrl, onOutcome = () => {} }) {
+    // messages: { copied, shareError } are the already-translated toast texts.
+    function createVerseShare({ shareOrCopy, navigator, playStoreUrl, toast, messages }) {
         return async function share(verse) {
             const text = buildVerseShareText(verse, { playStoreUrl });
             if (!text) return;
             const outcome = await shareOrCopy(navigator, { title: verse.reference, text });
-            onOutcome(outcome);
+            if (outcome === 'copied') toast.show(messages.copied);
+            if (outcome === 'failed') toast.show(messages.shareError, { kind: 'error' });
         };
     }
 

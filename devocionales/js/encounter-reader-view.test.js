@@ -65,7 +65,7 @@ test('reader phase renders progress, the current page and the nav, and the foote
     view.render({ ...base, index: 0 });
     assert.ok(detailView.querySelector('.pager-dots'));
     assert.ok(detailView.querySelector('.encounter-page'));
-    assert.ok(detailView.querySelector('.encounter-nav'));
+    assert.ok(detailView.querySelector('.reader-nav'));
     assert.equal(detailView.querySelector('.encounter-footer'), null);
     view.render({ ...base, index: 2 });
     assert.ok(detailView.querySelector('.encounter-footer'));
@@ -75,7 +75,7 @@ test('re-rendering replaces the previous content instead of appending to it', ()
     const { view, detailView } = setup();
     view.render({ ...base, index: 0 });
     view.render({ ...base, index: 1 });
-    assert.equal(detailView.querySelectorAll('.encounter-nav').length, 1);
+    assert.equal(detailView.querySelectorAll('.reader-nav').length, 1);
     assert.equal(detailView.querySelectorAll('.pager-dots').length, 1);
 });
 

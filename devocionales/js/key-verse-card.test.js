@@ -59,3 +59,13 @@ test('share button calls the injected handler with the verse', () => {
     button.listeners.click.forEach((fn) => fn());
     assert.deepEqual(calls, [{ reference: 'John 3:16', text: 'For God so loved' }]);
 });
+
+test('no share button for a verse without text or reference (nothing to share)', () => {
+    const shared = W.KeyVerseCard.createKeyVerseCard({
+        h: W.DomBuilder.createBuilder(doc),
+        shareVerse: () => {},
+        shareLabel: 'Share',
+    });
+    assert.equal(shared.build({ label: 'KEY VERSE', reference: '', text: 'For God so loved' }).querySelector('.key-verse-card-share'), null);
+    assert.equal(shared.build({ label: 'KEY VERSE', reference: 'John 3:16', text: '' }).querySelector('.key-verse-card-share'), null);
+});

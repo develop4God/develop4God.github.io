@@ -197,41 +197,41 @@ test('nav: Previous disabled on the first page; Next on middle pages; Exit on th
     const calls = [];
     const handlers = { onPrev: () => calls.push('prev'), onNext: () => calls.push('next'), onExit: () => calls.push('exit') };
     const first = dom.buildNav({ index: 0, total: 3, ...handlers });
-    assert.equal(first.querySelector('.study-prev').hasAttribute('disabled'), true);
-    first.querySelector('.study-next').click();
+    assert.equal(first.querySelector('.reader-prev').hasAttribute('disabled'), true);
+    first.querySelector('.reader-next').click();
     const middle = dom.buildNav({ index: 1, total: 3, ...handlers });
-    assert.equal(middle.querySelector('.study-prev').hasAttribute('disabled'), false);
-    middle.querySelector('.study-prev').click();
+    assert.equal(middle.querySelector('.reader-prev').hasAttribute('disabled'), false);
+    middle.querySelector('.reader-prev').click();
     const last = dom.buildNav({ index: 2, total: 3, ...handlers });
-    assert.equal(last.querySelector('.study-next'), null);
-    last.querySelector('.study-exit').click();
+    assert.equal(last.querySelector('.reader-next'), null);
+    last.querySelector('.reader-exit').click();
     assert.deepEqual(calls, ['next', 'prev', 'exit']);
 });
 
 test('nav: a one-page study shows only Exit', () => {
     const el = dom.buildNav({ index: 0, total: 1, onPrev: noop, onNext: noop, onExit: noop });
-    assert.equal(el.querySelector('.study-next'), null);
-    assert.ok(el.querySelector('.study-exit'));
+    assert.equal(el.querySelector('.reader-next'), null);
+    assert.ok(el.querySelector('.reader-exit'));
 });
 
 test('footer (last page): Mark as completed calls back; completed shows a disabled "Study completed" (C4)', () => {
     let done = 0;
     const open = dom.buildFooter({ isCompleted: false, copyright: 'Public Domain.', onComplete: () => { done += 1; } });
-    open.querySelector('.study-complete').click();
+    open.querySelector('.reader-complete').click();
     assert.equal(done, 1);
-    assert.equal(open.querySelector('.study-complete').textContent, 'Complete study');
+    assert.equal(open.querySelector('.reader-complete').textContent, 'Complete study');
     const finished = dom.buildFooter({ isCompleted: true, copyright: 'x', onComplete: () => { done += 1; } });
-    assert.equal(finished.querySelector('.study-complete').textContent, 'Study completed');
-    assert.equal(finished.querySelector('.study-complete').hasAttribute('disabled'), true);
+    assert.equal(finished.querySelector('.reader-complete').textContent, 'Study completed');
+    assert.equal(finished.querySelector('.reader-complete').hasAttribute('disabled'), true);
 });
 
 test('footer: a completed button carries a decorative check, an open one does not', () => {
-    const finished = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: noop }).querySelector('.study-complete');
-    const check = finished.querySelector('.study-complete-check');
+    const finished = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: noop }).querySelector('.reader-complete');
+    const check = finished.querySelector('.reader-complete-check');
     assert.ok(check);
     assert.equal(check.getAttribute('aria-hidden'), 'true');
     assert.equal(finished.textContent, 'Study completed', 'the check adds no text for screen readers');
-    assert.equal(dom.buildFooter({ isCompleted: false, copyright: '', onComplete: noop }).querySelector('.study-complete-check'), null);
+    assert.equal(dom.buildFooter({ isCompleted: false, copyright: '', onComplete: noop }).querySelector('.reader-complete-check'), null);
 });
 
 test('footer: shows the copyright line (C5) and omits it when empty', () => {
@@ -259,4 +259,12 @@ test('without the key verse card script (an older cached page) the key verse sti
     const el = plainDom.buildPage(pageOf(study, 0));
     assert.equal(el.querySelector('.key-verse-card'), null);
     assert.equal(el.querySelector('.study-keyverse-text').textContent, study.key_verse.text);
+});
+
+test('without the paging module (older ui-pager-dots.js) the card still renders and the controls are empty', () => {
+    const noPaging = W.DiscoveryDetailDom.createDetailDom({ h: W.DomBuilder.createBuilder(doc), t, paging: null });
+    const study = fixture('ascension_victory_en_001.json');
+    const page = noPaging.buildPage(pageOf(study, 0));
+    assert.ok(page.querySelector('.study-keyverse-text') || page.querySelector('.key-verse-card'));
+    assert.equal(noPaging.buildNav({ index: 0, total: 2, onPrev: noop, onNext: noop, onExit: noop }).querySelector('.reader-prev'), null);
 });

@@ -175,24 +175,24 @@ test('footer: a complete button before completion, a disabled completed state af
     const { dom } = setup();
     let completed = 0;
     const open = dom.buildFooter({ isCompleted: false, copyright: 'copyright text', onComplete: () => { completed += 1; } });
-    assert.match(text(open.querySelector('.encounter-complete')), /complete/);
-    assert.equal(open.querySelector('.encounter-complete').getAttribute('disabled'), null);
-    open.querySelector('.encounter-complete').dispatch('click');
+    assert.match(text(open.querySelector('.reader-complete')), /complete/);
+    assert.equal(open.querySelector('.reader-complete').getAttribute('disabled'), null);
+    open.querySelector('.reader-complete').dispatch('click');
     assert.equal(completed, 1);
     assert.match(text(open), /copyright text/);
 
     const done = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: () => {} });
-    assert.equal(done.querySelector('.encounter-complete').getAttribute('disabled'), '');
+    assert.equal(done.querySelector('.reader-complete').getAttribute('disabled'), '');
 });
 
 test('nav: previous is disabled on the first page; on the last page the next button becomes exit', () => {
     const { dom } = setup();
     const first = dom.buildNav({ index: 0, total: 3, onPrev: () => {}, onNext: () => {}, onExit: () => {} });
-    assert.equal(first.querySelector('.encounter-prev').getAttribute('disabled'), '');
-    assert.ok(first.querySelector('.encounter-next'));
+    assert.equal(first.querySelector('.reader-prev').getAttribute('disabled'), '');
+    assert.ok(first.querySelector('.reader-next'));
     const last = dom.buildNav({ index: 2, total: 3, onPrev: () => {}, onNext: () => {}, onExit: () => {} });
-    assert.equal(last.querySelector('.encounter-next'), null);
-    assert.ok(last.querySelector('.encounter-exit'));
+    assert.equal(last.querySelector('.reader-next'), null);
+    assert.ok(last.querySelector('.reader-exit'));
 });
 
 test('not-found and error states are alerts with a way back', () => {
@@ -219,10 +219,34 @@ test('cinematic_scene and scripture_moment render scripture_connections, as the 
     assert.match(text(scrip), /John 1:42/);
 });
 
-test('footer: the completed button carries the pop class; the pending one does not', () => {
+test('footer: the completed button says "Encounter completed" (encounter_completed), not the card badge', () => {
     const { dom } = setup();
     const done = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: () => {} });
-    assert.ok(done.querySelector('.encounter-complete').classList.contains('encounter-complete--pop'));
+    assert.equal(done.querySelector('.reader-complete').textContent.includes('encounter_completed'), true);
+});
+
+test('footer: the completed button shows the check; the pending one does not', () => {
+    const { dom } = setup();
+    const done = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: () => {} });
+    assert.ok(done.querySelector('.reader-complete .reader-complete-check'));
     const open = dom.buildFooter({ isCompleted: false, copyright: '', onComplete: () => {} });
-    assert.equal(open.querySelector('.encounter-complete').classList.contains('encounter-complete--pop'), false);
+    assert.equal(open.querySelector('.reader-complete-check'), null);
+});
+
+test('footer: only the render right after completing plays the done animation', () => {
+    const { dom } = setup();
+    const just = dom.buildFooter({ isCompleted: true, justCompleted: true, copyright: '', onComplete: () => {} });
+    assert.ok(just.querySelector('.reader-complete').classList.contains('is-just-done'));
+    const later = dom.buildFooter({ isCompleted: true, copyright: '', onComplete: () => {} });
+    assert.equal(later.querySelector('.reader-complete').classList.contains('is-just-done'), false);
+});
+
+test('without the paging module (older ui-pager-dots.js) the reader still renders its pages', () => {
+    const noPaging = global.window.EncounterReaderDom.createReaderDom({
+        h: createBuilder(new FakeDocument()), t: (k) => k, imageUrlFor: () => '', paging: null,
+    });
+    const el = noPaging.buildPage({ kind: 'keyVerse', keyVerse: { reference: 'Mark 10:46', text: 'And they came' } }, 'b1');
+    assert.match(text(el), /And they came/);
+    const nav = noPaging.buildNav({ index: 0, total: 2, onPrev: () => {}, onNext: () => {}, onExit: () => {} });
+    assert.equal(nav.querySelector('.reader-prev'), null);
 });

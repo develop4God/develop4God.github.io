@@ -8,7 +8,7 @@
     // sharing works (that is verse-share.js).
     function createKeyVerseCard({ h, shareVerse = null, shareLabel = '' }) {
         function shareButton(verse) {
-            if (typeof shareVerse !== 'function') return null;
+            if (typeof shareVerse !== 'function' || !verse.text || !verse.reference) return null;
             return h('button', {
                 class: 'key-verse-card-share',
                 text: shareLabel,

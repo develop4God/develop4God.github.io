@@ -61,7 +61,8 @@ function setup({ study = SAMPLE, loadError = null, completed = false, timers = f
         dom,
         timers,
         celebrate: () => { calls.celebrated += 1; },
-        toast: (msg) => calls.toasts.push(msg),
+        toast: { show: (msg) => calls.toasts.push(msg) },
+        completedMessage: 'Encounter completed successfully',
         onExit: () => { calls.exits += 1; },
         copyright: (lang, bibleVersion) => `copyright:${lang}:${bibleVersion}`,
     });
@@ -98,6 +99,23 @@ test('paging to the completion card does not complete the encounter', async () =
     page.goTo(3);
     assert.equal(last(calls).index, 3);
     assert.deepEqual(calls.completed, []);
+});
+
+test('completing shows the same completion toast as Bible studies, with the encounter wording', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    page.goTo(3);
+    page.complete();
+    assert.deepEqual(calls.toasts, ['Encounter completed successfully']);
+});
+
+test('a second press does not repeat the completion toast', async () => {
+    const { page, calls } = setup();
+    await page.open(SUMMARY);
+    page.goTo(3);
+    page.complete();
+    page.complete();
+    assert.equal(calls.toasts.length, 1);
 });
 
 test('completing marks the encounter once, celebrates, and starts the 5 s return', async () => {
