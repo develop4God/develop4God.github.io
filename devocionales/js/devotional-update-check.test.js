@@ -171,3 +171,42 @@ test('a version check that never answers gives up after the timeout and does not
     assert.ok(Date.now() - started >= 900, 'waits for the timeout before giving up');
     assert.equal(registration.updates, 0);
 });
+
+function fakeToastWindow(options = {}) {
+    const shown = [];
+    const win = fakeWindow(options);
+    win.document = { body: {} };
+    win.UiToast = { createToast: ({ container }) => { win.toastContainer = container; return { show: (text) => shown.push(text) }; } };
+    win.shown = shown;
+    return win;
+}
+
+test('a fresh page that finds a newer build shows the Updating note in the reader language', async () => {
+    const win = fakeToastWindow();
+    win.DevotionalI18n = { t: (key, fallback) => (key === 'shell.updating' ? 'Actualizando…' : fallback) };
+    await checkForNewBuild(win, fakeRegistration(), fakeEntry());
+    assert.deepEqual(win.shown, ['Actualizando…']);
+    assert.equal(win.toastContainer, win.document.body);
+});
+
+test('the Updating note falls back to English when no translation is loaded', async () => {
+    const win = fakeToastWindow();
+    await checkForNewBuild(win, fakeRegistration(), fakeEntry());
+    assert.deepEqual(win.shown, ['Updating…']);
+});
+
+test('no Updating note when the build is the same or the page was already used', async () => {
+    const same = fakeToastWindow({ pageId: 'same', serverBody: { id: 'same' } });
+    await checkForNewBuild(same, fakeRegistration(), fakeEntry());
+    const used = fakeToastWindow();
+    await checkForNewBuild(used, fakeRegistration(), fakeEntry({ open: false }));
+    assert.deepEqual(same.shown, []);
+    assert.deepEqual(used.shown, []);
+});
+
+test('the check works without a toast on the page', async () => {
+    const win = fakeWindow();
+    const registration = fakeRegistration();
+    assert.equal(await checkForNewBuild(win, registration, fakeEntry()), true);
+    assert.equal(registration.updates, 1);
+});

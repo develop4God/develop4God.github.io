@@ -29,6 +29,19 @@
         }
     }
 
+    // A short "Updating…" note, in the reader's language, shown while the new build is fetched and
+    // swapped in. Best-effort: without the toast or the translation the update still happens.
+    function announceUpdate(win) {
+        try {
+            if (!win.UiToast || !win.document || !win.document.body) return;
+            const i18n = win.DevotionalI18n;
+            const text = i18n && typeof i18n.t === 'function' ? i18n.t('shell.updating', 'Updating…') : 'Updating…';
+            win.UiToast.createToast({ document: win.document, container: win.document.body }).show(text);
+        } catch (err) {
+            // The note is optional.
+        }
+    }
+
     // True only when both ids are known and differ: an unknown build is never treated as stale.
     function isNewer(pageId, serverId) {
         return Boolean(pageId) && Boolean(serverId) && pageId !== serverId;
@@ -40,6 +53,7 @@
         const pageId = win.DevotionalBuild && win.DevotionalBuild.id;
         const serverId = await fetchServerBuildId(win);
         if (!isNewer(pageId, serverId) || !entry.isOpen()) return false;
+        announceUpdate(win);
 
         // Asks the waiting worker to take over. The entry latch keeps the page open to the reload
         // that follows the takeover, even though the download may have taken longer than the window.
