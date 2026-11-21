@@ -225,3 +225,35 @@ test('tabsForPage: every tab carries its i18n key and an English fallback label'
         assert.ok(tab.fallback.length > 0);
     }
 });
+
+// ---- tabsForPage: the "New" badge marks Studies and Encounters, but only on the tab you are not on ----
+
+test('tabsForPage (reader): the New badge is on the Studies and Encounters links, never on Home or Settings', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('reader', ['home', 'studies', 'encounters', 'settings']);
+    assert.deepEqual(tabs.map((t) => [t.name, t.badge]), [
+        ['home', false], ['studies', true], ['encounters', true], ['settings', false],
+    ]);
+});
+
+test('tabsForPage (studies page): the badge hides on the current Studies tab and stays on Encounters', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('studies', ['home', 'studies', 'encounters', 'settings']);
+    assert.deepEqual(tabs.map((t) => [t.name, t.badge]), [
+        ['home', false], ['studies', false], ['encounters', true], ['settings', false],
+    ]);
+});
+
+test('tabsForPage (encounters page): the badge hides on the current Encounters tab and stays on Studies', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('encounters', ['home', 'studies', 'encounters', 'settings']);
+    assert.deepEqual(tabs.map((t) => [t.name, t.badge]), [
+        ['home', false], ['studies', true], ['encounters', false], ['settings', false],
+    ]);
+});
+
+test('tabsForPage: a page whose config has no Studies or Encounters tab shows no badge', () => {
+    const { tabsForPage } = loadCore();
+    const tabs = tabsForPage('reader', ['home', 'settings']);
+    assert.ok(tabs.every((t) => t.badge === false));
+});

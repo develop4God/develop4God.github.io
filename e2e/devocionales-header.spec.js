@@ -49,7 +49,7 @@ test.describe('web header: Studies tab next to Today\'s Devotional', () => {
     await expect(links).toHaveCount(3); // devotional, studies, encounters
     await expect(links.nth(2)).toHaveAttribute('href', '/devocionales/encounters/');
     await expect(links.nth(0)).toHaveClass(/active/);
-    await expect(links.nth(1)).toHaveText('Bible Studies');
+    await expect(links.nth(1).locator('[data-i18n="shell.studies"]')).toHaveText('Bible Studies');
     await expect(links.nth(1)).toHaveAttribute('href', '/devocionales/estudios/');
     await links.nth(1).click();
     await expect(page).toHaveURL(/\/devocionales\/estudios\//);
@@ -72,7 +72,7 @@ test.describe('web header: Studies tab next to Today\'s Devotional', () => {
   test('both links are translated (Spanish) on both pages', async ({ page }) => {
     await mockStudies(page);
     await page.goto('/devocionales/?lang=es', { waitUntil: 'networkidle' });
-    await expect(page.locator('#nav-studies-label')).toHaveText('Estudios Bíblicos');
+    await expect(page.locator('#nav-studies-label [data-i18n="shell.studies"]')).toHaveText('Estudios Bíblicos');
     await page.goto('/devocionales/estudios/?lang=es', { waitUntil: 'networkidle' });
     await expect(page.locator('#studies-nav a').nth(1)).toHaveText('Estudios Bíblicos');
     await expect(page.locator('#studies-nav a').nth(0)).not.toHaveText('');

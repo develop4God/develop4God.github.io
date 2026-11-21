@@ -51,6 +51,15 @@
     // The bar is generated from the one tab table (devotional-shell-core.js tabsForPage), so the
     // reader and the Bible-studies page always show the same shell. Labels use data-i18n (kept in
     // step by the page's language switch) plus the current text for the first paint.
+    // The "New" bubble on a tab (styled in css/shell.css, which every page with the bar links).
+    function newBadge(doc, t) {
+        const badge = doc.createElement('span');
+        badge.className = 'nav-new-badge';
+        badge.setAttribute('data-i18n', 'shell.new_badge');
+        badge.textContent = t ? t('shell.new_badge', 'New') : 'New';
+        return badge;
+    }
+
     function renderNav(doc, win, nav, tabs) {
         const t = global.DevotionalI18n && typeof global.DevotionalI18n.t === 'function' ? global.DevotionalI18n.t : null;
         const label = doc.createElement('span');
@@ -76,6 +85,7 @@
             text.setAttribute('data-i18n', tab.labelKey);
             text.textContent = t ? t(tab.labelKey, tab.fallback) : tab.fallback;
             el.append(icon, text);
+            if (tab.badge) el.append(newBadge(doc, t));
             return el;
         });
         nav.removeAttribute('aria-label'); // the static name only exists for the HTML validator and a no-JS reader

@@ -356,3 +356,18 @@ a.shell-tab { text-decoration: none; }
 /* The bottom share row is gone: its label and rule go with the button. */
 .shell-active[data-shell-layout="bar"] #comparte-label { display: none; }
 .shell-active[data-shell-layout="bar"] div:has(> #share-native) { display: contents; }
+
+/* "New" bubble on the Bible-studies and Encounters tabs (browser tabs and the installed bar). */
+.nav-new-badge {
+    display: inline-block;
+    margin-inline-start: 0.35em;
+    padding: 0.05em 0.45em;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.68em;
+    font-weight: 700;
+    line-height: 1.5;
+    vertical-align: middle;
+    white-space: nowrap;
+}

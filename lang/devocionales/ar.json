@@ -249,7 +249,8 @@
     "theme": "المظهر",
     "font_size": "حجم الخط",
     "app_version": "إصدار التطبيق",
-    "encounters": "لقاءات"
+    "encounters": "لقاءات",
+    "new_badge": "جديد"
   },
   "discovery": {
     "title": "دراسات كتابية",

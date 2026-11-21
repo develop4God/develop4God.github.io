@@ -97,6 +97,7 @@
     };
     // On the reader, Home and Settings are panels; every other page reaches every tab by link.
     const PANELS_ON_READER = ['home', 'settings'];
+    const NEW_TABS = ['studies', 'encounters']; // tabs that show the "New" bubble
     const PAGE_TAB = { studies: 'studies', encounters: 'encounters' }; // which tab is current on a page that is not the reader
 
     // `allowed` is the PWA config's `tabs`: it decides which tabs exist and in which order.
@@ -115,6 +116,8 @@
                 controls: isPanel ? def.controls : undefined,
                 href: isPanel ? undefined : def.href,
                 current: PAGE_TAB[page] === name,
+                // The "New" bubble marks the new sections, but not the tab the reader is already on.
+                badge: NEW_TABS.includes(name) && PAGE_TAB[page] !== name,
             };
         });
     }
