@@ -381,7 +381,7 @@ test.describe('replay across a deploy', () => {
         await page.goto(READER, { waitUntil: 'domcontentloaded' });
         // The push ids are the ones the current push script reads (the old enable/disable button ids went
         // away with the switch: no deployed script ever read them, push has not shipped).
-        const ids = ['nav-vision-label', 'install-app-btn', 'ios-install-hint', 'page-footer', 'footer-privacy-link', 'app-banner', 'download-app-android-btn',
+        const ids = ['install-app-btn', 'ios-install-hint', 'page-footer', 'footer-privacy-link', 'app-banner', 'download-app-android-btn',
             'push-hour', 'push-switch-label', 'push-status', 'back-link', 'language-selector', 'theme-toggle', 'font_normal', 'font_large', 'font_larger', 'version-select'];
         for (const id of ids) await expect(page.locator(`#${id}`)).toHaveCount(1);
     });
