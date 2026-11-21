@@ -85,7 +85,12 @@
             text.setAttribute('data-i18n', tab.labelKey);
             text.textContent = t ? t(tab.labelKey, tab.fallback) : tab.fallback;
             el.append(icon, text);
-            if (tab.badge) el.append(newBadge(doc, t));
+            if (tab.badge) {
+                const badges = global.DevotionalNewBadge;
+                const storage = badges ? badges.storageOf(win) : null;
+                if (!badges || !badges.isSeen(storage, tab.name)) el.append(newBadge(doc, t));
+                if (badges) el.addEventListener('click', () => badges.markSeen(storage, tab.name));
+            }
             return el;
         });
         nav.removeAttribute('aria-label'); // the static name only exists for the HTML validator and a no-JS reader
