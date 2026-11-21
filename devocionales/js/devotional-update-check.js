@@ -50,13 +50,16 @@
             return true;
         };
         if (askWhenWaiting()) return true;
-        registration.addEventListener('updatefound', () => {
-            const installing = registration.installing;
+        // A worker that is already installing when the check runs fires no updatefound for us, so
+        // it is watched directly as well as through the next updatefound.
+        const watch = (installing) => {
             if (!installing) return;
             installing.addEventListener('statechange', () => {
                 if (installing.state === 'installed') askWhenWaiting();
             });
-        });
+        };
+        watch(registration.installing);
+        registration.addEventListener('updatefound', () => watch(registration.installing));
         try {
             await registration.update();
         } catch (err) {

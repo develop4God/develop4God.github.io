@@ -372,3 +372,10 @@ test('the real worker template carries the push marker and the real push source 
     assert.ok(template.includes(PUSH_MARKER));
     assert.ok(fs.existsSync(path.join(__dirname, 'sw-push.js')));
 });
+
+test('buildSw emits the version file the page checks, carrying the same build id as the worker', () => {
+    const { root } = makeSite();
+    const { config, version } = buildSw(root);
+    assert.deepEqual(JSON.parse(version), { id: config.version });
+    assert.ok(version.endsWith('\n'));
+});

@@ -146,3 +146,28 @@ test('a failed update request reports false instead of throwing', async () => {
     assert.equal(await checkForNewBuild(win, registration, fakeEntry()), false);
     await settle();
 });
+
+test('a worker already installing when the check runs is asked to take over once installed', async () => {
+    const win = fakeWindow();
+    const entry = fakeEntry();
+    const installing = { state: 'installing', listeners: {}, addEventListener(type, handler) { this.listeners[type] = handler; } };
+    const registration = fakeRegistration();
+    registration.installing = installing;
+    await checkForNewBuild(win, registration, entry);
+    assert.deepEqual(registration.posted, [], 'nothing to ask while it is still installing');
+    registration.waiting = { postMessage: (message) => registration.posted.push(message) };
+    installing.state = 'installed';
+    installing.listeners.statechange();
+    assert.deepEqual(registration.posted, [{ type: 'devocionales-skip-waiting', entry: true }]);
+});
+
+test('a version check that never answers gives up after the timeout and does nothing', async () => {
+    const win = fakeWindow({ fetchImpl: (url, options) => new Promise((resolve, reject) => {
+        options.signal.addEventListener('abort', () => reject(new Error('aborted')));
+    }) });
+    const registration = fakeRegistration();
+    const started = Date.now();
+    assert.equal(await checkForNewBuild(win, registration, fakeEntry()), false);
+    assert.ok(Date.now() - started >= 900, 'waits for the timeout before giving up');
+    assert.equal(registration.updates, 0);
+});
