@@ -155,5 +155,5 @@
         return true;
     }
 
-    global.DevotionalShell = { init };
+    global.DevotionalShell = { init, renderNav };
 })(window);
