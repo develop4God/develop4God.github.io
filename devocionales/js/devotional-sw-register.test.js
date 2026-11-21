@@ -523,3 +523,17 @@ test('start: wires the entry window so a freshly loaded visible page updates its
     nav.listeners.controllerchange();
     assert.equal(reloads, 1);
 });
+
+test('the entry window opens when the worker registration starts, so a slow load does not use it up', () => {
+    const { createEntryWindow } = loadModule();
+    let t = 0;
+    const perf = { now: () => t };
+    const entry = createEntryWindow(perf, 8000);
+    t = 9000;
+    assert.equal(entry.isOpen(), false, 'before open() a page that loaded slowly is past the window');
+    entry.open();
+    t = 9500;
+    assert.equal(entry.isOpen(), true, 'open at 9 s, still open 0.5 s later');
+    t = 17500;
+    assert.equal(entry.isOpen(), false, 'closed 8 s after open()');
+});

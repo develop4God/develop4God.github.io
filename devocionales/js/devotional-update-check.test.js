@@ -39,6 +39,7 @@ function fakeRegistration({ waiting = null } = {}) {
         posted,
         listeners,
         addEventListener: (type, handler) => { listeners[type] = handler; },
+        removeEventListener: (type) => { delete listeners[type]; },
         update() { registration.updates += 1; return Promise.resolve(); },
     };
     if (waiting) waiting.postMessage = (message) => posted.push(message);
@@ -181,17 +182,27 @@ function fakeToastWindow(options = {}) {
     return win;
 }
 
-test('a fresh page that finds a newer build shows the Updating note in the reader language', async () => {
+test('a fresh page shows the Updating note in the reader language only when the takeover is asked', async () => {
     const win = fakeToastWindow();
     win.DevotionalI18n = { t: (key, fallback) => (key === 'shell.updating' ? 'Actualizando…' : fallback) };
-    await checkForNewBuild(win, fakeRegistration(), fakeEntry());
+    const registration = fakeRegistration();
+    await checkForNewBuild(win, registration, fakeEntry());
+    assert.deepEqual(win.shown, [], 'no note while nothing is being updated');
+    const installing = { state: 'installing', listeners: {}, addEventListener(type, handler) { this.listeners[type] = handler; } };
+    registration.installing = installing;
+    registration.listeners.updatefound();
+    assert.deepEqual(win.shown, [], 'still nothing while the worker installs');
+    registration.waiting = { postMessage: (message) => registration.posted.push(message) };
+    installing.state = 'installed';
+    installing.listeners.statechange();
     assert.deepEqual(win.shown, ['Actualizando…']);
     assert.equal(win.toastContainer, win.document.body);
 });
 
 test('the Updating note falls back to English when no translation is loaded', async () => {
     const win = fakeToastWindow();
-    await checkForNewBuild(win, fakeRegistration(), fakeEntry());
+    const registration = fakeRegistration({ waiting: {} });
+    await checkForNewBuild(win, registration, fakeEntry());
     assert.deepEqual(win.shown, ['Updating…']);
 });
 
@@ -209,4 +220,45 @@ test('the check works without a toast on the page', async () => {
     const registration = fakeRegistration();
     assert.equal(await checkForNewBuild(win, registration, fakeEntry()), true);
     assert.equal(registration.updates, 1);
+});
+
+test('a page that was already used when the check started is never asked with the entry flag, even after a later install', async () => {
+    const win = fakeWindow();
+    const registration = fakeRegistration();
+    const installing = { state: 'installing', listeners: {}, addEventListener(type, handler) { this.listeners[type] = handler; } };
+    registration.installing = installing;
+    const entry = fakeEntry({ open: false });
+    assert.equal(await checkForNewBuild(win, registration, entry), false);
+    registration.waiting = { postMessage: (message) => registration.posted.push(message) };
+    installing.state = 'installed';
+    if (installing.listeners.statechange) installing.listeners.statechange();
+    assert.deepEqual(registration.posted, []);
+    assert.equal(registration.updates, 0);
+    assert.equal(registration.listeners.updatefound, undefined);
+});
+
+test('the window is still open at the start, so a slow version check does not lose the takeover', async () => {
+    let open = true;
+    const win = fakeWindow({ fetchImpl: () => new Promise((resolve) => {
+        open = false;
+        setTimeout(() => resolve({ ok: true, json: () => Promise.resolve({ id: 'new2' }) }), 20);
+    }) });
+    const registration = fakeRegistration({ waiting: {} });
+    const entry = { isOpen: () => open, latch() {}, state: {} };
+    assert.equal(await checkForNewBuild(win, registration, entry), true, 'decided at the start, before the fetch closed the window');
+});
+
+test('after the install grace the worker is no longer asked with the entry flag', async (t) => {
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    const win = fakeWindow();
+    const registration = fakeRegistration();
+    const installing = { state: 'installing', listeners: {}, addEventListener(type, handler) { this.listeners[type] = handler; } };
+    registration.installing = installing;
+    const entry = fakeEntry();
+    await checkForNewBuild(win, registration, entry);
+    t.mock.timers.tick(60000);
+    registration.waiting = { postMessage: (message) => registration.posted.push(message) };
+    installing.state = 'installed';
+    installing.listeners.statechange();
+    assert.deepEqual(registration.posted, []);
 });

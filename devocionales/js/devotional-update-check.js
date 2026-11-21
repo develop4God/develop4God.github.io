@@ -12,6 +12,8 @@
     // Must equal SKIP_WAITING_MESSAGE in devotional-sw-register.js and scripts/sw.template.js.
     const SKIP_WAITING_MESSAGE = 'devocionales-skip-waiting';
     const CHECK_TIMEOUT_MS = 1000;
+    // How long after the check a new worker may still be taken over with the entry flag.
+    const INSTALL_GRACE_MS = 60000;
 
     // The build id the server serves, or null when it cannot be read in time (offline included).
     async function fetchServerBuildId(win) {
@@ -47,36 +49,52 @@
         return Boolean(pageId) && Boolean(serverId) && pageId !== serverId;
     }
 
-    // Resolves to true when a newer build was found and the worker was asked to take over.
+    // Resolves to true when a newer build was found and a check for the new worker was started. Once
+    // that worker has installed, it is asked to take over with the entry flag, but only when the page
+    // was still in its entry window when the check started, and only for INSTALL_GRACE_MS. A page the
+    // reader has already used is left to deliverUpdates, which waits for the tab to be hidden.
     async function checkForNewBuild(win, registration, entry) {
         if (!registration || !entry) return false;
+        // Decided before the fetch, so a slow version check cannot close the window on a fresh page.
+        const fresh = entry.isOpen();
         const pageId = win.DevotionalBuild && win.DevotionalBuild.id;
         const serverId = await fetchServerBuildId(win);
-        if (!isNewer(pageId, serverId) || !entry.isOpen()) return false;
-        announceUpdate(win);
+        if (!fresh || !isNewer(pageId, serverId)) return false;
 
-        // Asks the waiting worker to take over. The entry latch keeps the page open to the reload
-        // that follows the takeover, even though the download may have taken longer than the window.
-        const askWhenWaiting = () => {
-            if (!registration.waiting) return false;
+        let pending = true;
+        let timer = null;
+        const finish = () => {
+            pending = false;
+            if (timer !== null) clearTimeout(timer);
+            registration.removeEventListener('updatefound', onUpdateFound);
+        };
+        // The note and the entry latch come with the request, so they show only when a takeover is asked.
+        const requestTakeover = () => {
+            if (!pending || !registration.waiting) return false;
+            finish();
+            announceUpdate(win);
             entry.latch();
             registration.waiting.postMessage({ type: SKIP_WAITING_MESSAGE, entry: true });
             return true;
         };
-        if (askWhenWaiting()) return true;
-        // A worker that is already installing when the check runs fires no updatefound for us, so
-        // it is watched directly as well as through the next updatefound.
         const watch = (installing) => {
             if (!installing) return;
             installing.addEventListener('statechange', () => {
-                if (installing.state === 'installed') askWhenWaiting();
+                if (installing.state === 'installed') requestTakeover();
             });
         };
+        const onUpdateFound = () => watch(registration.installing);
+
+        if (requestTakeover()) return true;
+        // A worker already installing fires no updatefound for us, so it is watched directly too.
         watch(registration.installing);
-        registration.addEventListener('updatefound', () => watch(registration.installing));
+        registration.addEventListener('updatefound', onUpdateFound);
+        timer = setTimeout(finish, INSTALL_GRACE_MS);
+        if (timer && typeof timer.unref === 'function') timer.unref();
         try {
             await registration.update();
         } catch (err) {
+            finish();
             return false;
         }
         return true;

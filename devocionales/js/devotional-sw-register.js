@@ -47,14 +47,18 @@
     const ENTRY_WINDOW_MS = 8000;
     const ENTRY_LATCH_MS = 10000;
 
+    // The window opens when open() is called (the page's worker registration, after its load), so a
+    // slow load does not use up the window; until then it counts from the start of the page.
     function createEntryWindow(perf, windowMs) {
+        let openedAt = 0;
         let latchedAt = null;
         const now = () => (perf && typeof perf.now === 'function' ? perf.now() : null);
         return {
+            open() { openedAt = now() || 0; latchedAt = null; },
             isOpen() {
                 const t = now();
                 if (t === null) return false;
-                return t < windowMs || (latchedAt !== null && t < latchedAt + ENTRY_LATCH_MS);
+                return t - openedAt < windowMs || (latchedAt !== null && t < latchedAt + ENTRY_LATCH_MS);
             },
             latch() { latchedAt = now(); },
         };
@@ -183,13 +187,16 @@
         answerBuildQueries(win.navigator, win);
         const entry = createEntryWindow(win.performance, ENTRY_WINDOW_MS);
         reloadOnUpdate(win.navigator, win.document, () => win.location.reload(), entry);
-        const registerWorker = () => clearStandDownMarker(win)
-            .then(() => register(win.navigator, workerUrl, scope))
-            .then((registration) => {
-                deliverUpdates(win.navigator, win.document, registration, entry);
-                // Checks the server for a newer build on entry (devotional-update-check.js), when loaded.
-                if (win.DevotionalUpdateCheck) win.DevotionalUpdateCheck.checkForNewBuild(win, registration, entry).catch(() => {});
-            });
+        const registerWorker = () => {
+            entry.open();
+            return clearStandDownMarker(win)
+                .then(() => register(win.navigator, workerUrl, scope))
+                .then((registration) => {
+                    deliverUpdates(win.navigator, win.document, registration, entry);
+                    // Checks the server for a newer build on entry (devotional-update-check.js), when loaded.
+                    if (win.DevotionalUpdateCheck) win.DevotionalUpdateCheck.checkForNewBuild(win, registration, entry).catch(() => {});
+                });
+        };
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
     }
