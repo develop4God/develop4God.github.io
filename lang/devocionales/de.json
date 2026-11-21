@@ -249,7 +249,8 @@
     "theme": "Design",
     "font_size": "Schriftgröße",
     "app_version": "App-Version",
-    "encounters": "Begegnungen"
+    "encounters": "Begegnungen",
+    "new_badge": "Neu"
   },
   "discovery": {
     "title": "Bibelstudien",

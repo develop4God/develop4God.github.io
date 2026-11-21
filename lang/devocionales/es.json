@@ -249,7 +249,8 @@
     "theme": "Tema",
     "font_size": "Tamaño de letra",
     "app_version": "Versión de la app",
-    "encounters": "Encuentros"
+    "encounters": "Encuentros",
+    "new_badge": "Nuevo"
   },
   "discovery": {
     "title": "Estudios Bíblicos",

@@ -249,7 +249,8 @@
     "theme": "Tema",
     "font_size": "Laki ng font",
     "app_version": "Bersyon ng app",
-    "encounters": "Mga Pagtatagpo"
+    "encounters": "Mga Pagtatagpo",
+    "new_badge": "Bago"
   },
   "discovery": {
     "title": "Mga Pag-aaral sa Biblia",

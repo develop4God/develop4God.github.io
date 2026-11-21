@@ -249,7 +249,8 @@
     "theme": "テーマ",
     "font_size": "フォントサイズ",
     "app_version": "アプリのバージョン",
-    "encounters": "出会い"
+    "encounters": "出会い",
+    "new_badge": "新着"
   },
   "discovery": {
     "title": "聖書研究",
