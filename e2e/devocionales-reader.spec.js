@@ -585,21 +585,6 @@ test.describe('devocionales reader nav availability at archive edges', () => {
   });
 });
 
-// Returning visitors can hold the previous devotional-render-dom.js in their browser cache
-// (scripts are cached for 4 hours, the HTML is revalidated every visit). That script still
-// looks up #nav-vision-label, so the page must keep the element or the reader shows its
-// "could not load" error. Delete this test, the fixture and the hidden element together once
-// the cache window has long passed.
-test('devocionales reader still renders when the browser serves the previous cached render script', async ({ page }) => {
-  const fs = require('node:fs');
-  const path = require('node:path');
-  const oldScript = fs.readFileSync(path.join(__dirname, 'fixtures', 'devotional-render-dom.cached-before-vision-removal.js'), 'utf8');
-  await page.route('**/devocionales/js/devotional-render-dom.js*', (route) => route.fulfill({ contentType: 'application/javascript', body: oldScript }));
-  await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
-  await expect(page.locator('#devotional-verse-ref')).not.toHaveText('');
-  await expect(page.locator('#error-state')).toBeHidden();
-});
-
 test.describe('devocionales reader renders remote content as text, never as HTML', () => {
   // Para Meditar, the tags and the Bible-version codes come from the Devocionales-json repo. A
   // markup payload in any of them must show up literally and run nothing.

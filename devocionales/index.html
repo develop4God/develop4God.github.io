@@ -304,10 +304,6 @@
             <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
             <nav aria-label="Navegación principal">
                 <ul class="flex flex-wrap justify-center items-center gap-6 text-sm">
-                    <!-- Temporary: the previous cached devotional-render-dom.js (up to 4 h in a returning visitor's browser)
-                         still writes to #nav-vision-label and fails the whole reader if it is missing. Remove with the test
-                         "previous cached render script" and its fixture once that cache window has long passed. -->
-                    <li hidden><span id="nav-vision-label"></span></li>
                     <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
                     <!-- Browser tab only: the installed app has the Studies tab in its bottom bar (shell.css hides this one). -->
                     <li id="nav-studies-item"><a href="/devocionales/estudios/" id="nav-studies-label"><span data-i18n="shell.studies">Estudios Bíblicos</span><span class="nav-new-badge" data-i18n="shell.new_badge">New</span></a></li>
