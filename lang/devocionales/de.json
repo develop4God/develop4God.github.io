@@ -250,7 +250,8 @@
     "font_size": "Schriftgröße",
     "app_version": "App-Version",
     "encounters": "Begegnungen",
-    "new_badge": "Neu"
+    "new_badge": "Neu",
+    "updating": "Wird aktualisiert…"
   },
   "discovery": {
     "title": "Bibelstudien",

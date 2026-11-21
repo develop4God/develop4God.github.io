@@ -250,7 +250,8 @@
     "font_size": "Font size",
     "app_version": "App version",
     "encounters": "Encounters",
-    "new_badge": "New"
+    "new_badge": "New",
+    "updating": "Updating…"
   },
   "discovery": {
     "title": "Bible Studies",

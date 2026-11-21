@@ -250,7 +250,8 @@
     "font_size": "حجم الخط",
     "app_version": "إصدار التطبيق",
     "encounters": "لقاءات",
-    "new_badge": "جديد"
+    "new_badge": "جديد",
+    "updating": "جارٍ التحديث…"
   },
   "discovery": {
     "title": "دراسات كتابية",

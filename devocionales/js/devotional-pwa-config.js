@@ -10,7 +10,7 @@
         enabled: true,
         // The version shown in the installed app's Settings, like the Flutter app's pubspec "1.0.1+1" (semantic
         // version + build number). Bump it by hand on each release; it is not derived from the build id.
-        appVersion: '1.0.1+1',
+        appVersion: '1.1.0+2',
         // Kill switch for daily push notifications. false = the enable button is hidden, no Firebase
         // code is ever loaded, and a reader who had opted in is unsubscribed on their next visit.
         // This client kill switch is cleanup only: it runs when the installed app is reopened, so a
