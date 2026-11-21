@@ -100,5 +100,5 @@
         return true;
     }
 
-    global.DevotionalUpdateCheck = { checkForNewBuild, isNewer, fetchServerBuildId };
+    global.DevotionalUpdateCheck = { checkForNewBuild, isNewer, fetchServerBuildId, CHECK_TIMEOUT_MS, INSTALL_GRACE_MS };
 })(window);

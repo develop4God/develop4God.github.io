@@ -12,7 +12,9 @@ function loadModule() {
     return win.DevotionalUpdateCheck;
 }
 
-const { checkForNewBuild, isNewer } = loadModule();
+const { checkForNewBuild, isNewer, CHECK_TIMEOUT_MS, INSTALL_GRACE_MS } = loadModule();
+// Simulated network delay for the slow-check test; kept well under the check timeout.
+const FAKE_NETWORK_MS = 20;
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -169,7 +171,7 @@ test('a version check that never answers gives up after the timeout and does not
     const registration = fakeRegistration();
     const started = Date.now();
     assert.equal(await checkForNewBuild(win, registration, fakeEntry()), false);
-    assert.ok(Date.now() - started >= 900, 'waits for the timeout before giving up');
+    assert.ok(Date.now() - started >= CHECK_TIMEOUT_MS - 100, 'waits for the timeout before giving up');
     assert.equal(registration.updates, 0);
 });
 
@@ -241,7 +243,7 @@ test('the window is still open at the start, so a slow version check does not lo
     let open = true;
     const win = fakeWindow({ fetchImpl: () => new Promise((resolve) => {
         open = false;
-        setTimeout(() => resolve({ ok: true, json: () => Promise.resolve({ id: 'new2' }) }), 20);
+        setTimeout(() => resolve({ ok: true, json: () => Promise.resolve({ id: 'new2' }) }), FAKE_NETWORK_MS);
     }) });
     const registration = fakeRegistration({ waiting: {} });
     const entry = { isOpen: () => open, latch() {}, state: {} };
@@ -256,7 +258,7 @@ test('after the install grace the worker is no longer asked with the entry flag'
     registration.installing = installing;
     const entry = fakeEntry();
     await checkForNewBuild(win, registration, entry);
-    t.mock.timers.tick(60000);
+    t.mock.timers.tick(INSTALL_GRACE_MS);
     registration.waiting = { postMessage: (message) => registration.posted.push(message) };
     installing.state = 'installed';
     installing.listeners.statechange();

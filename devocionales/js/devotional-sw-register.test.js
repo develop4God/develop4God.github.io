@@ -525,15 +525,16 @@ test('start: wires the entry window so a freshly loaded visible page updates its
 });
 
 test('the entry window opens when the worker registration starts, so a slow load does not use it up', () => {
-    const { createEntryWindow } = loadModule();
+    const { createEntryWindow, ENTRY_WINDOW_MS } = loadModule();
+    const slowLoadMs = ENTRY_WINDOW_MS + 1000; // the page finished loading after the window would have closed
     let t = 0;
     const perf = { now: () => t };
-    const entry = createEntryWindow(perf, 8000);
-    t = 9000;
+    const entry = createEntryWindow(perf, ENTRY_WINDOW_MS);
+    t = slowLoadMs;
     assert.equal(entry.isOpen(), false, 'before open() a page that loaded slowly is past the window');
     entry.open();
-    t = 9500;
-    assert.equal(entry.isOpen(), true, 'open at 9 s, still open 0.5 s later');
-    t = 17500;
-    assert.equal(entry.isOpen(), false, 'closed 8 s after open()');
+    t = slowLoadMs + ENTRY_WINDOW_MS / 2;
+    assert.equal(entry.isOpen(), true, 'still open half a window after open()');
+    t = slowLoadMs + ENTRY_WINDOW_MS;
+    assert.equal(entry.isOpen(), false, 'closed once a full window has passed since open()');
 });

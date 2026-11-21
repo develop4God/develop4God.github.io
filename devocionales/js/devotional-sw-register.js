@@ -201,5 +201,8 @@
         else win.addEventListener('load', registerWorker);
     }
 
-    global.DevotionalSwRegister = { register, reloadOnUpdate, deliverUpdates, answerBuildQueries, createEntryWindow, start, disable };
+    global.DevotionalSwRegister = {
+        register, reloadOnUpdate, deliverUpdates, answerBuildQueries, createEntryWindow, start, disable,
+        ENTRY_WINDOW_MS, ENTRY_LATCH_MS,
+    };
 })(window);
