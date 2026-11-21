@@ -87,7 +87,7 @@ function fakeLink(href) {
     return {
         getAttribute: (name) => (name === 'href' ? href : null),
         addEventListener: (type, fn) => { if (type === 'click') listeners.push(fn); },
-        click: () => listeners.forEach((fn) => fn()),
+        click: (event = {}) => listeners.forEach((fn) => fn(event)),
     };
 }
 
@@ -146,4 +146,18 @@ test('loading the module on a page wires that page\'s static badges', () => {
     const page = { document: fakeDocument([studies]), localStorage: storage };
     load(page);
     assert.equal(studies.removed, true, 'a seen static badge is removed on page load');
+});
+
+test('a modified click (ctrl, cmd, shift, middle) opens the tab in the background and does not mark it seen', () => {
+    const api = load();
+    const storage = memoryStorage();
+    const encounters = fakeBadge('/devocionales/encounters/');
+    api.wire(fakeDocument([encounters]), storage);
+    encounters.link.click({ ctrlKey: true, button: 0 });
+    encounters.link.click({ metaKey: true, button: 0 });
+    encounters.link.click({ shiftKey: true, button: 0 });
+    encounters.link.click({ button: 1 });
+    assert.equal(api.isSeen(storage, 'encounters'), false);
+    encounters.link.click({ button: 0 });
+    assert.equal(api.isSeen(storage, 'encounters'), true, 'a plain tap still marks the tab');
 });

@@ -47,8 +47,12 @@
     }
 
     // Marks the tab as seen when its link is tapped. Shared by the static header and the installed bar.
+    // A modified click (ctrl, cmd, shift, middle button) opens the tab in the background: not seen yet.
     function bindTap(link, tab, storage) {
-        link.addEventListener('click', () => markSeen(storage, tab));
+        link.addEventListener('click', (event) => {
+            if (event && (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0)) return;
+            markSeen(storage, tab);
+        });
     }
 
     // Static bubbles (browser header, Bible-studies and Encounters pages): drop the ones already
