@@ -26,6 +26,7 @@
     "DevotionalIosHint": "readonly",
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",
+    "DevotionalUpdateCheck": "readonly",
     "DevotionalBuild": "readonly",
     "DiscoveryData": "readonly",
     "DiscoveryStore": "readonly",

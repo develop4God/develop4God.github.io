@@ -185,7 +185,11 @@
         reloadOnUpdate(win.navigator, win.document, () => win.location.reload(), entry);
         const registerWorker = () => clearStandDownMarker(win)
             .then(() => register(win.navigator, workerUrl, scope))
-            .then((registration) => deliverUpdates(win.navigator, win.document, registration, entry));
+            .then((registration) => {
+                deliverUpdates(win.navigator, win.document, registration, entry);
+                // Checks the server for a newer build on entry (devotional-update-check.js), when loaded.
+                if (win.DevotionalUpdateCheck) win.DevotionalUpdateCheck.checkForNewBuild(win, registration, entry).catch(() => {});
+            });
         if (win.document.readyState === 'complete') registerWorker();
         else win.addEventListener('load', registerWorker);
     }
