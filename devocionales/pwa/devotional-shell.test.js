@@ -11,6 +11,7 @@ const vm = require('node:vm');
 
 const SHELL_FILE = path.join(__dirname, 'devotional-shell.js');
 const BADGE_FILE = path.join(__dirname, '..', 'js', 'devotional-nav-new-badge.js');
+const CORE_FILE = path.join(__dirname, 'devotional-shell-core.js');
 
 function fakeElement(tag) {
     return {
@@ -106,4 +107,19 @@ test('a tab without the badge flag never gets a bubble, even when unseen', () =>
     tabs[0].badge = false;
     const { items } = renderWith({ tabs });
     assert.equal(hasBubble(items[0]), false);
+});
+
+// Guard against drift: the badge module maps hrefs to tab names, and the shell core owns the tab
+// hrefs. Both must agree on the bubble tabs, or tapping a tab would never mark it seen.
+test('the badge module and the shell core agree on the bubble tabs and their hrefs', () => {
+    const win = {};
+    vm.runInThisContext(`(function(window){${fs.readFileSync(BADGE_FILE, 'utf8')}\n})`, { filename: BADGE_FILE })(win);
+    vm.runInThisContext(`(function(window){${fs.readFileSync(CORE_FILE, 'utf8')}\n})`, { filename: CORE_FILE })(win);
+    const badges = win.DevotionalNewBadge;
+    const tabs = win.DevotionalShellCore.tabsForPage('studies', ['studies', 'encounters', 'home', 'settings']);
+    const bubbleTabs = tabs.filter((tab) => tab.badge).map((tab) => tab.name);
+    assert.deepEqual(bubbleTabs, ['encounters']);
+    for (const tab of tabs.filter((t) => ['studies', 'encounters'].includes(t.name))) {
+        assert.equal(badges.tabForHref(tab.href), tab.name, `${tab.name} href must map to its tab name`);
+    }
 });
