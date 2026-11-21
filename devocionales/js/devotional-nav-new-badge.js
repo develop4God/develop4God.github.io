@@ -46,6 +46,11 @@
         }
     }
 
+    // Marks the tab as seen when its link is tapped. Shared by the static header and the installed bar.
+    function bindTap(link, tab, storage) {
+        link.addEventListener('click', () => markSeen(storage, tab));
+    }
+
     // Static bubbles (browser header, Bible-studies and Encounters pages): drop the ones already
     // seen and mark a tab as seen when it is tapped.
     function wire(doc, storage) {
@@ -57,11 +62,11 @@
                 badge.remove();
                 return;
             }
-            link.addEventListener('click', () => markSeen(storage, tab));
+            bindTap(link, tab, storage);
         });
     }
 
-    global.DevotionalNewBadge = { tabForHref, storageOf, isSeen, markSeen, wire };
+    global.DevotionalNewBadge = { tabForHref, storageOf, isSeen, markSeen, bindTap, wire };
     // Loaded at the end of <body>, after the static nav markup. Pages without that markup match nothing.
     if (global.document) wire(global.document, storageOf(global));
 })(window);

@@ -89,7 +89,7 @@
                 const badges = global.DevotionalNewBadge;
                 const storage = badges ? badges.storageOf(win) : null;
                 if (!badges || !badges.isSeen(storage, tab.name)) el.append(newBadge(doc, t));
-                if (badges) el.addEventListener('click', () => badges.markSeen(storage, tab.name));
+                if (badges) badges.bindTap(el, tab.name, storage);
             }
             return el;
         });
