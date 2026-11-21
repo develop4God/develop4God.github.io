@@ -250,7 +250,8 @@
     "font_size": "Tamanho da fonte",
     "app_version": "Versão do app",
     "encounters": "Encontros",
-    "new_badge": "Novo"
+    "new_badge": "Novo",
+    "updating": "Atualizando…"
   },
   "discovery": {
     "title": "Estudos Bíblicos",

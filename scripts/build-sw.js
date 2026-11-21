@@ -33,6 +33,8 @@ const WORKER_URL = '/devocionales/sw.js';
 // page). It is precached like any page script but is not part of the version it carries.
 const STAMP_URL = '/devocionales/js/devotional-build.js';
 const STAMP_FILE = 'devocionales/js/devotional-build.js';
+// The build the server serves now, fetched past every cache by the page (devotional-update-check.js).
+const VERSION_FILE = 'devocionales/version.json';
 const LINK_RELS = new Set(['stylesheet', 'preload', 'modulepreload', 'manifest', 'apple-touch-icon', 'icon']);
 
 // Runtime behaviour that is not derived from the page.
@@ -171,6 +173,7 @@ function renderSw(template, config, pushSource) {
 }
 
 const stampSource = (version) => `window.DevotionalBuild = Object.freeze({ id: '${version}' });\n`;
+const versionSource = (version) => `${JSON.stringify({ id: version })}\n`;
 
 // `overrides` replaces runtime settings; it exists so tests can exercise the validation below.
 function buildSw(root, overrides = {}) {
@@ -187,12 +190,12 @@ function buildSw(root, overrides = {}) {
     // collectPrecache walked, so the two can never disagree about what a page is.
     const pages = pageFiles(root).filter((file) => file !== SHELL_FILE).map((file) => `/${file}`);
     const config = { version: computeVersion(root, precache, template, runtime, pushSource), ...runtime, pages, precache };
-    return { source: renderSw(template, config, pushSource), config, stamp: stampSource(config.version) };
+    return { source: renderSw(template, config, pushSource), config, stamp: stampSource(config.version), version: versionSource(config.version) };
 }
 
 function main(root, args) {
-    const { source, stamp } = buildSw(root);
-    const outputs = [[OUTPUT_FILE, source], [STAMP_FILE, stamp]];
+    const { source, stamp, version } = buildSw(root);
+    const outputs = [[OUTPUT_FILE, source], [STAMP_FILE, stamp], [VERSION_FILE, version]];
     if (args.includes('--check')) {
         const stale = outputs.filter(([file, content]) => {
             const target = path.join(root, file);

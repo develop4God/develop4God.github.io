@@ -5,6 +5,9 @@
 /devocionales/sw.js
   Cache-Control: no-cache
 
+/devocionales/version.json
+  Cache-Control: no-cache
+
 /devocionales/js/devotional-pwa-config.js
   Cache-Control: no-cache
 
