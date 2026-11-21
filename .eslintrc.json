@@ -73,6 +73,7 @@
     "DevotionalPush": "readonly",
     "DevotionalShell": "readonly",
     "DevotionalShellCore": "readonly",
+    "DevotionalNewBadge": "readonly",
     "DevotionalPushStore": "readonly",
     "DevotionalPushFirebase": "readonly",
     "DevotionalPushHelp": "readonly",
