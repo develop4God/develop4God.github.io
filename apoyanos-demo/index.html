@@ -102,6 +102,7 @@
         .goal-price { font-size: 1.6rem; font-weight: 800; color: var(--accent); margin: 8px 0 10px; }
 
         /* Give */
+        .give-options { display: flex; gap: 12px; flex-wrap: wrap; }
         .presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
         .preset { background: var(--accent-soft); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; }
         .preset[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
@@ -132,7 +133,7 @@
     <section>
         <span class="eyebrow">Devocionales Cristianos</span>
         <h1>Apóyanos</h1>
-        <p class="lead">Este ministerio es gratis para todos. No tiene anuncios en la app, en la web ni en la PWA, y el contenido funciona sin conexión. Tu aporte ayuda a mantenerlo así.</p>
+        <p class="lead">Este ministerio es gratis para todos. No tiene anuncios en la app ni en la página web, y el contenido funciona sin conexión. Tu aporte ayuda a mantenerlo así.</p>
         <a class="btn-primary" href="#dar">Quiero apoyar</a>
     </section>
 
@@ -158,7 +159,7 @@
             <div class="card">
                 <div class="reason-icon">2</div>
                 <h3>Sin anuncios</h3>
-                <p class="muted">Ni en la app, ni en la web, ni en la PWA. Nunca hemos querido llenar tu momento con Dios de publicidad.</p>
+                <p class="muted">Ni en la app ni en la página web. Nunca hemos querido llenar tu momento con Dios de publicidad.</p>
             </div>
             <div class="card">
                 <div class="reason-icon">3</div>
@@ -183,14 +184,15 @@
         <span class="eyebrow">Cómo vamos este año</span>
         <div class="progress-head">
             <h2 style="margin:0">Costos anuales del ministerio</h2>
-            <span class="progress-total">USD 74.15 de USD 540</span>
+            <span class="progress-total">USD 540 al año</span>
         </div>
-        <p class="muted" style="margin:0">Recibido en 2026. Actualizado: 23 nov 2026.</p>
+        <p class="muted" style="margin:0">Recibido hasta el 23 nov 2026 desde la app: USD 74.15. Proyección anual en curso.</p>
+        <p class="muted" style="margin:6px 0 0; font-size:.9rem">Proyección 2026 a ritmo de los últimos 30 días: ~USD 129 (estimación).</p>
 
         <div class="rubro">
-            <div class="rubro-top"><h3>Infraestructura y notificaciones</h3><span class="muted">$60 al año</span></div>
+            <div class="rubro-top"><h3>Infraestructura y notificaciones</h3><span class="muted">$60 al año · cubierto</span></div>
             <p>Servidores y el envío de notificaciones diarias.</p>
-            <div class="fill" role="presentation"><span data-width="11%"></span></div>
+            <div class="fill" role="presentation"><span class="done" data-width="100%"></span></div>
         </div>
         <div class="rubro">
             <div class="rubro-top"><h3>Contenido devocional nuevo</h3><span class="muted">$240 al año</span></div>
@@ -202,7 +204,7 @@
             <p>Lo que permite construir y mantener la app siendo un solo desarrollador.</p>
             <div class="fill" role="presentation"><span data-width="0%"></span></div>
         </div>
-        <p class="muted" style="margin:18px 0 0; font-size:.9rem">La barra total refleja el aporte recibido. Los rubros individuales se muestran sin cifra porque no tenemos el desglose del pago.</p>
+        <p class="muted" style="margin:18px 0 0; font-size:.9rem">Las barras de los rubros muestran lo ya cubierto. Los demás rubros se cubren con los aportes que se reciban.</p>
     </section>
 
     <!-- CÓMO SE ASIGNAN TUS RECURSOS -->
@@ -229,7 +231,7 @@
             <li><strong>Feb 2026</strong><span>Habitus+Faith se publica en Google Play, y se lanzan las insignias de apoyo en la app.</span></li>
             <li><strong>Mar 2026</strong><span>Encuentros y estudios bíblicos en la app.</span></li>
             <li><strong>Jul 2026</strong><span>Devocionales en la web, en 10 idiomas, con lectura en voz alta.</span></li>
-            <li><strong>Nov 2026</strong><span>Notificaciones y la app instalable (PWA).</span></li>
+            <li><strong>Nov 2026</strong><span>Notificaciones diarias y la app que se instala desde el navegador, sin tienda.</span></li>
         </ul>
     </section>
 
@@ -254,14 +256,18 @@
     <!-- DAR -->
     <section id="dar" class="card" aria-labelledby="dar-title">
         <span class="eyebrow">Dar</span>
-        <h2 id="dar-title">Elige un aporte único</h2>
+        <h2 id="dar-title">Elige cómo apoyar</h2>
         <div class="presets" role="group" aria-label="Monto">
             <button class="preset" type="button" data-amount="5" aria-pressed="false">$5</button>
             <button class="preset" type="button" data-amount="10" aria-pressed="true">$10</button>
             <button class="preset" type="button" data-amount="25" aria-pressed="false">$25</button>
             <button class="preset" type="button" data-amount="other" aria-pressed="false">Otro</button>
         </div>
-        <a class="btn-primary" href="#" id="give-link">Dar con PayPal</a>
+        <div class="give-options">
+            <a class="btn-primary" href="#" id="give-link">Dar con PayPal</a>
+            <a class="btn-secondary" href="https://wa.me/50688424291" target="_blank" rel="noopener">Transferencia o Yappy (Panamá): escríbenos</a>
+        </div>
+        <p class="muted" style="margin:14px 0 0; font-size:.9rem">Si prefieres transferencia o Yappy, escríbenos y te damos los datos por ese medio.</p>
         <p class="muted" style="margin:24px 0 0">
             <strong>Desbloquea los Encuentros:</strong> un aporte único desbloquea todos los Encuentros. Hazlo desde la página de Encuentros.
         </p>
