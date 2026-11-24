@@ -20,6 +20,7 @@
         failed: 'El aporte no se completó. Intenta de nuevo.',
         thanksRecurring: '¡Gracias! Tu aporte mensual o anual quedó registrado.',
         sdkFailed: 'No se pudo cargar PayPal. Puedes dar con el enlace de PayPal de abajo.',
+        sdkFailedRecurring: 'No se pudo cargar PayPal. Revisa tu conexión e intenta de nuevo.',
         badAmount: 'Escribe un monto de $1 o más, con hasta dos decimales.',
         fixedAmounts: 'Los aportes mensuales y anuales están en montos fijos ($5, $10 o $25).',
     };
@@ -28,7 +29,6 @@
     var state = { frequency: 'once', amount: 10 };
     var sdkLoads = {};
     var renderToken = 0;
-    var subscriptionsRendered = false;
 
     var frequencyButtons = document.querySelectorAll('[data-frequency]:not(.plan-slot)');
     var amountButtons = document.querySelectorAll('[data-amount]:not(.plan-slot)');
@@ -40,7 +40,13 @@
     var plansBox = document.getElementById('plans');
     var status = document.getElementById('sdk-status');
 
-    function say(text) { status.textContent = text; }
+    // A result message (thanks, failure) stays until the next result; hints are cleared on every change.
+    var resultShown = false;
+    function say(text, isResult) {
+        status.textContent = text;
+        resultShown = !!isResult;
+    }
+    function hint(text) { if (!resultShown) { say(text, false); } }
 
     // Loads one SDK build into window[namespace]; a failed load can be retried.
     function loadSdk(namespace, url) {
@@ -82,7 +88,7 @@
 
     function showFallback() {
         onceLink.hidden = false;
-        say(MSG.sdkFailed);
+        say(MSG.sdkFailed, true);
     }
 
     function renderOnce() {
@@ -91,8 +97,8 @@
         onceButtons.replaceChildren();
         onceLink.hidden = true;
         setFallbackLink(raw);
-        if (!validOnceAmount(raw)) { say(MSG.badAmount); return; }
-        say('');
+        if (!validOnceAmount(raw)) { hint(MSG.badAmount); return; }
+        hint('');
         var slot = document.createElement('div');
         onceButtons.appendChild(slot);
         onceSdk().then(function (paypal) {
@@ -101,8 +107,8 @@
                 amount: parseFloat(raw),
                 currency: onceConfig.currency,
                 description: DESCRIPTION,
-                onApproved: function (details) { say(details && details.status === 'COMPLETED' ? MSG.thanks : MSG.pending); },
-                onError: function () { say(MSG.failed); },
+                onApproved: function (details) { say(details && details.status === 'COMPLETED' ? MSG.thanks : MSG.pending, true); },
+                onError: function () { say(MSG.failed, true); },
             });
         }).catch(function () {
             if (token === renderToken) { showFallback(); }
@@ -120,20 +126,21 @@
         });
     }
 
-    function renderSubscriptions() {
-        if (subscriptionsRendered) { return; }
-        subscriptionsRendered = true;
+    // A button is rendered only once its slot is visible: PayPal sizes the button from the container
+    // width, and a hidden container has none.
+    function renderVisibleSubscription() {
+        var slot = plansBox.querySelector('.plan-slot.visible');
+        if (!slot || slot.getAttribute('data-rendered') === 'true') { return; }
+        slot.setAttribute('data-rendered', 'true');
         subscriptionSdk().then(function (paypal) {
-            plansBox.querySelectorAll('.plan-slot').forEach(function (slot) {
-                PayPalCheckout.renderSubscriptionButton(paypal, slot, {
-                    planId: slot.getAttribute('data-plan'),
-                    onApproved: function () { say(MSG.thanksRecurring); },
-                    onError: function () { say(MSG.failed); },
-                });
+            return PayPalCheckout.renderSubscriptionButton(paypal, slot, {
+                planId: slot.getAttribute('data-plan'),
+                onApproved: function () { say(MSG.thanksRecurring, true); },
+                onError: function () { say(MSG.failed, true); },
             });
         }).catch(function () {
-            subscriptionsRendered = false;
-            say(MSG.sdkFailed.replace(' Puedes dar con el enlace de PayPal de abajo.', ''));
+            slot.removeAttribute('data-rendered');
+            say(MSG.sdkFailedRecurring, true);
         });
     }
 
@@ -143,8 +150,8 @@
                 && slot.getAttribute('data-amount') === String(state.amount);
             slot.classList.toggle('visible', show);
         });
-        say(state.amount === 'other' ? MSG.fixedAmounts : '');
-        renderSubscriptions();
+        hint(state.amount === 'other' ? MSG.fixedAmounts : '');
+        renderVisibleSubscription();
     }
 
     function refresh() {

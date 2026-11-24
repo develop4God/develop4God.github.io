@@ -127,13 +127,30 @@ test.describe('Apóyanos page', () => {
     await expect(page.locator('.plan-slot.visible')).toHaveAttribute('data-plan', 'P-0LF0259858521293SNMALTTQ');
   });
 
-  test('the subscription SDK loads on demand with the subscription intent and renders every plan', async ({ page }) => {
+  test('the subscription SDK loads on demand and renders only the visible plan', async ({ page }) => {
     const requests = stubSdk(page);
     await openDonate(page);
     await page.getByRole('button', { name: 'Mensual' }).click();
-    await expect.poll(() => renders(page, 'subscription')).toBe(6);
+    await expect.poll(() => renders(page, 'subscription')).toBe(1);
     const subscription = requests.find((url) => url.searchParams.get('intent') === 'subscription');
     expect(subscription.searchParams.get('vault')).toBe('true');
+    await page.getByRole('button', { name: '$25' }).click();
+    await expect.poll(() => renders(page, 'subscription')).toBe(2);
+    await page.getByRole('button', { name: '$10' }).click();
+    await page.waitForTimeout(300);
+    expect(await renders(page, 'subscription')).toBe(2); // the $10 button was rendered at the start; not again
+  });
+
+  test('a thank-you message survives later amount changes', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await page.evaluate(() => window.__lastOrderOptions.onApprove({}, {
+      order: { capture: () => Promise.resolve({ status: 'COMPLETED' }) },
+    }));
+    await expect(page.locator('#sdk-status')).toContainText('Gracias');
+    await page.getByRole('button', { name: '$25' }).click();
+    await expect(page.locator('#sdk-status')).toContainText('Gracias');
   });
 
   test('the Encounters unlock option links to the Encounters page', async ({ page }) => {

@@ -104,8 +104,13 @@
         return paypal.Buttons({
             style: { shape: 'pill', color: 'blue', layout: 'vertical', label: 'subscribe' },
             createSubscription: (data, actions) => actions.subscription.create({ plan_id: planId }),
+            // An error thrown by onApproved must not be reported as a failed subscription: it is already approved.
             onApprove: (data) => {
-                if (typeof onApproved === 'function') onApproved(data.subscriptionID);
+                try {
+                    if (typeof onApproved === 'function') onApproved(data.subscriptionID);
+                } catch (error) {
+                    console.error('PayPalCheckout: onApproved failed after an approved subscription', error);
+                }
             },
             onError: (error) => {
                 if (typeof onError === 'function') onError(error);

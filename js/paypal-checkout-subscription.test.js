@@ -72,3 +72,22 @@ test('renderSubscriptionButton reports an approved subscription id to onApproved
 test('renderSubscriptionButton refuses a missing plan id', () => {
   assert.throws(() => renderSubscriptionButton({ Buttons() {} }, 'c', { planId: '' }), /planId/);
 });
+
+test('a throwing onApproved after an approved subscription is not reported as a failed subscription', () => {
+  let options = null;
+  const fakePaypal = { Buttons(opts) { options = opts; return { render() { return Promise.resolve(); } }; } };
+  const errors = [];
+  renderSubscriptionButton(fakePaypal, 'c', {
+    planId: 'P-123',
+    onApproved: () => { throw new Error('ui broke'); },
+    onError: (error) => errors.push(error),
+  });
+  const originalError = console.error;
+  console.error = () => {};
+  try {
+    assert.doesNotThrow(() => options.onApprove({ subscriptionID: 'I-SUB1' }));
+  } finally {
+    console.error = originalError;
+  }
+  assert.deepEqual(errors, []);
+});
