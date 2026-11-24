@@ -86,6 +86,11 @@
         .preset:active { transform: scale(.94); }
         .preset[aria-pressed="true"] { background: var(--accent); color: var(--bg); transform: scale(1.05); }
         .give-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        button.btn-secondary { background: none; font: inherit; font-weight: 700; cursor: pointer; }
+        .yappy-box { margin-top: 16px; padding: 14px 16px; border: 1px dashed var(--accent); border-radius: 8px; animation: open .3s ease; }
+        .yappy-box[hidden], .yappy-row[hidden] { display: none; }
+        .yappy-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+        .yappy-row .preset { padding: 8px 16px; }
 
         footer { border-top: 1px solid var(--border); padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: .9rem; }
 
@@ -210,9 +215,16 @@
         </div>
         <div class="give-options">
             <a class="btn-primary" href="#" id="give-link">Dar con PayPal</a>
-            <a class="btn-secondary" href="https://wa.me/50688424291" target="_blank" rel="noopener">Transferencia o Yappy (Panamá): escríbenos</a>
+            <button class="btn-secondary" type="button" id="yappy-btn" aria-controls="yappy-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Yappy (Panamá): tocar para copiar</button>
         </div>
-        <p class="muted small" style="margin:14px 0 0">Si prefieres transferencia o Yappy, escríbenos y te damos los datos por ese medio.</p>
+        <div class="yappy-box" id="yappy-box" role="status" aria-live="polite" hidden>
+            <span class="muted small" id="yappy-label"></span>
+            <div class="yappy-row" id="yappy-row" hidden>
+                <strong id="yappy-number"></strong>
+                <button class="preset" type="button" id="yappy-copy">Copiar</button>
+            </div>
+        </div>
+        <p class="muted small" style="margin:14px 0 0">¿Prefieres transferencia u otro medio? <a href="https://wa.me/50688424291" target="_blank" rel="noopener">Escríbenos por WhatsApp</a> y te damos los datos.</p>
         <p class="muted small" style="margin:18px 0 0"><strong>Desbloquea los Encuentros:</strong> un aporte único desbloquea todos los Encuentros. Hazlo desde la página de Encuentros.</p>
     </section>
 </main>
@@ -241,6 +253,66 @@
                 presets.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
                 btn.setAttribute('aria-pressed', 'true');
             });
+        });
+
+        // Yappy: one tap fetches the number from /api/yappy and copies it; it is never embedded in this page.
+        // The SPA fallback answers unknown paths with HTML (200), so the body is validated, not just the status.
+        var yappyBtn = document.getElementById('yappy-btn');
+        var yappyBox = document.getElementById('yappy-box');
+        var yappyLabel = document.getElementById('yappy-label');
+        var yappyRow = document.getElementById('yappy-row');
+        var yappyNumber = document.getElementById('yappy-number');
+        var yappyCopy = document.getElementById('yappy-copy');
+        var NUMBER_PATTERN = /^[0-9+\-\s]{6,20}$/;
+        var COPY_HINT = 'Mantén presionado el número para copiarlo.';
+
+        function showYappy(message, number) {
+            yappyBox.hidden = false;
+            yappyLabel.textContent = message;
+            yappyRow.hidden = !number;
+            yappyNumber.textContent = number || '';
+        }
+
+        function fetchYappyNumber() {
+            return fetch('/api/yappy', { cache: 'no-store', headers: { Accept: 'application/json' } })
+                .then(function (res) { return res.ok ? res.json() : Promise.reject(new Error('status')); })
+                .then(function (data) {
+                    if (!data || typeof data.number !== 'string' || !NUMBER_PATTERN.test(data.number)) {
+                        throw new Error('shape');
+                    }
+                    return data.number;
+                });
+        }
+
+        // Safari only allows a clipboard write inside the tap, so hand it a promise instead of waiting for the fetch.
+        function copyWhenReady(numberPromise) {
+            var clip = navigator.clipboard;
+            if (clip && window.ClipboardItem && clip.write) {
+                var blobPromise = numberPromise.then(function (n) { return new Blob([n], { type: 'text/plain' }); });
+                return clip.write([new window.ClipboardItem({ 'text/plain': blobPromise })]);
+            }
+            return numberPromise.then(function (n) { return clip.writeText(n); });
+        }
+
+        yappyBtn.addEventListener('click', function () {
+            showYappy('Cargando…', null);
+            var numberPromise = fetchYappyNumber();
+            var copied = copyWhenReady(numberPromise).then(function () { return true; }, function () { return false; });
+            Promise.all([numberPromise, copied]).then(function (result) {
+                showYappy(result[1] ? 'Número copiado. Pégalo en Yappy:' : 'Toca Copiar y pégalo en Yappy:', result[0]);
+            }).catch(function () {
+                showYappy('No pudimos cargar el número. Escríbenos por WhatsApp y te lo damos.', null);
+            });
+        });
+
+        yappyCopy.addEventListener('click', function () {
+            var done = function () { yappyCopy.textContent = '¡Copiado!'; setTimeout(function () { yappyCopy.textContent = 'Copiar'; }, 1800); };
+            var clip = navigator.clipboard;
+            if (clip && clip.writeText) {
+                clip.writeText(yappyNumber.textContent).then(done, function () { yappyLabel.textContent = COPY_HINT; });
+            } else {
+                yappyLabel.textContent = COPY_HINT;
+            }
         });
 
         // Count-up for the received total.

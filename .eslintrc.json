@@ -109,6 +109,12 @@
   },
   "overrides": [
     {
+      "files": ["functions/**/*.js"],
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    },
+    {
       "files": ["**/*.test.js", "e2e/**/*.js", "scripts/**/*.js"],
       "env": {
         "node": true
