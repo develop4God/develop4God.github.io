@@ -599,7 +599,7 @@ test.describe('Studies tab in the installed app', () => {
         await expect(tabs).toHaveCount(4);
         expect(await tabs.evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'encounters', 'settings']);
         const studies = page.locator('[data-shell-tab="studies"]');
-        await expect(studies).toContainText('Studies');
+        await expect(studies.locator(':scope > span:not(.nav-new-badge)')).toHaveText('Studies');
         await expect(studies).toHaveAttribute('href', '/devocionales/estudios/');
         await expect(studies.locator('svg.lucide-graduation-cap')).toBeVisible();
         expect(await noHorizontalScroll(page)).toBe(true);
@@ -659,7 +659,7 @@ test.describe('Studies tab in the installed app', () => {
         expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
         const box = await page.locator('[data-shell-nav]').boundingBox();
         expect(Math.round(box.x)).toBe(0);
-        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Studies');
+        await expect(page.locator('[data-shell-tab="studies"] > span:not(.nav-new-badge)')).toHaveText('Studies');
         await shot(page, 'desktop-studies');
     });
 
@@ -667,7 +667,7 @@ test.describe('Studies tab in the installed app', () => {
         await installedIos(page);
         await mockStudies(page);
         await openStudies(page, PHONE, '/devocionales/estudios/?lang=es');
-        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Estudios');
+        await expect(page.locator('[data-shell-tab="studies"] > span:not(.nav-new-badge)')).toHaveText('Estudios');
         await expect(page.locator('[data-shell-tab="home"]')).toContainText('Inicio');
         await expect(page.locator('[data-shell-tab="settings"]')).toContainText('Ajustes');
     });
@@ -931,4 +931,24 @@ test.describe('bottom bar tab labels in every shipped language', () => {
             });
         }
     }
+});
+
+// A new page can meet an older language file (cached, or from the previous build) that has no shell.tab_* keys.
+// The bar must keep its own readable fallback labels then, never the raw keys.
+test('bar labels fall back to readable text when the language file predates the tab keys', async ({ page }) => {
+    await installedIos(page);
+    await page.route('**/lang/devocionales/*.json', async (route) => {
+        const response = await route.fetch();
+        const json = await response.json();
+        for (const key of Object.keys(json.shell)) if (key.startsWith('tab_')) delete json.shell[key];
+        await route.fulfill({ response, json });
+    });
+    await page.setViewportSize({ width: 375, height: 700 });
+    await page.goto('/devocionales/estudios/?lang=es', { waitUntil: 'networkidle' });
+    await expect(page.locator('html')).toHaveClass(/shell-active/);
+    await page.waitForFunction(() => window.i18n && Object.keys(window.i18n.translations || {}).length > 0);
+    // translatePage() runs again whenever the language changes; it must not turn the labels into raw keys.
+    await page.evaluate(() => window.i18n.translatePage());
+    const labels = page.locator('.shell-tab > span:not(.nav-new-badge)');
+    await expect(labels).toHaveText(['Home', 'Studies', 'Encounters', 'Settings']);
 });
