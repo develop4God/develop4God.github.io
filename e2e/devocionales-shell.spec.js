@@ -158,6 +158,13 @@ test.describe('installed iOS app on a phone (390px)', () => {
         expect(Math.round(box.y + box.height)).toBe(PHONE.height);
         expect(Math.round(box.width)).toBe(await page.evaluate(() => document.documentElement.clientWidth));
         await expect(page.locator('[data-shell-tab="home"]')).toContainText('Home');
+        // Every tab's icon is centred in its cell, the one carrying the "New" bubble included.
+        for (const tab of await page.locator('[data-shell-tab]').all()) {
+            const cell = await tab.boundingBox();
+            const icon = await tab.locator('.shell-tab-icon').boundingBox();
+            expect(Math.abs(icon.x + icon.width / 2 - (cell.x + cell.width / 2))).toBeLessThanOrEqual(1);
+            expect(Math.abs(icon.y + icon.height / 2 - (cell.y + cell.height / 2))).toBeLessThanOrEqual(16);
+        }
         await expect(page.locator('[data-shell-tab="settings"]')).toContainText('Settings');
         await expect(page.locator('[data-shell-tab="home"]')).toHaveAttribute('aria-current', 'page');
         await expect(page.locator('main')).toBeVisible();

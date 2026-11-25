@@ -38,10 +38,12 @@
 
 a.shell-tab { text-decoration: none; }
 
+/* A wrapping label in the rail must not squeeze the icon (the Encounters pin shrank to a dot). */
 .shell-tab-icon,
 .shell-tab svg {
     inline-size: 1.25rem;
     block-size: 1.25rem;
+    flex-shrink: 0;
 }
 
 .shell-tab[aria-current="page"] { color: var(--accent); }
@@ -59,6 +61,7 @@ a.shell-tab { text-decoration: none; }
 }
 
 .shell-active[data-shell-layout="bar"] .shell-tab {
+    position: relative;
     flex: 1;
     flex-direction: column;
     min-height: 3.5rem;
@@ -370,6 +373,15 @@ a.shell-tab { text-decoration: none; }
     line-height: 1.5;
     vertical-align: middle;
     white-space: nowrap;
+}
+
+/* The "New" bubble sits on the icon's corner instead of being a third item in the column, which pushed
+   the icon and label of that tab off-centre against the other tabs. */
+.shell-active[data-shell-layout="bar"] .shell-tab .nav-new-badge {
+    position: absolute;
+    inset-block-start: 0.35rem;
+    inset-inline-start: calc(50% + 0.25rem);
+    margin: 0;
 }
 
 /* "A new version is available" (devotional-update-banner.js): a card at the bottom of the screen, above the
