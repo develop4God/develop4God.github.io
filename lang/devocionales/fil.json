@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "Nabigasyon ng app",
+    "tab_home": "Home",
+    "tab_studies": "Pag-aaral",
+    "tab_encounters": "Pagtatagpo",
+    "tab_settings": "Setting",
     "home": "Home",
     "studies": "Mga Pag-aaral sa Biblia",
     "settings": "Mga Setting",

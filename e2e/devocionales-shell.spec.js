@@ -599,7 +599,7 @@ test.describe('Studies tab in the installed app', () => {
         await expect(tabs).toHaveCount(4);
         expect(await tabs.evaluateAll((els) => els.map((el) => el.dataset.shellTab))).toEqual(['home', 'studies', 'encounters', 'settings']);
         const studies = page.locator('[data-shell-tab="studies"]');
-        await expect(studies).toContainText('Bible Studies');
+        await expect(studies.locator(':scope > span:not(.nav-new-badge)')).toHaveText('Studies');
         await expect(studies).toHaveAttribute('href', '/devocionales/estudios/');
         await expect(studies.locator('svg.lucide-graduation-cap')).toBeVisible();
         expect(await noHorizontalScroll(page)).toBe(true);
@@ -659,7 +659,7 @@ test.describe('Studies tab in the installed app', () => {
         expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
         const box = await page.locator('[data-shell-nav]').boundingBox();
         expect(Math.round(box.x)).toBe(0);
-        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Bible Studies');
+        await expect(page.locator('[data-shell-tab="studies"] > span:not(.nav-new-badge)')).toHaveText('Studies');
         await shot(page, 'desktop-studies');
     });
 
@@ -667,7 +667,7 @@ test.describe('Studies tab in the installed app', () => {
         await installedIos(page);
         await mockStudies(page);
         await openStudies(page, PHONE, '/devocionales/estudios/?lang=es');
-        await expect(page.locator('[data-shell-tab="studies"]')).toContainText('Estudios Bíblicos');
+        await expect(page.locator('[data-shell-tab="studies"] > span:not(.nav-new-badge)')).toHaveText('Estudios');
         await expect(page.locator('[data-shell-tab="home"]')).toContainText('Inicio');
         await expect(page.locator('[data-shell-tab="settings"]')).toContainText('Ajustes');
     });
@@ -872,4 +872,83 @@ test.describe('installed app Settings on a tablet rail', () => {
         expect(await page.evaluate(() => document.documentElement.dataset.shellLayout)).toBe('rail');
         expect(await noHorizontalScroll(page)).toBe(true);
     });
+});
+
+// The bottom bar is a layout contract, not a per-language fix: every shipped translation of a tab label must
+// fit on one line in its own equal-width tab at the narrowest phone width, with the icon and label centred
+// on one axis and the icons on one row. The languages are read from the lang folder, so a language added later
+// is held to the same contract with no change here.
+const LANG_DIR = path.join(__dirname, '..', 'lang', 'devocionales');
+const SHIPPED_LANGUAGES = fs.readdirSync(LANG_DIR).filter((file) => file.endsWith('.json')).map((file) => path.basename(file, '.json'));
+
+test.describe('bottom bar tab labels in every shipped language', () => {
+    for (const width of [320, 375]) {
+        for (const lang of SHIPPED_LANGUAGES) {
+            test(`${lang} at ${width}px: one line, not truncated, centred, on one row`, async ({ page }) => {
+                await installedIos(page);
+                await page.setViewportSize({ width, height: 700 });
+                await page.goto(`/devocionales/estudios/?lang=${lang}`, { waitUntil: 'networkidle' });
+                await expect(page.locator('html')).toHaveClass(/shell-active/);
+                // Wait until the page has written the translation into every tab label.
+                await page.waitForFunction((code) => window.i18n && window.i18n.currentLang === code
+                    && [...document.querySelectorAll('.shell-tab > span:not(.nav-new-badge)')]
+                        .every((label) => label.textContent === window.i18n.t(label.getAttribute('data-i18n'))), lang);
+                const tabs = await page.evaluate(() => [...document.querySelectorAll('.shell-tab')].map((tab) => {
+                    const label = tab.querySelector(':scope > span:not(.nav-new-badge)');
+                    const icon = tab.querySelector('svg, i').getBoundingClientRect();
+                    const range = document.createRange();
+                    range.selectNodeContents(label);
+                    const lines = [...range.getClientRects()];
+                    const left = Math.min(...lines.map((r) => r.left));
+                    const right = Math.max(...lines.map((r) => r.right));
+                    return {
+                        name: tab.dataset.shellTab,
+                        text: label.textContent,
+                        truncated: label.scrollWidth > label.clientWidth,
+                        rows: new Set(lines.map((r) => Math.round(r.top))).size,
+                        iconCentre: icon.left + icon.width / 2,
+                        iconTop: icon.top,
+                        textCentre: (left + right) / 2,
+                        left,
+                        right,
+                        tabWidth: tab.getBoundingClientRect().width,
+                    };
+                }));
+                expect(tabs).toHaveLength(4);
+                for (const tab of tabs) {
+                    const who = `${tab.name} "${tab.text}"`;
+                    expect(tab.rows, `${who} is on one line`).toBe(1);
+                    expect(tab.truncated, `${who} fits its tab without being cut`).toBe(false);
+                    expect(Math.abs(tab.iconCentre - tab.textCentre), `${who} icon and text share a centre`).toBeLessThanOrEqual(1);
+                    expect(Math.abs(tab.iconTop - tabs[0].iconTop), `${who} icon is on the shared row`).toBeLessThanOrEqual(1);
+                    expect(Math.abs(tab.tabWidth - tabs[0].tabWidth), `${who} tab is as wide as the others`).toBeLessThanOrEqual(1);
+                }
+                // Neighbours in DOM order sit side by side in either text direction (right to left reverses the row).
+                for (let i = 1; i < tabs.length; i += 1) {
+                    const gap = Math.max(tabs[i].left - tabs[i - 1].right, tabs[i - 1].left - tabs[i].right);
+                    expect(gap, `${tabs[i - 1].name} and ${tabs[i].name} keep a gap`).toBeGreaterThanOrEqual(4);
+                }
+            });
+        }
+    }
+});
+
+// A new page can meet an older language file (cached, or from the previous build) that has no shell.tab_* keys.
+// The bar must keep its own readable fallback labels then, never the raw keys.
+test('bar labels fall back to readable text when the language file predates the tab keys', async ({ page }) => {
+    await installedIos(page);
+    await page.route('**/lang/devocionales/*.json', async (route) => {
+        const response = await route.fetch();
+        const json = await response.json();
+        for (const key of Object.keys(json.shell)) if (key.startsWith('tab_')) delete json.shell[key];
+        await route.fulfill({ response, json });
+    });
+    await page.setViewportSize({ width: 375, height: 700 });
+    await page.goto('/devocionales/estudios/?lang=es', { waitUntil: 'networkidle' });
+    await expect(page.locator('html')).toHaveClass(/shell-active/);
+    await page.waitForFunction(() => window.i18n && Object.keys(window.i18n.translations || {}).length > 0);
+    // translatePage() runs again whenever the language changes; it must not turn the labels into raw keys.
+    await page.evaluate(() => window.i18n.translatePage());
+    const labels = page.locator('.shell-tab > span:not(.nav-new-badge)');
+    await expect(labels).toHaveText(['Home', 'Studies', 'Encounters', 'Settings']);
 });

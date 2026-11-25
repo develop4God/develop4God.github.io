@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "App-Navigation",
+    "tab_home": "Start",
+    "tab_studies": "Studien",
+    "tab_encounters": "Begegnung",
+    "tab_settings": "Optionen",
     "home": "Start",
     "studies": "Bibelstudien",
     "settings": "Einstellungen",

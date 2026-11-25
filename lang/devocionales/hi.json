@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "ऐप नेविगेशन",
+    "tab_home": "होम",
+    "tab_studies": "अध्ययन",
+    "tab_encounters": "मुलाकातें",
+    "tab_settings": "सेटिंग्स",
     "home": "होम",
     "studies": "बाइबिल अध्ययन",
     "settings": "सेटिंग्स",

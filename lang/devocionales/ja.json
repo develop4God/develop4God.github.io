@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "アプリのナビゲーション",
+    "tab_home": "ホーム",
+    "tab_studies": "聖書研究",
+    "tab_encounters": "出会い",
+    "tab_settings": "設定",
     "home": "ホーム",
     "studies": "聖書研究",
     "settings": "設定",
