@@ -251,7 +251,9 @@
     "app_version": "アプリのバージョン",
     "encounters": "出会い",
     "new_badge": "新着",
-    "updating": "更新中…"
+    "updating": "更新中…",
+    "updateAvailable": "新しいバージョンがあります",
+    "updateAction": "更新"
   },
   "discovery": {
     "title": "聖書研究",
