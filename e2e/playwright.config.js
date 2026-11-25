@@ -44,10 +44,10 @@ module.exports = defineConfig({
     // Opt-in (E2E_DEVICES=1) so the pre-push hook stays fast; iphone-13 needs WebKit installed.
     ...(process.env.E2E_DEVICES
       ? [
-        { name: 'pixel-7', testMatch: /(discovery-(studies|detail|offline)|encounters)\.spec.js/, use: { ...devices['Pixel 7'] } },
-        { name: 'iphone-13', testMatch: /(discovery-(studies|detail|offline)|encounters)\.spec.js/, use: { ...devices['iPhone 13'] } },
-        { name: 'small-320', testMatch: /(discovery-(studies|detail|offline)|encounters)\.spec.js/, use: { viewport: { width: 320, height: 568 } } },
-        { name: 'ipad', testMatch: /(discovery-(studies|detail|offline)|encounters)\.spec.js/, use: { ...devices['iPad (gen 7)'] } },
+        { name: 'pixel-7', testMatch: /(discovery-(studies|detail|offline)|encounters|devocionales-update-check)\.spec\.js/, use: { ...devices['Pixel 7'] } },
+        { name: 'iphone-13', testMatch: /(discovery-(studies|detail|offline)|encounters|devocionales-update-check)\.spec\.js/, use: { ...devices['iPhone 13'] } },
+        { name: 'small-320', testMatch: /(discovery-(studies|detail|offline)|encounters|devocionales-update-check)\.spec\.js/, use: { viewport: { width: 320, height: 568 } } },
+        { name: 'ipad', testMatch: /(discovery-(studies|detail|offline)|encounters|devocionales-update-check)\.spec\.js/, use: { ...devices['iPad (gen 7)'] } },
       ]
       : []),
   ],

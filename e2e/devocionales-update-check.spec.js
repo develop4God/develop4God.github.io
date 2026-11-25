@@ -97,10 +97,18 @@ test.describe('update banner', () => {
     })).toBe(true);
 
     await Promise.all([page.waitForEvent('load'), banner.locator('button').click()]);
-    await expect.poll(() => page.evaluate(async () => {
+    // What the reader sees: the page reloaded under the new worker and runs the server's build. The worker's
+    // own state string is not used: WebKit keeps reporting 'activating' for a controlled page (see the PR notes).
+    await expect.poll(async () => page.evaluate(async () => {
       const registration = await navigator.serviceWorker.getRegistration('/devocionales/');
-      return { waiting: Boolean(registration.waiting), active: registration.active && registration.active.state, banner: document.querySelectorAll('.update-banner').length };
-    }), { timeout: 15_000 }).toEqual({ waiting: false, active: 'activated', banner: 0 });
+      const served = await (await fetch('/devocionales/version.json', { cache: 'no-store' })).json();
+      return {
+        controlled: Boolean(navigator.serviceWorker.controller),
+        waiting: Boolean(registration.waiting),
+        banner: document.querySelectorAll('.update-banner').length,
+        build: window.DevotionalBuild && window.DevotionalBuild.id === served.id,
+      };
+    }), { timeout: 20_000 }).toEqual({ controlled: true, waiting: false, banner: 0, build: true });
     expect(consoleErrors).toEqual([]);
   });
 });
