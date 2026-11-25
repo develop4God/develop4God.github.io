@@ -75,7 +75,7 @@ test.describe('PayPal demo page', () => {
 });
 
 test.describe('PayPal demo page, subscription mode', () => {
-  test('loads the SDK for subscriptions and renders a subscribe button for each plan', async ({ page }) => {
+  test('loads the SDK for subscriptions and renders a subscribe button for the monthly and yearly plans', async ({ page }) => {
     const requests = stubSdk(page);
     await page.route(/paypal-demo\/(\?.*)?$/, async (route) => {
       const response = await route.fetch();
@@ -88,7 +88,7 @@ test.describe('PayPal demo page, subscription mode', () => {
     const url = new URL(requests[0]);
     expect(url.searchParams.get('intent')).toBe('subscription');
     expect(url.searchParams.get('vault')).toBe('true');
-    await expect(page.locator('.plan-slot')).toHaveCount(6);
-    await expect(page.locator('.plan-slot').first()).toContainText('Monthly 5 USD');
+    await expect(page.locator('.plan-slot')).toHaveCount(2);
+    await expect(page.locator('.plan-slot').first()).toContainText('monthly 5 USD');
   });
 });

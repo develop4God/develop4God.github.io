@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex">
     <title>Apóyanos (demo)</title>
+    <link rel="stylesheet" href="/devocionales/css/celebration.css">
     <style>
         :root {
             color-scheme: light dark;
@@ -15,10 +16,9 @@
             --border: light-dark(#ded4ef, #2a2822);
             --accent: light-dark(#6d4aa8, #5fb8ae);
             --accent-soft: light-dark(#ece5f7, #16302d);
+            --highlight: light-dark(#a8461c, #e08a5c); /* used by the shared confetti stylesheet */
             --ok: light-dark(#4f6f00, #84cc16);
         }
-        :root[data-theme="light"] { color-scheme: light; }
-        :root[data-theme="dark"] { color-scheme: dark; }
 
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -28,7 +28,6 @@
         .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
         .site-nav-inner { max-width: 760px; margin: 0 auto; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .brand { font-weight: 800; text-decoration: none; font-size: 1.1rem; }
-        .theme-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: .85rem; }
 
         main { max-width: 760px; margin: 0 auto; padding: 40px 16px 24px; }
         .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; margin-bottom: 12px; display: block; }
@@ -86,9 +85,17 @@
         .other { margin: -6px 0 18px; }
         .other[hidden], #once-pay[hidden], #plans[hidden], #once-link[hidden] { display: none; }
         .other input { width: 100%; padding: 10px; font: inherit; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); margin-top: 4px; }
-        .plan-slot { display: none; }
-        .plan-slot.visible { display: block; }
         #once-link { margin-top: 12px; }
+        .thanks { text-align: center; padding: 8px 0 4px; outline: none; }
+        .thanks[hidden], #give-controls[hidden] { display: none; }
+        .thanks h3 { margin: 4px 0 8px; font-size: 1.4rem; }
+        .thanks-verse { margin: 16px auto; padding: 14px 18px; max-width: 30em; border-radius: 12px; background: var(--accent-soft); }
+        .thanks-verse blockquote { margin: 0; font-style: italic; }
+        .thanks-verse figcaption { margin-top: 6px; font-size: .85rem; font-weight: 700; color: var(--accent); }
+        .thanks p { margin: 0 auto 10px; max-width: 34em; }
+        .thanks .btn-secondary { margin-top: 8px; }
+        /* PayPal's buttons are a light document: without this the dark page paints an opaque white box behind them. */
+        #once-buttons iframe, #plans iframe { color-scheme: light; }
         #sdk-status { min-height: 1.2em; margin: 8px 0 14px; }
         .preset { background: var(--accent-soft); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; transition: transform .15s ease, background .2s; }
         .preset:active { transform: scale(.94); }
@@ -99,6 +106,9 @@
         .yappy-box[hidden], .yappy-row[hidden] { display: none; }
         .yappy-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
         .yappy-row .preset { padding: 8px 16px; }
+        .yappy-logo { height: 22px; width: auto; display: block; }
+        /* The dark-blue wordmark is unreadable on a dark surface: lift it there. */
+        @media (prefers-color-scheme: dark) { .yappy-logo { filter: brightness(1.4); } }
 
         footer { border-top: 1px solid var(--border); padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: .9rem; }
 
@@ -123,7 +133,6 @@
 <header class="site-nav">
     <div class="site-nav-inner">
         <a class="brand" href="#">Develop4God</a>
-        <button class="theme-btn" id="theme-toggle" type="button" aria-label="Cambiar tema">Tema</button>
     </div>
 </header>
 
@@ -215,6 +224,7 @@
     <section id="dar" class="give reveal" aria-labelledby="dar-title">
         <span class="eyebrow">Dar</span>
         <h2 id="dar-title">Elige cómo apoyar</h2>
+        <div id="give-controls">
         <div class="presets presets-3" role="group" aria-label="Frecuencia">
             <button class="preset" type="button" data-frequency="once" aria-pressed="true">Única vez</button>
             <button class="preset" type="button" data-frequency="monthly" aria-pressed="false">Mensual</button>
@@ -236,8 +246,20 @@
         </div>
         <div id="plans" aria-live="polite" hidden></div>
         <p class="muted small" id="sdk-status" role="status"></p>
+        </div>
+        <div class="thanks" id="thanks" role="status" tabindex="-1" hidden>
+            <h3 id="thanks-title">¡Gracias por apoyar nuestro ministerio!</h3>
+            <p id="thanks-detail"></p>
+            <p id="thanks-blessing">❤️ Tu apoyo hace posible que sigamos sirviendo y creciendo con amor. ¡Bendiciones! ✨</p>
+            <figure class="thanks-verse">
+                <blockquote id="thanks-verse">“El que siembra generosamente, generosamente también segará.” 🙏</blockquote>
+                <figcaption id="thanks-verse-ref">2 Corintios 9:6</figcaption>
+            </figure>
+            <p class="muted small" id="thanks-ref"></p>
+            <button class="btn-secondary" type="button" id="thanks-again">¡Amén! 🙌</button>
+        </div>
         <div class="give-options">
-            <button class="btn-secondary" type="button" id="yappy-btn" aria-controls="yappy-box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Yappy (Panamá): tocar para copiar</button>
+            <button class="btn-secondary" type="button" id="yappy-btn" aria-controls="yappy-box" aria-label="Yappy, Panamá: tocar para copiar el número"><img class="yappy-logo" src="/img/yappy-logo.png" width="88" height="22" alt="" decoding="async"><span aria-hidden="true">🇵🇦</span><span>tocar para copiar</span></button>
         </div>
         <div class="yappy-box" id="yappy-box" role="status" aria-live="polite" hidden>
             <span class="muted small" id="yappy-label"></span>
@@ -256,20 +278,16 @@
 <div class="sticky" id="sticky"><a class="btn-primary" href="#dar">Quiero apoyar</a></div>
 
 <script src="/js/paypal-checkout.js"></script>
+<script src="/devocionales/js/dom-builder.js"></script>
+<script src="/devocionales/js/ui-celebration.js"></script>
 <script src="/devocionales/js/devotional-pwa-config.js"></script>
+<script src="/js/paypal-config.js"></script>
 <script src="/apoyanos/donate.js"></script>
 <script>
     (function () {
         var root = document.documentElement;
         root.classList.add('js');
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        // Theme toggle (demo only: not persisted).
-        document.getElementById('theme-toggle').addEventListener('click', function () {
-            var dark = root.getAttribute('data-theme') === 'dark' ||
-                (!root.getAttribute('data-theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-            root.setAttribute('data-theme', dark ? 'light' : 'dark');
-        });
 
         // Yappy: one tap fetches the number from /api/yappy and copies it; it is never embedded in this page.
         // The SPA fallback answers unknown paths with HTML (200), so the body is validated, not just the status.
@@ -315,7 +333,9 @@
             var numberPromise = fetchYappyNumber();
             var copied = copyWhenReady(numberPromise).then(function () { return true; }, function () { return false; });
             Promise.all([numberPromise, copied]).then(function (result) {
-                showYappy(result[1] ? 'Número copiado. Pégalo en Yappy:' : 'Toca Copiar y pégalo en Yappy:', result[0]);
+                // Copied: the number stays out of sight. Only when the clipboard is blocked is it shown, so the donor can copy it by hand.
+                if (result[1]) { showYappy('Número copiado. Pégalo en la aplicación Yappy.', null); }
+                else { showYappy('Toca Copiar y pégalo en la aplicación Yappy:', result[0]); }
             }).catch(function () {
                 showYappy('No pudimos cargar el número. Escríbenos por WhatsApp y te lo damos.', null);
             });

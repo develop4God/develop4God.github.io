@@ -5,6 +5,7 @@
     // removed after the animation. Each piece's drift, colour and delay come from the page CSS
     // (.confetti-piece:nth-child), so the DOM carries no inline styles and the burst is deterministic.
     // Skipped entirely when the viewer prefers reduced motion. Timers are injected for tests.
+    // Styles: link /devocionales/css/celebration.css (the one source) and provide --accent and --highlight.
     const DEFAULT_PIECES = 28;
 
     function createCelebration({ h, container, reducedMotion, durationMs = 2200, pieces = DEFAULT_PIECES, setTimer = setTimeout, clearTimer = clearTimeout }) {

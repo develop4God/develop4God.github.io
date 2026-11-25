@@ -1,6 +1,15 @@
 // The Apóyanos page with the PayPal SDK stubbed, so the spec runs offline and never reaches paypal.com.
 const { test, expect } = require('/tmp/pw-tools/node_modules/@playwright/test');
 
+const fs = require('node:fs');
+const path = require('node:path');
+
+// The active environment's ids, read from the generated config the page itself loads.
+const configSource = fs.readFileSync(path.join(__dirname, '..', 'js', 'paypal-config.js'), 'utf8');
+const config = JSON.parse(configSource.slice(configSource.indexOf('Object.freeze(') + 'Object.freeze('.length, configSource.lastIndexOf(')')));
+const PLANS = config.plans;
+const CLIENT_ID = config.clientId;
+
 const SDK_PATTERN = /^https:\/\/www\.paypal\.com\/sdk\/js/;
 
 // A stand-in for the SDK that installs itself under the namespace the page asks for, and records what the
@@ -12,6 +21,7 @@ const FAKE_SDK = `
   window[ns] = {
     Buttons: function (options) {
       window.__lastOrderOptions = options.createOrder ? options : window.__lastOrderOptions;
+      window.__lastSubscriptionOptions = options.createSubscription ? options : window.__lastSubscriptionOptions;
       return {
         render: function () {
           window.__renders.push({ ns: ns, kind: options.createSubscription ? 'subscription' : 'order' });
@@ -34,6 +44,11 @@ function stubSdk(page) {
 async function openDonate(page) {
   await page.goto('/apoyanos/', { waitUntil: 'domcontentloaded' });
   await page.locator('#dar').scrollIntoViewIfNeeded();
+}
+
+// The body the latest subscribe button would send to PayPal when the donor approves.
+function subscriptionRequest(page) {
+  return page.evaluate(() => window.__lastSubscriptionOptions.createSubscription(null, { subscription: { create: (body) => body } }));
 }
 
 const renders = (page, kind) => page.evaluate((k) => (window.__renders || []).filter((r) => r.kind === k).length, kind);
@@ -108,62 +123,204 @@ test.describe('Apóyanos page', () => {
     await expect(page.locator('#sdk-status')).toContainText('No se pudo cargar PayPal');
   });
 
-  test('choosing monthly shows only the subscribe button for the selected amount', async ({ page }) => {
+  test('monthly sends the monthly plan with the chosen amount as the quantity', async ({ page }) => {
     stubSdk(page);
     await openDonate(page);
     await page.getByRole('button', { name: 'Mensual' }).click();
     await page.getByRole('button', { name: '$25' }).click();
-    const visible = page.locator('.plan-slot.visible');
-    await expect(visible).toHaveCount(1);
-    await expect(visible).toHaveAttribute('data-plan', 'P-35R67290FY745831SNMALS2Q');
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    expect(await subscriptionRequest(page)).toEqual({ plan_id: PLANS.monthly, quantity: '25' });
     await expect(page.locator('#once-pay')).toBeHidden();
   });
 
-  test('yearly shows the yearly plan for the selected amount', async ({ page }) => {
+  test('yearly sends the yearly plan', async ({ page }) => {
     stubSdk(page);
     await openDonate(page);
     await page.getByRole('button', { name: 'Anual' }).click();
     await page.getByRole('button', { name: '$5' }).click();
-    await expect(page.locator('.plan-slot.visible')).toHaveAttribute('data-plan', 'P-0LF0259858521293SNMALTTQ');
+    await expect.poll(async () => (await subscriptionRequest(page)).plan_id).toBe(PLANS.yearly);
+    expect((await subscriptionRequest(page)).quantity).toBe('5');
   });
 
-  test('the subscription SDK loads on demand and renders only the visible plan', async ({ page }) => {
+  test('"Otro" with a recurring frequency sends the typed whole amount as the quantity', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: 'Otro' }).click();
+    await expect(page.locator('#other-box')).toBeVisible();
+    await page.fill('#other-amount', '137');
+    await expect.poll(async () => (await subscriptionRequest(page)).quantity).toBe('137');
+  });
+
+  test('a recurring custom amount below the minimum, with decimals or junk creates no button', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: 'Otro' }).click();
+    for (const bad of ['4', '12.5', '0', '-8', '']) {
+      await page.fill('#other-amount', bad);
+      await expect(page.locator('#sdk-status')).toContainText('monto entero entre $5 y $10000');
+      await expect(page.locator('#plans > *')).toHaveCount(0);
+    }
+  });
+
+  test('a recurring amount above the maximum creates no button', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: 'Otro' }).click();
+    await page.fill('#other-amount', '99999999');
+    await expect(page.locator('#sdk-status')).toContainText('monto entero entre $5 y $10000');
+    await expect(page.locator('#plans > *')).toHaveCount(0);
+  });
+
+  test('an invalid recurring amount is explained even after an earlier failure message', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await page.evaluate(() => window.__lastOrderOptions.onError(new Error('declined')));
+    await expect(page.locator('#sdk-status')).toContainText('no se completó');
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: 'Otro' }).click();
+    await page.fill('#other-amount', '3');
+    await expect(page.locator('#sdk-status')).toContainText('monto entero entre $5 y $10000');
+  });
+
+  test('the subscription SDK loads on demand and the button is rebuilt for each amount', async ({ page }) => {
     const requests = stubSdk(page);
     await openDonate(page);
     await page.getByRole('button', { name: 'Mensual' }).click();
     await expect.poll(() => renders(page, 'subscription')).toBe(1);
     const subscription = requests.find((url) => url.searchParams.get('intent') === 'subscription');
     expect(subscription.searchParams.get('vault')).toBe('true');
+    expect(subscription.searchParams.get('client-id')).toBe(CLIENT_ID);
     await page.getByRole('button', { name: '$25' }).click();
     await expect.poll(() => renders(page, 'subscription')).toBe(2);
-    await page.getByRole('button', { name: '$10' }).click();
-    await page.waitForTimeout(300);
-    expect(await renders(page, 'subscription')).toBe(2); // the $10 button was rendered at the start; not again
+    expect((await subscriptionRequest(page)).quantity).toBe('25');
   });
 
-  test('a thank-you message survives later amount changes', async ({ page }) => {
+  test('the preset buttons are the ones in the PayPal config, and the page shows nothing else', async ({ page }) => {
+    stubSdk(page);
+    await page.goto('/apoyanos/', { waitUntil: 'domcontentloaded' });
+    const presets = await page.locator('[data-amount]:not([data-amount="other"])').evaluateAll((els) => els.map((el) => Number(el.dataset.amount)));
+    expect(presets).toEqual(await page.evaluate(() => window.PayPalConfig.presetAmounts));
+  });
+
+  const approveOnce = (page, status) => page.evaluate((st) => window.__lastOrderOptions.onApprove({}, {
+    order: { capture: () => Promise.resolve({ status: st, id: 'ORDER-123' }) },
+  }), status);
+
+  test('a completed one-time gift replaces the controls with a clear confirmation', async ({ page }) => {
     stubSdk(page);
     await openDonate(page);
     await expect.poll(() => renders(page, 'order')).toBe(1);
-    await page.evaluate(() => window.__lastOrderOptions.onApprove({}, {
-      order: { capture: () => Promise.resolve({ status: 'COMPLETED' }) },
-    }));
-    await expect(page.locator('#sdk-status')).toContainText('Gracias');
+    await approveOnce(page, 'COMPLETED');
+    const thanks = page.locator('#thanks');
+    await expect(thanks).toBeVisible();
+    await expect(page.locator('#thanks-title')).toContainText('¡Gracias por apoyar nuestro ministerio!');
+    await expect(page.locator('#thanks-detail')).toContainText('$10');
+    await expect(page.locator('#thanks-detail')).toContainText('correo');
+    await expect(page.locator('#thanks-ref')).toContainText('ORDER-123');
+    await expect(page.locator('#give-controls')).toBeHidden();
+    await expect(thanks).toBeFocused();
+  });
+
+  test('the confirmation blesses the donor with a verse from the Bible', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await approveOnce(page, 'COMPLETED');
+    await expect(page.locator('#thanks-blessing')).toContainText('Bendiciones');
+    await expect(page.locator('#thanks-verse')).toContainText('El que siembra generosamente, generosamente también segará.');
+    await expect(page.locator('#thanks-verse-ref')).toHaveText('2 Corintios 9:6');
+  });
+
+  test('a confirmation celebrates with confetti', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await approveOnce(page, 'COMPLETED');
+    await expect(page.locator('.celebration')).toHaveCount(1);
+    expect(await page.locator('.celebration .confetti-piece').count()).toBeGreaterThan(10);
+    await expect(page.locator('.celebration')).toHaveCount(0, { timeout: 5000 }); // removed after the animation
+  });
+
+  test('no confetti when the visitor prefers reduced motion, but the confirmation still shows', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await approveOnce(page, 'COMPLETED');
+    await expect(page.locator('#thanks')).toBeVisible();
+    await expect(page.locator('.celebration')).toHaveCount(0);
+  });
+
+  test('a subscription also celebrates', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    await page.evaluate(() => window.__lastSubscriptionOptions.onApprove({ subscriptionID: 'I-TEST3' }));
+    await expect(page.locator('.celebration')).toHaveCount(1);
+    await expect(page.locator('#thanks-verse-ref')).toHaveText('2 Corintios 9:6');
+  });
+
+  test('an approved monthly subscription confirms the amount, the frequency and how to cancel', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
     await page.getByRole('button', { name: '$25' }).click();
-    await expect(page.locator('#sdk-status')).toContainText('Gracias');
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    await page.evaluate(() => window.__lastSubscriptionOptions.onApprove({ subscriptionID: 'I-TEST1' }));
+    await expect(page.locator('#thanks-detail')).toContainText('mensual de $25');
+    await expect(page.locator('#thanks-detail')).toContainText('cancelarlo');
+    await expect(page.locator('#thanks-ref')).toContainText('I-TEST1');
+    await expect(page.locator('#give-controls')).toBeHidden();
+  });
+
+  test('a yearly subscription says yearly', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Anual' }).click();
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    await page.evaluate(() => window.__lastSubscriptionOptions.onApprove({ subscriptionID: 'I-TEST2' }));
+    await expect(page.locator('#thanks-detail')).toContainText('anual de $10');
+  });
+
+  test('"¡Amén!" closes the confirmation and brings the controls back', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await approveOnce(page, 'COMPLETED');
+    await page.getByRole('button', { name: /Amén/ }).click();
+    await expect(page.locator('#thanks')).toBeHidden();
+    await expect(page.locator('#give-controls')).toBeVisible();
+    await expect.poll(() => renders(page, 'order')).toBe(2);
+  });
+
+  test('a pending payment is not celebrated: no confirmation card, a warning in the status line', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await approveOnce(page, 'PENDING');
+    await expect(page.locator('#thanks')).toBeHidden();
+    await expect(page.locator('#give-controls')).toBeVisible();
+    await expect(page.locator('#sdk-status')).toContainText('pendiente');
+  });
+
+  test('a failed subscription keeps the controls and shows the failure', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    await page.evaluate(() => window.__lastSubscriptionOptions.onError(new Error('declined')));
+    await expect(page.locator('#thanks')).toBeHidden();
+    await expect(page.locator('#sdk-status')).toContainText('no se completó');
   });
 
   test('the Encounters unlock option links to the Encounters page', async ({ page }) => {
     stubSdk(page);
     await page.goto('/apoyanos/', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('link', { name: 'Desbloquear Encuentros' })).toHaveAttribute('href', '/devocionales/encounters/');
-  });
-
-  test('"Otro" with a recurring frequency explains that recurring amounts are fixed', async ({ page }) => {
-    stubSdk(page);
-    await openDonate(page);
-    await page.getByRole('button', { name: 'Mensual' }).click();
-    await page.getByRole('button', { name: 'Otro' }).click();
-    await expect(page.locator('#sdk-status')).toContainText('montos fijos');
   });
 });

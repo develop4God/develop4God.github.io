@@ -6,7 +6,7 @@ const PAGE = '/apoyanos/';
 const FAKE_NUMBER = '+507 6000-0000';
 
 test.describe('Apoyanos Yappy', () => {
-  test('shows the number and the copy hint after one tap', async ({ page, context }) => {
+  test('one tap copies the number and says so without showing it', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.route('**/api/yappy', (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ number: FAKE_NUMBER }) }));
@@ -15,9 +15,24 @@ test.describe('Apoyanos Yappy', () => {
     await expect(page.locator('#yappy-box')).toBeHidden();
     await page.locator('#yappy-btn').click();
 
-    await expect(page.locator('#yappy-number')).toHaveText(FAKE_NUMBER);
-    await expect(page.locator('#yappy-label')).toContainText('Pégalo en Yappy');
+    await expect(page.locator('#yappy-label')).toHaveText('Número copiado. Pégalo en la aplicación Yappy.');
+    await expect(page.locator('#yappy-row')).toBeHidden();
+    await expect(page.locator('body')).not.toContainText(FAKE_NUMBER);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(FAKE_NUMBER);
+  });
+
+  test('when the clipboard is blocked the number is shown with a Copiar button', async ({ page }) => {
+    await page.route('**/api/yappy', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ number: FAKE_NUMBER }) }));
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'clipboard', { value: { write: () => Promise.reject(new Error('blocked')), writeText: () => Promise.reject(new Error('blocked')) } });
+    });
+    await page.goto(PAGE);
+    await page.locator('#yappy-btn').click();
+
+    await expect(page.locator('#yappy-number')).toHaveText(FAKE_NUMBER);
+    await expect(page.locator('#yappy-label')).toContainText('Toca Copiar y pégalo en la aplicación Yappy');
+    await expect(page.locator('#yappy-copy')).toBeVisible();
   });
 
   test('the number is not in the page HTML', async ({ page }) => {

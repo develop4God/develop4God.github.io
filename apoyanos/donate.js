@@ -1,13 +1,13 @@
 // Donation controls of the Apóyanos page: frequency (once / monthly / yearly), amount and the PayPal
 // buttons. One-time gifts render the standard PayPal buttons (yellow PayPal button plus the card
-// option); recurring gifts render the subscription button of the matching plan. The two flows need
-// different SDK intents, so each loads on demand into its own namespace.
-// Needs the PayPalCheckout and DevotionalPwaConfig globals loaded before it.
+// option); recurring gifts render the subscription button of the monthly or yearly quantity plan, with the
+// donor's amount as the quantity. The two flows need different SDK intents, so each loads on demand into
+// its own namespace. Needs the PayPalCheckout, PayPalConfig and DevotionalPwaConfig globals loaded before it.
 (function () {
     'use strict';
 
-    // PUBLIC client id of the sandbox app that owns the subscription plans in PayPalCheckout.SUBSCRIPTION_PLANS.
-    var SUBSCRIPTION_CLIENT_ID = 'AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-';
+    // js/paypal-config.js, generated from config/paypal.<environment>.yml. Without it only the recurring options degrade.
+    var recurring = window.PayPalConfig || null;
     var PAYPAL_ME = 'https://www.paypal.com/paypalme/develop4godOfficial/';
     var DESCRIPTION = 'Apoyo a Devocionales Cristianos';
     var AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/;
@@ -15,14 +15,14 @@
     var DEBOUNCE_MS = 400;
 
     var MSG = {
-        thanks: '¡Gracias! Tu aporte se recibió.',
+        thanksTitle: '🎉 ¡Gracias por apoyar nuestro ministerio!',
+        receipt: 'PayPal te enviará el recibo por correo.',
         pending: 'Tu pago quedó pendiente. Revisa tu cuenta de PayPal antes de intentarlo de nuevo.',
         failed: 'El aporte no se completó. Intenta de nuevo.',
-        thanksRecurring: '¡Gracias! Tu aporte mensual o anual quedó registrado.',
         sdkFailed: 'No se pudo cargar PayPal. Puedes dar con el enlace de PayPal de abajo.',
         sdkFailedRecurring: 'No se pudo cargar PayPal. Revisa tu conexión e intenta de nuevo.',
+        recurringUnavailable: 'Los aportes mensuales y anuales no están disponibles ahora. Puedes dar una sola vez.',
         badAmount: 'Escribe un monto de $1 o más, con hasta dos decimales.',
-        fixedAmounts: 'Los aportes mensuales y anuales están en montos fijos ($5, $10 o $25).',
     };
 
     var onceConfig = window.DevotionalPwaConfig && window.DevotionalPwaConfig.encountersUnlock;
@@ -30,14 +30,23 @@
     var sdkLoads = {};
     var renderToken = 0;
 
-    var frequencyButtons = document.querySelectorAll('[data-frequency]:not(.plan-slot)');
-    var amountButtons = document.querySelectorAll('[data-amount]:not(.plan-slot)');
+    var frequencyButtons = document.querySelectorAll('[data-frequency]');
+    var amountButtons = document.querySelectorAll('[data-amount]');
     var otherBox = document.getElementById('other-box');
     var otherInput = document.getElementById('other-amount');
     var oncePay = document.getElementById('once-pay');
     var onceButtons = document.getElementById('once-buttons');
     var onceLink = document.getElementById('once-link');
     var plansBox = document.getElementById('plans');
+    var controls = document.getElementById('give-controls');
+    var thanks = document.getElementById('thanks');
+    var FREQUENCY_WORD = { monthly: 'mensual', yearly: 'anual' };
+    // Confetti for a completed gift. Decorative, so the page works without it (script blocked or reduced motion).
+    var celebration = window.UiCelebration && window.DomBuilder ? window.UiCelebration.createCelebration({
+        h: window.DomBuilder.createBuilder(document),
+        container: document.body,
+        reducedMotion: function () { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; },
+    }) : null;
     var status = document.getElementById('sdk-status');
 
     // A result message (thanks, failure) stays until the next result; hints are cleared on every change.
@@ -47,6 +56,22 @@
         resultShown = !!isResult;
     }
     function hint(text) { if (!resultShown) { say(text, false); } }
+    // A validation hint explains why no button is shown, so it replaces an earlier result message.
+    function warn(text) { say(text, false); }
+
+    // The confirmation replaces the payment controls, so the donor sees that it worked and cannot pay twice by accident.
+    function showThanks(detail, reference) {
+        if (!thanks) { say(detail, true); return; } // an older cached page has no confirmation card
+        say('', false);
+        document.getElementById('thanks-title').textContent = MSG.thanksTitle;
+        document.getElementById('thanks-detail').textContent = detail;
+        document.getElementById('thanks-ref').textContent = reference ? 'Referencia: ' + reference : '';
+        controls.hidden = true;
+        thanks.hidden = false;
+        thanks.focus();
+        thanks.scrollIntoView({ block: 'nearest' });
+        if (celebration) { celebration.burst(); }
+    }
 
     // Loads one SDK build into window[namespace]; a failed load can be retried.
     function loadSdk(namespace, url) {
@@ -69,11 +94,11 @@
     }
 
     function subscriptionSdk() {
-        var url = PayPalCheckout.buildSdkUrl({ clientId: SUBSCRIPTION_CLIENT_ID, currency: 'USD', intent: 'subscription' });
+        var url = PayPalCheckout.buildSdkUrl({ clientId: recurring.clientId, currency: recurring.currency, intent: 'subscription' });
         return loadSdk('paypalSub', url);
     }
 
-    function onceAmount() {
+    function amountText() {
         return state.amount === 'other' ? otherInput.value.trim() : String(state.amount);
     }
 
@@ -92,22 +117,29 @@
     }
 
     function renderOnce() {
-        var raw = onceAmount();
+        var raw = amountText();
         var token = ++renderToken;
         onceButtons.replaceChildren();
         onceLink.hidden = true;
         setFallbackLink(raw);
-        if (!validOnceAmount(raw)) { hint(MSG.badAmount); return; }
+        if (!validOnceAmount(raw)) { warn(MSG.badAmount); return; }
         hint('');
         var slot = document.createElement('div');
         onceButtons.appendChild(slot);
         onceSdk().then(function (paypal) {
             if (token !== renderToken) { return null; } // a newer amount replaced this render
             return PayPalCheckout.renderButtons(paypal, slot, {
+                style: Object.assign({}, PayPalCheckout.PILL_LOOK, { color: 'gold' }),
                 amount: parseFloat(raw),
                 currency: onceConfig.currency,
                 description: DESCRIPTION,
-                onApproved: function (details) { say(details && details.status === 'COMPLETED' ? MSG.thanks : MSG.pending, true); },
+                onApproved: function (details) {
+                    if (details && details.status === 'COMPLETED') {
+                        showThanks('Recibimos tu aporte único de $' + raw + ' USD. ' + MSG.receipt, details.id);
+                    } else {
+                        say(MSG.pending, true);
+                    }
+                },
                 onError: function () { say(MSG.failed, true); },
             });
         }).catch(function () {
@@ -115,51 +147,46 @@
         });
     }
 
-    function buildPlanSlots() {
-        PayPalCheckout.SUBSCRIPTION_PLANS.forEach(function (plan) {
-            var slot = document.createElement('div');
-            slot.className = 'plan-slot';
-            slot.setAttribute('data-frequency', plan.frequency);
-            slot.setAttribute('data-amount', String(plan.amount));
-            slot.setAttribute('data-plan', plan.planId);
-            plansBox.appendChild(slot);
-        });
-    }
-
-    // A button is rendered only once its slot is visible: PayPal sizes the button from the container
-    // width, and a hidden container has none.
-    function renderVisibleSubscription() {
-        var slot = plansBox.querySelector('.plan-slot.visible');
-        if (!slot || slot.getAttribute('data-rendered') === 'true') { return; }
-        slot.setAttribute('data-rendered', 'true');
+    // The recurring button is rebuilt whenever the frequency or the amount changes: the quantity is part of
+    // the subscription request, so one plan per frequency serves every amount.
+    function renderRecurring() {
+        var token = ++renderToken;
+        plansBox.replaceChildren();
+        if (!recurring || !PayPalCheckout.parseQuantity) { warn(MSG.recurringUnavailable); return; }
+        var quantity = PayPalCheckout.parseQuantity(amountText(), recurring.minimumAmount, recurring.maximumAmount);
+        if (quantity === null) {
+            warn('Escribe un monto entero entre $' + recurring.minimumAmount + ' y $' + recurring.maximumAmount + ', sin decimales.');
+            return;
+        }
+        hint('');
+        var frequency = state.frequency; // the donor may change it before PayPal answers
+        var slot = document.createElement('div');
+        plansBox.appendChild(slot);
         subscriptionSdk().then(function (paypal) {
+            if (token !== renderToken) { return null; } // a newer choice replaced this render
             return PayPalCheckout.renderSubscriptionButton(paypal, slot, {
-                planId: slot.getAttribute('data-plan'),
-                onApproved: function () { say(MSG.thanksRecurring, true); },
+                planId: recurring.plans[frequency],
+                quantity: quantity,
+                onApproved: function (subscriptionId) {
+                    showThanks('Tu aporte ' + FREQUENCY_WORD[frequency] + ' de $' + (quantity * recurring.unitPrice) + ' ' + recurring.currency + ' quedó activo. ' + MSG.receipt
+                        + ' Puedes cancelarlo cuando quieras desde tu cuenta de PayPal.', subscriptionId);
+                },
                 onError: function () { say(MSG.failed, true); },
             });
         }).catch(function () {
-            slot.removeAttribute('data-rendered');
-            say(MSG.sdkFailedRecurring, true);
+            if (token === renderToken) { say(MSG.sdkFailedRecurring, true); }
         });
-    }
-
-    function refreshRecurring() {
-        plansBox.querySelectorAll('.plan-slot').forEach(function (slot) {
-            var show = slot.getAttribute('data-frequency') === state.frequency
-                && slot.getAttribute('data-amount') === String(state.amount);
-            slot.classList.toggle('visible', show);
-        });
-        hint(state.amount === 'other' ? MSG.fixedAmounts : '');
-        renderVisibleSubscription();
     }
 
     function refresh() {
         var once = state.frequency === 'once';
-        otherBox.hidden = !(once && state.amount === 'other');
+        otherBox.hidden = state.amount !== 'other';
         oncePay.hidden = !once;
         plansBox.hidden = once;
-        if (once) { renderOnce(); } else { refreshRecurring(); }
+        // Recurring gifts are whole dollars from the plan minimum up; one-time gifts allow cents.
+        otherInput.min = once || !recurring ? String(MIN_ONCE_AMOUNT) : String(recurring.minimumAmount);
+        otherInput.step = once ? '0.01' : '1';
+        if (once) { renderOnce(); } else { renderRecurring(); }
     }
 
     function pressed(buttons, key, value) {
@@ -169,6 +196,16 @@
     function debounce(fn, ms) {
         var timer = null;
         return function () { clearTimeout(timer); timer = setTimeout(fn, ms); };
+    }
+
+    var thanksAgain = document.getElementById('thanks-again');
+    if (thanksAgain) {
+        thanksAgain.addEventListener('click', function () {
+            thanks.hidden = true;
+            controls.hidden = false;
+            say('', false);
+            refresh();
+        });
     }
 
     frequencyButtons.forEach(function (b) {
@@ -187,11 +224,11 @@
         });
     });
     otherInput.addEventListener('input', debounce(function () {
-        if (state.frequency === 'once' && state.amount === 'other') { renderOnce(); }
+        if (state.amount !== 'other') { return; }
+        if (state.frequency === 'once') { renderOnce(); } else { renderRecurring(); }
     }, DEBOUNCE_MS));
 
-    buildPlanSlots();
-    setFallbackLink(onceAmount());
+    setFallbackLink(amountText());
     oncePay.hidden = false;
 
     // The one-time buttons are the default view: load them when the donate section is about to show,
