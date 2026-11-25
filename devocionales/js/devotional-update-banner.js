@@ -75,6 +75,7 @@
         const hadController = Boolean(container.controller);
         let shown = false;
         let requested = false;
+        let everRequested = false;
         let timer = null;
         let reloaded = false;
 
@@ -84,7 +85,14 @@
             win.location.reload();
         };
 
+        const stopTimer = () => {
+            if (timer === null) return;
+            clearTimer(timer);
+            timer = null;
+        };
+
         const release = (button) => {
+            stopTimer();
             requested = false;
             button.disabled = false;
             button.setAttribute('aria-busy', 'false');
@@ -97,17 +105,22 @@
             button.setAttribute('aria-busy', 'true');
             const waiting = registration.waiting;
             if (!waiting) {
-                // Another tab already switched: this page only needs the new files.
-                reload();
+                // Another tab already switched: this page only needs the new files. After an earlier tap of
+                // this tab the switch may still be running, so the controller change is awaited instead.
+                if (!everRequested) {
+                    reload();
+                    return;
+                }
+                timer = setTimer(() => release(button), REQUEST_TIMEOUT_MS);
                 return;
             }
-            // Whichever comes first: the page's controller changes, or the worker reports it is active.
-            container.addEventListener('controllerchange', reload);
+            everRequested = true;
             waiting.addEventListener('statechange', () => {
                 if (waiting.state === 'activated') reload();
                 else if (waiting.state === 'redundant') release(button);
             });
             // If no takeover follows (the worker was dropped, or the message was lost), the reader can retry.
+            stopTimer();
             timer = setTimer(() => release(button), REQUEST_TIMEOUT_MS);
             waiting.postMessage({ type: SKIP_WAITING_MESSAGE, force: true });
         };
@@ -127,18 +140,29 @@
             display();
         };
 
-        registration.addEventListener('updatefound', () => {
-            const installing = registration.installing;
-            if (!installing) return;
-            installing.addEventListener('statechange', () => {
-                if (installing.state === 'installed') show();
+        // A worker that is installing now fires no updatefound for us, so it is watched directly too.
+        const watchInstalling = (worker) => {
+            if (!worker) return;
+            worker.addEventListener('statechange', () => {
+                if (worker.state === 'installed') show();
             });
-        });
-        // Another tab switched the build under this page: offer the reload here too. A first worker
-        // claiming a page that had none is not an update.
+        };
+        registration.addEventListener('updatefound', () => watchInstalling(registration.installing));
+        watchInstalling(registration.installing);
+
+        // The page's controller changed: a tap of this tab (reload), or another tab switched the build
+        // under this page, which is offered the reload here too. A first worker claiming a page that
+        // had none is not an update, and a takeover this page started itself (the entry flow, or a
+        // hidden tab) is already reloading it, so no banner is drawn for those.
         container.addEventListener('controllerchange', () => {
-            if (hadController && !requested) display();
-            if (timer !== null) clearTimer(timer);
+            stopTimer();
+            if (everRequested) {
+                reload();
+                return;
+            }
+            const doc = win.document;
+            const selfTakeover = (entry && entry.isOpen()) || (doc && doc.visibilityState === 'hidden');
+            if (hadController && !selfTakeover) display();
         });
         show();
     }

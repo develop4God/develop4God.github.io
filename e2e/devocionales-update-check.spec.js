@@ -49,9 +49,9 @@ test.describe('with a service worker', () => {
 
 test.describe('update banner', () => {
   test.use({ serviceWorkers: 'allow' });
-  // The page's entry window (ENTRY_WINDOW_MS in devotional-sw-register.js) lets a new worker take
-  // over by itself; the banner is for the reader who has been on the page longer than that.
-  const PAST_ENTRY_WINDOW_MS = 9_000;
+  // The page's entry window (DevotionalSwRegister.ENTRY_WINDOW_MS) lets a new worker take over by
+  // itself; the banner is for the reader who has been on the page longer than that.
+  const ENTRY_WINDOW_MARGIN_MS = 1_000;
 
   test('a new build waiting behind a visible tab shows the banner, and one tap switches to it', async ({ page }) => {
     test.setTimeout(60_000);
@@ -79,7 +79,7 @@ test.describe('update banner', () => {
     await otherTab.goto('/devocionales/estudios/', { waitUntil: 'load' });
     await expect.poll(() => otherTab.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15_000 }).toBe(true);
     await page.bringToFront();
-    await page.waitForTimeout(PAST_ENTRY_WINDOW_MS);
+    await page.waitForTimeout(await page.evaluate(() => window.DevotionalSwRegister.ENTRY_WINDOW_MS) + ENTRY_WINDOW_MARGIN_MS);
     await expect(page.locator('.update-banner')).toHaveCount(0);
 
     // The browser now checks for a new worker and finds the real (different) one.

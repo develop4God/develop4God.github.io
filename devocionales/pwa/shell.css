@@ -395,7 +395,7 @@ a.shell-tab { text-decoration: none; }
 .shell-active[data-shell-layout="bar"] .update-banner { inset-block-end: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem); }
 
 /* Beside the rail (tablet, desktop) the banner is centred in the space the rail leaves, not over it. */
-.shell-active[data-shell-layout="rail"] .update-banner { margin-inline-start: calc(12rem + var(--shell-rail-inset) + 1rem); }
+.shell-active[data-shell-layout="rail"] .update-banner { inset-inline-start: calc(12rem + var(--shell-rail-inset) + 1rem); }
 
 .update-banner button {
     min-block-size: 2.75rem;

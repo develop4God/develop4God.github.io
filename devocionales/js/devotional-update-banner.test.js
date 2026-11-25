@@ -34,7 +34,7 @@ function fakeElement(tagName) {
 }
 
 function fakeDocument({ withBody = true } = {}) {
-    return { body: withBody ? fakeElement('body') : null, createElement: fakeElement };
+    return { body: withBody ? fakeElement('body') : null, createElement: fakeElement, visibilityState: 'visible' };
 }
 
 const findAll = (root, tagName) => root.children.flatMap((child) => [
@@ -342,4 +342,82 @@ test('a tab that tapped Update is not given a second banner by its own controlle
     buttonOf(document).click();
     serviceWorker.fire('controllerchange');
     assert.equal(banners(document).length, 1);
+});
+
+// ------------------------------------------------------ second review
+
+test('a worker that is already installing when the page starts still shows the banner once it has installed', () => {
+    const { win, document, registration } = setup();
+    const installing = fakeWorker();
+    installing.state = 'installing';
+    registration.installing = installing;
+    watch(win, registration);
+    assert.equal(banners(document).length, 0);
+    installing.become('installed');
+    registration.waiting = installing;
+    installing.become('installed');
+    assert.equal(banners(document).length, 1);
+});
+
+test('a takeover this page started itself (entry window, or a hidden tab) draws no banner', () => {
+    const entryOpen = setup();
+    watch(entryOpen.win, entryOpen.registration, { isOpen: () => true });
+    entryOpen.serviceWorker.fire('controllerchange');
+    assert.equal(banners(entryOpen.document).length, 0, 'the entry flow is already reloading this page');
+
+    const hidden = setup();
+    hidden.document.visibilityState = 'hidden';
+    watch(hidden.win, hidden.registration, { isOpen: () => false });
+    hidden.serviceWorker.fire('controllerchange');
+    assert.equal(banners(hidden.document).length, 0, 'a hidden tab reloads by itself');
+});
+
+test('retrying keeps one reload listener, one live timer, and a stale timer never frees a later request', () => {
+    const worker = fakeWorker();
+    const { win, document, serviceWorker, registration, timers } = setup({ waiting: worker });
+    watch(win, registration);
+    const button = buttonOf(document);
+    const listenersBefore = serviceWorker.listeners.controllerchange.length;
+    button.click();
+    timers.run();
+    button.click();
+    assert.equal(serviceWorker.listeners.controllerchange.length, listenersBefore, 'no listener is added per tap');
+    assert.equal(worker.posted.length, 2);
+});
+
+test('a redundant worker stops its timer, so the freed button is not freed again later', () => {
+    const worker = fakeWorker();
+    const { win, document, registration, timers } = setup({ waiting: worker });
+    const cleared = [];
+    win.clearTimeout = (id) => cleared.push(id);
+    watch(win, registration);
+    buttonOf(document).click();
+    worker.become('redundant');
+    assert.equal(cleared.length, 1);
+    assert.equal(buttonOf(document).disabled, false);
+    assert.equal(timers.pending.length > 0, true);
+});
+
+test('a second tap after the timeout, while the switch is still running, waits for it instead of reloading early', () => {
+    const worker = fakeWorker();
+    const { win, document, serviceWorker, registration, reloads, timers } = setup({ waiting: worker });
+    watch(win, registration);
+    const button = buttonOf(document);
+    button.click();
+    registration.waiting = null; // activation is under way: nothing waits any more, the controller has not changed yet
+    timers.run();
+    button.click();
+    assert.equal(reloads.length, 0, 'the page must not reload before the new worker controls it');
+    assert.equal(button.disabled, true);
+    serviceWorker.fire('controllerchange');
+    assert.equal(reloads.length, 1);
+});
+
+test('a switch that finishes after the timeout still reloads the tab that asked for it', () => {
+    const { win, document, serviceWorker, registration, reloads, timers } = setup({ waiting: fakeWorker() });
+    watch(win, registration);
+    buttonOf(document).click();
+    timers.run();
+    serviceWorker.fire('controllerchange');
+    assert.equal(reloads.length, 1);
 });
