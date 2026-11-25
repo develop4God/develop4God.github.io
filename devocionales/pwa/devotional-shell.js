@@ -100,6 +100,27 @@
         return items;
     }
 
+    // Smallest size a bar label is shrunk to before it is allowed to wrap; below this it is hard to read.
+    const MIN_BAR_LABEL_PX = 10;
+
+    // Autofit: in the bottom bar a label wraps onto a second line when the tab is too narrow (shell.css), and a
+    // single word still wider than its tab is shrunk until it fits, so it never spills over a neighbour.
+    // Re-run on resize or rotation, since the tab width changes.
+    function fitBarLabels(win, tabs) {
+        const labels = tabs
+            .map((tab) => ({ tab, label: tab.querySelector(':scope > span:not(.nav-new-badge)') }))
+            .filter((entry) => entry.label);
+        labels.forEach(({ label }) => { label.style.fontSize = ''; });
+        if (win.document.documentElement.dataset.shellLayout !== 'bar') return;
+        labels.forEach(({ tab, label }) => {
+            let size = parseFloat(win.getComputedStyle(label).fontSize);
+            while (label.getBoundingClientRect().width > tab.getBoundingClientRect().width && size > MIN_BAR_LABEL_PX) {
+                size -= 0.5;
+                label.style.fontSize = `${size}px`;
+            }
+        });
+    }
+
     // Returns whether the shell was started. A page without the shell placeholder (an older
     // cached HTML) stays as it is.
     function init(doc, win, config) {
@@ -152,6 +173,8 @@
 
         applyLayout(root, win, layout);
         root.classList.add('shell-active');
+        fitBarLabels(win, elements);
+        win.addEventListener('resize', () => fitBarLabels(win, elements));
         return true;
     }
 

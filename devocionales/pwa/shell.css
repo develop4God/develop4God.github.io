@@ -64,7 +64,18 @@ a.shell-tab { text-decoration: none; }
     position: relative;
     flex: 1;
     flex-direction: column;
+
+    /* Icons start from the top edge so they stay on one row whether a label has one line or two. */
+    justify-content: flex-start;
+    padding-top: 0.5rem;
     min-height: 3.5rem;
+}
+
+/* A label stays on one line when the tab has room; when it does not, the words stack one over the other, centred. */
+.shell-active[data-shell-layout="bar"] .shell-tab > span:not(.nav-new-badge) {
+    max-inline-size: 100%;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .shell-active[data-shell-layout="bar"] body { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }

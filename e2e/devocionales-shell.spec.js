@@ -873,3 +873,38 @@ test.describe('installed app Settings on a tablet rail', () => {
         expect(await noHorizontalScroll(page)).toBe(true);
     });
 });
+
+// A label that wraps to two lines (Spanish "Estudios Bíblicos", French "Études Bibliques") must not
+// push its icon off the row or leave its text off-centre: every bar tab keeps the icon and label centred
+// on one axis, with the icons on one line.
+test.describe('bar tabs with wrapping labels', () => {
+    // iPhone X / XS screen (375x812 at 3x) as plain options: device presets force a worker, which a describe may not.
+    test.use({ viewport: { width: 375, height: 812 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+    for (const lang of ['es', 'fr']) {
+        test(`${lang}: icon and label share a centre line and icons sit on one row`, async ({ page }) => {
+            await installedIos(page);
+            await page.goto(`/devocionales/estudios/?lang=${lang}`, { waitUntil: 'networkidle' });
+            await expect(page.locator('html')).toHaveClass(/shell-active/);
+            const tabs = await page.evaluate(() => [...document.querySelectorAll('.shell-tab')].map((tab) => {
+                const icon = tab.querySelector('svg, i').getBoundingClientRect();
+                const label = tab.querySelector(':scope > span:not(.nav-new-badge)');
+                const range = document.createRange();
+                range.selectNodeContents(label);
+                const lines = [...range.getClientRects()];
+                const left = Math.min(...lines.map((r) => r.left));
+                const right = Math.max(...lines.map((r) => r.right));
+                const rows = new Set(lines.map((r) => Math.round(r.top))).size;
+                return { name: tab.dataset.shellTab, iconCentre: icon.left + icon.width / 2, iconTop: icon.top, textCentre: (left + right) / 2, rows };
+            }));
+            expect(tabs).toHaveLength(4);
+            // Without room the two words stack one over the other; a single word stays on one line.
+            expect(tabs.find((tab) => tab.name === 'studies').rows).toBe(2);
+            expect(tabs.find((tab) => tab.name === 'home').rows).toBe(1);
+            for (const tab of tabs) {
+                expect(Math.abs(tab.iconCentre - tab.textCentre), tab.name).toBeLessThanOrEqual(1);
+                expect(Math.abs(tab.iconTop - tabs[0].iconTop), tab.name).toBeLessThanOrEqual(1);
+            }
+        });
+    }
+});
