@@ -331,7 +331,10 @@
         yappyBtn.addEventListener('click', function () {
             showYappy('Cargando…', null);
             var numberPromise = fetchYappyNumber();
-            var copied = copyWhenReady(numberPromise).then(function () { return true; }, function () { return false; });
+            // A synchronous throw (a browser that refuses a promise inside ClipboardItem) must not stop the number from showing.
+            var copied;
+            try { copied = copyWhenReady(numberPromise).then(function () { return true; }, function () { return false; }); }
+            catch (error) { copied = Promise.resolve(false); }
             Promise.all([numberPromise, copied]).then(function (result) {
                 // Copied: the number stays out of sight. Only when the clipboard is blocked is it shown, so the donor can copy it by hand.
                 if (result[1]) { showYappy('Número copiado. Pégalo en la aplicación Yappy.', null); }

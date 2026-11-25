@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { parseYaml, loadConfig, render, activeEnvironment, OUTPUT_FILE, ENVIRONMENTS } = require('./build-paypal-config.js');
+const { parseYaml, loadConfig, render, activeEnvironment, toPublicConfig, OUTPUT_FILE, ENVIRONMENTS } = require('./build-paypal-config.js');
 
 const ROOT = path.join(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
@@ -94,4 +94,42 @@ test('the active environment file names a known environment', () => {
 
 test('the committed generated config matches the active environment (run node scripts/build-paypal-config.js)', () => {
     assert.equal(read(OUTPUT_FILE), render(activeEnvironment()));
+});
+
+// A complete, valid raw config to break one field at a time.
+const validRaw = () => ({
+    environment: 'sandbox',
+    client_id: 'AQ-test',
+    currency: 'USD',
+    unit_price: 1,
+    minimum_amount: 5,
+    maximum_amount: 10000,
+    preset_amounts: [5, 10, 25],
+    plans: { monthly: 'P-1', yearly: 'P-2' },
+});
+const build = (raw) => toPublicConfig('sandbox', { file: 'config/paypal.sandbox.yml', raw });
+
+test('a valid config builds', () => {
+    assert.equal(build(validRaw()).minimumAmount, 5);
+});
+
+test('amounts that would break the page are refused at build time', () => {
+    const bad = [
+        ['minimum above maximum', { minimum_amount: 50, maximum_amount: 5 }, /minimum_amount/],
+        ['zero unit price', { unit_price: 0 }, /unit_price/],
+        ['negative minimum', { minimum_amount: -1 }, /minimum_amount/],
+        ['text instead of a number', { minimum_amount: 'five' }, /minimum_amount/],
+        ['fractional minimum (the amount is a whole-number quantity)', { minimum_amount: 2.5 }, /minimum_amount/],
+        ['a preset below the minimum', { preset_amounts: [1, 10] }, /preset_amounts/],
+        ['a preset above the maximum', { preset_amounts: [5, 20000] }, /preset_amounts/],
+        ['a lower-case currency', { currency: 'usd' }, /currency/],
+    ];
+    for (const [label, change, pattern] of bad) {
+        assert.throws(() => build({ ...validRaw(), ...change }), pattern, label);
+    }
+});
+
+test('a tab inside a comment is harmless, a tab in the settings is still refused', () => {
+    assert.deepEqual(parseYaml('a: 1 # note\twith a tab'), { a: 1 });
+    assert.throws(() => parseYaml('a:\t1'), /tab/i);
 });

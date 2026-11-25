@@ -36,8 +36,8 @@ function parseYaml(source) {
     let section = null;
     source.split('\n').forEach((rawLine, index) => {
         const lineNumber = index + 1;
-        if (rawLine.includes('\t')) throw new Error(`Tab character on line ${lineNumber}: indent with spaces`);
         const line = rawLine.replace(/\s+#.*$/, '').replace(/^#.*$/, '').trimEnd();
+        if (line.includes('\t')) throw new Error(`Tab character on line ${lineNumber}: indent with spaces`);
         if (line.trim() === '') return;
         const nested = line.startsWith('  ');
         const match = /^( {2})?([A-Za-z_][A-Za-z0-9_]*):(?: (.*))?$/.exec(line);
@@ -74,6 +74,20 @@ function activeEnvironment() {
     return fs.readFileSync(path.join(ROOT, ACTIVE_FILE), 'utf8').trim();
 }
 
+const isWhole = (value) => Number.isInteger(value) && value > 0;
+
+// The donor's amount is the plan quantity, so every amount setting must be a positive whole number and the
+// range must make sense: a typo here would otherwise ship a page that rejects every amount.
+function validateAmounts(file, raw) {
+    const fail = (key, why) => { throw new Error(`${file}: ${key} ${why}`); };
+    if (typeof raw.unit_price !== 'number' || !(raw.unit_price > 0)) fail('unit_price', 'must be a positive number');
+    if (!isWhole(raw.minimum_amount)) fail('minimum_amount', 'must be a positive whole number');
+    if (!isWhole(raw.maximum_amount) || raw.maximum_amount < raw.minimum_amount) fail('maximum_amount', 'must be a whole number at or above minimum_amount');
+    const inRange = (amount) => isWhole(amount) && amount >= raw.minimum_amount && amount <= raw.maximum_amount;
+    if (!Array.isArray(raw.preset_amounts) || !raw.preset_amounts.every(inRange)) fail('preset_amounts', 'must be whole numbers between minimum_amount and maximum_amount');
+    if (typeof raw.currency !== 'string' || !/^[A-Z]{3}$/.test(raw.currency)) fail('currency', 'must be a three-letter uppercase code');
+}
+
 // Refuses an environment that is not ready to deploy: an empty id would ship a donate button that fails.
 function toPublicConfig(environment, { file, raw }) {
     const required = ['client_id', 'currency', 'unit_price', 'minimum_amount', 'maximum_amount', 'preset_amounts', 'plans.monthly', 'plans.yearly'];
@@ -83,6 +97,7 @@ function toPublicConfig(environment, { file, raw }) {
     });
     if (missing.length) throw new Error(`${environment} is not ready (${file}): fill in ${missing.join(', ')}`);
     if (raw.environment !== environment) throw new Error(`${file} says environment "${raw.environment}", expected "${environment}"`);
+    validateAmounts(file, raw);
     return {
         environment,
         clientId: raw.client_id,
@@ -128,4 +143,4 @@ if (require.main === module) {
     }
 }
 
-module.exports = { parseYaml, loadConfig, render, activeEnvironment, OUTPUT_FILE, ENVIRONMENTS };
+module.exports = { parseYaml, loadConfig, render, activeEnvironment, toPublicConfig, OUTPUT_FILE, ENVIRONMENTS };

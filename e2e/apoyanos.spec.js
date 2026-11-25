@@ -318,6 +318,42 @@ test.describe('Apóyanos page', () => {
     await expect(page.locator('#sdk-status')).toContainText('no se completó');
   });
 
+  test('without the Encounters unlock config the one-time controls keep working on the PayPal.me link', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.route('**/devocionales/js/devotional-pwa-config.js', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/javascript', body: 'window.DevotionalPwaConfig = Object.freeze({});' }));
+    stubSdk(page);
+    await page.goto('/apoyanos/', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: '$25' }).click();
+    await expect(page.locator('#once-link')).toHaveAttribute('href', /paypalme\/develop4godOfficial\/25USD$/);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: 'Única vez' }).click();
+    expect(errors).toEqual([]);
+  });
+
+  test('a failure message goes away when the donor chooses something else', async ({ page }) => {
+    stubSdk(page);
+    await openDonate(page);
+    await expect.poll(() => renders(page, 'order')).toBe(1);
+    await page.evaluate(() => window.__lastOrderOptions.onError(new Error('declined')));
+    await expect(page.locator('#sdk-status')).toContainText('no se completó');
+    await page.getByRole('button', { name: '$25' }).click();
+    await expect(page.locator('#sdk-status')).not.toContainText('no se completó');
+  });
+
+  test('a rendering error is not reported as a connection problem', async ({ page }) => {
+    await page.route(SDK_PATTERN, (route) => route.fulfill({
+      status: 200,
+      contentType: 'application/javascript',
+      body: "(function(){var ns=document.currentScript.getAttribute('data-namespace');window[ns]={Buttons:function(){return{render:function(){return Promise.reject(new Error('render failed'))}}}}})();",
+    }));
+    await openDonate(page);
+    await expect(page.locator('#sdk-status')).toContainText('no se completó');
+    await expect(page.locator('#sdk-status')).not.toContainText('Revisa tu conexión');
+    await expect(page.locator('#sdk-status')).not.toContainText('No se pudo cargar PayPal');
+  });
+
   test('the Encounters unlock option links to the Encounters page', async ({ page }) => {
     stubSdk(page);
     await page.goto('/apoyanos/', { waitUntil: 'domcontentloaded' });

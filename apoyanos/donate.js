@@ -49,20 +49,13 @@
     }) : null;
     var status = document.getElementById('sdk-status');
 
-    // A result message (thanks, failure) stays until the next result; hints are cleared on every change.
-    var resultShown = false;
-    function say(text, isResult) {
-        status.textContent = text;
-        resultShown = !!isResult;
-    }
-    function hint(text) { if (!resultShown) { say(text, false); } }
-    // A validation hint explains why no button is shown, so it replaces an earlier result message.
-    function warn(text) { say(text, false); }
+    // The status line: a validation hint or a failure. Every new choice clears it before rendering again.
+    function say(text) { status.textContent = text; }
 
     // The confirmation replaces the payment controls, so the donor sees that it worked and cannot pay twice by accident.
     function showThanks(detail, reference) {
-        if (!thanks) { say(detail, true); return; } // an older cached page has no confirmation card
-        say('', false);
+        if (!thanks) { say(detail); return; } // an older cached page has no confirmation card
+        say('');
         document.getElementById('thanks-title').textContent = MSG.thanksTitle;
         document.getElementById('thanks-detail').textContent = detail;
         document.getElementById('thanks-ref').textContent = reference ? 'Referencia: ' + reference : '';
@@ -113,17 +106,18 @@
 
     function showFallback() {
         onceLink.hidden = false;
-        say(MSG.sdkFailed, true);
+        say(MSG.sdkFailed);
     }
 
     function renderOnce() {
         var raw = amountText();
         var token = ++renderToken;
+        say('');
         onceButtons.replaceChildren();
         onceLink.hidden = true;
         setFallbackLink(raw);
-        if (!validOnceAmount(raw)) { warn(MSG.badAmount); return; }
-        hint('');
+        if (!validOnceAmount(raw)) { say(MSG.badAmount); return; }
+        if (!onceConfig || !onceConfig.clientId) { showFallback(); return; }
         var slot = document.createElement('div');
         onceButtons.appendChild(slot);
         onceSdk().then(function (paypal) {
@@ -137,13 +131,17 @@
                     if (details && details.status === 'COMPLETED') {
                         showThanks('Recibimos tu aporte único de $' + raw + ' USD. ' + MSG.receipt, details.id);
                     } else {
-                        say(MSG.pending, true);
+                        say(MSG.pending);
                     }
                 },
-                onError: function () { say(MSG.failed, true); },
+                onError: function () { say(MSG.failed); },
             });
-        }).catch(function () {
-            if (token === renderToken) { showFallback(); }
+        }).catch(function (error) {
+            if (token !== renderToken) { return; }
+            if (error && error.message === 'sdk') { showFallback(); return; }
+            console.error('Apoyanos: the one-time buttons failed to render', error);
+            onceLink.hidden = false;
+            say(MSG.failed);
         });
     }
 
@@ -151,14 +149,14 @@
     // the subscription request, so one plan per frequency serves every amount.
     function renderRecurring() {
         var token = ++renderToken;
+        say('');
         plansBox.replaceChildren();
-        if (!recurring || !PayPalCheckout.parseQuantity) { warn(MSG.recurringUnavailable); return; }
+        if (!recurring || !PayPalCheckout.parseQuantity) { say(MSG.recurringUnavailable); return; }
         var quantity = PayPalCheckout.parseQuantity(amountText(), recurring.minimumAmount, recurring.maximumAmount);
         if (quantity === null) {
-            warn('Escribe un monto entero entre $' + recurring.minimumAmount + ' y $' + recurring.maximumAmount + ', sin decimales.');
+            say('Escribe un monto entero entre $' + recurring.minimumAmount + ' y $' + recurring.maximumAmount + ', sin decimales.');
             return;
         }
-        hint('');
         var frequency = state.frequency; // the donor may change it before PayPal answers
         var slot = document.createElement('div');
         plansBox.appendChild(slot);
@@ -171,10 +169,13 @@
                     showThanks('Tu aporte ' + FREQUENCY_WORD[frequency] + ' de $' + (quantity * recurring.unitPrice) + ' ' + recurring.currency + ' quedó activo. ' + MSG.receipt
                         + ' Puedes cancelarlo cuando quieras desde tu cuenta de PayPal.', subscriptionId);
                 },
-                onError: function () { say(MSG.failed, true); },
+                onError: function () { say(MSG.failed); },
             });
-        }).catch(function () {
-            if (token === renderToken) { say(MSG.sdkFailedRecurring, true); }
+        }).catch(function (error) {
+            if (token !== renderToken) { return; }
+            if (error && error.message === 'sdk') { say(MSG.sdkFailedRecurring); return; }
+            console.error('Apoyanos: the subscribe button failed to render', error);
+            say(MSG.failed);
         });
     }
 
@@ -203,7 +204,7 @@
         thanksAgain.addEventListener('click', function () {
             thanks.hidden = true;
             controls.hidden = false;
-            say('', false);
+            say('');
             refresh();
         });
     }

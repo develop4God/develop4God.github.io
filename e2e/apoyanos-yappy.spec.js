@@ -69,4 +69,17 @@ test.describe('Apoyanos Yappy', () => {
     await expect(page.locator('#yappy-label')).toContainText('WhatsApp');
     await expect(page.locator('#yappy-row')).toBeHidden();
   });
+
+  test('a browser whose ClipboardItem throws still shows the number to copy by hand', async ({ page }) => {
+    await page.route('**/api/yappy', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ number: FAKE_NUMBER }) }));
+    await page.addInitScript(() => {
+      window.ClipboardItem = function ClipboardItem() { throw new Error('promise values unsupported'); };
+      Object.defineProperty(navigator, 'clipboard', { value: { write: () => Promise.resolve(), writeText: () => Promise.reject(new Error('blocked')) } });
+    });
+    await page.goto(PAGE);
+    await page.locator('#yappy-btn').click();
+    await expect(page.locator('#yappy-number')).toHaveText(FAKE_NUMBER);
+    await expect(page.locator('#yappy-copy')).toBeVisible();
+  });
 });
