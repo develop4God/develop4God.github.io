@@ -34,3 +34,13 @@ test('the boot script starts the worker with the shared scope and config, and sw
     assert.deepEqual(calls[0].slice(1), ['/devocionales/sw.js', '/devocionales/', { enabled: true }]);
     assert.doesNotThrow(() => new Function('window', source)({}), 'a missing register script must not throw');
 });
+
+test('every page that starts the worker also loads the update banner, after the register script', () => {
+    for (const page of ['devocionales/index.html', ...BOOT_PAGES]) {
+        const html = read(page);
+        const register = html.indexOf('/devocionales/js/devotional-sw-register.js');
+        const banner = html.indexOf('/devocionales/js/devotional-update-banner.js');
+        assert.ok(banner >= 0, `${page} must load the banner`);
+        assert.ok(banner > register, `${page}: the banner loads after the register script`);
+    }
+});

@@ -950,6 +950,30 @@ test('a plain request still needs every page hidden, even from a page that sends
     assert.equal(worker.spies.skipWaiting, 0);
 });
 
+// The reader tapped "Update" on the banner: an explicit request, obeyed whatever other pages show.
+const FORCE = { type: 'devocionales-skip-waiting', force: true };
+
+test('a forced request (the reader tapped Update) is obeyed even while pages are visible', async () => {
+    const worker = await installed();
+    worker.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' }, { ...pageOf('v0', 'visible'), id: 'other' });
+    await worker.message(FORCE, sender);
+    assert.equal(worker.spies.skipWaiting, 1);
+
+    const noSender = await installed();
+    noSender.windows.push(pageOf('v0', 'visible'));
+    await noSender.message(FORCE, undefined);
+    assert.equal(noSender.spies.skipWaiting, 1, 'force needs no sender');
+});
+
+test('only force:true forces: truthy look-alikes still wait for hidden pages', async () => {
+    for (const force of ['true', 1, 'yes', {}, false, null]) {
+        const worker = await installed();
+        worker.windows.push({ ...pageOf('v0', 'visible'), id: 'sender' });
+        await worker.message({ type: 'devocionales-skip-waiting', force }, sender);
+        assert.equal(worker.spies.skipWaiting, 0, `force: ${JSON.stringify(force)}`);
+    }
+});
+
 test('other messages do not make the worker take over', async () => {
     const worker = await installed();
     for (const data of [{ type: 'other' }, 'devocionales-skip-waiting', null, undefined, {}]) await worker.message(data);
@@ -963,6 +987,8 @@ test('the message types are the same in the worker and in the page script', () =
     const worker = constants('sw.template.js');
     assert.equal(Object.keys(worker).length, 2);
     assert.deepEqual(constants('../devocionales/js/devotional-sw-register.js'), worker);
+    assert.equal(constants('../devocionales/js/devotional-update-banner.js').SKIP_WAITING_MESSAGE, worker.SKIP_WAITING_MESSAGE, 'the banner sends the type the worker listens for');
+    assert.equal(constants('../devocionales/js/devotional-update-check.js').SKIP_WAITING_MESSAGE, worker.SKIP_WAITING_MESSAGE, 'so does the update check');
 });
 
 test('the push handlers ship in the worker next to the existing ones, which stay registered', () => {

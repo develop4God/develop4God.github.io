@@ -251,7 +251,9 @@
     "app_version": "App-Version",
     "encounters": "Begegnungen",
     "new_badge": "Neu",
-    "updating": "Wird aktualisiert…"
+    "updating": "Wird aktualisiert…",
+    "updateAvailable": "Eine neue Version ist verfügbar",
+    "updateAction": "Aktualisieren"
   },
   "discovery": {
     "title": "Bibelstudien",

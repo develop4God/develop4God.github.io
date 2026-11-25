@@ -251,7 +251,9 @@
     "app_version": "إصدار التطبيق",
     "encounters": "لقاءات",
     "new_badge": "جديد",
-    "updating": "جارٍ التحديث…"
+    "updating": "جارٍ التحديث…",
+    "updateAvailable": "يتوفر إصدار جديد",
+    "updateAction": "تحديث"
   },
   "discovery": {
     "title": "دراسات كتابية",

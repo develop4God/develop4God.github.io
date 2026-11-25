@@ -193,9 +193,15 @@ self.addEventListener('activate', (event) => {
 // page is hidden: a visible page must never get another build's files under it. An entry request
 // comes from a page that has only just loaded, so the reader has not started anything on it: it is
 // obeyed when every OTHER page is hidden (the sender is found by its client id; without one the
-// request is treated as a plain one).
+// request is treated as a plain one). A forced request (force: true) is the reader tapping
+// "Update" on the banner: an explicit choice, obeyed whatever the other pages show. Other open
+// pages still reload only once hidden (reloadOnUpdate), never under the reader's eyes.
 self.addEventListener('message', (event) => {
   if (!event.data || event.data.type !== SKIP_WAITING_MESSAGE) return;
+  if (event.data.force === true) {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
   const senderId = event.data.entry && event.source ? event.source.id : null;
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((pages) => {
