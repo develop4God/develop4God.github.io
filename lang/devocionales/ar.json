@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "التنقل في التطبيق",
+    "tab_home": "الرئيسية",
+    "tab_studies": "دراسات",
+    "tab_encounters": "لقاءات",
+    "tab_settings": "الإعدادات",
     "home": "الرئيسية",
     "studies": "دراسات كتابية",
     "settings": "الإعدادات",

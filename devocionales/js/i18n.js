@@ -149,7 +149,11 @@ class I18n {
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
             const translation = this.t(key);
-            
+
+            // t() answers a missing key with the key itself. Keep the text already in the element (the page's own
+            // fallback) instead of showing the raw key, for instance when a new page meets an older cached language file.
+            if (translation === key) return;
+
             if (element.tagName === 'INPUT' && (element.type === 'button' || element.type === 'submit')) {
                 element.value = translation;
             } else if (element.tagName === 'INPUT' && element.placeholder !== undefined) {
