@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "应用导航",
+    "tab_home": "首页",
+    "tab_studies": "圣经研究",
+    "tab_encounters": "相遇",
+    "tab_settings": "设置",
     "home": "首页",
     "studies": "圣经研究",
     "settings": "设置",

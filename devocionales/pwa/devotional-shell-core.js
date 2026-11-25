@@ -90,10 +90,11 @@
     // the markup is generated from here, so the bar can never differ between pages.
     // `panel` tabs are panels of the reader page (switched in place); `link` tabs navigate.
     const TAB_TABLE = {
-        home: { icon: 'house', labelKey: 'shell.home', fallback: 'Home', controls: 'shell-home-panel', href: `${SCOPE_PATH}/` },
-        studies: { icon: 'graduation-cap', labelKey: 'shell.studies', fallback: 'Bible Studies', href: `${SCOPE_PATH}/estudios/` },
-        encounters: { icon: 'map-pin', labelKey: 'shell.encounters', fallback: 'Encounters', href: `${SCOPE_PATH}/encounters/` },
-        settings: { icon: 'settings', labelKey: 'shell.settings', fallback: 'Settings', controls: 'shell-settings', href: `${SCOPE_PATH}/#settings` },
+        // The bar has its own short labels (shell.tab_*): the full names (shell.studies, ...) are headings and header links.
+        home: { icon: 'house', labelKey: 'shell.tab_home', fallback: 'Home', controls: 'shell-home-panel', href: `${SCOPE_PATH}/` },
+        studies: { icon: 'graduation-cap', labelKey: 'shell.tab_studies', fallback: 'Studies', href: `${SCOPE_PATH}/estudios/` },
+        encounters: { icon: 'map-pin', labelKey: 'shell.tab_encounters', fallback: 'Encounters', href: `${SCOPE_PATH}/encounters/` },
+        settings: { icon: 'settings', labelKey: 'shell.tab_settings', fallback: 'Settings', controls: 'shell-settings', href: `${SCOPE_PATH}/#settings` },
     };
     // On the reader, Home and Settings are panels; every other page reaches every tab by link.
     const PANELS_ON_READER = ['home', 'settings'];

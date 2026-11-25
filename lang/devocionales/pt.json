@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "Navegação do app",
+    "tab_home": "Início",
+    "tab_studies": "Estudos",
+    "tab_encounters": "Encontros",
+    "tab_settings": "Ajustes",
     "home": "Início",
     "studies": "Estudos Bíblicos",
     "settings": "Configurações",
