@@ -60,14 +60,25 @@ test.describe('update banner', () => {
     page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
 
     // The reader's installed worker is an older one: the server answers the first request for it with
-    // other bytes (the version stamp is kept, so it still claims the page). Playwright intercepts only
-    // that first fetch; the browser's later update checks get the real worker.
+    // other bytes (the version stamp is kept, so it still claims the page); every later fetch, the
+    // browser's update checks included, gets the real worker.
+    let answered = false;
     await page.context().route('**/devocionales/sw.js', async (route) => {
+      if (answered) {
+        await route.continue();
+        return;
+      }
+      answered = true;
       const response = await route.fetch();
       await route.fulfill({ response, body: `${await response.text()}\n// e2e: the previous worker\n` });
     });
     await page.goto('/devocionales/', { waitUntil: 'load' });
     await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15_000 }).toBe(true);
+    // A second tab of the app, open on another page of it.
+    const otherTab = await page.context().newPage();
+    await otherTab.goto('/devocionales/estudios/', { waitUntil: 'load' });
+    await expect.poll(() => otherTab.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15_000 }).toBe(true);
+    await page.bringToFront();
     await page.waitForTimeout(PAST_ENTRY_WINDOW_MS);
     await expect(page.locator('.update-banner')).toHaveCount(0);
 
@@ -77,6 +88,8 @@ test.describe('update banner', () => {
     const banner = page.locator('.update-banner');
     await expect(banner).toBeVisible({ timeout: 20_000 });
     await expect(banner.locator('button')).toHaveAttribute('type', 'button');
+    // The waiting build is offered in the other tab too.
+    await expect(otherTab.locator('.update-banner')).toHaveCount(1, { timeout: 20_000 });
     // Installed and waiting behind the old worker: nothing took over under the visible tab.
     expect(await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.getRegistration('/devocionales/');

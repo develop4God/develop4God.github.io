@@ -987,6 +987,8 @@ test('the message types are the same in the worker and in the page script', () =
     const worker = constants('sw.template.js');
     assert.equal(Object.keys(worker).length, 2);
     assert.deepEqual(constants('../devocionales/js/devotional-sw-register.js'), worker);
+    assert.equal(constants('../devocionales/js/devotional-update-banner.js').SKIP_WAITING_MESSAGE, worker.SKIP_WAITING_MESSAGE, 'the banner sends the type the worker listens for');
+    assert.equal(constants('../devocionales/js/devotional-update-check.js').SKIP_WAITING_MESSAGE, worker.SKIP_WAITING_MESSAGE, 'so does the update check');
 });
 
 test('the push handlers ship in the worker next to the existing ones, which stay registered', () => {

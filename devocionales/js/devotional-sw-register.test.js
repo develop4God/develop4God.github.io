@@ -141,6 +141,7 @@ test('start: hands the registration to the update banner when it is loaded, and 
     await settle();
     assert.equal(watched.length, 1);
     assert.equal(watched[0][0], win);
+    assert.equal(typeof watched[0][2].isOpen, 'function', 'the banner is given the entry window, so it does not flash during the entry flow');
 
     const bare = { navigator: fakeNavigator(), document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
     bare.document.readyState = 'complete';

@@ -196,7 +196,7 @@
                     // Offers "update now" when a new build waits (devotional-update-banner.js), when loaded.
                     // It is optional, so a failure there must never stop the update check below.
                     try {
-                        if (win.DevotionalUpdateBanner) win.DevotionalUpdateBanner.watch(win, registration);
+                        if (win.DevotionalUpdateBanner) win.DevotionalUpdateBanner.watch(win, registration, entry);
                     } catch (err) {
                         // The page works without the banner.
                     }
