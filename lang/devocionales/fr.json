@@ -251,7 +251,9 @@
     "app_version": "Version de l'app",
     "encounters": "Rencontres",
     "new_badge": "Nouveau",
-    "updating": "Mise à jour…"
+    "updating": "Mise à jour…",
+    "updateAvailable": "Une nouvelle version est disponible",
+    "updateAction": "Mettre à jour"
   },
   "discovery": {
     "title": "Études Bibliques",

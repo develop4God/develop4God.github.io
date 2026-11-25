@@ -251,7 +251,9 @@
     "app_version": "App version",
     "encounters": "Encounters",
     "new_badge": "New",
-    "updating": "Updating…"
+    "updating": "Updating…",
+    "updateAvailable": "A new version is available",
+    "updateAction": "Update"
   },
   "discovery": {
     "title": "Bible Studies",

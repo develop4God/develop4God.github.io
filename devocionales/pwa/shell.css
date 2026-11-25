@@ -371,3 +371,46 @@ a.shell-tab { text-decoration: none; }
     vertical-align: middle;
     white-space: nowrap;
 }
+
+/* "A new version is available" (devotional-update-banner.js): a card at the bottom of the screen, above the
+   bottom bar when the installed app has one. It sits over the toast (z-index 50) because the reader asked for it. */
+.update-banner {
+    position: fixed;
+    inset-inline: 1rem;
+    inset-block-end: calc(1rem + env(safe-area-inset-bottom));
+    margin-inline: auto;
+    max-inline-size: 28rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 0.875rem;
+    z-index: 60;
+}
+
+.shell-active[data-shell-layout="bar"] .update-banner { inset-block-end: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem); }
+
+.update-banner button {
+    min-block-size: 2.75rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.update-banner button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.update-banner button:focus-visible {
+    outline: 2px solid var(--bg);
+    outline-offset: 2px;
+}

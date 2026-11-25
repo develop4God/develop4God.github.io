@@ -46,3 +46,48 @@ test.describe('with a service worker', () => {
     expect(consoleErrors).toEqual([]);
   });
 });
+
+test.describe('update banner', () => {
+  test.use({ serviceWorkers: 'allow' });
+  // The page's entry window (ENTRY_WINDOW_MS in devotional-sw-register.js) lets a new worker take
+  // over by itself; the banner is for the reader who has been on the page longer than that.
+  const PAST_ENTRY_WINDOW_MS = 9_000;
+
+  test('a new build waiting behind a visible tab shows the banner, and one tap switches to it', async ({ page }) => {
+    test.setTimeout(60_000);
+    const consoleErrors = [];
+    page.on('pageerror', (e) => consoleErrors.push(e.message));
+    page.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()); });
+
+    // The reader's installed worker is an older one: the server answers the first request for it with
+    // other bytes (the version stamp is kept, so it still claims the page). Playwright intercepts only
+    // that first fetch; the browser's later update checks get the real worker.
+    await page.context().route('**/devocionales/sw.js', async (route) => {
+      const response = await route.fetch();
+      await route.fulfill({ response, body: `${await response.text()}\n// e2e: the previous worker\n` });
+    });
+    await page.goto('/devocionales/', { waitUntil: 'load' });
+    await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)), { timeout: 15_000 }).toBe(true);
+    await page.waitForTimeout(PAST_ENTRY_WINDOW_MS);
+    await expect(page.locator('.update-banner')).toHaveCount(0);
+
+    // The browser now checks for a new worker and finds the real (different) one.
+    await page.evaluate(async () => (await navigator.serviceWorker.getRegistration('/devocionales/')).update());
+
+    const banner = page.locator('.update-banner');
+    await expect(banner).toBeVisible({ timeout: 20_000 });
+    await expect(banner.locator('button')).toHaveAttribute('type', 'button');
+    // Installed and waiting behind the old worker: nothing took over under the visible tab.
+    expect(await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration('/devocionales/');
+      return Boolean(registration.waiting) && Boolean(registration.active);
+    })).toBe(true);
+
+    await Promise.all([page.waitForEvent('load'), banner.locator('button').click()]);
+    await expect.poll(() => page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.getRegistration('/devocionales/');
+      return { waiting: Boolean(registration.waiting), active: registration.active && registration.active.state, banner: document.querySelectorAll('.update-banner').length };
+    }), { timeout: 15_000 }).toEqual({ waiting: false, active: 'activated', banner: 0 });
+    expect(consoleErrors).toEqual([]);
+  });
+});

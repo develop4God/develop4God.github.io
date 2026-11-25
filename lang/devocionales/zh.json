@@ -251,7 +251,9 @@
     "app_version": "应用版本",
     "encounters": "相遇",
     "new_badge": "新",
-    "updating": "正在更新…"
+    "updating": "正在更新…",
+    "updateAvailable": "有新版本可用",
+    "updateAction": "更新"
   },
   "discovery": {
     "title": "圣经研究",

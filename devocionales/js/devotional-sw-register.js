@@ -193,6 +193,13 @@
                 .then(() => register(win.navigator, workerUrl, scope))
                 .then((registration) => {
                     deliverUpdates(win.navigator, win.document, registration, entry);
+                    // Offers "update now" when a new build waits (devotional-update-banner.js), when loaded.
+                    // It is optional, so a failure there must never stop the update check below.
+                    try {
+                        if (win.DevotionalUpdateBanner) win.DevotionalUpdateBanner.watch(win, registration);
+                    } catch (err) {
+                        // The page works without the banner.
+                    }
                     // Checks the server for a newer build on entry (devotional-update-check.js), when loaded.
                     if (win.DevotionalUpdateCheck) win.DevotionalUpdateCheck.checkForNewBuild(win, registration, entry).catch(() => {});
                 });
