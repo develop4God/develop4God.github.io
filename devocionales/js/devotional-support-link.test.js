@@ -28,8 +28,8 @@ test('SUPPORT_LANGUAGES are exactly the languages the Apóyanos page is translat
     assert.deepEqual([...SUPPORT_LANGUAGES].sort(), files.sort());
 });
 
-test('apply: Spanish and English show the button as a flex row', () => {
-    for (const lang of ['es', 'en']) {
+test('apply: translated languages show the button as a flex row', () => {
+    for (const lang of ['es', 'en', 'fr', 'ja', 'ar']) {
         const el = button(['hidden']);
         apply(el, lang);
         assert.equal(el.classes.has('hidden'), false, lang);
@@ -38,7 +38,7 @@ test('apply: Spanish and English show the button as a flex row', () => {
 });
 
 test('apply: a language without an Apóyanos translation keeps the button hidden', () => {
-    for (const lang of ['fr', 'ja', 'ar', 'zz']) {
+    for (const lang of ['ru', 'ko', 'zz']) {
         const el = button(['hidden']);
         apply(el, lang);
         assert.equal(el.classes.has('hidden'), true, lang);
