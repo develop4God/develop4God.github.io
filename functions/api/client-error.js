@@ -2,7 +2,7 @@
 // Receives a small error report from the donation page and writes it as one structured console line,
 // which Cloudflare keeps as a function log. Nothing personal is accepted: only a fixed stage, an optional
 // frequency and quantity, and a short message. The user agent is read from the request headers.
-const STAGES = ['sdk', 'render', 'capture', 'subscribe'];
+const STAGES = ['sdk', 'render', 'checkout', 'subscribe'];
 const FREQUENCIES = ['once', 'monthly', 'yearly'];
 const MAX_BODY_BYTES = 2048;
 const MAX_MESSAGE = 300;
@@ -44,8 +44,9 @@ function isSameSite(request) {
 
 export async function onRequestPost({ request }) {
   if (!isSameSite(request)) return reply(403);
+  if (Number(request.headers.get('content-length')) > MAX_BODY_BYTES) return reply(413);
   const text = await request.text();
-  if (text.length > MAX_BODY_BYTES) return reply(413);
+  if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) return reply(413);
   let body;
   try {
     body = JSON.parse(text);
@@ -60,4 +61,9 @@ export async function onRequestPost({ request }) {
     userAgent: clean(request.headers.get('user-agent') || '', MAX_USER_AGENT),
   }));
   return reply(204);
+}
+
+// Any other method (a crawler, a mistyped GET) must not fall through to the site's page fallback.
+export function onRequest() {
+  return new Response(null, { status: 405, headers: { ...HEADERS, Allow: 'POST' } });
 }

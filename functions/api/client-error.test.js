@@ -26,7 +26,7 @@ async function post(body, { headers = {}, raw } = {}) {
     }
 }
 
-const VALID = { stage: 'capture', frequency: 'once', quantity: 5, message: 'Window closed' };
+const VALID = { stage: 'checkout', frequency: 'once', quantity: 5, message: 'Window closed' };
 
 test('logs one structured line for a valid report and answers 204', async () => {
     const { res, lines } = await post(VALID);
@@ -34,7 +34,7 @@ test('logs one structured line for a valid report and answers 204', async () => 
     assert.equal(lines.length, 1);
     const entry = JSON.parse(lines[0]);
     assert.equal(entry.event, 'client_error');
-    assert.equal(entry.stage, 'capture');
+    assert.equal(entry.stage, 'checkout');
     assert.equal(entry.frequency, 'once');
     assert.equal(entry.quantity, 5);
     assert.equal(entry.message, 'Window closed');
@@ -79,6 +79,21 @@ test('rejects an oversized body with 413', async () => {
     const { res, lines } = await post({ ...VALID, message: 'x'.repeat(5000) });
     assert.equal(res.status, 413);
     assert.equal(lines.length, 0);
+});
+
+test('rejects an oversized body by bytes, not characters, and by Content-Length', async () => {
+    const wide = await post({ ...VALID, message: '€'.repeat(800) }); // 800 characters, 2400 bytes
+    assert.equal(wide.res.status, 413);
+    const { onRequestPost } = await import(MODULE_URL);
+    const declared = new Request(ENDPOINT, { method: 'POST', headers: { 'content-length': '999999' }, body: '{}' });
+    assert.equal((await onRequestPost({ request: declared })).status, 413);
+});
+
+test('answers 405 with Allow: POST for any other method', async () => {
+    const { onRequest } = await import(MODULE_URL);
+    const res = onRequest({ request: new Request(ENDPOINT, { method: 'GET' }) });
+    assert.equal(res.status, 405);
+    assert.equal(res.headers.get('allow'), 'POST');
 });
 
 test('truncates a long message and strips control characters', async () => {

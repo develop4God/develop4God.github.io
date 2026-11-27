@@ -124,9 +124,9 @@ test.describe('Apóyanos page', () => {
   });
 
   // The error reports the page sends to /api/client-error, answered with 204 so nothing leaves the machine.
-  function captureErrorReports(page) {
+  async function captureErrorReports(page) {
     const reports = [];
-    page.route('**/api/client-error', (route) => {
+    await page.route('**/api/client-error', (route) => {
       reports.push(JSON.parse(route.request().postData()));
       return route.fulfill({ status: 204 });
     });
@@ -134,7 +134,7 @@ test.describe('Apóyanos page', () => {
   }
 
   test('reports a PayPal load failure to the error endpoint', async ({ page }) => {
-    const reports = captureErrorReports(page);
+    const reports = await captureErrorReports(page);
     await page.route(SDK_PATTERN, (route) => route.abort());
     await openDonate(page);
     await expect.poll(() => reports.length).toBe(1);
@@ -142,7 +142,7 @@ test.describe('Apóyanos page', () => {
   });
 
   test('reports a failed subscription with its frequency and quantity', async ({ page }) => {
-    const reports = captureErrorReports(page);
+    const reports = await captureErrorReports(page);
     stubSdk(page);
     await openDonate(page);
     await page.getByRole('button', { name: 'Mensual' }).click();

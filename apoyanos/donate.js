@@ -139,11 +139,11 @@
                         say(MSG.pending);
                     }
                 },
-                onError: function (error) { report('capture', error, { frequency: 'once' }); say(MSG.failed); },
+                onError: function (error) { report('checkout', error, { frequency: 'once' }); say(MSG.failed); },
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
-            if (error && error.message === 'sdk') { report('sdk', error, { frequency: 'once' }); showFallback(); return; }
+            if (error && error.message === 'sdk') { report('sdk', 'PayPal SDK did not load', { frequency: 'once' }); showFallback(); return; }
             report('render', error, { frequency: 'once' });
             console.error('Apoyanos: the one-time buttons failed to render', error);
             onceLink.hidden = false;
@@ -179,7 +179,7 @@
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
-            if (error && error.message === 'sdk') { report('sdk', error, { frequency: frequency, quantity: quantity }); say(MSG.sdkFailedRecurring); return; }
+            if (error && error.message === 'sdk') { report('sdk', 'PayPal SDK did not load', { frequency: frequency, quantity: quantity }); say(MSG.sdkFailedRecurring); return; }
             report('render', error, { frequency: frequency, quantity: quantity });
             console.error('Apoyanos: the subscribe button failed to render', error);
             say(MSG.failed);

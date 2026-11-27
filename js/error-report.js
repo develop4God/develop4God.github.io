@@ -6,11 +6,15 @@
     // swallowed. Each stage and message is sent once per page load so a retry loop cannot flood the log.
     const ENDPOINT = '/api/client-error';
     const sent = new Set();
+    // The endpoint caps messages at the same length; cutting here keeps a long PayPal error from
+    // pushing the whole report over the endpoint's body limit.
+    const MAX_MESSAGE = 300;
 
     function messageOf(error) {
-        if (typeof error === 'string') return error;
-        if (error && typeof error.message === 'string') return error.message;
-        return 'unknown';
+        let text = 'unknown';
+        if (typeof error === 'string') text = error;
+        else if (error && typeof error.message === 'string') text = error.message;
+        return text.slice(0, MAX_MESSAGE);
     }
 
     function buildPayload(stage, error, { frequency, quantity } = {}) {
@@ -35,7 +39,7 @@
     function report(stage, error, context) {
         try {
             const payload = buildPayload(stage, error, context);
-            const key = stage + '|' + payload.message;
+            const key = [stage, payload.frequency, payload.message].join('|');
             if (sent.has(key)) return;
             sent.add(key);
             transmit(JSON.stringify(payload));

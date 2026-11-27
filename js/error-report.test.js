@@ -24,10 +24,10 @@ function load({ navigator = {}, fetch } = {}) {
 test('report sends a JSON beacon to /api/client-error', () => {
     const sent = [];
     const { report } = load({ navigator: { sendBeacon: (url, blob) => { sent.push({ url, blob }); return true; } } });
-    report('capture', new Error('Window closed'), { frequency: 'once', quantity: 5 });
+    report('checkout', new Error('Window closed'), { frequency: 'once', quantity: 5 });
     assert.equal(sent.length, 1);
     assert.equal(sent[0].url, '/api/client-error');
-    assert.deepEqual(JSON.parse(sent[0].blob.text), { stage: 'capture', frequency: 'once', quantity: 5, message: 'Window closed' });
+    assert.deepEqual(JSON.parse(sent[0].blob.text), { stage: 'checkout', frequency: 'once', quantity: 5, message: 'Window closed' });
 });
 
 test('accepts a string, a plain object, undefined or null as the error', () => {
@@ -36,6 +36,19 @@ test('accepts a string, a plain object, undefined or null as the error', () => {
     assert.equal(buildPayload('render', { message: 'boom' }, {}).message, 'boom');
     assert.equal(buildPayload('render', undefined, {}).message, 'unknown');
     assert.equal(buildPayload('render', null, {}).message, 'unknown');
+});
+
+test('cuts a long message to the length the endpoint accepts', () => {
+    const { buildPayload } = load();
+    assert.equal(buildPayload('subscribe', new Error('x'.repeat(5000)), {}).message.length, 300);
+});
+
+test('the same stage and message is reported again for another frequency', () => {
+    const sent = [];
+    const { report } = load({ navigator: { sendBeacon: (url, blob) => { sent.push(blob); return true; } } });
+    report('sdk', 'down', { frequency: 'once' });
+    report('sdk', 'down', { frequency: 'monthly' });
+    assert.equal(sent.length, 2);
 });
 
 test('omits frequency and quantity when not given', () => {
@@ -68,8 +81,8 @@ test('never throws, even if the transport throws, rejects or is missing', async 
 test('reports each stage and message once, so a retry loop cannot flood the endpoint', () => {
     const sent = [];
     const { report } = load({ navigator: { sendBeacon: (url, blob) => { sent.push(blob); return true; } } });
-    report('capture', 'same', {});
-    report('capture', 'same', {});
-    report('capture', 'other', {});
+    report('checkout', 'same', {});
+    report('checkout', 'same', {});
+    report('checkout', 'other', {});
     assert.equal(sent.length, 2);
 });
