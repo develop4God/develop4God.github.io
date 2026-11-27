@@ -889,6 +889,9 @@ test.describe('bottom bar tab labels in every shipped language', () => {
                 await page.setViewportSize({ width, height: 700 });
                 await page.goto(`/devocionales/estudios/?lang=${lang}`, { waitUntil: 'networkidle' });
                 await expect(page.locator('html')).toHaveClass(/shell-active/);
+                // The fallback font differs per machine (CI's is wider than a laptop's). Pin a wide one so the
+                // contract holds on the worst case, not on whichever font this host happens to have.
+                await page.addStyleTag({ content: '.shell-tab, .shell-tab * { font-family: "DejaVu Sans", sans-serif !important; }' });
                 // Wait until the page has written the translation into every tab label.
                 await page.waitForFunction((code) => window.i18n && window.i18n.currentLang === code
                     && [...document.querySelectorAll('.shell-tab > span:not(.nav-new-badge)')]

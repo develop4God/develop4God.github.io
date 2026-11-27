@@ -67,8 +67,12 @@ a.shell-tab { text-decoration: none; }
     flex: 1 1 0;
     min-width: 0;
     flex-direction: column;
-    padding-inline: 0.25rem;
+    padding-inline: 0.125rem;
     min-height: 3.5rem;
+
+    /* A 320px phone gives each tab 80px. At 12px a ten-letter label ("Encounters") needs up to 78px in a wide
+       fallback font, so the bar labels are 11px, like the iOS tab bar. */
+    font-size: 0.6875rem;
 }
 
 /* A tab label is one line, centred under its icon. It is short by contract (the shell.tab_* translations); if a
