@@ -10,6 +10,8 @@
   "globals": {
     "DevotionalI18n": "readonly",
     "PayPalCheckout": "readonly",
+    "ErrorReport": "readonly",
+    "PayPalConfig": "readonly",
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",
     "DevotionalShare": "readonly",
@@ -109,6 +111,12 @@
     "no-console": "off"
   },
   "overrides": [
+    {
+      "files": ["functions/**/*.js"],
+      "parserOptions": {
+        "sourceType": "module"
+      }
+    },
     {
       "files": ["**/*.test.js", "e2e/**/*.js", "scripts/**/*.js"],
       "env": {

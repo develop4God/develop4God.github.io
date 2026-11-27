@@ -22,6 +22,7 @@ const ENV = Object.fromEntries(Object.entries(process.env).filter(([key]) => !ke
 const CSS = 'devocionales/vendor/tailwind.css';
 const SW = 'devocionales/sw.js';
 const MANIFEST = 'devocionales/manifests/en.webmanifest';
+const PAYPAL_CONFIG = 'js/paypal-config.js';
 
 // What each stub "build" generates. A stub for a --check mode compares its committed output to it.
 const STUBS = {
@@ -29,6 +30,7 @@ const STUBS = {
     'if [ -f scripts/fail-tailwind ]; then echo "tailwind exploded" >&2; exit 3; fi\nprintf "css\\n" > "$1"\n',
   'scripts/build-manifests.js': checkStub(MANIFEST, 'manifest\n', 'node scripts/build-manifests.js'),
   'scripts/build-sw.js': checkStub(SW, 'sw\n', 'node scripts/build-sw.js'),
+  'scripts/build-paypal-config.js': checkStub(PAYPAL_CONFIG, 'paypal\n', 'node scripts/build-paypal-config.js'),
 };
 
 function checkStub(file, expected, command) {
@@ -55,7 +57,7 @@ function tempRepo(t, { committed = {}, gitRepo = true } = {}) {
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   write(dir, 'scripts/check-generated.sh', fs.readFileSync(SCRIPT, 'utf8'));
   for (const [file, content] of Object.entries(STUBS)) write(dir, file, content);
-  const outputs = { [CSS]: 'css\n', [SW]: 'sw\n', [MANIFEST]: 'manifest\n', ...committed };
+  const outputs = { [CSS]: 'css\n', [SW]: 'sw\n', [MANIFEST]: 'manifest\n', [PAYPAL_CONFIG]: 'paypal\n', ...committed };
   for (const [file, content] of Object.entries(outputs)) if (content !== null) write(dir, file, content);
   if (gitRepo) {
     git(dir, 'init', '-q');
@@ -86,7 +88,7 @@ function status(dir) {
   return spawnSync('git', ['status', '--porcelain'], { cwd: dir, encoding: 'utf8', env: ENV }).stdout;
 }
 
-const REBUILD = 'bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js';
+const REBUILD = 'bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js && node scripts/build-paypal-config.js';
 
 test('check-generated: passes when every committed generated file is up to date', (t) => {
   const dir = tempRepo(t);
@@ -103,8 +105,8 @@ test('check-generated: fails on a stale committed stylesheet and names the rebui
   assert.ok(result.output.includes(REBUILD), result.output);
 });
 
-test('check-generated: fails on a stale committed worker or manifest', (t) => {
-  for (const file of [SW, MANIFEST]) {
+test('check-generated: fails on a stale committed worker, manifest or PayPal config', (t) => {
+  for (const file of [SW, MANIFEST, PAYPAL_CONFIG]) {
     const dir = tempRepo(t, { committed: { [file]: 'stale\n' } });
     const result = check(dir);
     assert.equal(result.status, 1, file);

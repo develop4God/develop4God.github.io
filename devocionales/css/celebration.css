@@ -1,0 +1,236 @@
+/* Confetti widget (UiCelebration, devocionales/js/ui-celebration.js): the one stylesheet for it. Any page that
+   uses the script links this file (or imports it, like discovery.css does). Colours come from the shared tokens
+   --accent and --highlight (theme.css); a page without them defines the two itself. */
+
+/* Confetti falls from the top, each piece styled by position. */
+.celebration {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 60;
+}
+
+.confetti-piece {
+    position: absolute;
+    inset-block-start: -1rem;
+    inline-size: 0.5rem;
+    block-size: 0.9rem;
+    border-radius: 0.1rem;
+    background: var(--accent);
+    opacity: 0;
+    animation: confetti-fall 2s ease-in forwards;
+}
+
+.confetti-piece:nth-child(5n+1) {
+    background: var(--accent);
+}
+
+.confetti-piece:nth-child(5n+2) {
+    background: var(--highlight);
+}
+
+.confetti-piece:nth-child(5n+3) {
+    background: #f5b301;
+}
+
+.confetti-piece:nth-child(5n+4) {
+    background: #2e9e6b;
+}
+
+.confetti-piece:nth-child(5n) {
+    background: #3b82f6;
+}
+
+.confetti-piece:nth-child(7n+1) {
+    --drift: -9rem;
+    --spin: 540deg;
+}
+
+.confetti-piece:nth-child(7n+2) {
+    --drift: 6rem;
+    --spin: -420deg;
+}
+
+.confetti-piece:nth-child(7n+3) {
+    --drift: -3rem;
+    --spin: 720deg;
+}
+
+.confetti-piece:nth-child(7n+4) {
+    --drift: 10rem;
+    --spin: -600deg;
+}
+
+.confetti-piece:nth-child(7n+5) {
+    --drift: -6rem;
+    --spin: 360deg;
+}
+
+.confetti-piece:nth-child(7n+6) {
+    --drift: 3rem;
+    --spin: -720deg;
+}
+
+.confetti-piece:nth-child(7n) {
+    --drift: 0rem;
+    --spin: 480deg;
+}
+
+.confetti-piece:nth-child(1) {
+    inset-inline-start: 5.7%;
+    animation-delay: 0.07s;
+}
+
+.confetti-piece:nth-child(2) {
+    inset-inline-start: 9.4%;
+    animation-delay: 0.14s;
+}
+
+.confetti-piece:nth-child(3) {
+    inset-inline-start: 13.1%;
+    animation-delay: 0.21s;
+}
+
+.confetti-piece:nth-child(4) {
+    inset-inline-start: 16.8%;
+    animation-delay: 0.28s;
+}
+
+.confetti-piece:nth-child(5) {
+    inset-inline-start: 20.5%;
+    animation-delay: 0.35s;
+}
+
+.confetti-piece:nth-child(6) {
+    inset-inline-start: 24.2%;
+    animation-delay: 0.42s;
+}
+
+.confetti-piece:nth-child(7) {
+    inset-inline-start: 27.9%;
+    animation-delay: 0.49s;
+}
+
+.confetti-piece:nth-child(8) {
+    inset-inline-start: 31.6%;
+    animation-delay: 0.56s;
+}
+
+.confetti-piece:nth-child(9) {
+    inset-inline-start: 35.3%;
+    animation-delay: 0.03s;
+}
+
+.confetti-piece:nth-child(10) {
+    inset-inline-start: 39.0%;
+    animation-delay: 0.1s;
+}
+
+.confetti-piece:nth-child(11) {
+    inset-inline-start: 42.7%;
+    animation-delay: 0.17s;
+}
+
+.confetti-piece:nth-child(12) {
+    inset-inline-start: 46.4%;
+    animation-delay: 0.24s;
+}
+
+.confetti-piece:nth-child(13) {
+    inset-inline-start: 50.1%;
+    animation-delay: 0.31s;
+}
+
+.confetti-piece:nth-child(14) {
+    inset-inline-start: 53.8%;
+    animation-delay: 0.38s;
+}
+
+.confetti-piece:nth-child(15) {
+    inset-inline-start: 57.5%;
+    animation-delay: 0.45s;
+}
+
+.confetti-piece:nth-child(16) {
+    inset-inline-start: 61.2%;
+    animation-delay: 0.52s;
+}
+
+.confetti-piece:nth-child(17) {
+    inset-inline-start: 64.9%;
+    animation-delay: 0.59s;
+}
+
+.confetti-piece:nth-child(18) {
+    inset-inline-start: 68.6%;
+    animation-delay: 0.06s;
+}
+
+.confetti-piece:nth-child(19) {
+    inset-inline-start: 72.3%;
+    animation-delay: 0.13s;
+}
+
+.confetti-piece:nth-child(20) {
+    inset-inline-start: 76.0%;
+    animation-delay: 0.2s;
+}
+
+.confetti-piece:nth-child(21) {
+    inset-inline-start: 79.7%;
+    animation-delay: 0.27s;
+}
+
+.confetti-piece:nth-child(22) {
+    inset-inline-start: 83.4%;
+    animation-delay: 0.34s;
+}
+
+.confetti-piece:nth-child(23) {
+    inset-inline-start: 87.1%;
+    animation-delay: 0.41s;
+}
+
+.confetti-piece:nth-child(24) {
+    inset-inline-start: 90.8%;
+    animation-delay: 0.48s;
+}
+
+.confetti-piece:nth-child(25) {
+    inset-inline-start: 94.5%;
+    animation-delay: 0.55s;
+}
+
+.confetti-piece:nth-child(26) {
+    inset-inline-start: 2.2%;
+    animation-delay: 0.02s;
+}
+
+.confetti-piece:nth-child(27) {
+    inset-inline-start: 5.9%;
+    animation-delay: 0.09s;
+}
+
+.confetti-piece:nth-child(28) {
+    inset-inline-start: 9.6%;
+    animation-delay: 0.16s;
+}
+
+@keyframes confetti-fall {
+    0% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) rotate(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate3d(var(--drift, 0), 105vh, 0) rotate(var(--spin, 360deg));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .celebration {
+        display: none;
+    }
+}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # check-generated.sh: the one "generated files are up to date" check, run by CI and by
 # scripts/validator.py. devocionales/vendor/tailwind.css, the manifests, devocionales/sw.js and the
-# build stamp devocionales/js/devotional-build.js are committed (GitHub Pages has no build step).
+# build stamp devocionales/js/devotional-build.js and js/paypal-config.js are committed (GitHub Pages has no build step).
 #
 # Read-only, and checks what is committed: it exports a commit (`git archive`) into a temp
 # directory and runs the read-only checks there, so uncommitted edits neither block nor fool it, a
@@ -17,7 +17,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-REBUILD='bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js'
+REBUILD='bash scripts/build-tailwind.sh && node scripts/build-manifests.js && node scripts/build-sw.js && node scripts/build-paypal-config.js'
 CSS=devocionales/vendor/tailwind.css
 
 shas=()
@@ -68,6 +68,7 @@ for sha in "${shas[@]}"; do
     fi
     node scripts/build-manifests.js --check || failed=1
     node scripts/build-sw.js --check || failed=1
+    node scripts/build-paypal-config.js --check || failed=1
     exit "${failed}"
   ) || stale=1
 done

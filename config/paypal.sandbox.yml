@@ -1,0 +1,18 @@
+# PayPal recurring-donation settings, SANDBOX environment.
+# Mirror of config/paypal.production.yml: both files must keep exactly the same keys, only the
+# values differ. Everything here is public (client id, plan ids); the app secret never goes in a file.
+environment: sandbox
+client_id: AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-
+currency: USD
+
+# Each plan costs unit_price per unit and supports quantity, so the donor's amount IS the quantity
+# sent to PayPal (5 USD = quantity 5). Verified in sandbox: quantities 1 to 10000 are accepted, hence maximum_amount.
+unit_price: 1
+minimum_amount: 5
+maximum_amount: 10000
+preset_amounts: [5, 10, 25]
+
+product_id: PROD-89P24471LP247082S
+plans:
+  monthly: P-1VE18400J3678614BNMDSHCA
+  yearly: P-4RY57834HB7835624NMDSHCI

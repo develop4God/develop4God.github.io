@@ -17,7 +17,7 @@ window.paypal = {
 async function openDemo(page, clientId) {
   await page.route('**/paypal-demo/', async (route) => {
     const response = await route.fetch();
-    const html = (await response.text()).replace(PLACEHOLDER, clientId);
+    const html = (await response.text()).replace(/data-client-id="[^"]*"/, `data-client-id="${clientId}"`);
     await route.fulfill({ response, body: html });
   });
   await page.goto('/paypal-demo/', { waitUntil: 'domcontentloaded' });
@@ -36,7 +36,7 @@ function stubSdk(page, { abort = false } = {}) {
 test.describe('PayPal demo page', () => {
   test('without a client id it shows a warning and never requests the SDK', async ({ page }) => {
     const requests = stubSdk(page);
-    await page.goto('/paypal-demo/', { waitUntil: 'domcontentloaded' });
+    await openDemo(page, PLACEHOLDER);
     await expect(page.locator('#status')).toContainText('Set data-client-id');
     await expect(page.locator('#status')).toHaveClass(/warning/);
     expect(requests).toEqual([]);
@@ -71,5 +71,24 @@ test.describe('PayPal demo page', () => {
     stubSdk(page, { abort: true });
     await openDemo(page, 'sandbox-test-id');
     await expect(page.locator('#status')).toContainText('Could not load the PayPal SDK');
+  });
+});
+
+test.describe('PayPal demo page, subscription mode', () => {
+  test('loads the SDK for subscriptions and renders a subscribe button for the monthly and yearly plans', async ({ page }) => {
+    const requests = stubSdk(page);
+    await page.route(/paypal-demo\/(\?.*)?$/, async (route) => {
+      const response = await route.fetch();
+      const html = (await response.text()).replace(/data-client-id="[^"]*"/, 'data-client-id="sandbox-test-id"');
+      await route.fulfill({ response, body: html });
+    });
+    await page.goto('/paypal-demo/?mode=subscription', { waitUntil: 'domcontentloaded' });
+
+    await expect.poll(() => requests.length).toBe(1);
+    const url = new URL(requests[0]);
+    expect(url.searchParams.get('intent')).toBe('subscription');
+    expect(url.searchParams.get('vault')).toBe('true');
+    await expect(page.locator('.plan-slot')).toHaveCount(2);
+    await expect(page.locator('.plan-slot').first()).toContainText('monthly 5 USD');
   });
 });

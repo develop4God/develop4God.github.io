@@ -1,0 +1,18 @@
+# PayPal recurring-donation settings, PRODUCTION environment.
+# Mirror of config/paypal.sandbox.yml: both files must keep exactly the same keys, only the
+# values differ. Everything here is public (client id, plan ids); the app secret never goes in a file.
+environment: production
+# The LIVE app's public client id: the same one the Encounters unlock uses (devotional-pwa-config.js).
+client_id: BAAzCtTUx9vcxROgeYlg1X3mkeTCAAWEyqv-_YAOoS8TROsuJTgJA40nvHpM_LP1q1vtHMMe3rDt53OPBY
+currency: USD
+
+# Same model as sandbox: the donor's amount IS the quantity of a 1 USD plan.
+unit_price: 1
+minimum_amount: 5
+maximum_amount: 10000
+preset_amounts: [5, 10, 25]
+
+product_id: PROD-5T14057146050063K
+plans:
+  monthly: P-6BX19202K97150722NME3QGA
+  yearly: P-2SH46376V52801545NME3QWY

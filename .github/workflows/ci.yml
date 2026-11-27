@@ -22,6 +22,11 @@ jobs:
         with:
           node-version: '22'
 
+      - name: PayPal environment is production on main
+        # Runs only for pushes to main and pull requests targeting main; feature branches may use sandbox.
+        if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+        run: node scripts/check-paypal-active.js
+
       - name: Run node --test with c8 coverage
         run: |
           npx --yes c8 node --test

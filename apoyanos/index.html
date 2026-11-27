@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Apóyanos</title>
+    <link rel="stylesheet" href="/devocionales/css/celebration.css">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: light-dark(#f5f2fb, #0b0b0a);
+            --surface: light-dark(#ffffff, #151412);
+            --text: light-dark(#1c1730, #f2f0ea);
+            --text-muted: light-dark(#6b6280, #a39e91);
+            --border: light-dark(#ded4ef, #2a2822);
+            --accent: light-dark(#6d4aa8, #5fb8ae);
+            --accent-soft: light-dark(#ece5f7, #16302d);
+            --highlight: light-dark(#a8461c, #e08a5c); /* used by the shared confetti stylesheet */
+            --ok: light-dark(#4f6f00, #84cc16);
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); padding-bottom: 76px; }
+        a { color: inherit; }
+
+        .site-nav { border-bottom: 1px solid var(--border); background: var(--bg); }
+        .site-nav-inner { max-width: 760px; margin: 0 auto; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .brand { font-weight: 800; text-decoration: none; font-size: 1.1rem; }
+
+        main { max-width: 760px; margin: 0 auto; padding: 40px 16px 24px; }
+        .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; margin-bottom: 12px; display: block; }
+        h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; margin: 0 0 14px; line-height: 1.1; }
+        h2 { font-size: clamp(1.3rem, 3vw, 1.7rem); font-weight: 800; margin: 0 0 14px; }
+        h3 { font-size: 1.05rem; font-weight: 700; margin: 0 0 4px; }
+        .lead { font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; margin: 0 0 24px; }
+        .muted { color: var(--text-muted); }
+        .small { font-size: .9rem; }
+
+        .btn-primary, .btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 8px; font-weight: 700; padding: 13px 22px; text-decoration: none; transition: transform .15s ease, box-shadow .2s ease; }
+        .btn-primary { background: var(--accent); color: var(--bg); position: relative; overflow: hidden; }
+        .btn-primary::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / .35) 50%, transparent 70%); transform: translateX(-120%); animation: shine 3.5s ease-in-out 1.5s infinite; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -8px var(--accent); }
+        .btn-secondary { border: 1px solid var(--border); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+        @keyframes shine { 0%, 60% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+
+        /* Hero: animated glow, counter, global bar */
+        .hero { position: relative; padding-bottom: 8px; }
+        .hero::before { content: ""; position: absolute; inset: -40px -20px auto; height: 260px; z-index: -1; background: radial-gradient(closest-side, var(--accent-soft), transparent); animation: drift 12s ease-in-out infinite alternate; }
+        @keyframes drift { to { transform: translate(40px, 20px) scale(1.15); } }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none; }
+        .chips li { background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 6px 14px; font-size: .85rem; font-weight: 600; }
+        .total { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 0 0 24px; }
+        .total-num { font-size: 2.4rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+        .fill { height: 12px; background: var(--accent-soft); border-radius: 999px; overflow: hidden; margin-top: 10px; }
+        .fill > span { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 999px; transition: width 1.2s cubic-bezier(.2, .8, .2, 1); }
+        .fill > span.done { background: var(--ok); }
+
+        /* Accordions */
+        .accordions { display: grid; gap: 10px; margin: 40px 0; }
+        details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; transition: border-color .2s; }
+        details[open] { border-color: var(--accent); }
+        summary { cursor: pointer; padding: 16px 18px; font-weight: 700; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        summary::-webkit-details-marker { display: none; }
+        summary::after { content: "+"; color: var(--accent); font-size: 1.4rem; line-height: 1; transition: transform .25s ease; }
+        details[open] summary::after { transform: rotate(45deg); }
+        .panel { padding: 0 18px 18px; animation: open .3s ease; }
+        @keyframes open { from { opacity: 0; transform: translateY(-6px); } }
+        .panel p { line-height: 1.65; margin: 0 0 10px; }
+        .rubro { margin-top: 18px; }
+        .rubro-top { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+        .rubro p { margin: 4px 0 0; color: var(--text-muted); font-size: .95rem; }
+        .timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+        .timeline li { display: grid; grid-template-columns: 88px 1fr; gap: 12px; padding-left: 14px; border-left: 2px solid var(--accent); }
+        .timeline strong { color: var(--accent); }
+        .goal + .goal { margin-top: 16px; }
+        .goal-price { font-size: 1.5rem; font-weight: 800; color: var(--accent); margin: 4px 0; }
+
+        /* Give */
+        .give { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; scroll-margin-top: 16px; }
+        .presets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+        .presets-3 { grid-template-columns: repeat(3, 1fr); margin-bottom: 0; }
+        .other { margin: -6px 0 18px; }
+        .other[hidden], #once-pay[hidden], #plans[hidden], #once-link[hidden] { display: none; }
+        .other input { width: 100%; padding: 10px; font: inherit; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); margin-top: 4px; }
+        #once-link { margin-top: 12px; }
+        .thanks { text-align: center; padding: 8px 0 4px; outline: none; }
+        .thanks[hidden], #give-controls[hidden] { display: none; }
+        .thanks h3 { margin: 4px 0 8px; font-size: 1.4rem; }
+        .thanks-verse { margin: 16px auto; padding: 14px 18px; max-width: 30em; border-radius: 12px; background: var(--accent-soft); }
+        .thanks-verse blockquote { margin: 0; font-style: italic; }
+        .thanks-verse figcaption { margin-top: 6px; font-size: .85rem; font-weight: 700; color: var(--accent); }
+        .thanks p { margin: 0 auto 10px; max-width: 34em; }
+        .thanks .btn-secondary { margin-top: 8px; }
+        /* PayPal's buttons are a light document: without this the dark page paints an opaque white box behind them. */
+        #once-buttons iframe, #plans iframe { color-scheme: light; }
+        #sdk-status { min-height: 1.2em; margin: 8px 0 14px; }
+        .preset { background: var(--accent-soft); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font: inherit; font-weight: 700; cursor: pointer; transition: transform .15s ease, background .2s; }
+        .preset:active { transform: scale(.94); }
+        .preset[aria-pressed="true"] { background: var(--accent); color: var(--bg); transform: scale(1.05); }
+        .give-options { display: flex; gap: 12px; flex-wrap: wrap; }
+        button.btn-secondary { background: none; font: inherit; font-weight: 700; cursor: pointer; }
+        .yappy-box { margin-top: 16px; padding: 14px 16px; border: 1px dashed var(--accent); border-radius: 8px; animation: open .3s ease; }
+        .yappy-box[hidden], .yappy-row[hidden] { display: none; }
+        .yappy-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+        .yappy-row .preset { padding: 8px 16px; }
+        .yappy-logo { height: 22px; width: auto; display: block; }
+        /* The dark-blue wordmark is unreadable on a dark surface: lift it there. */
+        @media (prefers-color-scheme: dark) { .yappy-logo { filter: brightness(1.4); } }
+
+        footer { border-top: 1px solid var(--border); padding: 24px 16px; text-align: center; color: var(--text-muted); font-size: .9rem; }
+
+        /* Sticky mobile bar */
+        .sticky { position: fixed; inset: auto 0 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--border); display: flex; justify-content: center; transition: transform .3s ease; }
+        .sticky .btn-primary { width: 100%; max-width: 420px; }
+        .sticky.hidden { transform: translateY(110%); }
+        @media (min-width: 720px) { .sticky { display: none; } body { padding-bottom: 0; } }
+
+        /* Reveal on scroll: only hidden when JS is running */
+        .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+        .js .reveal.in { opacity: 1; transform: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+            .js .reveal { opacity: 1; transform: none; }
+        }
+    </style>
+</head>
+<body>
+<header class="site-nav">
+    <div class="site-nav-inner">
+        <a class="brand" href="#">Develop4God</a>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <span class="eyebrow">Devocionales Cristianos</span>
+        <h1>Apóyanos</h1>
+        <p class="lead">Este ministerio es gratis para todos. Tu aporte ayuda a mantenerlo así.</p>
+        <ul class="chips">
+            <li>Gratis</li>
+            <li>Sin anuncios</li>
+            <li>Sin conexión</li>
+            <li>10 idiomas</li>
+        </ul>
+
+        <div class="total reveal">
+            <span class="muted small">Recibido desde la app hasta el 23 nov 2026</span>
+            <div class="total-num">USD <span id="total-count" data-target="74.15">74.15</span></div>
+            <div class="fill" role="presentation"><span data-width="13.7%"></span></div>
+            <p class="muted small" style="margin:10px 0 0">de USD 540 de costos al año.</p>
+        </div>
+        <a class="btn-primary" href="#dar">Quiero apoyar</a>
+    </section>
+
+    <section class="accordions" aria-label="Más información">
+        <details class="reveal">
+            <summary>Cómo se usan los costos</summary>
+            <div class="panel">
+                <div class="rubro">
+                    <div class="rubro-top"><h3>Infraestructura y notificaciones</h3><span class="muted small">$60 al año · cubierto</span></div>
+                    <p>Servidores y el envío de notificaciones diarias.</p>
+                    <div class="fill" role="presentation"><span class="done" data-width="100%"></span></div>
+                </div>
+                <div class="rubro">
+                    <div class="rubro-top"><h3>Contenido devocional nuevo</h3><span class="muted small">$240 al año</span></div>
+                    <p>Generar devocionales nuevos cada mes, en los 10 idiomas.</p>
+                    <div class="fill" role="presentation"><span data-width="0%"></span></div>
+                </div>
+                <div class="rubro">
+                    <div class="rubro-top"><h3>Herramientas de desarrollo con IA</h3><span class="muted small">$240 al año</span></div>
+                    <p>Lo que permite construir y mantener la app siendo un solo desarrollador.</p>
+                    <div class="fill" role="presentation"><span data-width="0%"></span></div>
+                </div>
+                <p class="muted small" style="margin:16px 0 0">Las barras muestran lo ya cubierto. El 90 % de cada aporte va al ministerio y el 10 % a otros ministerios de sana doctrina.</p>
+            </div>
+        </details>
+
+        <details class="reveal" id="quienes">
+            <summary>Quiénes somos</summary>
+            <div class="panel">
+                <p><strong>Evelin y Giovanni, esposos y cofundadores.</strong></p>
+                <p>Evelin inspiró la idea de Devocionales Cristianos, ha diseñado y probado varias funciones del app y ha sostenido económicamente la mayor parte del ministerio.</p>
+                <p>Giovanni es el desarrollador que la construye diariamente generando contenido para ser llevado a las naciones.</p>
+                <p class="muted">Sin ambos, este ministerio no existiría. Sin anuncios no hay ingresos que cubran los costos: tu aporte ayuda a que no dependa solo de nuestra familia.</p>
+            </div>
+        </details>
+
+        <details class="reveal">
+            <summary>Hitos del ministerio</summary>
+            <div class="panel">
+                <ul class="timeline">
+                    <li><strong>Jul 2025</strong><span>Devocionales Cristianos se publica en Google Play.</span></li>
+                    <li><strong>Nov 2025</strong><span>El sitio se vuelve multilingüe y se suma Habitus+Faith.</span></li>
+                    <li><strong>Feb 2026</strong><span>Habitus+Faith se publica en Google Play, y se lanzan las insignias de apoyo en la app.</span></li>
+                    <li><strong>Mar 2026</strong><span>Encuentros y estudios bíblicos en la app.</span></li>
+                    <li><strong>Jul 2026</strong><span>Devocionales en la web, en 10 idiomas, con lectura en voz alta.</span></li>
+                    <li><strong>Nov 2026</strong><span>Notificaciones diarias y la app que se instala desde el navegador, sin tienda.</span></li>
+                </ul>
+            </div>
+        </details>
+
+        <details class="reveal" id="metas">
+            <summary>Próximas metas</summary>
+            <div class="panel">
+                <div class="goal">
+                    <h3>Llegar a iPhone</h3>
+                    <div class="goal-price">$100 al año</div>
+                    <p class="muted">Licencia de desarrollador de Apple para publicar Devocionales Cristianos en la App Store.</p>
+                </div>
+                <div class="goal">
+                    <h3>Una Mac para IA local y desarrollo iOS</h3>
+                    <div class="goal-price">$3,199</div>
+                    <p class="muted">Un Mac mini M5 Pro con 64 GB de memoria. Generar contenido con IA local, sin depender de la nube, y desarrollar para iOS en la misma máquina.</p>
+                </div>
+            </div>
+        </details>
+    </section>
+
+    <section id="dar" class="give reveal" aria-labelledby="dar-title">
+        <span class="eyebrow">Dar</span>
+        <h2 id="dar-title">Elige cómo apoyar</h2>
+        <div id="give-controls">
+        <div class="presets presets-3" role="group" aria-label="Frecuencia">
+            <button class="preset" type="button" data-frequency="once" aria-pressed="true">Única vez</button>
+            <button class="preset" type="button" data-frequency="monthly" aria-pressed="false">Mensual</button>
+            <button class="preset" type="button" data-frequency="yearly" aria-pressed="false">Anual</button>
+        </div>
+        <div class="presets" role="group" aria-label="Monto">
+            <button class="preset" type="button" data-amount="5" aria-pressed="false">$5</button>
+            <button class="preset" type="button" data-amount="10" aria-pressed="true">$10</button>
+            <button class="preset" type="button" data-amount="25" aria-pressed="false">$25</button>
+            <button class="preset" type="button" data-amount="other" aria-pressed="false">Otro</button>
+        </div>
+        <div class="other" id="other-box" hidden>
+            <label for="other-amount">Otro monto (USD)</label>
+            <input id="other-amount" type="number" min="1" step="0.01" value="15" inputmode="decimal">
+        </div>
+        <div id="once-pay" hidden>
+            <div id="once-buttons"></div>
+            <a class="btn-primary" id="once-link" href="https://www.paypal.com/paypalme/develop4godOfficial/10USD" target="_blank" rel="noopener" hidden>Dar con PayPal</a>
+        </div>
+        <div id="plans" aria-live="polite" hidden></div>
+        <p class="muted small" id="sdk-status" role="status"></p>
+        </div>
+        <div class="thanks" id="thanks" role="status" tabindex="-1" hidden>
+            <h3 id="thanks-title">¡Gracias por apoyar nuestro ministerio!</h3>
+            <p id="thanks-detail"></p>
+            <p id="thanks-blessing">❤️ Tu apoyo hace posible que sigamos sirviendo y creciendo con amor. ¡Bendiciones! ✨</p>
+            <figure class="thanks-verse">
+                <blockquote id="thanks-verse">“El que siembra generosamente, generosamente también segará.” 🙏</blockquote>
+                <figcaption id="thanks-verse-ref">2 Corintios 9:6</figcaption>
+            </figure>
+            <p class="muted small" id="thanks-ref"></p>
+            <button class="btn-secondary" type="button" id="thanks-again">¡Amén! 🙌</button>
+        </div>
+        <div class="give-options">
+            <button class="btn-secondary" type="button" id="yappy-btn" aria-controls="yappy-box" aria-label="Yappy, Panamá: tocar para copiar el número"><img class="yappy-logo" src="/img/yappy-logo.png" width="88" height="22" alt="" decoding="async"><span aria-hidden="true">🇵🇦</span><span>tocar para copiar</span></button>
+        </div>
+        <div class="yappy-box" id="yappy-box" role="status" aria-live="polite" hidden>
+            <span class="muted small" id="yappy-label"></span>
+            <div class="yappy-row" id="yappy-row" hidden>
+                <strong id="yappy-number"></strong>
+                <button class="preset" type="button" id="yappy-copy">Copiar</button>
+            </div>
+        </div>
+        <p class="muted small" style="margin:14px 0 0">¿Prefieres transferencia u otro medio? <a href="https://wa.me/50688424291" target="_blank" rel="noopener">Escríbenos por WhatsApp</a> y te damos los datos.</p>
+        <p class="muted small" style="margin:18px 0 0"><strong>Desbloquea los Encuentros:</strong> el desbloqueo se hace desde la página de Encuentros, con un aporte único en ese mismo lugar. <a href="/devocionales/encounters/">Desbloquear Encuentros</a></p>
+    </section>
+</main>
+
+<footer>Develop4God · Devocionales Cristianos</footer>
+
+<div class="sticky" id="sticky"><a class="btn-primary" href="#dar">Quiero apoyar</a></div>
+
+<script src="/js/error-report.js"></script>
+<script src="/js/paypal-checkout.js"></script>
+<script src="/devocionales/js/dom-builder.js"></script>
+<script src="/devocionales/js/ui-celebration.js"></script>
+<script src="/devocionales/js/devotional-pwa-config.js"></script>
+<script src="/js/paypal-config.js"></script>
+<script src="/apoyanos/donate.js"></script>
+<script>
+    (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // Yappy: one tap fetches the number from /api/yappy and copies it; it is never embedded in this page.
+        // The SPA fallback answers unknown paths with HTML (200), so the body is validated, not just the status.
+        var yappyBtn = document.getElementById('yappy-btn');
+        var yappyBox = document.getElementById('yappy-box');
+        var yappyLabel = document.getElementById('yappy-label');
+        var yappyRow = document.getElementById('yappy-row');
+        var yappyNumber = document.getElementById('yappy-number');
+        var yappyCopy = document.getElementById('yappy-copy');
+        var NUMBER_PATTERN = /^[0-9+\-\s]{6,20}$/;
+        var COPY_HINT = 'Mantén presionado el número para copiarlo.';
+
+        function showYappy(message, number) {
+            yappyBox.hidden = false;
+            yappyLabel.textContent = message;
+            yappyRow.hidden = !number;
+            yappyNumber.textContent = number || '';
+        }
+
+        function fetchYappyNumber() {
+            return fetch('/api/yappy', { cache: 'no-store', headers: { Accept: 'application/json' } })
+                .then(function (res) { return res.ok ? res.json() : Promise.reject(new Error('status')); })
+                .then(function (data) {
+                    if (!data || typeof data.number !== 'string' || !NUMBER_PATTERN.test(data.number)) {
+                        throw new Error('shape');
+                    }
+                    return data.number;
+                });
+        }
+
+        // Safari only allows a clipboard write inside the tap, so hand it a promise instead of waiting for the fetch.
+        function copyWhenReady(numberPromise) {
+            var clip = navigator.clipboard;
+            if (clip && window.ClipboardItem && clip.write) {
+                var blobPromise = numberPromise.then(function (n) { return new Blob([n], { type: 'text/plain' }); });
+                return clip.write([new window.ClipboardItem({ 'text/plain': blobPromise })]);
+            }
+            return numberPromise.then(function (n) { return clip.writeText(n); });
+        }
+
+        yappyBtn.addEventListener('click', function () {
+            showYappy('Cargando…', null);
+            var numberPromise = fetchYappyNumber();
+            // A synchronous throw (a browser that refuses a promise inside ClipboardItem) must not stop the number from showing.
+            var copied;
+            try { copied = copyWhenReady(numberPromise).then(function () { return true; }, function () { return false; }); }
+            catch (error) { copied = Promise.resolve(false); }
+            Promise.all([numberPromise, copied]).then(function (result) {
+                // Copied: the number stays out of sight. Only when the clipboard is blocked is it shown, so the donor can copy it by hand.
+                if (result[1]) { showYappy('Número copiado. Pégalo en la aplicación Yappy.', null); }
+                else { showYappy('Toca Copiar y pégalo en la aplicación Yappy:', result[0]); }
+            }).catch(function () {
+                showYappy('No pudimos cargar el número. Escríbenos por WhatsApp y te lo damos.', null);
+            });
+        });
+
+        yappyCopy.addEventListener('click', function () {
+            var done = function () { yappyCopy.textContent = '¡Copiado!'; setTimeout(function () { yappyCopy.textContent = 'Copiar'; }, 1800); };
+            var clip = navigator.clipboard;
+            if (clip && clip.writeText) {
+                clip.writeText(yappyNumber.textContent).then(done, function () { yappyLabel.textContent = COPY_HINT; });
+            } else {
+                yappyLabel.textContent = COPY_HINT;
+            }
+        });
+
+        // Count-up for the received total.
+        function countUp(el) {
+            var target = parseFloat(el.getAttribute('data-target'));
+            if (reduced) { return; }
+            var start = null;
+            function step(ts) {
+                if (start === null) { start = ts; }
+                var p = Math.min((ts - start) / 1400, 1);
+                el.textContent = (target * (1 - Math.pow(1 - p, 3))).toFixed(2);
+                if (p < 1) { requestAnimationFrame(step); }
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Reveal blocks and fill bars when they scroll into view.
+        function reveal(el) {
+            el.classList.add('in');
+            var count = el.querySelector('#total-count');
+            if (count) { countUp(count); }
+        }
+        function fill(el) { el.style.width = el.getAttribute('data-width'); }
+
+        if (!('IntersectionObserver' in window)) {
+            document.querySelectorAll('.reveal').forEach(reveal);
+            document.querySelectorAll('[data-width]').forEach(fill);
+        } else {
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (!e.isIntersecting) { return; }
+                    if (e.target.classList.contains('reveal')) { reveal(e.target); }
+                    else { fill(e.target); }
+                    io.unobserve(e.target);
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll('.reveal, [data-width]').forEach(function (el) { io.observe(el); });
+
+            // Hide the sticky bar while the donate section is on screen.
+            var sticky = document.getElementById('sticky');
+            new IntersectionObserver(function (entries) {
+                sticky.classList.toggle('hidden', entries[0].isIntersecting);
+            }).observe(document.getElementById('dar'));
+        }
+    })();
+</script>
+</body>
+</html>

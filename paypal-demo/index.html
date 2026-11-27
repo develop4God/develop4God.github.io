@@ -14,7 +14,7 @@
         .warning { color: #9a3412; }
     </style>
 </head>
-<body data-client-id="REPLACE_WITH_SANDBOX_CLIENT_ID" data-currency="USD">
+<body data-client-id="AQ71LLZhIEEHJcztnFQ-1X-VT0v3FEVWOCJFPm6lu3gQANytMKRXGCFGg3Ic5xMX7pERPz0JiHCHd0a-" data-currency="USD">
     <h1>PayPal checkout demo</h1>
     <p>Sandbox only. Replace the client id on the body tag with your PayPal sandbox client id.</p>
 
@@ -28,11 +28,15 @@
     <p id="status" role="status"></p>
 
     <script src="/js/paypal-checkout.js"></script>
+    <script src="/js/paypal-config.js"></script>
     <script>
         (function () {
             'use strict';
             var body = document.body;
-            var clientId = body.getAttribute('data-client-id');
+            var mode = new URLSearchParams(window.location.search).get('mode');
+            var isSubscriptionMode = mode === 'subscription';
+            // Subscription plans belong to the app in PayPalConfig, so the SDK must load with that app's client id.
+            var clientId = isSubscriptionMode ? (window.PayPalConfig || {}).clientId : body.getAttribute('data-client-id');
             var currency = body.getAttribute('data-currency');
             var status = document.getElementById('status');
             var container = document.getElementById('paypal-button-container');
@@ -42,14 +46,43 @@
                 status.className = isWarning ? 'warning' : '';
             }
 
+            if (isSubscriptionMode && !window.PayPalConfig) {
+                say('js/paypal-config.js did not load: run node scripts/build-paypal-config.js.', true);
+                return;
+            }
             if (!clientId || clientId.indexOf('REPLACE_') === 0) {
                 say('Set data-client-id on the body tag to your sandbox client id to load the buttons.', true);
                 return;
             }
 
             var sdkScript = document.createElement('script');
-            sdkScript.src = PayPalCheckout.buildSdkUrl({ clientId: clientId, currency: currency });
+            sdkScript.src = PayPalCheckout.buildSdkUrl({
+                clientId: clientId,
+                currency: currency,
+                intent: isSubscriptionMode ? 'subscription' : 'capture'
+            });
             sdkScript.onload = function () {
+                if (isSubscriptionMode) {
+                    ['monthly', 'yearly'].forEach(function (frequency) {
+                        var slot = document.createElement('div');
+                        slot.className = 'plan-slot';
+                        slot.textContent = frequency + ' ' + PayPalConfig.minimumAmount + ' ' + PayPalConfig.currency;
+                        var buttonBox = document.createElement('div');
+                        slot.appendChild(buttonBox);
+                        container.appendChild(slot);
+                        PayPalCheckout.renderSubscriptionButton(window.paypal, buttonBox, {
+                            planId: PayPalConfig.plans[frequency],
+                            quantity: PayPalConfig.minimumAmount,
+                            onApproved: function (subscriptionId) {
+                                say('Subscription started. ID: ' + subscriptionId, false);
+                            },
+                            onError: function () {
+                                say('The subscription did not complete. Check your PayPal account before trying again.', true);
+                            }
+                        });
+                    });
+                    return;
+                }
                 PayPalCheckout.renderButtons(window.paypal, container, {
                     amount: parseFloat(document.getElementById('amount').value),
                     currency: currency,
