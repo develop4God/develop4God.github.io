@@ -53,12 +53,12 @@
             margin: 0 auto;
             padding: 0.5rem 1rem;
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: minmax(0, 1fr) auto;
             grid-template-areas: "brand actions" "nav nav";
             align-items: center;
             column-gap: 0.75rem;
         }
-        .site-brand { grid-area: brand; white-space: nowrap; }
+        .site-brand { grid-area: brand; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
         /* The tabs autofit: the text scales with the screen so all three stay on one row, spread across it.
            On a phone the "New" badge shrinks to a dot (the label stays as the accessible text), which leaves room. */
         .site-header-nav { grid-area: nav; min-width: 0; font-size: clamp(0.6875rem, calc((100vw - 4rem) / 23), 0.875rem); }
