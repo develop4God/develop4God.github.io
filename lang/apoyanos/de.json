@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "Unterstütze uns" },
+  "ministry": "Christliche Andachten",
+  "hero": {
+    "title": "Unterstütze uns",
+    "lead": "Dieser Dienst ist für alle kostenlos. Deine Gabe hilft, dass es so bleibt.",
+    "chipFree": "Kostenlos",
+    "chipNoAds": "Keine Werbung",
+    "chipOffline": "Funktioniert offline",
+    "chipLanguages": "10 Sprachen",
+    "receivedLabel": "Über die App erhalten (Stand 23. Nov. 2026)",
+    "costsOf": "von 540 USD jährlichen Kosten.",
+    "cta": "Ich möchte unterstützen"
+  },
+  "more": { "aria": "Weitere Informationen" },
+  "costs": {
+    "summary": "Wofür die Kosten verwendet werden",
+    "infra": { "title": "Infrastruktur und Benachrichtigungen", "amount": "60 $ im Jahr · gedeckt", "text": "Server und der Versand der täglichen Benachrichtigungen." },
+    "content": { "title": "Neue Andachtsinhalte", "amount": "240 $ im Jahr", "text": "Jeden Monat neue Andachten erstellen, in allen 10 Sprachen." },
+    "tools": { "title": "KI-Entwicklungswerkzeuge", "amount": "240 $ im Jahr", "text": "Sie machen es möglich, die App als einzelner Entwickler zu bauen und zu pflegen." },
+    "note": "Die Balken zeigen, was bereits gedeckt ist. 90 % jeder Gabe gehen an diesen Dienst und 10 % an andere Dienste mit gesunder Lehre."
+  },
+  "about": {
+    "summary": "Wer wir sind",
+    "founders": "Evelin und Giovanni, Ehepaar und Mitgründer.",
+    "evelin": "Evelin hat die Idee zu Christliche Andachten inspiriert, mehrere Funktionen der App entworfen und getestet und den Großteil des Dienstes finanziell getragen.",
+    "giovanni": "Giovanni ist der Entwickler, der ihn jeden Tag aufbaut und Inhalte erstellt, die zu den Nationen gebracht werden sollen.",
+    "closing": "Ohne uns beide gäbe es diesen Dienst nicht. Ohne Werbung gibt es keine Einnahmen, um die Kosten zu decken: Deine Gabe hilft, nicht allein von unserer Familie abzuhängen."
+  },
+  "milestones": {
+    "summary": "Meilensteine des Dienstes",
+    "m1": { "date": "Juli 2025", "text": "Christliche Andachten erscheint bei Google Play." },
+    "m2": { "date": "Nov. 2025", "text": "Die Website wird mehrsprachig und Habitus+Faith kommt dazu." },
+    "m3": { "date": "Feb. 2026", "text": "Habitus+Faith erscheint bei Google Play und die Unterstützer-Abzeichen starten in der App." },
+    "m4": { "date": "März 2026", "text": "Begegnungen und Bibelstudien in der App." },
+    "m5": { "date": "Juli 2026", "text": "Andachten im Web, in 10 Sprachen, mit Vorlesefunktion." },
+    "m6": { "date": "Nov. 2026", "text": "Tägliche Benachrichtigungen und die App, die man ohne Store über den Browser installiert." }
+  },
+  "goals": {
+    "summary": "Nächste Ziele",
+    "ios": { "title": "Das iPhone erreichen", "price": "100 $ im Jahr", "text": "Apple-Entwicklerlizenz, um Christliche Andachten im App Store zu veröffentlichen." },
+    "mac": { "title": "Ein Mac für lokale KI und iOS-Entwicklung", "price": "3.199 $", "text": "Ein Mac mini M5 Pro mit 64 GB Speicher. Inhalte mit lokaler KI erstellen, ohne von der Cloud abhängig zu sein, und auf demselben Gerät für iOS entwickeln." }
+  },
+  "give": {
+    "eyebrow": "Geben",
+    "title": "Wähle, wie du unterstützen möchtest",
+    "frequencyAria": "Häufigkeit",
+    "once": "Einmalig",
+    "monthly": "Monatlich",
+    "yearly": "Jährlich",
+    "amountAria": "Betrag",
+    "other": "Anderer",
+    "otherLabel": "Anderer Betrag (USD)",
+    "paypalLink": "Mit PayPal geben",
+    "yappyAria": "Yappy, Panama: tippen, um die Nummer zu kopieren",
+    "yappyTap": "zum Kopieren tippen",
+    "transfer": "Lieber per Banküberweisung oder anders? {link}, dann senden wir dir die Details.",
+    "transferLink": "Schreib uns auf WhatsApp",
+    "unlock": "{lead} Das Freischalten geschieht auf der Seite Begegnungen, mit einer dort direkt getätigten Einmalgabe. {link}",
+    "unlockLead": "Begegnungen freischalten:",
+    "unlockLink": "Begegnungen freischalten"
+  },
+  "errors": {
+    "pending": "Deine Zahlung ist ausstehend. Prüfe dein PayPal-Konto, bevor du es erneut versuchst.",
+    "failed": "Die Gabe ist nicht durchgegangen. Bitte versuche es erneut.",
+    "sdkFailed": "PayPal konnte nicht geladen werden. Du kannst über den PayPal-Link unten geben.",
+    "sdkFailedRecurring": "PayPal konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "recurringUnavailable": "Monatliche und jährliche Gaben sind derzeit nicht verfügbar. Du kannst einmalig geben.",
+    "badAmount": "Gib einen Betrag ab 1 $ ein, mit höchstens zwei Dezimalstellen.",
+    "badWholeAmount": "Gib einen ganzen Betrag zwischen ${min} und ${max} ein, ohne Dezimalstellen."
+  },
+  "thanks": {
+    "title": "🎉 Danke, dass du unseren Dienst unterstützt!",
+    "once": "Wir haben deine Einmalgabe von ${amount} USD erhalten. PayPal sendet dir den Beleg per E-Mail.",
+    "monthly": "Deine monatliche Gabe von ${amount} {currency} ist jetzt aktiv. PayPal sendet dir den Beleg per E-Mail. Du kannst sie jederzeit in deinem PayPal-Konto kündigen.",
+    "yearly": "Deine jährliche Gabe von ${amount} {currency} ist jetzt aktiv. PayPal sendet dir den Beleg per E-Mail. Du kannst sie jederzeit in deinem PayPal-Konto kündigen.",
+    "reference": "Referenz: {id}",
+    "blessing": "❤️ Deine Unterstützung ermöglicht es uns, weiter mit Liebe zu dienen und zu wachsen. Gottes Segen! ✨",
+    "verse": "„Wer da kärglich sät, der wird auch kärglich ernten; und wer da sät im Segen, der wird auch ernten im Segen.“ 🙏",
+    "verseRef": "2. Korinther 9,6",
+    "again": "Amen! 🙌"
+  },
+  "yappy": {
+    "loading": "Wird geladen…",
+    "copied": "Nummer kopiert. Füge sie in der Yappy-App ein.",
+    "tapCopy": "Tippe auf Kopieren und füge sie in der Yappy-App ein:",
+    "failed": "Wir konnten die Nummer nicht laden. Schreib uns auf WhatsApp, dann geben wir sie dir.",
+    "hint": "Halte die Nummer gedrückt, um sie zu kopieren.",
+    "copy": "Kopieren",
+    "done": "Kopiert!"
+  },
+  "footer": "Develop4God · Christliche Andachten"
+}

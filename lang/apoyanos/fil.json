@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "Suportahan Kami" },
+  "ministry": "Mga Debosyonal na Kristiyano",
+  "hero": {
+    "title": "Suportahan Kami",
+    "lead": "Libre para sa lahat ang ministeryong ito. Nakatutulong ang iyong handog para manatili itong ganoon.",
+    "chipFree": "Libre",
+    "chipNoAds": "Walang ads",
+    "chipOffline": "Gumagana offline",
+    "chipLanguages": "10 wika",
+    "receivedLabel": "Natanggap sa app hanggang Nob 23, 2026",
+    "costsOf": "mula sa USD 540 na taunang gastos.",
+    "cta": "Gusto kong sumuporta"
+  },
+  "more": { "aria": "Karagdagang impormasyon" },
+  "costs": {
+    "summary": "Paano ginagamit ang mga gastos",
+    "infra": { "title": "Imprastraktura at mga notification", "amount": "$60 kada taon · sakop na", "text": "Mga server at ang pagpapadala ng mga araw-araw na notification." },
+    "content": { "title": "Bagong nilalamang debosyonal", "amount": "$240 kada taon", "text": "Paggawa ng mga bagong debosyonal bawat buwan, sa lahat ng 10 wika." },
+    "tools": { "title": "Mga AI development tool", "amount": "$240 kada taon", "text": "Ito ang nagbibigay-daan para magawa at mapanatili ang app ng nag-iisang developer." },
+    "note": "Ipinapakita ng mga bar kung ano ang sakop na. 90% ng bawat handog ay napupunta sa ministeryong ito at 10% sa iba pang ministeryo ng wastong doktrina."
+  },
+  "about": {
+    "summary": "Sino kami",
+    "founders": "Sina Evelin at Giovanni, mag-asawa at mga co-founder.",
+    "evelin": "Si Evelin ang nagbigay-inspirasyon sa ideya ng Mga Debosyonal na Kristiyano, nagdisenyo at sumubok ng ilang feature ng app, at pinansyal na umako sa karamihan ng ministeryo.",
+    "giovanni": "Si Giovanni ang developer na gumagawa nito araw-araw, lumilikha ng nilalamang dadalhin sa mga bansa.",
+    "closing": "Kung wala kaming dalawa, hindi iiral ang ministeryong ito. Kung walang ads, walang kita para sa mga gastos: nakatutulong ang iyong handog para hindi lang sa aming pamilya umasa."
+  },
+  "milestones": {
+    "summary": "Mga mahahalagang hakbang ng ministeryo",
+    "m1": { "date": "Hul 2025", "text": "Nailathala ang Mga Debosyonal na Kristiyano sa Google Play." },
+    "m2": { "date": "Nob 2025", "text": "Naging multilingual ang site at sumama ang Habitus+Faith." },
+    "m3": { "date": "Peb 2026", "text": "Nailathala ang Habitus+Faith sa Google Play, at inilunsad ang mga support badge sa app." },
+    "m4": { "date": "Mar 2026", "text": "Mga Pagtatagpo at mga pag-aaral ng Bibliya sa app." },
+    "m5": { "date": "Hul 2026", "text": "Mga debosyonal sa web, sa 10 wika, na may pagbasa nang malakas." },
+    "m6": { "date": "Nob 2026", "text": "Mga araw-araw na notification, at ang app na maiinstall mula sa browser, walang store." }
+  },
+  "goals": {
+    "summary": "Mga susunod na layunin",
+    "ios": { "title": "Maabot ang iPhone", "price": "$100 kada taon", "text": "Lisensya ng Apple developer para mailathala ang Mga Debosyonal na Kristiyano sa App Store." },
+    "mac": { "title": "Isang Mac para sa lokal na AI at iOS development", "price": "$3,199", "text": "Isang Mac mini M5 Pro na may 64 GB na memorya. Gumawa ng nilalaman gamit ang lokal na AI, nang hindi umaasa sa cloud, at mag-develop para sa iOS sa iisang makina." }
+  },
+  "give": {
+    "eyebrow": "Magbigay",
+    "title": "Piliin kung paano susuporta",
+    "frequencyAria": "Dalas",
+    "once": "Isang beses",
+    "monthly": "Buwan-buwan",
+    "yearly": "Taon-taon",
+    "amountAria": "Halaga",
+    "other": "Iba pa",
+    "otherLabel": "Ibang halaga (USD)",
+    "paypalLink": "Magbigay gamit ang PayPal",
+    "yappyAria": "Yappy, Panama: i-tap para kopyahin ang numero",
+    "yappyTap": "i-tap para kopyahin",
+    "transfer": "Mas gusto ang bank transfer o ibang paraan? {link} at ipapadala namin ang mga detalye.",
+    "transferLink": "Mag-message sa amin sa WhatsApp",
+    "unlock": "{lead} ginagawa ang pag-unlock sa pahina ng Mga Pagtatagpo, sa isang beses na handog na ibibigay mismo doon. {link}",
+    "unlockLead": "I-unlock ang Mga Pagtatagpo:",
+    "unlockLink": "I-unlock ang Mga Pagtatagpo"
+  },
+  "errors": {
+    "pending": "Nakabinbin ang iyong bayad. Tingnan ang iyong PayPal account bago sumubok ulit.",
+    "failed": "Hindi natuloy ang handog. Pakisubukan ulit.",
+    "sdkFailed": "Hindi ma-load ang PayPal. Maaari kang magbigay gamit ang PayPal link sa ibaba.",
+    "sdkFailedRecurring": "Hindi ma-load ang PayPal. Suriin ang iyong koneksyon at subukan ulit.",
+    "recurringUnavailable": "Hindi available ngayon ang buwanan at taunang handog. Maaari kang magbigay nang isang beses.",
+    "badAmount": "Maglagay ng halagang $1 o higit pa, na hanggang dalawang decimal.",
+    "badWholeAmount": "Maglagay ng buong halaga na nasa pagitan ng ${min} at ${max}, walang decimal."
+  },
+  "thanks": {
+    "title": "🎉 Salamat sa pagsuporta sa aming ministeryo!",
+    "once": "Natanggap namin ang iyong isang-beses na handog na ${amount} USD. Ipapadala ng PayPal ang resibo sa iyong email.",
+    "monthly": "Aktibo na ang iyong buwanang handog na ${amount} {currency}. Ipapadala ng PayPal ang resibo sa iyong email. Maaari mo itong kanselahin anumang oras sa iyong PayPal account.",
+    "yearly": "Aktibo na ang iyong taunang handog na ${amount} {currency}. Ipapadala ng PayPal ang resibo sa iyong email. Maaari mo itong kanselahin anumang oras sa iyong PayPal account.",
+    "reference": "Reperensya: {id}",
+    "blessing": "❤️ Dahil sa iyong suporta, patuloy kaming makapaglilingkod at lalago nang may pag-ibig. Pagpalain ka! ✨",
+    "verse": "“Ang nagtatanim ng kakaunti ay aani ng kakaunti, at ang nagtatanim naman ng marami ay aani ng marami.” 🙏",
+    "verseRef": "2 Corinto 9:6",
+    "again": "Amen! 🙌"
+  },
+  "yappy": {
+    "loading": "Naglo-load…",
+    "copied": "Nakopya na ang numero. I-paste ito sa Yappy app.",
+    "tapCopy": "I-tap ang Kopyahin at i-paste ito sa Yappy app:",
+    "failed": "Hindi namin ma-load ang numero. Mag-message sa amin sa WhatsApp at ibibigay namin ito sa iyo.",
+    "hint": "Pindutin nang matagal ang numero para kopyahin ito.",
+    "copy": "Kopyahin",
+    "done": "Nakopya!"
+  },
+  "footer": "Develop4God · Mga Debosyonal na Kristiyano"
+}

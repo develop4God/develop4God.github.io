@@ -24,11 +24,11 @@ test('pickLanguage: a saved supported language wins over the browser language', 
 });
 
 test('pickLanguage: a saved language the page does not have yet falls through to the browser language', () => {
-    assert.equal(pickLanguage({ saved: 'fr', browser: 'es-PA' }), 'es');
+    assert.equal(pickLanguage({ saved: 'ru', browser: 'es-PA' }), 'es');
 });
 
 test('pickLanguage: unsupported saved and browser languages fall back to English', () => {
-    assert.equal(pickLanguage({ saved: 'ja', browser: 'zh-CN' }), 'en');
+    assert.equal(pickLanguage({ saved: 'ru', browser: 'ko-KR' }), 'en');
 });
 
 test('pickLanguage: missing or empty inputs fall back to English instead of throwing', () => {
