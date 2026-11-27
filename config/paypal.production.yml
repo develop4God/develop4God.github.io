@@ -2,8 +2,8 @@
 # Mirror of config/paypal.sandbox.yml: both files must keep exactly the same keys, only the
 # values differ. Everything here is public (client id, plan ids); the app secret never goes in a file.
 environment: production
-# TODO before going live: the LIVE app's client id (developer dashboard, Live toggle).
-client_id: ""
+# The LIVE app's public client id: the same one the Encounters unlock uses (devotional-pwa-config.js).
+client_id: BAAzCtTUx9vcxROgeYlg1X3mkeTCAAWEyqv-_YAOoS8TROsuJTgJA40nvHpM_LP1q1vtHMMe3rDt53OPBY
 currency: USD
 
 # Same model as sandbox: the donor's amount IS the quantity of a 1 USD plan.
@@ -12,10 +12,7 @@ minimum_amount: 5
 maximum_amount: 10000
 preset_amounts: [5, 10, 25]
 
-# TODO before going live: product and plans created in the LIVE account. The product already
-# exists as a draft ("Apoyo a Devocionales Cristianos") but its id is not recorded yet, and the two
-# plans (monthly, yearly, 1 USD per unit, quantity pricing) are not created.
-product_id: ""
+product_id: PROD-5T14057146050063K
 plans:
-  monthly: ""
-  yearly: ""
+  monthly: P-6BX19202K97150722NME3QGA
+  yearly: P-2SH46376V52801545NME3QWY
