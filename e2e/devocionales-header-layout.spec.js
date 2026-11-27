@@ -39,8 +39,8 @@ test.describe('devocionales header layout', () => {
     }
   }
 
-  // The Donate button is shown only in es/en, so the other languages are held to the same no-overflow contract
-  // on the rest of the header (the long Filipino labels may wrap; right-to-left Arabic must not widen the page).
+  // The Donate button shows in all 10 languages, so the other eight are held to the same no-overflow contract
+  // on the header (the long Filipino labels may wrap; right-to-left Arabic must not widen the page).
   for (const lang of ['fr', 'de', 'pt', 'fil', 'ja', 'hi', 'zh', 'ar']) {
     for (const width of [320, 390]) {
       test(`${lang} at ${width}px: the header does not push the page sideways`, async ({ page }) => {
@@ -66,6 +66,19 @@ test.describe('devocionales header layout', () => {
     const box = await page.locator('#install-app-btn').boundingBox();
     expect(box.width).toBeGreaterThan(100);
   });
+
+  for (const width of WIDTHS) {
+    test(`at ${width}px the actions sit side by side in one row, level with the brand`, async ({ page }) => {
+      await openHeader(page, width, 'es');
+      const rows = await page.evaluate(() => {
+        const mid = (selector) => { const r = document.querySelector(selector).getBoundingClientRect(); return r.top + r.height / 2; };
+        return ['.site-brand', '#support-ministry-btn', '#install-app-btn', '#language-selector', '.theme-switch'].map(mid);
+      });
+      const [brand, ...actions] = rows;
+      for (const centre of actions) expect(Math.abs(centre - brand), 'every action is level with the brand').toBeLessThan(40);
+      expect(Math.max(...actions) - Math.min(...actions), 'the actions share one row').toBeLessThan(40);
+    });
+  }
 
   test('the language list opens fully on screen from the icon-only phone selector', async ({ page }) => {
     await openHeader(page, 390, 'es');
