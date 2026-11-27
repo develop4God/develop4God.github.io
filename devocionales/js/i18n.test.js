@@ -42,11 +42,12 @@ function loadI18nSandbox() {
 // (captured when the class body was evaluated in that vm context), not
 // Node's global `document` — so container lookups must be stubbed on
 // the sandbox's document, not on `global.document`.
-function makeInstance(translations, containers) {
+function makeInstance(translations, containers, elements = []) {
     const sandbox = loadI18nSandbox();
     const instance = new sandbox.__I18nClass();
     instance.translations = translations;
     sandbox.document.getElementById = (id) => containers[id] || null;
+    sandbox.document.querySelectorAll = () => elements;
     return instance;
 }
 
@@ -129,4 +130,28 @@ test('renderLegalPrivacy: shows an error message when translations.legal.privacy
     instance.renderLegalPrivacy();
 
     assert.match(container.innerHTML, /\[Error\]/);
+});
+
+function makeLabel(key, text) {
+    return { tagName: 'SPAN', innerHTML: text, getAttribute: (name) => (name === 'data-i18n' ? key : null) };
+}
+
+test('translatePage: writes the translation into an element whose key exists', () => {
+    const label = makeLabel('shell.tab_studies', 'Studies');
+    makeInstance({ shell: { tab_studies: 'Estudios' } }, {}, [label]).translatePage();
+    assert.equal(label.innerHTML, 'Estudios');
+});
+
+test('translatePage: leaves the existing text when the key has no translation (an older cached language file), never the raw key', () => {
+    const label = makeLabel('shell.tab_studies', 'Studies');
+    makeInstance({ shell: { studies: 'Estudios Bíblicos' } }, {}, [label]).translatePage();
+    assert.equal(label.innerHTML, 'Studies');
+});
+
+test('translatePage: a missing key does not stop the other elements from being translated', () => {
+    const missing = makeLabel('shell.tab_studies', 'Studies');
+    const present = makeLabel('shell.home', 'Home');
+    makeInstance({ shell: { home: 'Inicio' } }, {}, [missing, present]).translatePage();
+    assert.equal(missing.innerHTML, 'Studies');
+    assert.equal(present.innerHTML, 'Inicio');
 });

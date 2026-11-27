@@ -29,6 +29,7 @@
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",
     "DevotionalUpdateCheck": "readonly",
+    "DevotionalUpdateBanner": "readonly",
     "DevotionalBuild": "readonly",
     "DiscoveryData": "readonly",
     "DiscoveryStore": "readonly",

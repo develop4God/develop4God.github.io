@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "Navegación de la app",
+    "tab_home": "Inicio",
+    "tab_studies": "Estudios",
+    "tab_encounters": "Encuentros",
+    "tab_settings": "Ajustes",
     "home": "Inicio",
     "studies": "Estudios Bíblicos",
     "settings": "Ajustes",
@@ -251,7 +255,9 @@
     "app_version": "Versión de la app",
     "encounters": "Encuentros",
     "new_badge": "Nuevo",
-    "updating": "Actualizando…"
+    "updating": "Actualizando…",
+    "updateAvailable": "Hay una nueva versión disponible",
+    "updateAction": "Actualizar"
   },
   "discovery": {
     "title": "Estudios Bíblicos",

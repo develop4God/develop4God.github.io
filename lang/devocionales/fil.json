@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "Nabigasyon ng app",
+    "tab_home": "Home",
+    "tab_studies": "Pag-aaral",
+    "tab_encounters": "Pagtatagpo",
+    "tab_settings": "Setting",
     "home": "Home",
     "studies": "Mga Pag-aaral sa Biblia",
     "settings": "Mga Setting",
@@ -251,7 +255,9 @@
     "app_version": "Bersyon ng app",
     "encounters": "Mga Pagtatagpo",
     "new_badge": "Bago",
-    "updating": "Ina-update…"
+    "updating": "Ina-update…",
+    "updateAvailable": "May bagong bersyon na available",
+    "updateAction": "I-update"
   },
   "discovery": {
     "title": "Mga Pag-aaral sa Biblia",

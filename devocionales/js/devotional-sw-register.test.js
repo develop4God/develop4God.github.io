@@ -132,6 +132,37 @@ test('start: waits for the load event so the worker never competes with first pa
     assert.equal(nav.calls.length, 1);
 });
 
+test('start: hands the registration to the update banner when it is loaded, and works without it', async () => {
+    const watched = [];
+    const nav = fakeNavigator();
+    const win = { navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {}, DevotionalUpdateBanner: { watch: (...args) => watched.push(args) } };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/');
+    await settle();
+    assert.equal(watched.length, 1);
+    assert.equal(watched[0][0], win);
+    assert.equal(typeof watched[0][2].isOpen, 'function', 'the banner is given the entry window, so it does not flash during the entry flow');
+
+    const bare = { navigator: fakeNavigator(), document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {} };
+    bare.document.readyState = 'complete';
+    start(bare, '/devocionales/sw.js', '/devocionales/');
+    await settle();
+});
+
+test('start: a failing banner never breaks registration or the update check', async () => {
+    let checked = 0;
+    const nav = fakeNavigator();
+    const win = {
+        navigator: nav, document: fakeDocument('visible'), location: { reload() {} }, addEventListener() {},
+        DevotionalUpdateBanner: { watch() { throw new Error('boom'); } },
+        DevotionalUpdateCheck: { checkForNewBuild: () => { checked += 1; return Promise.resolve(); } },
+    };
+    win.document.readyState = 'complete';
+    start(win, '/devocionales/sw.js', '/devocionales/');
+    await settle();
+    assert.equal(checked, 1);
+});
+
 // ------------------------------------------------------------------ master switch (kill switch)
 
 function disableWindow({ registrations = [], cacheNames = [], manifest = { removed: false, remove() { this.removed = true; } } } = {}) {

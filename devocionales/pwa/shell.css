@@ -38,10 +38,12 @@
 
 a.shell-tab { text-decoration: none; }
 
+/* A wrapping label in the rail must not squeeze the icon (the Encounters pin shrank to a dot). */
 .shell-tab-icon,
 .shell-tab svg {
     inline-size: 1.25rem;
     block-size: 1.25rem;
+    flex-shrink: 0;
 }
 
 .shell-tab[aria-current="page"] { color: var(--accent); }
@@ -58,10 +60,26 @@ a.shell-tab { text-decoration: none; }
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Four equal columns whatever the labels say: a flex item's default min-width is its content, so a long label
+   would otherwise widen its own tab and squeeze the others. */
 .shell-active[data-shell-layout="bar"] .shell-tab {
-    flex: 1;
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
     flex-direction: column;
+    padding-inline: 0.25rem;
     min-height: 3.5rem;
+}
+
+/* A tab label is one line, centred under its icon. It is short by contract (the shell.tab_* translations); if a
+   translation is still too long for its tab it ends in an ellipsis rather than wrapping or touching its
+   neighbour, so the bar keeps one shape in every language. */
+.shell-active[data-shell-layout="bar"] .shell-tab > span:not(.nav-new-badge) {
+    max-inline-size: 100%;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .shell-active[data-shell-layout="bar"] body { padding-bottom: calc(3.5rem + env(safe-area-inset-bottom)); }
@@ -370,4 +388,59 @@ a.shell-tab { text-decoration: none; }
     line-height: 1.5;
     vertical-align: middle;
     white-space: nowrap;
+}
+
+/* The "New" bubble sits on the icon's corner instead of being a third item in the column, which pushed
+   the icon and label of that tab off-centre against the other tabs. */
+.shell-active[data-shell-layout="bar"] .shell-tab .nav-new-badge {
+    position: absolute;
+    inset-block-start: 0.35rem;
+    inset-inline-start: calc(50% + 0.25rem);
+    margin: 0;
+}
+
+/* "A new version is available" (devotional-update-banner.js): a card at the bottom of the screen, above the
+   bottom bar when the installed app has one. It sits over the toast (z-index 50) because the reader asked for it. */
+.update-banner {
+    position: fixed;
+    inset-inline: 1rem;
+    inset-block-end: calc(1rem + env(safe-area-inset-bottom));
+    margin-inline: auto;
+    max-inline-size: 28rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 0.875rem;
+    z-index: 60;
+}
+
+.shell-active[data-shell-layout="bar"] .update-banner { inset-block-end: calc(3.5rem + env(safe-area-inset-bottom) + 0.5rem); }
+
+/* Beside the rail (tablet, desktop) the banner is centred in the space the rail leaves, not over it. */
+.shell-active[data-shell-layout="rail"] .update-banner { inset-inline-start: calc(12rem + var(--shell-rail-inset) + 1rem); }
+
+.update-banner button {
+    min-block-size: 2.75rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.update-banner button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.update-banner button:focus-visible {
+    outline: 2px solid var(--bg);
+    outline-offset: 2px;
 }

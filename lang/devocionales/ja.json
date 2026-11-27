@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "アプリのナビゲーション",
+    "tab_home": "ホーム",
+    "tab_studies": "聖書研究",
+    "tab_encounters": "出会い",
+    "tab_settings": "設定",
     "home": "ホーム",
     "studies": "聖書研究",
     "settings": "設定",
@@ -251,7 +255,9 @@
     "app_version": "アプリのバージョン",
     "encounters": "出会い",
     "new_badge": "新着",
-    "updating": "更新中…"
+    "updating": "更新中…",
+    "updateAvailable": "新しいバージョンがあります",
+    "updateAction": "更新"
   },
   "discovery": {
     "title": "聖書研究",

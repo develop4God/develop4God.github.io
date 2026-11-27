@@ -242,6 +242,10 @@
   },
   "shell": {
     "nav_label": "App-Navigation",
+    "tab_home": "Start",
+    "tab_studies": "Studien",
+    "tab_encounters": "Begegnung",
+    "tab_settings": "Optionen",
     "home": "Start",
     "studies": "Bibelstudien",
     "settings": "Einstellungen",
@@ -251,7 +255,9 @@
     "app_version": "App-Version",
     "encounters": "Begegnungen",
     "new_badge": "Neu",
-    "updating": "Wird aktualisiert…"
+    "updating": "Wird aktualisiert…",
+    "updateAvailable": "Eine neue Version ist verfügbar",
+    "updateAction": "Aktualisieren"
   },
   "discovery": {
     "title": "Bibelstudien",
