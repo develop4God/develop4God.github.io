@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "Apoie-nos" },
+  "ministry": "Devocionais Cristãos",
+  "hero": {
+    "title": "Apoie-nos",
+    "lead": "Este ministério é gratuito para todos. A sua oferta ajuda a mantê-lo assim.",
+    "chipFree": "Gratuito",
+    "chipNoAds": "Sem anúncios",
+    "chipOffline": "Funciona offline",
+    "chipLanguages": "10 idiomas",
+    "receivedLabel": "Recebido pelo app até 23 de nov. de 2026",
+    "costsOf": "de USD 540 em custos anuais.",
+    "cta": "Quero apoiar"
+  },
+  "more": { "aria": "Mais informações" },
+  "costs": {
+    "summary": "Como os custos são usados",
+    "infra": { "title": "Infraestrutura e notificações", "amount": "$60 por ano · coberto", "text": "Servidores e envio das notificações diárias." },
+    "content": { "title": "Novo conteúdo devocional", "amount": "$240 por ano", "text": "Gerar novos devocionais todos os meses, nos 10 idiomas." },
+    "tools": { "title": "Ferramentas de desenvolvimento com IA", "amount": "$240 por ano", "text": "O que torna possível construir e manter o app como um único desenvolvedor." },
+    "note": "As barras mostram o que já está coberto. 90% de cada oferta vai para este ministério e 10% para outros ministérios de sã doutrina."
+  },
+  "about": {
+    "summary": "Quem somos",
+    "founders": "Evelin e Giovanni, marido e mulher e cofundadores.",
+    "evelin": "Evelin inspirou a ideia dos Devocionais Cristãos, desenhou e testou vários recursos do app e sustentou financeiramente a maior parte do ministério.",
+    "giovanni": "Giovanni é o desenvolvedor que o constrói todos os dias, criando conteúdo para ser levado às nações.",
+    "closing": "Sem nós dois, este ministério não existiria. Sem anúncios não há receita para cobrir os custos: a sua oferta ajuda a não depender apenas da nossa família."
+  },
+  "milestones": {
+    "summary": "Marcos do ministério",
+    "m1": { "date": "Jul 2025", "text": "Os Devocionais Cristãos são publicados no Google Play." },
+    "m2": { "date": "Nov 2025", "text": "O site se torna multilíngue e o Habitus+Faith se junta." },
+    "m3": { "date": "Fev 2026", "text": "O Habitus+Faith é publicado no Google Play e os selos de apoio chegam ao app." },
+    "m4": { "date": "Mar 2026", "text": "Encontros e estudos bíblicos no app." },
+    "m5": { "date": "Jul 2026", "text": "Devocionais na web, em 10 idiomas, com leitura em voz alta." },
+    "m6": { "date": "Nov 2026", "text": "Notificações diárias e o app que se instala pelo navegador, sem loja." }
+  },
+  "goals": {
+    "summary": "Próximas metas",
+    "ios": { "title": "Chegar ao iPhone", "price": "$100 por ano", "text": "Licença de desenvolvedor Apple para publicar os Devocionais Cristãos na App Store." },
+    "mac": { "title": "Um Mac para IA local e desenvolvimento iOS", "price": "$3.199", "text": "Um Mac mini M5 Pro com 64 GB de memória. Gerar conteúdo com IA local, sem depender da nuvem, e desenvolver para iOS na mesma máquina." }
+  },
+  "give": {
+    "eyebrow": "Ofertar",
+    "title": "Escolha como apoiar",
+    "frequencyAria": "Frequência",
+    "once": "Uma vez",
+    "monthly": "Mensal",
+    "yearly": "Anual",
+    "amountAria": "Valor",
+    "other": "Outro",
+    "otherLabel": "Outro valor (USD)",
+    "paypalLink": "Ofertar com PayPal",
+    "yappyAria": "Yappy, Panamá: toque para copiar o número",
+    "yappyTap": "toque para copiar",
+    "transfer": "Prefere transferência bancária ou outra forma? {link} e enviaremos os dados.",
+    "transferLink": "Escreva-nos no WhatsApp",
+    "unlock": "{lead} o desbloqueio é feito na página de Encontros, com uma oferta única feita ali mesmo. {link}",
+    "unlockLead": "Desbloquear Encontros:",
+    "unlockLink": "Desbloquear Encontros"
+  },
+  "errors": {
+    "pending": "O seu pagamento está pendente. Verifique a sua conta PayPal antes de tentar novamente.",
+    "failed": "A oferta não foi concluída. Tente novamente.",
+    "sdkFailed": "Não foi possível carregar o PayPal. Você pode ofertar pelo link do PayPal abaixo.",
+    "sdkFailedRecurring": "Não foi possível carregar o PayPal. Verifique a sua conexão e tente novamente.",
+    "recurringUnavailable": "As ofertas mensais e anuais não estão disponíveis agora. Você pode ofertar uma vez.",
+    "badAmount": "Digite um valor de $1 ou mais, com até duas casas decimais.",
+    "badWholeAmount": "Digite um valor inteiro entre ${min} e ${max}, sem decimais."
+  },
+  "thanks": {
+    "title": "🎉 Obrigado por apoiar o nosso ministério!",
+    "once": "Recebemos a sua oferta única de ${amount} USD. O PayPal enviará o recibo por e-mail.",
+    "monthly": "A sua oferta mensal de ${amount} {currency} está ativa. O PayPal enviará o recibo por e-mail. Você pode cancelá-la a qualquer momento na sua conta PayPal.",
+    "yearly": "A sua oferta anual de ${amount} {currency} está ativa. O PayPal enviará o recibo por e-mail. Você pode cancelá-la a qualquer momento na sua conta PayPal.",
+    "reference": "Referência: {id}",
+    "blessing": "❤️ O seu apoio nos permite continuar servindo e crescendo com amor. Bênçãos! ✨",
+    "verse": "“O que semeia pouco, pouco também ceifará; e o que semeia em abundância, em abundância também ceifará.” 🙏",
+    "verseRef": "2 Coríntios 9:6",
+    "again": "Amém! 🙌"
+  },
+  "yappy": {
+    "loading": "Carregando…",
+    "copied": "Número copiado. Cole-o no app Yappy.",
+    "tapCopy": "Toque em Copiar e cole no app Yappy:",
+    "failed": "Não conseguimos carregar o número. Escreva-nos no WhatsApp e nós o enviaremos.",
+    "hint": "Mantenha o número pressionado para copiá-lo.",
+    "copy": "Copiar",
+    "done": "Copiado!"
+  },
+  "footer": "Develop4God · Devocionais Cristãos"
+}

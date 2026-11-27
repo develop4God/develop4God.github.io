@@ -1,10 +1,21 @@
 const { test, expect } = require('/tmp/pw-tools/node_modules/@playwright/test');
 
-// Donate / support options are hidden for now (class "hidden" in the markup).
-// Remove this spec when they are re-enabled.
-test.describe('donate / support options are hidden', () => {
-  test('devocionales header donate button is not visible', async ({ page }) => {
-    await page.goto('/devocionales/?lang=en', { waitUntil: 'networkidle' });
+// The habitus donate section is still hidden. The devocionales header Donate button is shown only in the
+// languages the Apóyanos page is translated into (es, en) and leads there.
+test.describe('donate / support options', () => {
+  for (const lang of ['es', 'en']) {
+    test(`devocionales header donate button in ${lang} opens the Apóyanos page`, async ({ page }) => {
+      await page.goto(`/devocionales/?lang=${lang}`, { waitUntil: 'networkidle' });
+      const button = page.locator('#support-ministry-btn');
+      await expect(button).toBeVisible();
+      await expect(button).toHaveAttribute('href', '/apoyanos/');
+      await button.click();
+      await expect(page).toHaveURL(/\/apoyanos\/$/);
+    });
+  }
+
+  test('devocionales header donate button stays hidden in a language without an Apóyanos translation', async ({ page }) => {
+    await page.goto('/devocionales/?lang=fr', { waitUntil: 'networkidle' });
     await expect(page.locator('#support-ministry-btn')).toBeHidden();
   });
 

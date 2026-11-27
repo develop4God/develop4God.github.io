@@ -27,6 +27,7 @@
     "DevotionalSalvationModal": "readonly",
     "DevotionalInstall": "readonly",
     "DevotionalIosHint": "readonly",
+    "DevotionalSupportLink": "readonly",
     "DevotionalPwaConfig": "readonly",
     "DevotionalSwRegister": "readonly",
     "DevotionalUpdateCheck": "readonly",

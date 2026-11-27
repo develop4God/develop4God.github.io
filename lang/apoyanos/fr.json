@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "Soutenez-nous" },
+  "ministry": "Méditations Chrétiennes",
+  "hero": {
+    "title": "Soutenez-nous",
+    "lead": "Ce ministère est gratuit pour tous. Votre don aide à ce qu'il le reste.",
+    "chipFree": "Gratuit",
+    "chipNoAds": "Sans publicité",
+    "chipOffline": "Fonctionne hors ligne",
+    "chipLanguages": "10 langues",
+    "receivedLabel": "Reçu via l'application au 23 nov. 2026",
+    "costsOf": "sur 540 USD de coûts annuels.",
+    "cta": "Je veux soutenir"
+  },
+  "more": { "aria": "Plus d'informations" },
+  "costs": {
+    "summary": "Comment les coûts sont utilisés",
+    "infra": { "title": "Infrastructure et notifications", "amount": "60 $ par an · couvert", "text": "Les serveurs et l'envoi des notifications quotidiennes." },
+    "content": { "title": "Nouveau contenu de méditations", "amount": "240 $ par an", "text": "Générer de nouvelles méditations chaque mois, dans les 10 langues." },
+    "tools": { "title": "Outils de développement IA", "amount": "240 $ par an", "text": "Ce qui permet de créer et de maintenir l'application en étant seul développeur." },
+    "note": "Les barres montrent ce qui est déjà couvert. 90 % de chaque don va à ce ministère et 10 % à d'autres ministères de saine doctrine."
+  },
+  "about": {
+    "summary": "Qui nous sommes",
+    "founders": "Evelin et Giovanni, mari et femme et cofondateurs.",
+    "evelin": "Evelin a inspiré l'idée de Méditations Chrétiennes, a conçu et testé plusieurs fonctionnalités de l'application et a porté financièrement la plus grande partie du ministère.",
+    "giovanni": "Giovanni est le développeur qui le construit chaque jour, en créant du contenu à porter aux nations.",
+    "closing": "Sans nous deux, ce ministère n'existerait pas. Sans publicité, il n'y a pas de revenus pour couvrir les coûts : votre don aide à ne pas dépendre de notre seule famille."
+  },
+  "milestones": {
+    "summary": "Étapes du ministère",
+    "m1": { "date": "Juil. 2025", "text": "Méditations Chrétiennes est publiée sur Google Play." },
+    "m2": { "date": "Nov. 2025", "text": "Le site devient multilingue et Habitus+Faith nous rejoint." },
+    "m3": { "date": "Fév. 2026", "text": "Habitus+Faith est publiée sur Google Play et les badges de soutien arrivent dans l'application." },
+    "m4": { "date": "Mars 2026", "text": "Rencontres et études bibliques dans l'application." },
+    "m5": { "date": "Juil. 2026", "text": "Méditations sur le web, en 10 langues, avec lecture à voix haute." },
+    "m6": { "date": "Nov. 2026", "text": "Notifications quotidiennes, et l'application installable depuis le navigateur, sans boutique." }
+  },
+  "goals": {
+    "summary": "Prochains objectifs",
+    "ios": { "title": "Arriver sur iPhone", "price": "100 $ par an", "text": "Licence de développeur Apple pour publier Méditations Chrétiennes sur l'App Store." },
+    "mac": { "title": "Un Mac pour l'IA locale et le développement iOS", "price": "3 199 $", "text": "Un Mac mini M5 Pro avec 64 Go de mémoire. Générer du contenu avec une IA locale, sans dépendre du cloud, et développer pour iOS sur la même machine." }
+  },
+  "give": {
+    "eyebrow": "Donner",
+    "title": "Choisissez comment soutenir",
+    "frequencyAria": "Fréquence",
+    "once": "Une fois",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "amountAria": "Montant",
+    "other": "Autre",
+    "otherLabel": "Autre montant (USD)",
+    "paypalLink": "Donner avec PayPal",
+    "yappyAria": "Yappy, Panama : touchez pour copier le numéro",
+    "yappyTap": "touchez pour copier",
+    "transfer": "Vous préférez un virement bancaire ou un autre moyen ? {link} et nous vous enverrons les détails.",
+    "transferLink": "Écrivez-nous sur WhatsApp",
+    "unlock": "{lead} le déverrouillage se fait depuis la page Rencontres, avec un don unique fait directement là. {link}",
+    "unlockLead": "Déverrouiller Rencontres :",
+    "unlockLink": "Déverrouiller Rencontres"
+  },
+  "errors": {
+    "pending": "Votre paiement est en attente. Vérifiez votre compte PayPal avant de réessayer.",
+    "failed": "Le don n'a pas abouti. Veuillez réessayer.",
+    "sdkFailed": "PayPal n'a pas pu être chargé. Vous pouvez donner avec le lien PayPal ci-dessous.",
+    "sdkFailedRecurring": "PayPal n'a pas pu être chargé. Vérifiez votre connexion et réessayez.",
+    "recurringUnavailable": "Les dons mensuels et annuels ne sont pas disponibles pour le moment. Vous pouvez donner une fois.",
+    "badAmount": "Saisissez un montant de 1 $ ou plus, avec au plus deux décimales.",
+    "badWholeAmount": "Saisissez un montant entier entre ${min} et ${max}, sans décimales."
+  },
+  "thanks": {
+    "title": "🎉 Merci de soutenir notre ministère !",
+    "once": "Nous avons reçu votre don unique de ${amount} USD. PayPal vous enverra le reçu par e-mail.",
+    "monthly": "Votre don mensuel de ${amount} {currency} est maintenant actif. PayPal vous enverra le reçu par e-mail. Vous pouvez l'annuler à tout moment depuis votre compte PayPal.",
+    "yearly": "Votre don annuel de ${amount} {currency} est maintenant actif. PayPal vous enverra le reçu par e-mail. Vous pouvez l'annuler à tout moment depuis votre compte PayPal.",
+    "reference": "Référence : {id}",
+    "blessing": "❤️ Votre soutien nous permet de continuer à servir et à grandir avec amour. Que Dieu vous bénisse ! ✨",
+    "verse": "« Celui qui sème peu moissonnera peu, et celui qui sème abondamment moissonnera abondamment. » 🙏",
+    "verseRef": "2 Corinthiens 9:6",
+    "again": "Amen ! 🙌"
+  },
+  "yappy": {
+    "loading": "Chargement…",
+    "copied": "Numéro copié. Collez-le dans l'application Yappy.",
+    "tapCopy": "Touchez Copier et collez-le dans l'application Yappy :",
+    "failed": "Nous n'avons pas pu charger le numéro. Écrivez-nous sur WhatsApp et nous vous le donnerons.",
+    "hint": "Appuyez longuement sur le numéro pour le copier.",
+    "copy": "Copier",
+    "done": "Copié !"
+  },
+  "footer": "Develop4God · Méditations Chrétiennes"
+}

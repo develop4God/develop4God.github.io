@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "支持我们" },
+  "ministry": "基督教灵修",
+  "hero": {
+    "title": "支持我们",
+    "lead": "这项事工对所有人免费。您的奉献帮助它继续保持免费。",
+    "chipFree": "免费",
+    "chipNoAds": "无广告",
+    "chipOffline": "可离线使用",
+    "chipLanguages": "10 种语言",
+    "receivedLabel": "截至 2026 年 11 月 23 日通过应用收到的奉献",
+    "costsOf": "，全年费用共 540 美元。",
+    "cta": "我想支持"
+  },
+  "more": { "aria": "更多信息" },
+  "costs": {
+    "summary": "费用的用途",
+    "infra": { "title": "基础设施与通知", "amount": "每年 $60 · 已覆盖", "text": "服务器以及每日通知的发送。" },
+    "content": { "title": "新的灵修内容", "amount": "每年 $240", "text": "每月以全部 10 种语言生成新的灵修内容。" },
+    "tools": { "title": "AI 开发工具", "amount": "每年 $240", "text": "让一位开发者能够构建并维护这款应用的工具。" },
+    "note": "进度条显示已覆盖的部分。每笔奉献的 90% 用于这项事工，10% 用于其他持守纯正教义的事工。"
+  },
+  "about": {
+    "summary": "关于我们",
+    "founders": "Evelin 和 Giovanni，是夫妻，也是共同创办人。",
+    "evelin": "Evelin 启发了“基督教灵修”的构想，设计并测试了应用的多项功能，并在经济上承担了事工的大部分开支。",
+    "giovanni": "Giovanni 是每天打造它的开发者，创作要传向万国的内容。",
+    "closing": "没有我们两人，就没有这项事工。没有广告，就没有收入来支付费用：您的奉献帮助它不再仅仅依靠我们一家。"
+  },
+  "milestones": {
+    "summary": "事工里程碑",
+    "m1": { "date": "2025 年 7 月", "text": "“基督教灵修”在 Google Play 上架。" },
+    "m2": { "date": "2025 年 11 月", "text": "网站支持多语言，Habitus+Faith 加入。" },
+    "m3": { "date": "2026 年 2 月", "text": "Habitus+Faith 在 Google Play 上架，应用中推出支持徽章。" },
+    "m4": { "date": "2026 年 3 月", "text": "应用中新增“相遇”与查经。" },
+    "m5": { "date": "2026 年 7 月", "text": "网页版灵修，支持 10 种语言和朗读。" },
+    "m6": { "date": "2026 年 11 月", "text": "每日通知，以及无需应用商店、可从浏览器安装的应用。" }
+  },
+  "goals": {
+    "summary": "下一步目标",
+    "ios": { "title": "登陆 iPhone", "price": "每年 $100", "text": "用于在 App Store 发布“基督教灵修”的 Apple 开发者许可。" },
+    "mac": { "title": "用于本地 AI 和 iOS 开发的 Mac", "price": "$3,199", "text": "一台 64 GB 内存的 Mac mini M5 Pro。用本地 AI 生成内容，不依赖云端，并在同一台机器上开发 iOS 应用。" }
+  },
+  "give": {
+    "eyebrow": "奉献",
+    "title": "选择支持方式",
+    "frequencyAria": "频率",
+    "once": "一次性",
+    "monthly": "每月",
+    "yearly": "每年",
+    "amountAria": "金额",
+    "other": "其他",
+    "otherLabel": "其他金额（美元）",
+    "paypalLink": "通过 PayPal 奉献",
+    "yappyAria": "Yappy（巴拿马）：点按复制号码",
+    "yappyTap": "点按复制",
+    "transfer": "更希望银行转账或其他方式？{link}，我们会把详情发给您。",
+    "transferLink": "通过 WhatsApp 联系我们",
+    "unlock": "{lead}解锁在“相遇”页面完成，在那里直接进行一次性奉献即可。{link}",
+    "unlockLead": "解锁“相遇”：",
+    "unlockLink": "解锁“相遇”"
+  },
+  "errors": {
+    "pending": "您的付款正在处理中。再次尝试之前，请先查看您的 PayPal 账户。",
+    "failed": "奉献未能完成，请重试。",
+    "sdkFailed": "无法加载 PayPal。您可以使用下方的 PayPal 链接奉献。",
+    "sdkFailedRecurring": "无法加载 PayPal。请检查网络连接后重试。",
+    "recurringUnavailable": "目前无法进行每月和每年奉献。您可以选择一次性奉献。",
+    "badAmount": "请输入 $1 或以上的金额，最多两位小数。",
+    "badWholeAmount": "请输入 ${min} 到 ${max} 之间的整数金额，不含小数。"
+  },
+  "thanks": {
+    "title": "🎉 感谢您支持我们的事工！",
+    "once": "我们已收到您 ${amount} 美元的一次性奉献。PayPal 会通过电子邮件发送收据。",
+    "monthly": "您每月 ${amount} {currency} 的奉献已生效。PayPal 会通过电子邮件发送收据。您可以随时在 PayPal 账户中取消。",
+    "yearly": "您每年 ${amount} {currency} 的奉献已生效。PayPal 会通过电子邮件发送收据。您可以随时在 PayPal 账户中取消。",
+    "reference": "参考编号：{id}",
+    "blessing": "❤️ 您的支持让我们能够继续以爱心服事并成长。愿主祝福您！✨",
+    "verse": "“少种的少收，多种的多收。”🙏",
+    "verseRef": "哥林多后书 9:6",
+    "again": "阿们！🙌"
+  },
+  "yappy": {
+    "loading": "加载中…",
+    "copied": "号码已复制。请粘贴到 Yappy 应用中。",
+    "tapCopy": "点按“复制”，然后粘贴到 Yappy 应用中：",
+    "failed": "无法加载号码。请通过 WhatsApp 联系我们，我们会提供给您。",
+    "hint": "长按号码即可复制。",
+    "copy": "复制",
+    "done": "已复制！"
+  },
+  "footer": "Develop4God · 基督教灵修"
+}

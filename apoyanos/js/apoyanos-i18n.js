@@ -9,7 +9,7 @@
 
   const DEFAULT_LANGUAGE = 'en';
   // Languages that have a /lang/apoyanos file; add a code here when its file ships.
-  const SUPPORTED = ['es', 'en'];
+  const SUPPORTED = ['es', 'en', 'pt', 'fr', 'de', 'ja', 'zh', 'hi', 'ar', 'fil'];
   const STORAGE_KEY = 'develop4God_language'; // shared with the other sections of the site
   const PLACEHOLDER = /\{(\w+)\}/g;
 
