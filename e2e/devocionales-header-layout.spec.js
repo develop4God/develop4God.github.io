@@ -67,6 +67,19 @@ test.describe('devocionales header layout', () => {
     expect(box.width).toBeGreaterThan(100);
   });
 
+  for (const width of WIDTHS) {
+    test(`at ${width}px the actions sit side by side in one row, level with the brand`, async ({ page }) => {
+      await openHeader(page, width, 'es');
+      const rows = await page.evaluate(() => {
+        const mid = (selector) => { const r = document.querySelector(selector).getBoundingClientRect(); return r.top + r.height / 2; };
+        return ['.site-brand', '#support-ministry-btn', '#install-app-btn', '#language-selector', '.theme-switch'].map(mid);
+      });
+      const [brand, ...actions] = rows;
+      for (const centre of actions) expect(Math.abs(centre - brand), 'every action is level with the brand').toBeLessThan(40);
+      expect(Math.max(...actions) - Math.min(...actions), 'the actions share one row').toBeLessThan(40);
+    });
+  }
+
   test('the language list opens fully on screen from the icon-only phone selector', async ({ page }) => {
     await openHeader(page, 390, 'es');
     await page.locator('.language-selector-button').click();
