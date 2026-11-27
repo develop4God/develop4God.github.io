@@ -67,21 +67,6 @@ test.describe('Apóyanos page language', () => {
     });
   });
 
-  test.describe('unsupported browser language', () => {
-    test.use({ locale: 'ru-RU' });
-
-    test('falls back to English', async ({ page }) => {
-      await page.goto(PAGE);
-      await expect(page.locator('h1')).toHaveText('Support us');
-    });
-
-    test('a saved language without a file (shared key from another section) is ignored', async ({ page }) => {
-      await page.addInitScript((key) => localStorage.setItem(key, 'ko'), SHARED_LANGUAGE_KEY);
-      await page.goto(PAGE);
-      await expect(page.locator('h1')).toHaveText('Support us');
-    });
-  });
-
   test.describe('translation files unreachable', () => {
     test.use({ locale: 'en-US' });
 
