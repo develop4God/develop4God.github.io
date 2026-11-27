@@ -6,6 +6,7 @@ const PAGE = '/apoyanos/';
 const FAKE_NUMBER = '+507 6000-0000';
 
 test.describe('Apoyanos Yappy', () => {
+  test.use({ locale: 'es-PA' }); // these specs assert the Spanish copy
   test('one tap copies the number and says so without showing it', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.route('**/api/yappy', (route) =>

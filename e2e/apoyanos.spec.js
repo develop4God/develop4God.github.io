@@ -61,6 +61,7 @@ function orderAmount(page) {
 }
 
 test.describe('Apóyanos page', () => {
+  test.use({ locale: 'es-PA' }); // these specs assert the Spanish copy; apoyanos-i18n.spec.js covers the other languages
   test('one-time is the default and renders the PayPal order buttons with the capture intent', async ({ page }) => {
     const requests = stubSdk(page);
     await openDonate(page);

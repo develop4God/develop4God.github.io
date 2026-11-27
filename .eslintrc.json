@@ -12,6 +12,7 @@
     "PayPalCheckout": "readonly",
     "ErrorReport": "readonly",
     "PayPalConfig": "readonly",
+    "ApoyanosI18n": "readonly",
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",
     "DevotionalShare": "readonly",

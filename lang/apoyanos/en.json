@@ -1,0 +1,93 @@
+{
+  "meta": { "title": "Support us" },
+  "ministry": "Christian Devotionals",
+  "hero": {
+    "title": "Support us",
+    "lead": "This ministry is free for everyone. Your gift helps keep it that way.",
+    "chipFree": "Free",
+    "chipNoAds": "No ads",
+    "chipOffline": "Works offline",
+    "chipLanguages": "10 languages",
+    "receivedLabel": "Received through the app as of Nov 23, 2026",
+    "costsOf": "of USD 540 in yearly costs.",
+    "cta": "I want to support"
+  },
+  "more": { "aria": "More information" },
+  "costs": {
+    "summary": "How the costs are used",
+    "infra": { "title": "Infrastructure and notifications", "amount": "$60 a year · covered", "text": "Servers and sending the daily notifications." },
+    "content": { "title": "New devotional content", "amount": "$240 a year", "text": "Generating new devotionals every month, in all 10 languages." },
+    "tools": { "title": "AI development tools", "amount": "$240 a year", "text": "What makes it possible to build and maintain the app as a single developer." },
+    "note": "The bars show what is already covered. 90% of every gift goes to this ministry and 10% to other ministries of sound doctrine."
+  },
+  "about": {
+    "summary": "Who we are",
+    "founders": "Evelin and Giovanni, husband and wife and co-founders.",
+    "evelin": "Evelin inspired the idea of Christian Devotionals, has designed and tested several features of the app, and has financially carried most of the ministry.",
+    "giovanni": "Giovanni is the developer who builds it every day, creating content to be taken to the nations.",
+    "closing": "Without both of us, this ministry would not exist. Without ads there is no income to cover the costs: your gift helps it not depend on our family alone."
+  },
+  "milestones": {
+    "summary": "Ministry milestones",
+    "m1": { "date": "Jul 2025", "text": "Christian Devotionals is published on Google Play." },
+    "m2": { "date": "Nov 2025", "text": "The site becomes multilingual and Habitus+Faith joins." },
+    "m3": { "date": "Feb 2026", "text": "Habitus+Faith is published on Google Play, and support badges launch in the app." },
+    "m4": { "date": "Mar 2026", "text": "Encounters and Bible studies in the app." },
+    "m5": { "date": "Jul 2026", "text": "Devotionals on the web, in 10 languages, with read-aloud." },
+    "m6": { "date": "Nov 2026", "text": "Daily notifications, and the app you can install from the browser, with no store." }
+  },
+  "goals": {
+    "summary": "Next goals",
+    "ios": { "title": "Reach iPhone", "price": "$100 a year", "text": "Apple developer license to publish Christian Devotionals on the App Store." },
+    "mac": { "title": "A Mac for local AI and iOS development", "price": "$3,199", "text": "A Mac mini M5 Pro with 64 GB of memory. Generate content with local AI, without depending on the cloud, and develop for iOS on the same machine." }
+  },
+  "give": {
+    "eyebrow": "Give",
+    "title": "Choose how to support",
+    "frequencyAria": "Frequency",
+    "once": "One time",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "amountAria": "Amount",
+    "other": "Other",
+    "otherLabel": "Other amount (USD)",
+    "paypalLink": "Give with PayPal",
+    "yappyAria": "Yappy, Panama: tap to copy the number",
+    "yappyTap": "tap to copy",
+    "transfer": "Prefer a bank transfer or another way? {link} and we will send you the details.",
+    "transferLink": "Message us on WhatsApp",
+    "unlock": "{lead} unlocking is done from the Encounters page, with a one-time gift made right there. {link}",
+    "unlockLead": "Unlock Encounters:",
+    "unlockLink": "Unlock Encounters"
+  },
+  "errors": {
+    "pending": "Your payment is pending. Check your PayPal account before trying again.",
+    "failed": "The gift did not go through. Please try again.",
+    "sdkFailed": "PayPal could not be loaded. You can give with the PayPal link below.",
+    "sdkFailedRecurring": "PayPal could not be loaded. Check your connection and try again.",
+    "recurringUnavailable": "Monthly and yearly gifts are not available right now. You can give one time.",
+    "badAmount": "Enter an amount of $1 or more, with up to two decimals.",
+    "badWholeAmount": "Enter a whole amount between ${min} and ${max}, with no decimals."
+  },
+  "thanks": {
+    "title": "🎉 Thank you for supporting our ministry!",
+    "once": "We received your one-time gift of ${amount} USD. PayPal will email you the receipt.",
+    "monthly": "Your monthly gift of ${amount} {currency} is now active. PayPal will email you the receipt. You can cancel it any time from your PayPal account.",
+    "yearly": "Your yearly gift of ${amount} {currency} is now active. PayPal will email you the receipt. You can cancel it any time from your PayPal account.",
+    "reference": "Reference: {id}",
+    "blessing": "❤️ Your support makes it possible for us to keep serving and growing with love. Blessings! ✨",
+    "verse": "“Whoever sows generously will also reap generously.” 🙏",
+    "verseRef": "2 Corinthians 9:6",
+    "again": "Amen! 🙌"
+  },
+  "yappy": {
+    "loading": "Loading…",
+    "copied": "Number copied. Paste it in the Yappy app.",
+    "tapCopy": "Tap Copy and paste it in the Yappy app:",
+    "failed": "We could not load the number. Message us on WhatsApp and we will give it to you.",
+    "hint": "Press and hold the number to copy it.",
+    "copy": "Copy",
+    "done": "Copied!"
+  },
+  "footer": "Develop4God · Christian Devotionals"
+}
