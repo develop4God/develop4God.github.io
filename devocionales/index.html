@@ -46,6 +46,60 @@
         .site-nav a:not(.btn-primary):hover { color: var(--text); }
         .site-nav a.active { color: var(--text); border-bottom-color: var(--accent); }
 
+        /* Header: two tidy rows at every width (brand + actions, then the tabs on one line that scrolls if it must).
+           Nothing wraps or clips, so the bar keeps the same shape in every language. */
+        .site-header-inner {
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            grid-template-areas: "brand actions" "nav nav";
+            align-items: center;
+            column-gap: 0.75rem;
+        }
+        .site-brand { grid-area: brand; white-space: nowrap; }
+        /* The tabs autofit: the text scales with the screen so all three stay on one row, spread across it.
+           On a phone the "New" badge shrinks to a dot (the label stays as the accessible text), which leaves room. */
+        .site-header-nav { grid-area: nav; min-width: 0; font-size: clamp(0.6875rem, calc((100vw - 4rem) / 23), 0.875rem); }
+        .site-header-nav ul { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 0.5rem; }
+        .site-header-nav li { white-space: nowrap; }
+        .site-header-nav .nav-new-badge {
+            font-size: 0; width: 0.5rem; height: 0.5rem; padding: 0; margin-inline-start: 0.25em;
+            border-radius: 50%; vertical-align: super;
+        }
+        @media (min-width: 700px) {
+            .site-header-nav { font-size: 0.875rem; }
+            .site-header-nav ul { justify-content: flex-start; gap: 1.25rem; }
+            .site-header-nav .nav-new-badge { font-size: 0.7em; width: auto; height: auto; padding-inline: 0.4em; margin-inline-start: 0; border-radius: 999px; vertical-align: baseline; }
+        }
+
+        /* Donate and Install are icon-only on a phone; the label stays readable to screen readers. */
+        .header-action { min-height: 2.5rem; min-width: 2.5rem; justify-content: center; white-space: nowrap; }
+        .header-action-label {
+            position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+        .site-header-actions .language-selector-button { min-width: 0; }
+        .site-header-actions .language-dropdown { left: auto; right: auto; inset-inline-end: 0; min-width: 12rem; }
+        .site-header-actions .language-current .font-medium { display: none; }
+        .site-header-actions .theme-switch-icon { display: none; }
+
+        @media (max-width: 359px) {
+            .site-header-inner .site-brand { font-size: 0.9rem; }
+            .site-header-inner { column-gap: 0.25rem; padding-inline: 0.75rem; }
+            .site-header-actions { gap: 0.25rem; }
+            .site-header-actions .header-action { min-width: 2.25rem; padding-inline: 0.5rem; }
+            .site-header-actions .language-selector-button { padding-inline: 0.5rem; }
+        }
+
+        @media (min-width: 700px) {
+            .header-action-label { position: static; width: auto; height: auto; margin: 0; clip: auto; overflow: visible; }
+            .site-header-actions .language-current .font-medium { display: inline; }
+            .site-header-actions .language-selector-button { min-width: 8rem; }
+            .site-header-actions .theme-switch-icon { display: block; }
+        }
+
         .eyebrow { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
 
         /* A light band sweeps across the install button 5 times, to draw the eye to it, then stops. */
@@ -300,28 +354,28 @@
 <body>
 
     <header class="site-nav">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-3">
-            <a href="/" class="font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
-            <nav aria-label="Navegación principal">
-                <ul class="flex flex-wrap justify-center items-center gap-6 text-sm">
+        <div class="site-header-inner">
+            <a href="/" class="site-brand font-bold text-lg tracking-tight" style="color: var(--text);">Develop4God</a>
+            <nav class="site-header-nav" aria-label="Navegación principal">
+                <ul>
                     <li><a href="/devocionales/" class="active" id="nav-devotional-label">Devocional de Hoy</a></li>
                     <!-- Browser tab only: the installed app has the Studies tab in its bottom bar (shell.css hides this one). -->
                     <li id="nav-studies-item"><a href="/devocionales/estudios/" id="nav-studies-label"><span data-i18n="shell.studies">Estudios Bíblicos</span><span class="nav-new-badge" data-i18n="shell.new_badge">New</span></a></li>
                     <li id="nav-encounters-item"><a href="/devocionales/encounters/" id="nav-encounters-label"><span data-i18n="shell.encounters">Encuentros</span><span class="nav-new-badge" data-i18n="shell.new_badge">New</span></a></li>
                 </ul>
             </nav>
-            <div class="flex flex-wrap items-center justify-center gap-3 md:flex-nowrap md:justify-normal">
-                <!-- Hidden for now ("hidden" replaces "flex"): restore "flex" to re-enable. -->
+            <div class="site-header-actions">
+                <!-- Starts hidden: devotional-support-link.js shows it in the languages /apoyanos/ is translated into. -->
                 <!-- [html-validate-disable-next wcag/h30] -->
                 <!-- text set by devotional-loader.js's applyStaticUiText() after page load -->
-                <a href="https://www.paypal.com/paypalme/develop4godOfficial" target="_blank" rel="noopener" id="support-ministry-btn" class="btn-primary px-5 py-2 hidden items-center gap-2">
+                <a href="/apoyanos/" id="support-ministry-btn" class="btn-primary header-action px-3 py-2 hidden items-center gap-2">
                     <i data-lucide="heart" class="w-4 h-4 support-btn-icon" fill="currentColor"></i>
-                    <span id="support-ministry-label"></span>
+                    <span id="support-ministry-label" class="header-action-label"></span>
                 </a>
                 <!-- Shown by devotional-install.js only when the browser offers to install the app. -->
-                <button type="button" id="install-app-btn" data-install class="btn-primary btn-shine px-4 py-2 hidden items-center gap-2">
+                <button type="button" id="install-app-btn" data-install class="btn-primary btn-shine header-action px-3 py-2 hidden items-center gap-2">
                     <i data-lucide="download" class="w-4 h-4"></i>
-                    <span data-i18n="devotionals.installApp">Install app</span>
+                    <span class="header-action-label" data-i18n="devotionals.installApp">Install app</span>
                 </button>
                 <div id="language-selector"></div>
                 <!-- label wraps its own input; for attribute kept for clarity -->
@@ -620,6 +674,7 @@
     <script src="/devocionales/js/devotional-progress.js"></script>
     <script src="/devocionales/js/devotional-version.js"></script>
     <script src="/devocionales/js/devotional-tts.js"></script>
+    <script src="/devocionales/js/devotional-support-link.js"></script>
     <script src="/devocionales/js/devotional-render-dom.js"></script>
     <script src="/devocionales/js/devotional-salvation-modal.js"></script>
     <script src="/devocionales/js/devotional-loader.js"></script>

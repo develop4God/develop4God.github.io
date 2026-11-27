@@ -156,6 +156,10 @@
         document.getElementById('nav-devotional-label').textContent = DevotionalI18n.t('devotionals.navDevotional', '');
         document.getElementById('support-ministry-label').textContent = DevotionalI18n.t('devotionals.supportMinistry', '');
         document.getElementById('support-ministry-btn').setAttribute('title', DevotionalI18n.t('devotionals.supportMinistryTitle', ''));
+        // typeof guard: a cached older page has no devotional-support-link.js tag, and its button stays hidden.
+        if (global.DevotionalSupportLink) {
+            global.DevotionalSupportLink.apply(document.getElementById('support-ministry-btn'), DevotionalI18n.currentLanguage());
+        }
         if (global.SiteFooter) {
             global.SiteFooter.renderSharedLines(document.getElementById('page-footer'), {
                 copyright: DevotionalI18n.t('footer.copyright', ''),
