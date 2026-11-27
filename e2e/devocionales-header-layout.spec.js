@@ -39,8 +39,8 @@ test.describe('devocionales header layout', () => {
     }
   }
 
-  // The Donate button is shown only in es/en, so the other languages are held to the same no-overflow contract
-  // on the rest of the header (the long Filipino labels may wrap; right-to-left Arabic must not widen the page).
+  // The Donate button shows in all 10 languages, so the other eight are held to the same no-overflow contract
+  // on the header (the long Filipino labels may wrap; right-to-left Arabic must not widen the page).
   for (const lang of ['fr', 'de', 'pt', 'fil', 'ja', 'hi', 'zh', 'ar']) {
     for (const width of [320, 390]) {
       test(`${lang} at ${width}px: the header does not push the page sideways`, async ({ page }) => {
