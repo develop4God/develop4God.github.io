@@ -2,7 +2,7 @@
 // buttons. One-time gifts render the standard PayPal buttons (yellow PayPal button plus the card
 // option); recurring gifts render the subscription button of the monthly or yearly quantity plan, with the
 // donor's amount as the quantity. The two flows need different SDK intents, so each loads on demand into
-// its own namespace. Needs the PayPalCheckout, PayPalConfig and DevotionalPwaConfig globals loaded before it.
+// its own namespace. Needs the PayPalCheckout, PayPalConfig and DevotionalPwaConfig globals (and optionally ErrorReport) loaded before it.
 (function () {
     'use strict';
 
@@ -24,6 +24,11 @@
         recurringUnavailable: 'Los aportes mensuales y anuales no están disponibles ahora. Puedes dar una sola vez.',
         badAmount: 'Escribe un monto de $1 o más, con hasta dos decimales.',
     };
+
+    // js/error-report.js; optional so the page still works if that script is blocked.
+    function report(stage, error, context) {
+        if (window.ErrorReport) { window.ErrorReport.report(stage, error, context); }
+    }
 
     var onceConfig = window.DevotionalPwaConfig && window.DevotionalPwaConfig.encountersUnlock;
     var state = { frequency: 'once', amount: 10 };
@@ -134,11 +139,12 @@
                         say(MSG.pending);
                     }
                 },
-                onError: function () { say(MSG.failed); },
+                onError: function (error) { report('capture', error, { frequency: 'once' }); say(MSG.failed); },
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
-            if (error && error.message === 'sdk') { showFallback(); return; }
+            if (error && error.message === 'sdk') { report('sdk', error, { frequency: 'once' }); showFallback(); return; }
+            report('render', error, { frequency: 'once' });
             console.error('Apoyanos: the one-time buttons failed to render', error);
             onceLink.hidden = false;
             say(MSG.failed);
@@ -169,11 +175,12 @@
                     showThanks('Tu aporte ' + FREQUENCY_WORD[frequency] + ' de $' + (quantity * recurring.unitPrice) + ' ' + recurring.currency + ' quedó activo. ' + MSG.receipt
                         + ' Puedes cancelarlo cuando quieras desde tu cuenta de PayPal.', subscriptionId);
                 },
-                onError: function () { say(MSG.failed); },
+                onError: function (error) { report('subscribe', error, { frequency: frequency, quantity: quantity }); say(MSG.failed); },
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
-            if (error && error.message === 'sdk') { say(MSG.sdkFailedRecurring); return; }
+            if (error && error.message === 'sdk') { report('sdk', error, { frequency: frequency, quantity: quantity }); say(MSG.sdkFailedRecurring); return; }
+            report('render', error, { frequency: frequency, quantity: quantity });
             console.error('Apoyanos: the subscribe button failed to render', error);
             say(MSG.failed);
         });

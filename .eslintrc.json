@@ -10,6 +10,7 @@
   "globals": {
     "DevotionalI18n": "readonly",
     "PayPalCheckout": "readonly",
+    "ErrorReport": "readonly",
     "PayPalConfig": "readonly",
     "BibleTextFormatter": "readonly",
     "HindiTtsNormalizer": "readonly",

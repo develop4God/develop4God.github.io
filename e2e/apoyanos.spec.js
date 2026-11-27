@@ -123,6 +123,37 @@ test.describe('Apóyanos page', () => {
     await expect(page.locator('#sdk-status')).toContainText('No se pudo cargar PayPal');
   });
 
+  // The error reports the page sends to /api/client-error, answered with 204 so nothing leaves the machine.
+  function captureErrorReports(page) {
+    const reports = [];
+    page.route('**/api/client-error', (route) => {
+      reports.push(JSON.parse(route.request().postData()));
+      return route.fulfill({ status: 204 });
+    });
+    return reports;
+  }
+
+  test('reports a PayPal load failure to the error endpoint', async ({ page }) => {
+    const reports = captureErrorReports(page);
+    await page.route(SDK_PATTERN, (route) => route.abort());
+    await openDonate(page);
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toMatchObject({ stage: 'sdk', frequency: 'once' });
+  });
+
+  test('reports a failed subscription with its frequency and quantity', async ({ page }) => {
+    const reports = captureErrorReports(page);
+    stubSdk(page);
+    await openDonate(page);
+    await page.getByRole('button', { name: 'Mensual' }).click();
+    await page.getByRole('button', { name: '$25' }).click();
+    await expect.poll(() => renders(page, 'subscription')).toBeGreaterThan(0);
+    await page.evaluate(() => window.__lastSubscriptionOptions.onError(new Error('Window closed')));
+    await expect.poll(() => reports.length).toBe(1);
+    expect(reports[0]).toEqual({ stage: 'subscribe', frequency: 'monthly', quantity: 25, message: 'Window closed' });
+    await expect(page.locator('#sdk-status')).toContainText('no se completó');
+  });
+
   test('monthly sends the monthly plan with the chosen amount as the quantity', async ({ page }) => {
     stubSdk(page);
     await openDonate(page);
