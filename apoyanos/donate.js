@@ -14,16 +14,20 @@
     var MIN_ONCE_AMOUNT = 1;
     var DEBOUNCE_MS = 400;
 
-    var MSG = {
-        thanksTitle: '🎉 ¡Gracias por apoyar nuestro ministerio!',
-        receipt: 'PayPal te enviará el recibo por correo.',
-        pending: 'Tu pago quedó pendiente. Revisa tu cuenta de PayPal antes de intentarlo de nuevo.',
-        failed: 'El aporte no se completó. Intenta de nuevo.',
-        sdkFailed: 'No se pudo cargar PayPal. Puedes dar con el enlace de PayPal de abajo.',
-        sdkFailedRecurring: 'No se pudo cargar PayPal. Revisa tu conexión e intenta de nuevo.',
-        recurringUnavailable: 'Los aportes mensuales y anuales no están disponibles ahora. Puedes dar una sola vez.',
-        badAmount: 'Escribe un monto de $1 o más, con hasta dos decimales.',
-    };
+    // Strings come from /lang/apoyanos/{lang}.json through apoyanos-i18n.js, which the page loads before this script.
+    // A page cached from before that script existed lacks its tag, so load it here rather than fail.
+    var i18n = window.ApoyanosI18n || null;
+    function t(key, params) { return i18n ? i18n.t(key, params) : key; }
+    function loadI18n() {
+        return new Promise(function (resolve) {
+            var script = document.createElement('script');
+            script.src = '/apoyanos/js/apoyanos-i18n.js';
+            script.onload = function () { i18n = window.ApoyanosI18n; resolve(i18n.ready); };
+            script.onerror = function () { resolve(); };
+            document.head.appendChild(script);
+        });
+    }
+    var i18nReady = i18n ? i18n.ready : loadI18n();
 
     // js/error-report.js; optional so the page still works if that script is blocked.
     function report(stage, error, context) {
@@ -45,7 +49,6 @@
     var plansBox = document.getElementById('plans');
     var controls = document.getElementById('give-controls');
     var thanks = document.getElementById('thanks');
-    var FREQUENCY_WORD = { monthly: 'mensual', yearly: 'anual' };
     // Confetti for a completed gift. Decorative, so the page works without it (script blocked or reduced motion).
     var celebration = window.UiCelebration && window.DomBuilder ? window.UiCelebration.createCelebration({
         h: window.DomBuilder.createBuilder(document),
@@ -61,9 +64,9 @@
     function showThanks(detail, reference) {
         if (!thanks) { say(detail); return; } // an older cached page has no confirmation card
         say('');
-        document.getElementById('thanks-title').textContent = MSG.thanksTitle;
+        document.getElementById('thanks-title').textContent = t('thanks.title');
         document.getElementById('thanks-detail').textContent = detail;
-        document.getElementById('thanks-ref').textContent = reference ? 'Referencia: ' + reference : '';
+        document.getElementById('thanks-ref').textContent = reference ? t('thanks.reference', { id: reference }) : '';
         controls.hidden = true;
         thanks.hidden = false;
         thanks.focus();
@@ -111,7 +114,7 @@
 
     function showFallback() {
         onceLink.hidden = false;
-        say(MSG.sdkFailed);
+        say(t('errors.sdkFailed'));
     }
 
     function renderOnce() {
@@ -121,7 +124,7 @@
         onceButtons.replaceChildren();
         onceLink.hidden = true;
         setFallbackLink(raw);
-        if (!validOnceAmount(raw)) { say(MSG.badAmount); return; }
+        if (!validOnceAmount(raw)) { say(t('errors.badAmount')); return; }
         if (!onceConfig || !onceConfig.clientId) { showFallback(); return; }
         var slot = document.createElement('div');
         onceButtons.appendChild(slot);
@@ -134,12 +137,12 @@
                 description: DESCRIPTION,
                 onApproved: function (details) {
                     if (details && details.status === 'COMPLETED') {
-                        showThanks('Recibimos tu aporte único de $' + raw + ' USD. ' + MSG.receipt, details.id);
+                        showThanks(t('thanks.once', { amount: raw }), details.id);
                     } else {
-                        say(MSG.pending);
+                        say(t('errors.pending'));
                     }
                 },
-                onError: function (error) { report('checkout', error, { frequency: 'once' }); say(MSG.failed); },
+                onError: function (error) { report('checkout', error, { frequency: 'once' }); say(t('errors.failed')); },
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
@@ -147,7 +150,7 @@
             report('render', error, { frequency: 'once' });
             console.error('Apoyanos: the one-time buttons failed to render', error);
             onceLink.hidden = false;
-            say(MSG.failed);
+            say(t('errors.failed'));
         });
     }
 
@@ -157,10 +160,10 @@
         var token = ++renderToken;
         say('');
         plansBox.replaceChildren();
-        if (!recurring || !PayPalCheckout.parseQuantity) { say(MSG.recurringUnavailable); return; }
+        if (!recurring || !PayPalCheckout.parseQuantity) { say(t('errors.recurringUnavailable')); return; }
         var quantity = PayPalCheckout.parseQuantity(amountText(), recurring.minimumAmount, recurring.maximumAmount);
         if (quantity === null) {
-            say('Escribe un monto entero entre $' + recurring.minimumAmount + ' y $' + recurring.maximumAmount + ', sin decimales.');
+            say(t('errors.badWholeAmount', { min: recurring.minimumAmount, max: recurring.maximumAmount }));
             return;
         }
         var frequency = state.frequency; // the donor may change it before PayPal answers
@@ -172,17 +175,16 @@
                 planId: recurring.plans[frequency],
                 quantity: quantity,
                 onApproved: function (subscriptionId) {
-                    showThanks('Tu aporte ' + FREQUENCY_WORD[frequency] + ' de $' + (quantity * recurring.unitPrice) + ' ' + recurring.currency + ' quedó activo. ' + MSG.receipt
-                        + ' Puedes cancelarlo cuando quieras desde tu cuenta de PayPal.', subscriptionId);
+                    showThanks(t('thanks.' + frequency, { amount: quantity * recurring.unitPrice, currency: recurring.currency }), subscriptionId);
                 },
-                onError: function (error) { report('subscribe', error, { frequency: frequency, quantity: quantity }); say(MSG.failed); },
+                onError: function (error) { report('subscribe', error, { frequency: frequency, quantity: quantity }); say(t('errors.failed')); },
             });
         }).catch(function (error) {
             if (token !== renderToken) { return; }
-            if (error && error.message === 'sdk') { report('sdk', 'PayPal SDK did not load', { frequency: frequency, quantity: quantity }); say(MSG.sdkFailedRecurring); return; }
+            if (error && error.message === 'sdk') { report('sdk', 'PayPal SDK did not load', { frequency: frequency, quantity: quantity }); say(t('errors.sdkFailedRecurring')); return; }
             report('render', error, { frequency: frequency, quantity: quantity });
             console.error('Apoyanos: the subscribe button failed to render', error);
-            say(MSG.failed);
+            say(t('errors.failed'));
         });
     }
 
@@ -241,17 +243,20 @@
 
     // The one-time buttons are the default view: load them when the donate section is about to show,
     // not on page load, so the page stays light for visitors who never reach it.
+    // It waits for the translations: the first render can already show a message.
     var donate = document.getElementById('dar');
-    if (onceConfig && onceConfig.clientId && 'IntersectionObserver' in window) {
-        var near = new IntersectionObserver(function (entries) {
-            if (!entries[0].isIntersecting) { return; }
-            near.disconnect();
+    i18nReady.then(function () {
+        if (onceConfig && onceConfig.clientId && 'IntersectionObserver' in window) {
+            var near = new IntersectionObserver(function (entries) {
+                if (!entries[0].isIntersecting) { return; }
+                near.disconnect();
+                refresh();
+            }, { rootMargin: '400px' });
+            near.observe(donate);
+        } else if (onceConfig && onceConfig.clientId) {
             refresh();
-        }, { rootMargin: '400px' });
-        near.observe(donate);
-    } else if (onceConfig && onceConfig.clientId) {
-        refresh();
-    } else {
-        showFallback();
-    }
+        } else {
+            showFallback();
+        }
+    });
 })();
