@@ -49,7 +49,7 @@ test('apply: a language without an Apóyanos translation keeps the button hidden
 test('apply: switching language back and forth toggles it both ways', () => {
     const el = button(['hidden']);
     apply(el, 'en');
-    apply(el, 'fr');
+    apply(el, 'ko');
     assert.equal(el.classes.has('hidden'), true);
     apply(el, 'es');
     assert.equal(el.classes.has('hidden'), false);
